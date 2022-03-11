@@ -1,5 +1,7 @@
 My Spot - Exporation
 
+Check it out on the AppStore: https://apps.apple.com/us/app/my-spot-exploration/id1613618373
+
 ---What is My Spot---
 
 My Spot is a simple app that allows users to create spots that save photos, location, date, and description info to keep track of certain locations. It also alows for spots to be uploaded and shared to others.
@@ -16,6 +18,8 @@ Everyone! Whether you are a skater, hiker, mountain biker, etc, or maybe you jus
 
 ---How to Use My Spot---
 
+Demo Video: https://youtu.be/ps4c8E3vbX0
+
 When starting My Spot you are greeted with the my spots tab where you can start by adding a spot. These spots are stored locally in core data unless the public slider is checked in which case it is uploaded to a database hoted in cloudkit.
 
 Quick interaction:
@@ -31,3 +35,10 @@ My Spot needs the following:
 - an icloud account to upload, download, or browse spots hosted with cloudkit
 - location services to create a spot (Spots MUST be created in the location, cooridinates are taken from gps and connot be entered manually)
 - camera access to take a photo of spot (Spot photos cannot be taken from photo library)
+
+---libraries used---
+
+- Swiftui
+- MapKit
+- Combine
+- CloudKit
