@@ -1,0 +1,637 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 55;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		C51503AE27D7C347009F0DCD /* My_SpotApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = C51503AD27D7C347009F0DCD /* My_SpotApp.swift */; };
+		C51503B027D7C347009F0DCD /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C51503AF27D7C347009F0DCD /* ContentView.swift */; };
+		C51503B227D7C349009F0DCD /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C51503B127D7C349009F0DCD /* Assets.xcassets */; };
+		C51503B527D7C349009F0DCD /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C51503B427D7C349009F0DCD /* Preview Assets.xcassets */; };
+		C51503C027D7C531009F0DCD /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C51503BF27D7C531009F0DCD /* CloudKit.framework */; };
+		C51503DD27D7C856009F0DCD /* UIImageTransformer.swift in Sources */ = {isa = PBXBuildFile; fileRef = C51503D427D7C856009F0DCD /* UIImageTransformer.swift */; };
+		C51503DE27D7C856009F0DCD /* SpotFromCloud.swift in Sources */ = {isa = PBXBuildFile; fileRef = C51503D527D7C856009F0DCD /* SpotFromCloud.swift */; };
+		C51503DF27D7C856009F0DCD /* Playlist+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = C51503D627D7C856009F0DCD /* Playlist+CoreDataClass.swift */; };
+		C51503E027D7C856009F0DCD /* Playlist+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = C51503D727D7C856009F0DCD /* Playlist+CoreDataProperties.swift */; };
+		C51503E127D7C856009F0DCD /* Spot+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = C51503D827D7C856009F0DCD /* Spot+CoreDataClass.swift */; };
+		C51503E227D7C856009F0DCD /* Spot+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = C51503D927D7C856009F0DCD /* Spot+CoreDataProperties.swift */; };
+		C51503E327D7C856009F0DCD /* CoreDataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C51503DA27D7C856009F0DCD /* CoreDataManager.swift */; };
+		C51503E427D7C856009F0DCD /* Spots.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = C51503DB27D7C856009F0DCD /* Spots.xcdatamodeld */; };
+		C51503E727D7C87D009F0DCD /* CloudKitViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C51503E627D7C87D009F0DCD /* CloudKitViewModel.swift */; };
+		C51503F327D7CA1D009F0DCD /* ViewSingleSpotOnMap.swift in Sources */ = {isa = PBXBuildFile; fileRef = C51503F027D7CA1D009F0DCD /* ViewSingleSpotOnMap.swift */; };
+		C51503F427D7CA1D009F0DCD /* MapViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C51503F127D7CA1D009F0DCD /* MapViewModel.swift */; };
+		C51503F527D7CA1D009F0DCD /* ViewOnlyUserOnMap.swift in Sources */ = {isa = PBXBuildFile; fileRef = C51503F227D7CA1D009F0DCD /* ViewOnlyUserOnMap.swift */; };
+		C51503FC27D7CA60009F0DCD /* MySpotsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C51503F927D7CA60009F0DCD /* MySpotsView.swift */; };
+		C51503FD27D7CA60009F0DCD /* DiscoverView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C51503FA27D7CA60009F0DCD /* DiscoverView.swift */; };
+		C51503FE27D7CA60009F0DCD /* PlaylistView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C51503FB27D7CA60009F0DCD /* PlaylistView.swift */; };
+		C515040227D7CA72009F0DCD /* SpotRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = C51503FF27D7CA72009F0DCD /* SpotRow.swift */; };
+		C515040327D7CA72009F0DCD /* AddSpotSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = C515040027D7CA72009F0DCD /* AddSpotSheet.swift */; };
+		C515040427D7CA72009F0DCD /* DetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C515040127D7CA72009F0DCD /* DetailView.swift */; };
+		C515040727D7CA7B009F0DCD /* DiscoverRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = C515040527D7CA7B009F0DCD /* DiscoverRow.swift */; };
+		C515040827D7CA7B009F0DCD /* DiscoverDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C515040627D7CA7B009F0DCD /* DiscoverDetailView.swift */; };
+		C515040D27D7CA87009F0DCD /* DetailedPlaylistView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C515040927D7CA87009F0DCD /* DetailedPlaylistView.swift */; };
+		C515040E27D7CA87009F0DCD /* PlaylistRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = C515040A27D7CA87009F0DCD /* PlaylistRow.swift */; };
+		C515040F27D7CA87009F0DCD /* AddSpotToPlaylistSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = C515040B27D7CA87009F0DCD /* AddSpotToPlaylistSheet.swift */; };
+		C515041027D7CA87009F0DCD /* AddPlaylistSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = C515040C27D7CA87009F0DCD /* AddPlaylistSheet.swift */; };
+		C515041427D7CAA3009F0DCD /* ViewMapSpots.swift in Sources */ = {isa = PBXBuildFile; fileRef = C515041127D7CAA3009F0DCD /* ViewMapSpots.swift */; };
+		C515041527D7CAA3009F0DCD /* SpotMapPreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = C515041227D7CAA3009F0DCD /* SpotMapPreview.swift */; };
+		C515041627D7CAA3009F0DCD /* MapAnnotationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C515041327D7CAA3009F0DCD /* MapAnnotationView.swift */; };
+		C515041A27D7CAAA009F0DCD /* DiscoverMapPreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = C515041727D7CAAA009F0DCD /* DiscoverMapPreview.swift */; };
+		C515041B27D7CAAA009F0DCD /* MapAnnotationDiscover.swift in Sources */ = {isa = PBXBuildFile; fileRef = C515041827D7CAAA009F0DCD /* MapAnnotationDiscover.swift */; };
+		C515041C27D7CAAA009F0DCD /* ViewDiscoverSpots.swift in Sources */ = {isa = PBXBuildFile; fileRef = C515041927D7CAAA009F0DCD /* ViewDiscoverSpots.swift */; };
+		C515041E27D7CAB1009F0DCD /* ViewPlaylistMap.swift in Sources */ = {isa = PBXBuildFile; fileRef = C515041D27D7CAB1009F0DCD /* ViewPlaylistMap.swift */; };
+		C515042327D7CAC6009F0DCD /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = C515042027D7CAC6009F0DCD /* Constants.swift */; };
+		C515042427D7CAC6009F0DCD /* TakePhoto.swift in Sources */ = {isa = PBXBuildFile; fileRef = C515042127D7CAC6009F0DCD /* TakePhoto.swift */; };
+		C515042527D7CAC6009F0DCD /* UIEmojiTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = C515042227D7CAC6009F0DCD /* UIEmojiTextField.swift */; };
+		C515042927D8540A009F0DCD /* TabController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C515042827D8540A009F0DCD /* TabController.swift */; };
+		C515042C27D95225009F0DCD /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C515042B27D95225009F0DCD /* LaunchScreen.storyboard */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		C51503AA27D7C347009F0DCD /* My Spot.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "My Spot.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		C51503AD27D7C347009F0DCD /* My_SpotApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = My_SpotApp.swift; sourceTree = "<group>"; };
+		C51503AF27D7C347009F0DCD /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		C51503B127D7C349009F0DCD /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		C51503B427D7C349009F0DCD /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		C51503BD27D7C52C009F0DCD /* My Spot.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "My Spot.entitlements"; sourceTree = "<group>"; };
+		C51503BF27D7C531009F0DCD /* CloudKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CloudKit.framework; path = System/Library/Frameworks/CloudKit.framework; sourceTree = SDKROOT; };
+		C51503D427D7C856009F0DCD /* UIImageTransformer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UIImageTransformer.swift; sourceTree = "<group>"; };
+		C51503D527D7C856009F0DCD /* SpotFromCloud.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SpotFromCloud.swift; sourceTree = "<group>"; };
+		C51503D627D7C856009F0DCD /* Playlist+CoreDataClass.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Playlist+CoreDataClass.swift"; sourceTree = "<group>"; };
+		C51503D727D7C856009F0DCD /* Playlist+CoreDataProperties.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Playlist+CoreDataProperties.swift"; sourceTree = "<group>"; };
+		C51503D827D7C856009F0DCD /* Spot+CoreDataClass.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Spot+CoreDataClass.swift"; sourceTree = "<group>"; };
+		C51503D927D7C856009F0DCD /* Spot+CoreDataProperties.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Spot+CoreDataProperties.swift"; sourceTree = "<group>"; };
+		C51503DA27D7C856009F0DCD /* CoreDataManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoreDataManager.swift; sourceTree = "<group>"; };
+		C51503DC27D7C856009F0DCD /* Spots.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Spots.xcdatamodel; sourceTree = "<group>"; };
+		C51503E627D7C87D009F0DCD /* CloudKitViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CloudKitViewModel.swift; sourceTree = "<group>"; };
+		C51503F027D7CA1D009F0DCD /* ViewSingleSpotOnMap.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ViewSingleSpotOnMap.swift; sourceTree = "<group>"; };
+		C51503F127D7CA1D009F0DCD /* MapViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MapViewModel.swift; sourceTree = "<group>"; };
+		C51503F227D7CA1D009F0DCD /* ViewOnlyUserOnMap.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ViewOnlyUserOnMap.swift; sourceTree = "<group>"; };
+		C51503F927D7CA60009F0DCD /* MySpotsView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MySpotsView.swift; sourceTree = "<group>"; };
+		C51503FA27D7CA60009F0DCD /* DiscoverView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DiscoverView.swift; sourceTree = "<group>"; };
+		C51503FB27D7CA60009F0DCD /* PlaylistView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlaylistView.swift; sourceTree = "<group>"; };
+		C51503FF27D7CA72009F0DCD /* SpotRow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SpotRow.swift; sourceTree = "<group>"; };
+		C515040027D7CA72009F0DCD /* AddSpotSheet.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AddSpotSheet.swift; sourceTree = "<group>"; };
+		C515040127D7CA72009F0DCD /* DetailView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DetailView.swift; sourceTree = "<group>"; };
+		C515040527D7CA7B009F0DCD /* DiscoverRow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DiscoverRow.swift; sourceTree = "<group>"; };
+		C515040627D7CA7B009F0DCD /* DiscoverDetailView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DiscoverDetailView.swift; sourceTree = "<group>"; };
+		C515040927D7CA87009F0DCD /* DetailedPlaylistView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DetailedPlaylistView.swift; sourceTree = "<group>"; };
+		C515040A27D7CA87009F0DCD /* PlaylistRow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlaylistRow.swift; sourceTree = "<group>"; };
+		C515040B27D7CA87009F0DCD /* AddSpotToPlaylistSheet.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AddSpotToPlaylistSheet.swift; sourceTree = "<group>"; };
+		C515040C27D7CA87009F0DCD /* AddPlaylistSheet.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AddPlaylistSheet.swift; sourceTree = "<group>"; };
+		C515041127D7CAA3009F0DCD /* ViewMapSpots.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ViewMapSpots.swift; sourceTree = "<group>"; };
+		C515041227D7CAA3009F0DCD /* SpotMapPreview.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SpotMapPreview.swift; sourceTree = "<group>"; };
+		C515041327D7CAA3009F0DCD /* MapAnnotationView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MapAnnotationView.swift; sourceTree = "<group>"; };
+		C515041727D7CAAA009F0DCD /* DiscoverMapPreview.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DiscoverMapPreview.swift; sourceTree = "<group>"; };
+		C515041827D7CAAA009F0DCD /* MapAnnotationDiscover.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MapAnnotationDiscover.swift; sourceTree = "<group>"; };
+		C515041927D7CAAA009F0DCD /* ViewDiscoverSpots.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ViewDiscoverSpots.swift; sourceTree = "<group>"; };
+		C515041D27D7CAB1009F0DCD /* ViewPlaylistMap.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ViewPlaylistMap.swift; sourceTree = "<group>"; };
+		C515042027D7CAC6009F0DCD /* Constants.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
+		C515042127D7CAC6009F0DCD /* TakePhoto.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TakePhoto.swift; sourceTree = "<group>"; };
+		C515042227D7CAC6009F0DCD /* UIEmojiTextField.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UIEmojiTextField.swift; sourceTree = "<group>"; };
+		C515042827D8540A009F0DCD /* TabController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabController.swift; sourceTree = "<group>"; };
+		C515042A27D95154009F0DCD /* My-Spot-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "My-Spot-Info.plist"; sourceTree = SOURCE_ROOT; };
+		C515042B27D95225009F0DCD /* LaunchScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		C51503A727D7C347009F0DCD /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C51503C027D7C531009F0DCD /* CloudKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		C51503A127D7C347009F0DCD = {
+			isa = PBXGroup;
+			children = (
+				C51503AC27D7C347009F0DCD /* My Spot */,
+				C51503AB27D7C347009F0DCD /* Products */,
+				C51503BE27D7C531009F0DCD /* Frameworks */,
+			);
+			sourceTree = "<group>";
+		};
+		C51503AB27D7C347009F0DCD /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				C51503AA27D7C347009F0DCD /* My Spot.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		C51503AC27D7C347009F0DCD /* My Spot */ = {
+			isa = PBXGroup;
+			children = (
+				C515042A27D95154009F0DCD /* My-Spot-Info.plist */,
+				C515041F27D7CABD009F0DCD /* Helper */,
+				C51503E827D7C9B1009F0DCD /* View */,
+				C51503E527D7C871009F0DCD /* Cloud */,
+				C51503D327D7C848009F0DCD /* Model */,
+				C51503BD27D7C52C009F0DCD /* My Spot.entitlements */,
+				C51503AD27D7C347009F0DCD /* My_SpotApp.swift */,
+				C51503AF27D7C347009F0DCD /* ContentView.swift */,
+				C51503B127D7C349009F0DCD /* Assets.xcassets */,
+				C51503B327D7C349009F0DCD /* Preview Content */,
+				C515042B27D95225009F0DCD /* LaunchScreen.storyboard */,
+			);
+			path = "My Spot";
+			sourceTree = "<group>";
+		};
+		C51503B327D7C349009F0DCD /* Preview Content */ = {
+			isa = PBXGroup;
+			children = (
+				C51503B427D7C349009F0DCD /* Preview Assets.xcassets */,
+			);
+			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		C51503BE27D7C531009F0DCD /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				C51503BF27D7C531009F0DCD /* CloudKit.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		C51503D327D7C848009F0DCD /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				C51503DA27D7C856009F0DCD /* CoreDataManager.swift */,
+				C51503D627D7C856009F0DCD /* Playlist+CoreDataClass.swift */,
+				C51503D727D7C856009F0DCD /* Playlist+CoreDataProperties.swift */,
+				C51503D827D7C856009F0DCD /* Spot+CoreDataClass.swift */,
+				C51503D927D7C856009F0DCD /* Spot+CoreDataProperties.swift */,
+				C51503D527D7C856009F0DCD /* SpotFromCloud.swift */,
+				C51503DB27D7C856009F0DCD /* Spots.xcdatamodeld */,
+				C51503D427D7C856009F0DCD /* UIImageTransformer.swift */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		C51503E527D7C871009F0DCD /* Cloud */ = {
+			isa = PBXGroup;
+			children = (
+				C51503E627D7C87D009F0DCD /* CloudKitViewModel.swift */,
+			);
+			path = Cloud;
+			sourceTree = "<group>";
+		};
+		C51503E827D7C9B1009F0DCD /* View */ = {
+			isa = PBXGroup;
+			children = (
+				C51503EB27D7C9E2009F0DCD /* Main View */,
+				C51503EA27D7C9DB009F0DCD /* Sub View */,
+				C51503E927D7C9CE009F0DCD /* Map */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		C51503E927D7C9CE009F0DCD /* Map */ = {
+			isa = PBXGroup;
+			children = (
+				C51503F127D7CA1D009F0DCD /* MapViewModel.swift */,
+				C51503F227D7CA1D009F0DCD /* ViewOnlyUserOnMap.swift */,
+				C51503F027D7CA1D009F0DCD /* ViewSingleSpotOnMap.swift */,
+				C51503EF27D7CA10009F0DCD /* Discover */,
+				C51503EE27D7CA03009F0DCD /* Playlist */,
+				C51503EC27D7C9F6009F0DCD /* Spot */,
+			);
+			path = Map;
+			sourceTree = "<group>";
+		};
+		C51503EA27D7C9DB009F0DCD /* Sub View */ = {
+			isa = PBXGroup;
+			children = (
+				C51503F827D7CA49009F0DCD /* Playlist */,
+				C51503F727D7CA3F009F0DCD /* Discover */,
+				C51503F627D7CA31009F0DCD /* Spot */,
+			);
+			path = "Sub View";
+			sourceTree = "<group>";
+		};
+		C51503EB27D7C9E2009F0DCD /* Main View */ = {
+			isa = PBXGroup;
+			children = (
+				C51503FA27D7CA60009F0DCD /* DiscoverView.swift */,
+				C51503F927D7CA60009F0DCD /* MySpotsView.swift */,
+				C51503FB27D7CA60009F0DCD /* PlaylistView.swift */,
+			);
+			path = "Main View";
+			sourceTree = "<group>";
+		};
+		C51503EC27D7C9F6009F0DCD /* Spot */ = {
+			isa = PBXGroup;
+			children = (
+				C515041327D7CAA3009F0DCD /* MapAnnotationView.swift */,
+				C515041227D7CAA3009F0DCD /* SpotMapPreview.swift */,
+				C515041127D7CAA3009F0DCD /* ViewMapSpots.swift */,
+			);
+			path = Spot;
+			sourceTree = "<group>";
+		};
+		C51503EE27D7CA03009F0DCD /* Playlist */ = {
+			isa = PBXGroup;
+			children = (
+				C515041D27D7CAB1009F0DCD /* ViewPlaylistMap.swift */,
+			);
+			path = Playlist;
+			sourceTree = "<group>";
+		};
+		C51503EF27D7CA10009F0DCD /* Discover */ = {
+			isa = PBXGroup;
+			children = (
+				C515041727D7CAAA009F0DCD /* DiscoverMapPreview.swift */,
+				C515041827D7CAAA009F0DCD /* MapAnnotationDiscover.swift */,
+				C515041927D7CAAA009F0DCD /* ViewDiscoverSpots.swift */,
+			);
+			path = Discover;
+			sourceTree = "<group>";
+		};
+		C51503F627D7CA31009F0DCD /* Spot */ = {
+			isa = PBXGroup;
+			children = (
+				C515040027D7CA72009F0DCD /* AddSpotSheet.swift */,
+				C515040127D7CA72009F0DCD /* DetailView.swift */,
+				C51503FF27D7CA72009F0DCD /* SpotRow.swift */,
+			);
+			path = Spot;
+			sourceTree = "<group>";
+		};
+		C51503F727D7CA3F009F0DCD /* Discover */ = {
+			isa = PBXGroup;
+			children = (
+				C515040627D7CA7B009F0DCD /* DiscoverDetailView.swift */,
+				C515040527D7CA7B009F0DCD /* DiscoverRow.swift */,
+			);
+			path = Discover;
+			sourceTree = "<group>";
+		};
+		C51503F827D7CA49009F0DCD /* Playlist */ = {
+			isa = PBXGroup;
+			children = (
+				C515040C27D7CA87009F0DCD /* AddPlaylistSheet.swift */,
+				C515040B27D7CA87009F0DCD /* AddSpotToPlaylistSheet.swift */,
+				C515040927D7CA87009F0DCD /* DetailedPlaylistView.swift */,
+				C515040A27D7CA87009F0DCD /* PlaylistRow.swift */,
+			);
+			path = Playlist;
+			sourceTree = "<group>";
+		};
+		C515041F27D7CABD009F0DCD /* Helper */ = {
+			isa = PBXGroup;
+			children = (
+				C515042027D7CAC6009F0DCD /* Constants.swift */,
+				C515042127D7CAC6009F0DCD /* TakePhoto.swift */,
+				C515042227D7CAC6009F0DCD /* UIEmojiTextField.swift */,
+				C515042827D8540A009F0DCD /* TabController.swift */,
+			);
+			path = Helper;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		C51503A927D7C347009F0DCD /* My Spot */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = C51503B827D7C349009F0DCD /* Build configuration list for PBXNativeTarget "My Spot" */;
+			buildPhases = (
+				C51503A627D7C347009F0DCD /* Sources */,
+				C51503A727D7C347009F0DCD /* Frameworks */,
+				C51503A827D7C347009F0DCD /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "My Spot";
+			productName = "My Spot";
+			productReference = C51503AA27D7C347009F0DCD /* My Spot.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		C51503A227D7C347009F0DCD /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1320;
+				LastUpgradeCheck = 1320;
+				TargetAttributes = {
+					C51503A927D7C347009F0DCD = {
+						CreatedOnToolsVersion = 13.2.1;
+					};
+				};
+			};
+			buildConfigurationList = C51503A527D7C347009F0DCD /* Build configuration list for PBXProject "My Spot" */;
+			compatibilityVersion = "Xcode 13.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = C51503A127D7C347009F0DCD;
+			productRefGroup = C51503AB27D7C347009F0DCD /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				C51503A927D7C347009F0DCD /* My Spot */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		C51503A827D7C347009F0DCD /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C515042C27D95225009F0DCD /* LaunchScreen.storyboard in Resources */,
+				C51503B527D7C349009F0DCD /* Preview Assets.xcassets in Resources */,
+				C51503B227D7C349009F0DCD /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		C51503A627D7C347009F0DCD /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C515042927D8540A009F0DCD /* TabController.swift in Sources */,
+				C515040827D7CA7B009F0DCD /* DiscoverDetailView.swift in Sources */,
+				C515042327D7CAC6009F0DCD /* Constants.swift in Sources */,
+				C51503E127D7C856009F0DCD /* Spot+CoreDataClass.swift in Sources */,
+				C51503E427D7C856009F0DCD /* Spots.xcdatamodeld in Sources */,
+				C51503E227D7C856009F0DCD /* Spot+CoreDataProperties.swift in Sources */,
+				C51503B027D7C347009F0DCD /* ContentView.swift in Sources */,
+				C515041C27D7CAAA009F0DCD /* ViewDiscoverSpots.swift in Sources */,
+				C51503F427D7CA1D009F0DCD /* MapViewModel.swift in Sources */,
+				C51503FC27D7CA60009F0DCD /* MySpotsView.swift in Sources */,
+				C515041B27D7CAAA009F0DCD /* MapAnnotationDiscover.swift in Sources */,
+				C51503AE27D7C347009F0DCD /* My_SpotApp.swift in Sources */,
+				C51503FD27D7CA60009F0DCD /* DiscoverView.swift in Sources */,
+				C51503DD27D7C856009F0DCD /* UIImageTransformer.swift in Sources */,
+				C515040F27D7CA87009F0DCD /* AddSpotToPlaylistSheet.swift in Sources */,
+				C51503F327D7CA1D009F0DCD /* ViewSingleSpotOnMap.swift in Sources */,
+				C51503E027D7C856009F0DCD /* Playlist+CoreDataProperties.swift in Sources */,
+				C51503F527D7CA1D009F0DCD /* ViewOnlyUserOnMap.swift in Sources */,
+				C515041A27D7CAAA009F0DCD /* DiscoverMapPreview.swift in Sources */,
+				C515042427D7CAC6009F0DCD /* TakePhoto.swift in Sources */,
+				C515040727D7CA7B009F0DCD /* DiscoverRow.swift in Sources */,
+				C515042527D7CAC6009F0DCD /* UIEmojiTextField.swift in Sources */,
+				C515040E27D7CA87009F0DCD /* PlaylistRow.swift in Sources */,
+				C515041E27D7CAB1009F0DCD /* ViewPlaylistMap.swift in Sources */,
+				C515040D27D7CA87009F0DCD /* DetailedPlaylistView.swift in Sources */,
+				C51503E727D7C87D009F0DCD /* CloudKitViewModel.swift in Sources */,
+				C515040427D7CA72009F0DCD /* DetailView.swift in Sources */,
+				C515041427D7CAA3009F0DCD /* ViewMapSpots.swift in Sources */,
+				C51503E327D7C856009F0DCD /* CoreDataManager.swift in Sources */,
+				C515041527D7CAA3009F0DCD /* SpotMapPreview.swift in Sources */,
+				C515040327D7CA72009F0DCD /* AddSpotSheet.swift in Sources */,
+				C515041627D7CAA3009F0DCD /* MapAnnotationView.swift in Sources */,
+				C515041027D7CA87009F0DCD /* AddPlaylistSheet.swift in Sources */,
+				C51503DE27D7C856009F0DCD /* SpotFromCloud.swift in Sources */,
+				C51503FE27D7CA60009F0DCD /* PlaylistView.swift in Sources */,
+				C515040227D7CA72009F0DCD /* SpotRow.swift in Sources */,
+				C51503DF27D7C856009F0DCD /* Playlist+CoreDataClass.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		C51503B627D7C349009F0DCD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.2;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		C51503B727D7C349009F0DCD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.2;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		C51503B927D7C349009F0DCD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = "My Spot/My Spot.entitlements";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"My Spot/Preview Content\"";
+				DEVELOPMENT_TEAM = 2HAP7LLHCJ;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "My-Spot-Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "My Spot";
+				INFOPLIST_KEY_NSCameraUsageDescription = "mySpot needs your camera to save a picture of your spot";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "mySpot needs your location to save and view your spots";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
+				INFOPLIST_KEY_UIStatusBarHidden = NO;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.2;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.isaacpaschall.My-Spot";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		C51503BA27D7C349009F0DCD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = "My Spot/My Spot.entitlements";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"My Spot/Preview Content\"";
+				DEVELOPMENT_TEAM = 2HAP7LLHCJ;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "My-Spot-Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "My Spot";
+				INFOPLIST_KEY_NSCameraUsageDescription = "mySpot needs your camera to save a picture of your spot";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "mySpot needs your location to save and view your spots";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
+				INFOPLIST_KEY_UIStatusBarHidden = NO;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.2;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.isaacpaschall.My-Spot";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		C51503A527D7C347009F0DCD /* Build configuration list for PBXProject "My Spot" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C51503B627D7C349009F0DCD /* Debug */,
+				C51503B727D7C349009F0DCD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		C51503B827D7C349009F0DCD /* Build configuration list for PBXNativeTarget "My Spot" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C51503B927D7C349009F0DCD /* Debug */,
+				C51503BA27D7C349009F0DCD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCVersionGroup section */
+		C51503DB27D7C856009F0DCD /* Spots.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				C51503DC27D7C856009F0DCD /* Spots.xcdatamodel */,
+			);
+			currentVersion = C51503DC27D7C856009F0DCD /* Spots.xcdatamodel */;
+			path = Spots.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+/* End XCVersionGroup section */
+	};
+	rootObject = C51503A227D7C347009F0DCD /* Project object */;
+}
