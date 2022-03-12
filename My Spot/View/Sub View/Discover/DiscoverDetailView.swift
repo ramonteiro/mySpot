@@ -21,7 +21,7 @@ struct DiscoverDetailView: View {
     @Environment(\.presentationMode) var presentationMode
     @Environment(\.managedObjectContext) var moc
     @EnvironmentObject var tabController: TabController
-    @StateObject var mapViewModel: MapViewModel
+    @EnvironmentObject var mapViewModel: MapViewModel
     
     @State private var nameInTitle = ""
     @State private var isSaving = false
@@ -54,7 +54,7 @@ struct DiscoverDetailView: View {
                 Text(spot.description)
             }
             Section(header: Text("Location")) {
-                ViewSingleSpotOnMap(mapViewModel: mapViewModel, singlePin: [SinglePin(name: spot.name, coordinate: spot.location.coordinate)])
+                ViewSingleSpotOnMap(singlePin: [SinglePin(name: spot.name, coordinate: spot.location.coordinate)])
                     .aspectRatio(contentMode: .fit)
                     .cornerRadius(15)
                 Button("Take Me To \(spot.name)") {

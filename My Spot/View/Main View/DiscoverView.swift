@@ -16,8 +16,8 @@ import MapKit
 
 struct DiscoverView: View {
     
-    @StateObject var mapViewModel: MapViewModel
-    @StateObject var cloudViewModel: CloudKitViewModel
+    @EnvironmentObject var mapViewModel: MapViewModel
+    @EnvironmentObject var cloudViewModel: CloudKitViewModel
     @EnvironmentObject var tabController: TabController
     
     @State private var hasInternet = true
@@ -125,6 +125,7 @@ struct DiscoverView: View {
                 .navigationBarItems(trailing:
                                         HStack {
                     Button {
+                        mapViewModel.checkLocationAuthorization()
                         if (isSearchingPickedLocation) {
                             loadSpotsFromDB(location: CLLocation(latitude: mapViewModel.searchingHere.center.latitude, longitude: mapViewModel.searchingHere.center.longitude))
                         } else {
@@ -140,7 +141,7 @@ struct DiscoverView: View {
                     }) {
                         Image(systemName: "map").imageScale(.large)
                     }
-                        .sheet(isPresented: $showingMapSheet, content: { ViewDiscoverSpots(mapViewModel: mapViewModel, cloudViewModel: cloudViewModel) })
+                        .sheet(isPresented: $showingMapSheet, content: { ViewDiscoverSpots() })
                 })
             if (isLoading) {
                 ZStack {
@@ -162,7 +163,7 @@ struct DiscoverView: View {
         ScrollViewReader { prox in
                 List {
                 ForEach(searchResults, id: \.self) { spot in
-                    NavigationLink(destination: DiscoverDetailView(spot: spot, mapViewModel: mapViewModel)) {
+                    NavigationLink(destination: DiscoverDetailView(spot: spot)) {
                         DiscoverRow(spot: spot)
                             .id(spot)
                     }
@@ -222,6 +223,7 @@ struct DiscoverView: View {
                 UserDefaults.standard.set(false, forKey: UserDefaultKeys.isFilterByLocation)
                 loadSpotsFromDB(location: CLLocation(latitude: mapViewModel.searchingHere.center.latitude, longitude: mapViewModel.searchingHere.center.longitude))
             } else {
+                mapViewModel.checkLocationAuthorization()
                 locationIcon = LocationForSorting.locationOn
                 UserDefaults.standard.set(true, forKey: UserDefaultKeys.isFilterByLocation)
                 loadSpotsFromDB(location: CLLocation(latitude: mapViewModel.region.center.latitude, longitude: mapViewModel.region.center.longitude))

@@ -17,8 +17,8 @@ import MapKit
 struct DetailPlaylistView: View {
     
     @ObservedObject var playlist: Playlist
-    @StateObject var mapViewModel: MapViewModel
-    @StateObject var cloudViewModel: CloudKitViewModel
+    @EnvironmentObject var mapViewModel: MapViewModel
+    @EnvironmentObject var cloudViewModel: CloudKitViewModel
     @Environment(\.managedObjectContext) var moc
     @Environment(\.presentationMode) var presentationMode
     @EnvironmentObject var tabController: TabController
@@ -108,7 +108,7 @@ struct DetailPlaylistView: View {
                 }
                 .disabled(playlist.spotArr.count == 0)
                 .sheet(isPresented: $showingMapSheet) {
-                    ViewPlaylistMap(mapViewModel: mapViewModel, playlist: playlist)
+                    ViewPlaylistMap(playlist: playlist)
                 }
                 Button(action: {
                     if (locationIcon == LocationForSorting.locationOn) {
@@ -136,6 +136,7 @@ struct DetailPlaylistView: View {
                 locationIcon = LocationForSorting.locationOff
                 UserDefaults.standard.set(false, forKey: UserDefaultKeys.isFilterByLocation)
             } else {
+                mapViewModel.checkLocationAuthorization()
                 locationIcon = LocationForSorting.locationOn
                 UserDefaults.standard.set(true, forKey: UserDefaultKeys.isFilterByLocation)
                 filter()
@@ -182,7 +183,7 @@ struct DetailPlaylistView: View {
     private var listFiltered: some View {
         List {
             ForEach(filteredSpots) { spot in
-                NavigationLink(destination: DetailView(fromPlaylist: true, cloudViewModel: cloudViewModel, mapViewModel: mapViewModel, spot: spot)) {
+                NavigationLink(destination: DetailView(fromPlaylist: true, spot: spot)) {
                     SpotRow(spot: spot)
                 }
             }
@@ -193,7 +194,7 @@ struct DetailPlaylistView: View {
     private var listUnfiltered: some View {
         List {
             ForEach(playlist.spotArr) { spot in
-                NavigationLink(destination: DetailView(fromPlaylist: true, cloudViewModel: cloudViewModel, mapViewModel: mapViewModel, spot: spot)) {
+                NavigationLink(destination: DetailView(fromPlaylist: true, spot: spot)) {
                     SpotRow(spot: spot)
                 }
             }

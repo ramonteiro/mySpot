@@ -18,8 +18,8 @@ import CoreData
 struct ViewDiscoverSpots: View {
     
     @Environment(\.presentationMode) var presentationMode
-    @StateObject var mapViewModel: MapViewModel
-    @StateObject var cloudViewModel: CloudKitViewModel
+    @EnvironmentObject var mapViewModel: MapViewModel
+    @EnvironmentObject var cloudViewModel: CloudKitViewModel
     @State private var selection = 0
     @State private var originalRegion = MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: 33.714712646421, longitude: -112.29072718706581), span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01))
     @State private var transIn: Edge = .leading
@@ -175,7 +175,7 @@ struct ViewDiscoverSpots: View {
         }
         .accentColor(.red)
         .sheet(isPresented: $showingDetailsSheet) {
-            DetailsDiscoverSheet(spot: cloudViewModel.spots[selection], mapViewModel: mapViewModel)
+            DetailsDiscoverSheet(spot: cloudViewModel.spots[selection])
         }
     }
     
@@ -197,7 +197,7 @@ struct DetailsDiscoverSheet: View {
     
     var spot: SpotFromCloud
     @Environment(\.managedObjectContext) var moc
-    @StateObject var mapViewModel: MapViewModel
+    @EnvironmentObject var mapViewModel: MapViewModel
     
     @State private var isSaving = false
     @State private var newName = ""
@@ -231,7 +231,7 @@ struct DetailsDiscoverSheet: View {
                     Text(spot.description)
                 }
                 Section(header: Text("Location")) {
-                    ViewSingleSpotOnMap(mapViewModel: mapViewModel, singlePin: [SinglePin(name: spot.name, coordinate: CLLocationCoordinate2D(latitude: spot.location.coordinate.latitude, longitude: spot.location.coordinate.longitude))])
+                    ViewSingleSpotOnMap(singlePin: [SinglePin(name: spot.name, coordinate: CLLocationCoordinate2D(latitude: spot.location.coordinate.latitude, longitude: spot.location.coordinate.longitude))])
                         .aspectRatio(contentMode: .fit)
                         .cornerRadius(15)
                     Button("Take Me To \(spot.name)") {

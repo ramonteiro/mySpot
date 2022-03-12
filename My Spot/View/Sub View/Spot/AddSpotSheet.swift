@@ -19,8 +19,8 @@ struct AddSpotSheet: View {
     
     @Environment(\.presentationMode) var presentationMode
     @Environment(\.managedObjectContext) var moc
-    @StateObject var mapViewModel: MapViewModel
-    @StateObject var cloudViewModel: CloudKitViewModel
+    @EnvironmentObject var mapViewModel: MapViewModel
+    @EnvironmentObject var cloudViewModel: CloudKitViewModel
     
     @State private var showingAlert = false
     @State private var hasInternet = true
@@ -70,7 +70,7 @@ struct AddSpotSheet: View {
                         Section(header: Text("Spot Location")) {
                             Text("Latitude: \(getLongitude())")
                             Text("Longitude: \(getLatitude())")
-                            NavigationLink(destination: ViewOnlyUserOnMap(mapViewModel: mapViewModel)) {
+                            NavigationLink(destination: ViewOnlyUserOnMap()) {
                                 Text("Show Map")
                             }
                         }

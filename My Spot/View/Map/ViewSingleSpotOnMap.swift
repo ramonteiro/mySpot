@@ -21,7 +21,7 @@ struct SinglePin: Identifiable {
 
 struct ViewSingleSpotOnMap: View {
     
-    @StateObject var mapViewModel: MapViewModel
+    @EnvironmentObject var mapViewModel: MapViewModel
     @State var singlePin: [SinglePin]
     
     var body: some View {

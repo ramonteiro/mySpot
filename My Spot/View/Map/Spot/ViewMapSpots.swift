@@ -16,7 +16,7 @@ import MapKit
 struct ViewMapSpots: View {
     @Environment(\.presentationMode) var presentationMode
     @FetchRequest(sortDescriptors: []) var spots: FetchedResults<Spot>
-    @StateObject var mapViewModel: MapViewModel
+    @EnvironmentObject var mapViewModel: MapViewModel
     @State private var selection = 0
     @State private var transIn: Edge = .leading
     @State private var transOut: Edge = .bottom
@@ -160,7 +160,7 @@ struct ViewMapSpots: View {
         }
         .accentColor(.red)
         .sheet(isPresented: $showingDetailsSheet) {
-            DetailsSheet(spot: spots[selection], mapViewModel: mapViewModel)
+            DetailsSheet(spot: spots[selection])
         }
     }
 }

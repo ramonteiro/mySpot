@@ -16,8 +16,8 @@ import MapKit
 struct ViewPlaylistMap: View {
     
     @Environment(\.presentationMode) var presentationMode
-    @StateObject var mapViewModel: MapViewModel
-    @StateObject var playlist: Playlist
+    @EnvironmentObject var mapViewModel: MapViewModel
+    @ObservedObject var playlist: Playlist
     @State private var selection = 0
     @State private var transIn: Edge = .leading
     @State private var transOut: Edge = .bottom
@@ -161,7 +161,7 @@ struct ViewPlaylistMap: View {
         }
         .accentColor(.red)
         .sheet(isPresented: $showingDetailsSheet) {
-            DetailsSheet(spot: playlist.spotArr[selection], mapViewModel: mapViewModel)
+            DetailsSheet(spot: playlist.spotArr[selection])
         }
     }
 }
@@ -170,7 +170,7 @@ struct ViewPlaylistMap: View {
 struct DetailsSheet: View {
     
     var spot: Spot
-    @StateObject var mapViewModel: MapViewModel
+    @EnvironmentObject var mapViewModel: MapViewModel
     
     var body: some View {
         NavigationView {
@@ -186,7 +186,7 @@ struct DetailsSheet: View {
                             Text(spot.details!)
                         }
                         Section(header: Text("Location")) {
-                            ViewSingleSpotOnMap(mapViewModel: mapViewModel, singlePin: [SinglePin(name: spot.name!, coordinate: CLLocationCoordinate2D(latitude: spot.x, longitude: spot.y))])
+                            ViewSingleSpotOnMap(singlePin: [SinglePin(name: spot.name!, coordinate: CLLocationCoordinate2D(latitude: spot.x, longitude: spot.y))])
                                 .aspectRatio(contentMode: .fit)
                                 .cornerRadius(15)
                             Button("Take Me To \(spot.name!)") {

@@ -21,7 +21,10 @@ struct My_SpotApp: App {
     
     var body: some Scene {
         WindowGroup {
-            ContentView(mapViewModel: mapViewModel, cloudViewModel: cloudViewModel).environment(\.managedObjectContext, dataController.container.viewContext)
+            ContentView()
+                .environment(\.managedObjectContext, dataController.container.viewContext)
+                .environmentObject(mapViewModel)
+                .environmentObject(cloudViewModel)
         }
     }
 }

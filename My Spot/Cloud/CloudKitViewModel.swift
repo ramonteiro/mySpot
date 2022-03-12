@@ -18,7 +18,7 @@ class CloudKitViewModel: ObservableObject {
         getiCloudStatus()
     }
     
-    private func getiCloudStatus() {
+    func getiCloudStatus() {
         CKContainer.default().accountStatus { [weak self] returnedStatus, returnedError in
             DispatchQueue.main.async {
                 switch returnedStatus {

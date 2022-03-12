@@ -9,28 +9,28 @@ import SwiftUI
 
 struct ContentView: View {
     
-    @StateObject var mapViewModel: MapViewModel
-    @StateObject var cloudViewModel: CloudKitViewModel
-    
+    @Environment(\.scenePhase) private var scenePhase
+    @EnvironmentObject var cloudViewModel: CloudKitViewModel
+    @EnvironmentObject var mapViewModel: MapViewModel
     @StateObject private var tabController = TabController()
     
     var body: some View {
         TabView(selection: $tabController.activeTab) {
-            MySpotsView(mapViewModel: mapViewModel, cloudViewModel: cloudViewModel)
+            MySpotsView()
                 .tabItem() {
                     Image(systemName: "mappin.and.ellipse")
                     Text("My Spots")
                 }
                 .tag(Tab.spots)
                 .accentColor(.red)
-            DiscoverView(mapViewModel: mapViewModel, cloudViewModel: cloudViewModel)
+            DiscoverView()
                 .tabItem() {
                     Image(systemName: "magnifyingglass")
                     Text("Discover")
                 }
                 .tag(Tab.discover)
                 .accentColor(.red)
-            PlaylistView(mapViewModel: mapViewModel, cloudViewModel: cloudViewModel)
+            PlaylistView()
                 .tabItem() {
                     Image(systemName: "books.vertical")
                     Text("Playlists")
@@ -38,6 +38,12 @@ struct ContentView: View {
                 .tag(Tab.playlists)
                 .accentColor(.red)
         }
+        .onChange(of: scenePhase, perform: { newValue in
+            if newValue == .active {
+                cloudViewModel.getiCloudStatus()
+                mapViewModel.checkLocationAuthorization()
+            }
+        })
         .onReceive(tabController.$activeTab) { selection in
             if (selection == Tab.spots) {
                 // spot pressed

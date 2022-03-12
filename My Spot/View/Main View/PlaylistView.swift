@@ -19,8 +19,8 @@ struct PlaylistView: View {
     ]) var playlists: FetchedResults<Playlist>
     @Environment(\.managedObjectContext) var moc
     
-    @StateObject var mapViewModel: MapViewModel
-    @StateObject var cloudViewModel: CloudKitViewModel
+    @EnvironmentObject var mapViewModel: MapViewModel
+    @EnvironmentObject var cloudViewModel: CloudKitViewModel
     
     @State private var showingAddPlaylistSheet = false
     
@@ -29,7 +29,7 @@ struct PlaylistView: View {
             ZStack {
                 List {
                     ForEach(playlists) { playlist in
-                        NavigationLink(destination: DetailPlaylistView(playlist: playlist, mapViewModel: mapViewModel, cloudViewModel: cloudViewModel)) {
+                        NavigationLink(destination: DetailPlaylistView(playlist: playlist)) {
                             PlaylistRow(playlist: playlist)
                         }
                     }

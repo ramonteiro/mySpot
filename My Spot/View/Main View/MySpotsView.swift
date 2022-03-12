@@ -21,9 +21,8 @@ struct MySpotsView: View {
         NSSortDescriptor( keyPath: \Spot.name, ascending: true)
     ], animation: .default) var spots: FetchedResults<Spot>
     @Environment(\.managedObjectContext) var moc
-    
-    @StateObject var mapViewModel: MapViewModel
-    @StateObject var cloudViewModel: CloudKitViewModel
+    @EnvironmentObject var mapViewModel: MapViewModel
+    @EnvironmentObject var cloudViewModel: CloudKitViewModel
     
     @State private var showingAddSheet = false
     @State private var showingMapSheet = false
@@ -43,7 +42,7 @@ struct MySpotsView: View {
                             Image(systemName: "map").imageScale(.large)
                         }
                         .sheet(isPresented: $showingMapSheet) {
-                            ViewMapSpots(mapViewModel: mapViewModel)
+                            ViewMapSpots()
                         }
                         .disabled(spots.isEmpty)
                         Button(action: {
@@ -56,7 +55,7 @@ struct MySpotsView: View {
                             Image(systemName: "plus").imageScale(.large)
                         }
                         .sheet(isPresented: $showingAddSheet) {
-                            AddSpotSheet(mapViewModel: mapViewModel, cloudViewModel: cloudViewModel)
+                            AddSpotSheet()
                         }
                     })
                     .navigationBarItems(leading: displayLocationIcon.disabled(!mapViewModel.isAuthorized))
@@ -73,7 +72,7 @@ struct MySpotsView: View {
                         }
                         .disabled(spots.isEmpty)
                         .sheet(isPresented: $showingMapSheet) {
-                            ViewMapSpots(mapViewModel: mapViewModel)
+                            ViewMapSpots()
                         }
                         Button(action: {
                             if (locationIcon == LocationForSorting.locationOn) {
@@ -85,7 +84,7 @@ struct MySpotsView: View {
                             Image(systemName: "plus").imageScale(.large)
                         }
                         .sheet(isPresented: $showingAddSheet) {
-                            AddSpotSheet(mapViewModel: mapViewModel, cloudViewModel: cloudViewModel)
+                            AddSpotSheet()
                         }
                     }
                     )
@@ -103,7 +102,7 @@ struct MySpotsView: View {
         ZStack {
             List {
                 ForEach(spots) { spot in
-                    NavigationLink(destination: DetailView(fromPlaylist: false, cloudViewModel: cloudViewModel, mapViewModel: mapViewModel, spot: spot)) {
+                    NavigationLink(destination: DetailView(fromPlaylist: false, spot: spot)) {
                         SpotRow(spot: spot)
                     }
                 }
@@ -137,7 +136,7 @@ struct MySpotsView: View {
         ZStack {
             List {
                 ForEach(filteredSpots) { spot in
-                    NavigationLink(destination: DetailView(fromPlaylist: false, cloudViewModel: cloudViewModel, mapViewModel: mapViewModel, spot: spot)) {
+                    NavigationLink(destination: DetailView(fromPlaylist: false, spot: spot)) {
                         SpotRow(spot: spot)
                     }
                 }
@@ -201,6 +200,7 @@ struct MySpotsView: View {
                 locationIcon = LocationForSorting.locationOff
                 UserDefaults.standard.set(false, forKey: UserDefaultKeys.isFilterByLocation)
             } else {
+                mapViewModel.checkLocationAuthorization()
                 locationIcon = LocationForSorting.locationOn
                 UserDefaults.standard.set(true, forKey: UserDefaultKeys.isFilterByLocation)
                 filter()

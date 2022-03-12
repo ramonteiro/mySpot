@@ -15,7 +15,7 @@ import MapKit
 
 struct ViewOnlyUserOnMap: View {
     
-    @StateObject var mapViewModel: MapViewModel
+    @EnvironmentObject var mapViewModel: MapViewModel
     
     var body: some View {
         ZStack {

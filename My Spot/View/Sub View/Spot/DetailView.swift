@@ -18,8 +18,8 @@ import Network
 struct DetailView: View {
     
     var fromPlaylist: Bool
-    @StateObject var cloudViewModel: CloudKitViewModel
-    @StateObject var mapViewModel: MapViewModel
+    @EnvironmentObject var cloudViewModel: CloudKitViewModel
+    @EnvironmentObject var mapViewModel: MapViewModel
     @ObservedObject var spot:Spot
     @Environment(\.managedObjectContext) var moc
     @Environment(\.presentationMode) var presentationMode
@@ -90,7 +90,7 @@ struct DetailView: View {
                         Text(spot.details!)
                     }
                     Section(header: Text("Location")) {
-                        ViewSingleSpotOnMap(mapViewModel: mapViewModel, singlePin: [SinglePin(name: spot.name!, coordinate: CLLocationCoordinate2D(latitude: spot.x, longitude: spot.y))])
+                        ViewSingleSpotOnMap(singlePin: [SinglePin(name: spot.name!, coordinate: CLLocationCoordinate2D(latitude: spot.x, longitude: spot.y))])
                             .aspectRatio(contentMode: .fit)
                             .cornerRadius(15)
                         Button("Take Me To \(spot.name!)") {
