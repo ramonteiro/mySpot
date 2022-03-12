@@ -23,10 +23,9 @@ struct DiscoverView: View {
     @State private var hasInternet = true
     @State private var showingMapSheet = false
     @State private var isLoading = false
-    @State private var isSearchingPickedLocation = false
     @State private var searchText = ""
-    @State private var locationIcon = "location"
     @State private var searchLocationName = ""
+    @State private var sortBy = "Sort By: Closest"
     
     let monitor = NWPathMonitor()
     
@@ -44,9 +43,6 @@ struct DiscoverView: View {
             if (hasInternet) {
                 if (cloudViewModel.isSignedInToiCloud) {
                 displaySpotsFromDB
-                    .onAppear {
-                        setFilteringType()
-                    }
                 } else {
                     displaySignInToIcloudPrompt
                         .navigationTitle("Discover Spots")
@@ -59,10 +55,11 @@ struct DiscoverView: View {
         .accentColor(.red)
         .onAppear {
             checkForInternetConnection()
+            mapViewModel.searchingHere = mapViewModel.region
             if (cloudViewModel.spots.count == 0) {
-                loadSpotsFromDB(location: CLLocation(latitude: mapViewModel.region.center.latitude, longitude: mapViewModel.region.center.longitude))
+                loadSpotsFromDB(location: CLLocation(latitude: mapViewModel.searchingHere.center.latitude, longitude: mapViewModel.searchingHere.center.longitude))
             }
-            mapViewModel.getPlacmarkOfLocation(location: CLLocation(latitude: mapViewModel.region.center.latitude, longitude: mapViewModel.region.center.longitude)) { location in
+            mapViewModel.getPlacmarkOfLocation(location: CLLocation(latitude: mapViewModel.searchingHere.center.latitude, longitude: mapViewModel.searchingHere.center.longitude)) { location in
                 searchLocationName = location
             }
         }
@@ -121,28 +118,26 @@ struct DiscoverView: View {
         ZStack {
             listSpots
                 .navigationTitle("Discover Spots")
-                .navigationBarItems(leading: displayLocationIcon.disabled(!mapViewModel.isAuthorized))
-                .navigationBarItems(trailing:
-                                        HStack {
-                    Button {
-                        mapViewModel.checkLocationAuthorization()
-                        if (isSearchingPickedLocation) {
-                            loadSpotsFromDB(location: CLLocation(latitude: mapViewModel.searchingHere.center.latitude, longitude: mapViewModel.searchingHere.center.longitude))
-                        } else {
-                            loadSpotsFromDB(location: CLLocation(latitude: mapViewModel.region.center.latitude, longitude: mapViewModel.region.center.longitude))
+                .toolbar {
+                    ToolbarItemGroup(placement: .navigationBarTrailing) {
+                        HStack {
+                            Button {
+                                mapViewModel.checkLocationAuthorization()
+                                loadSpotsFromDB(location: CLLocation(latitude: mapViewModel.searchingHere.center.latitude, longitude: mapViewModel.searchingHere.center.longitude))
+                                
+                            } label: {
+                                Image(systemName: "arrow.triangle.2.circlepath")
+                            }
+                            
+                            Button(action: {
+                                showingMapSheet.toggle()
+                            }) {
+                                Image(systemName: "map").imageScale(.large)
+                            }
+                            .sheet(isPresented: $showingMapSheet, content: { ViewDiscoverSpots() })
                         }
-                        
-                    } label: {
-                        Image(systemName: "arrow.triangle.2.circlepath")
                     }
-
-                    Button(action: {
-                        showingMapSheet.toggle()
-                    }) {
-                        Image(systemName: "map").imageScale(.large)
-                    }
-                        .sheet(isPresented: $showingMapSheet, content: { ViewDiscoverSpots() })
-                })
+                }
             if (isLoading) {
                 ZStack {
                     ProgressView("Loading Spots")
@@ -182,64 +177,11 @@ struct DiscoverView: View {
                 mapViewModel.getPlacmarkOfLocation(location: CLLocation(latitude: mapViewModel.searchingHere.center.latitude, longitude: mapViewModel.searchingHere.center.longitude)) { location in
                     searchLocationName = location
                 }
-                isSearchingPickedLocation = true
-            }
-            .onChange(of: locationIcon) { icon in
-                if (icon == LocationForSorting.locationOff) {
-                    isSearchingPickedLocation = true
-                    mapViewModel.getPlacmarkOfLocation(location: CLLocation(latitude: mapViewModel.searchingHere.center.latitude, longitude: mapViewModel.searchingHere.center.longitude)) { location in
-                        searchLocationName = location
-                    }
-                } else {
-                    isSearchingPickedLocation = false
-                    mapViewModel.getPlacmarkOfLocation(location: CLLocation(latitude: mapViewModel.region.center.latitude, longitude: mapViewModel.region.center.longitude)) { location in
-                        searchLocationName = location
-                    }
-                }
             }
         }
     }
     
     private func distanceBetween(x1: Double, x2: Double, y1: Double, y2: Double) -> Double {
         return (((x2 - x1) * (x2 - x1))+((y2 - y1) * (y2 - y1))).squareRoot()
-    }
-    
-    private func setFilteringType() {
-        if (UserDefaults.standard.valueExists(forKey: UserDefaultKeys.isFilterByLocation)) {
-            if (UserDefaults.standard.value(forKey: UserDefaultKeys.isFilterByLocation) as! Bool == false) {
-                locationIcon = LocationForSorting.locationOff
-            } else {
-                locationIcon = LocationForSorting.locationOn
-            }
-        } else {
-            locationIcon = LocationForSorting.locationOff
-        }
-    }
-    
-    private var displayLocationIcon: some View {
-        Button(action: {
-            if (locationIcon == LocationForSorting.locationOn) {
-                locationIcon = LocationForSorting.locationOff
-                UserDefaults.standard.set(false, forKey: UserDefaultKeys.isFilterByLocation)
-                loadSpotsFromDB(location: CLLocation(latitude: mapViewModel.searchingHere.center.latitude, longitude: mapViewModel.searchingHere.center.longitude))
-            } else {
-                mapViewModel.checkLocationAuthorization()
-                locationIcon = LocationForSorting.locationOn
-                UserDefaults.standard.set(true, forKey: UserDefaultKeys.isFilterByLocation)
-                loadSpotsFromDB(location: CLLocation(latitude: mapViewModel.region.center.latitude, longitude: mapViewModel.region.center.longitude))
-            }
-        }) {
-            Image(systemName: locationIcon).imageScale(.large)
-        }
-        .onChange(of: mapViewModel.isAuthorized) { newValue in
-            if (!newValue) {
-                locationIcon = LocationForSorting.locationOff
-                UserDefaults.standard.set(false, forKey: UserDefaultKeys.isFilterByLocation)
-            }
-        }
-        .onChange(of: mapViewModel.searchingHere.center.latitude) { newValue in
-            locationIcon = LocationForSorting.locationOff
-            UserDefaults.standard.set(false, forKey: UserDefaultKeys.isFilterByLocation)
-        }
     }
 }

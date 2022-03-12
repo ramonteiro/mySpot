@@ -34,7 +34,7 @@ struct ViewDiscoverSpots: View {
         }
         .onAppear {
             withAnimation {
-                spotRegion = mapViewModel.region
+                spotRegion = mapViewModel.searchingHere
             }
             originalRegion = spotRegion
         }
@@ -196,6 +196,7 @@ struct ViewDiscoverSpots: View {
 struct DetailsDiscoverSheet: View {
     
     var spot: SpotFromCloud
+    @Environment(\.presentationMode) var presentationMode
     @Environment(\.managedObjectContext) var moc
     @EnvironmentObject var mapViewModel: MapViewModel
     
@@ -275,6 +276,15 @@ struct DetailsDiscoverSheet: View {
                         nameIsFocused = false
                     }
                     .accentColor(.blue)
+                }
+                ToolbarItemGroup(placement: .navigationBarLeading) {
+                    Button {
+                        presentationMode.wrappedValue.dismiss()
+                    } label: {
+                        Image(systemName: "arrowshape.turn.up.backward").imageScale(.large)
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .accentColor(.red)
                 }
             }
         }

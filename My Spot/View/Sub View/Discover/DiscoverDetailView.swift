@@ -20,14 +20,19 @@ struct DiscoverDetailView: View {
     var spot: SpotFromCloud
     @Environment(\.presentationMode) var presentationMode
     @Environment(\.managedObjectContext) var moc
+    @FetchRequest(sortDescriptors: []) var likedIds: FetchedResults<Likes>
     @EnvironmentObject var tabController: TabController
     @EnvironmentObject var mapViewModel: MapViewModel
+    @EnvironmentObject var cloudViewModel: CloudKitViewModel
     
     @State private var nameInTitle = ""
     @State private var isSaving = false
+    @State private var likeButton = "hand.thumbsup"
     @State private var newName = ""
+    @State private var likes = 0
     @State private var imageLoaded: Bool = false
     @State private var isSaved: Bool = false
+    @State private var didLikeNow = false
     @FocusState private var nameIsFocused: Bool
     
     var body: some View {
@@ -97,6 +102,21 @@ struct DiscoverDetailView: View {
             isSaving = false
             imageLoaded = false
             newName = ""
+            likes = spot.likes
+            var didlike = false
+            print("\(likedIds.count)")
+            for i in likedIds {
+                print(i.likedId ?? "none?")
+            }
+            for i in likedIds {
+                if i.likedId == String(spot.location.coordinate.latitude + spot.location.coordinate.longitude) + spot.name {
+                    didlike = true
+                    break
+                }
+            }
+            if (didlike) {
+                likeButton = "hand.thumbsup.fill"
+            }
         }
         .navigationTitle(nameInTitle)
         .toolbar {
@@ -105,6 +125,39 @@ struct DiscoverDetailView: View {
                     nameIsFocused = false
                 }
                 .accentColor(.blue)
+            }
+            ToolbarItemGroup(placement: .navigationBarTrailing) {
+                Text("\(likes)")
+                    .foregroundColor(.red)
+                Button(action: {
+                    if (!didLikeNow) {
+                        if (likeButton == "hand.thumbsup") {
+                            let newLike = Likes(context: moc)
+                            newLike.likedId = String(spot.location.coordinate.latitude + spot.location.coordinate.longitude) + spot.name
+                            try? moc.save()
+                            didLikeNow = true
+                            likeButton = "hand.thumbsup.fill"
+                            cloudViewModel.likeSpot(spot: spot, like: true)
+                            likes += 1
+                        } else {
+                            for i in likedIds {
+                                if (i.likedId == String(spot.location.coordinate.latitude + spot.location.coordinate.longitude) + spot.name) {
+                                    moc.delete(i)
+                                    try? moc.save()
+                                    break
+                                }
+                            }
+                            didLikeNow = true
+                            likeButton = "hand.thumbsup"
+                            cloudViewModel.likeSpot(spot: spot, like: false)
+                            likes -= 1
+                        }
+                    }
+                }, label: {
+                    Image(systemName: likeButton)
+                })
+                .accentColor(.red)
+                .padding()
             }
         }
         .onChange(of: tabController.discoverPopToRoot) { _ in

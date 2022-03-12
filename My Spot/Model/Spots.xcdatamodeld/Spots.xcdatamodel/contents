@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="19574" systemVersion="21D62" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+    <entity name="Likes" representedClassName="Likes" syncable="YES">
+        <attribute name="likedId" optional="YES" attributeType="String"/>
+    </entity>
     <entity name="Playlist" representedClassName="Playlist" syncable="YES">
         <attribute name="emoji" optional="YES" attributeType="String"/>
         <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
@@ -24,5 +27,6 @@
     <elements>
         <element name="Playlist" positionX="-63" positionY="54" width="128" height="14"/>
         <element name="Spot" positionX="-63" positionY="-18" width="128" height="224"/>
+        <element name="Likes" positionX="-54" positionY="90" width="128" height="44"/>
     </elements>
 </model>

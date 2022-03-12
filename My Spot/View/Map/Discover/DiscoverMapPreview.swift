@@ -69,6 +69,13 @@ struct DiscoverMapPreview: View {
             
             Text("By: \(spot.founder)")
                 .font(.subheadline)
+            
+            HStack {
+                Image(systemName: "hand.thumbsup.fill")
+                    .font(.subheadline)
+                Text("\(spot.likes)")
+                    .font(.subheadline)
+            }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
     }

@@ -21,6 +21,10 @@ struct DiscoverRow: View {
                 Text(spot.name)
                 Text("By: \(spot.founder)").font(.subheadline).foregroundColor(.gray)
                 Text("On: \(spot.date)").font(.subheadline).foregroundColor(.gray)
+                HStack(spacing: 0) {
+                    Image(systemName: "hand.thumbsup.fill").font(.subheadline).foregroundColor(.gray)
+                    Text("\(spot.likes)").font(.subheadline).foregroundColor(.gray)
+                }
             }
             Spacer()
             Text(spot.emoji)

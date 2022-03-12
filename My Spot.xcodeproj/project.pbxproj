@@ -48,6 +48,8 @@
 		C515042527D7CAC6009F0DCD /* UIEmojiTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = C515042227D7CAC6009F0DCD /* UIEmojiTextField.swift */; };
 		C515042927D8540A009F0DCD /* TabController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C515042827D8540A009F0DCD /* TabController.swift */; };
 		C515042C27D95225009F0DCD /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C515042B27D95225009F0DCD /* LaunchScreen.storyboard */; };
+		C5F44E8D27DD3818001E9E32 /* Likes+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5F44E8B27DD3818001E9E32 /* Likes+CoreDataClass.swift */; };
+		C5F44E8E27DD3818001E9E32 /* Likes+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5F44E8C27DD3818001E9E32 /* Likes+CoreDataProperties.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -95,6 +97,8 @@
 		C515042827D8540A009F0DCD /* TabController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabController.swift; sourceTree = "<group>"; };
 		C515042A27D95154009F0DCD /* My-Spot-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "My-Spot-Info.plist"; sourceTree = SOURCE_ROOT; };
 		C515042B27D95225009F0DCD /* LaunchScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
+		C5F44E8B27DD3818001E9E32 /* Likes+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Likes+CoreDataClass.swift"; sourceTree = "<group>"; };
+		C5F44E8C27DD3818001E9E32 /* Likes+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Likes+CoreDataProperties.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -163,6 +167,8 @@
 		C51503D327D7C848009F0DCD /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				C5F44E8B27DD3818001E9E32 /* Likes+CoreDataClass.swift */,
+				C5F44E8C27DD3818001E9E32 /* Likes+CoreDataProperties.swift */,
 				C51503DA27D7C856009F0DCD /* CoreDataManager.swift */,
 				C51503D627D7C856009F0DCD /* Playlist+CoreDataClass.swift */,
 				C51503D727D7C856009F0DCD /* Playlist+CoreDataProperties.swift */,
@@ -398,6 +404,8 @@
 				C515041527D7CAA3009F0DCD /* SpotMapPreview.swift in Sources */,
 				C515040327D7CA72009F0DCD /* AddSpotSheet.swift in Sources */,
 				C515041627D7CAA3009F0DCD /* MapAnnotationView.swift in Sources */,
+				C5F44E8D27DD3818001E9E32 /* Likes+CoreDataClass.swift in Sources */,
+				C5F44E8E27DD3818001E9E32 /* Likes+CoreDataProperties.swift in Sources */,
 				C515041027D7CA87009F0DCD /* AddPlaylistSheet.swift in Sources */,
 				C51503DE27D7C856009F0DCD /* SpotFromCloud.swift in Sources */,
 				C51503FE27D7CA60009F0DCD /* PlaylistView.swift in Sources */,
@@ -532,7 +540,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = "My Spot/My Spot.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_ASSET_PATHS = "\"My Spot/Preview Content\"";
 				DEVELOPMENT_TEAM = 2HAP7LLHCJ;
 				ENABLE_PREVIEWS = YES;
@@ -568,7 +576,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = "My Spot/My Spot.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_ASSET_PATHS = "\"My Spot/Preview Content\"";
 				DEVELOPMENT_TEAM = 2HAP7LLHCJ;
 				ENABLE_PREVIEWS = YES;

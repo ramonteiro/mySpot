@@ -64,6 +64,7 @@ class CloudKitViewModel: ObservableObject {
         newSpot["type"] = type
         newSpot["emoji"] = emoji
         newSpot["id"] = UUID().uuidString
+        newSpot["likes"] = 0
         
         if let imageData = compressImage(image: image).pngData() {
             do {
@@ -112,8 +113,9 @@ class CloudKitViewModel: ObservableObject {
                 guard let type = record["type"] as? String else { return }
                 guard let emoji = record["emoji"] as? String else { return }
                 guard let image = record["image"] as? CKAsset else { return }
+                guard let likes = record["likes"] as? Int else { return }
                 let imageURL = image.fileURL
-                returnedSpots.append(SpotFromCloud(id: UUID(), name: name, founder: founder, description: description, date: date, location: location, type: type, emoji: emoji, imageURL: imageURL ?? URL(fileURLWithPath: "none"), record: record))
+                returnedSpots.append(SpotFromCloud(id: UUID(), name: name, founder: founder, description: description, date: date, location: location, type: type, emoji: emoji, imageURL: imageURL ?? URL(fileURLWithPath: "none"), likes: likes, record: record))
             case .failure(let error):
                 print("FETCH ERROR: \(error)")
             }
@@ -146,6 +148,20 @@ class CloudKitViewModel: ObservableObject {
         }
     }
     
+    func likeSpot(spot: SpotFromCloud, like: Bool) {
+        if (spot.likes < 1 && !like) {
+            return
+        }
+        let record = spot.record
+        if (like) {
+            record["likes"]! += 1
+        } else {
+            record["likes"]! -= 1
+        }
+        saveSpotPublic(record: record)
+        return
+    }
+    
     func fetchMoreSpotsPublic(cursor:CKQueryOperation.Cursor?)  {
 
         guard let cursorChecked = cursor else { return }
@@ -166,8 +182,9 @@ class CloudKitViewModel: ObservableObject {
                 guard let type = record["type"] as? String else { return }
                 guard let emoji = record["emoji"] as? String else { return }
                 guard let image = record["image"] as? CKAsset else { return }
+                guard let likes = record["likes"] as? Int else { return }
                 let imageURL = image.fileURL
-                returnedSpots.append(SpotFromCloud(id: UUID(), name: name, founder: founder, description: description, date: date, location: location, type: type, emoji: emoji, imageURL: imageURL ?? URL(fileURLWithPath: "none"), record: record))
+                returnedSpots.append(SpotFromCloud(id: UUID(), name: name, founder: founder, description: description, date: date, location: location, type: type, emoji: emoji, imageURL: imageURL ?? URL(fileURLWithPath: "none"), likes: likes, record: record))
             case .failure(let error):
                 print("FETCH ERROR: \(error)")
             }
