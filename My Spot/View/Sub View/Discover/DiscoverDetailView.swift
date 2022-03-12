@@ -32,7 +32,6 @@ struct DiscoverDetailView: View {
     @State private var likes = 0
     @State private var imageLoaded: Bool = false
     @State private var isSaved: Bool = false
-    @State private var didLikeNow = false
     @FocusState private var nameIsFocused: Bool
     
     var body: some View {
@@ -128,30 +127,28 @@ struct DiscoverDetailView: View {
             }
             ToolbarItemGroup(placement: .navigationBarTrailing) {
                 Text("\(likes)")
+                    .fontWeight(.bold)
                     .foregroundColor(.red)
+                    .offset(x: 26)
                 Button(action: {
-                    if (!didLikeNow) {
-                        if (likeButton == "hand.thumbsup") {
-                            let newLike = Likes(context: moc)
-                            newLike.likedId = String(spot.location.coordinate.latitude + spot.location.coordinate.longitude) + spot.name
-                            try? moc.save()
-                            didLikeNow = true
-                            likeButton = "hand.thumbsup.fill"
-                            cloudViewModel.likeSpot(spot: spot, like: true)
-                            likes += 1
-                        } else {
-                            for i in likedIds {
-                                if (i.likedId == String(spot.location.coordinate.latitude + spot.location.coordinate.longitude) + spot.name) {
-                                    moc.delete(i)
-                                    try? moc.save()
-                                    break
-                                }
+                    if (likeButton == "hand.thumbsup") {
+                        let newLike = Likes(context: moc)
+                        newLike.likedId = String(spot.location.coordinate.latitude + spot.location.coordinate.longitude) + spot.name
+                        try? moc.save()
+                        likeButton = "hand.thumbsup.fill"
+                        cloudViewModel.likeSpot(spot: spot, like: true)
+                        likes += 1
+                    } else {
+                        for i in likedIds {
+                            if (i.likedId == String(spot.location.coordinate.latitude + spot.location.coordinate.longitude) + spot.name) {
+                                moc.delete(i)
+                                try? moc.save()
+                                break
                             }
-                            didLikeNow = true
-                            likeButton = "hand.thumbsup"
-                            cloudViewModel.likeSpot(spot: spot, like: false)
-                            likes -= 1
                         }
+                        likeButton = "hand.thumbsup"
+                        cloudViewModel.likeSpot(spot: spot, like: false)
+                        likes -= 1
                     }
                 }, label: {
                     Image(systemName: likeButton)
