@@ -21,9 +21,9 @@ struct AddSpotToPlaylistSheet: View {
     var body: some View {
         NavigationView {
             if (!spots.isEmpty) {
-                displayAvailableSpots
+                availableSpots
             } else {
-                displayMessageNoSpotsAvailable
+                messageNoSpotsAvailable
             }
         }
         .interactiveDismissDisabled()
@@ -33,7 +33,7 @@ struct AddSpotToPlaylistSheet: View {
         presentationMode.wrappedValue.dismiss()
     }
     
-    private var displayAvailableSpots: some View {
+    private var availableSpots: some View {
         List(spots) { spot in
             if (spot.playlist == nil) {
                 SpotRow(spot: spot)
@@ -55,7 +55,7 @@ struct AddSpotToPlaylistSheet: View {
         .navigationTitle("Add Spots")
     }
     
-    private var displayMessageNoSpotsAvailable: some View {
+    private var messageNoSpotsAvailable: some View {
         HStack {
             Spacer()
             Text("No Spots Available To Add")

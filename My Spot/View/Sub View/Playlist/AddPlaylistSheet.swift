@@ -23,45 +23,34 @@ struct AddPlaylistSheet: View {
     @State private var emoji = ""
     @State private var isEmoji: Bool = true
     
-    @FocusState private var nameIsFocused: Bool
-    @FocusState private var emojiIsFocused: Bool
+    enum Field {
+        case emoji
+        case name
+    }
+    
+    @FocusState private var focusState: Field?
 
     var body: some View {
         NavigationView {
             Form {
                 Section(header: Text("Playlist Name")) {
-                    displayPlaylistNamePrompt
+                    playlistNamePrompt
                 }
                 Section(header: Text("Emoji ID")) {
-                    displayEmojiPrompt
+                    emojiPrompt
                 }
             }
             .accentColor(.red)
             .navigationTitle("Create Playlist")
             .toolbar {
                 ToolbarItemGroup(placement: .keyboard) {
-                    Button("Done") {
-                        nameIsFocused = false
-                        emojiIsFocused = false
-                    }
+                    doneButton
                 }
                 ToolbarItemGroup(placement: .navigationBarTrailing) {
-                    Button("Save") {
-                        save()
-                        close()
-                    }
-                    .padding()
-                    .disabled(name == "" || emoji == "")
+                    saveButton
                 }
                 ToolbarItemGroup(placement: .navigationBarLeading) {
-                    Button("Delete") {
-                        showingAlert = true
-                    }
-                    .alert("Are you sure you want to delete playlist?", isPresented: $showingAlert) {
-                        Button("Yes", role: .destructive) { close() }
-                    }
-                    .padding()
-                    .accentColor(.red)
+                    deleteButton
                 }
             }
         }
@@ -80,9 +69,36 @@ struct AddPlaylistSheet: View {
         try? moc.save()
     }
     
-    private var displayPlaylistNamePrompt: some View {
+    private var doneButton: some View {
+        Button("Done") {
+            focusState = nil
+        }
+    }
+    
+    private var saveButton: some View {
+        Button("Save") {
+            save()
+            close()
+        }
+        .padding()
+        .disabled(name == "" || emoji == "")
+    }
+    
+    private var deleteButton: some View {
+        Button("Delete") {
+            showingAlert = true
+        }
+        .alert("Are you sure you want to delete playlist?", isPresented: $showingAlert) {
+            Button("Yes", role: .destructive) { close() }
+        }
+        .padding()
+        .accentColor(.red)
+    }
+    
+    private var playlistNamePrompt: some View {
         TextField("Enter Playlist Name", text: $name)
-            .focused($nameIsFocused)
+            .focused($focusState, equals: .name)
+            .submitLabel(.next)
             .onReceive(Just(name)) { _ in
                 if (name.count > MaxCharLength.names) {
                     name = String(name.prefix(MaxCharLength.names))
@@ -90,11 +106,12 @@ struct AddPlaylistSheet: View {
             }
     }
     
-    private var displayEmojiPrompt: some View {
+    private var emojiPrompt: some View {
         EmojiTextField(text: $emoji, placeholder: "Enter Emoji")
+            .focused($focusState, equals: .emoji)
+            .submitLabel(.done)
             .onReceive(Just(emoji), perform: { _ in
                 self.emoji = String(self.emoji.onlyEmoji().prefix(MaxCharLength.emojis))
             })
-            .focused($emojiIsFocused)
     }
 }
