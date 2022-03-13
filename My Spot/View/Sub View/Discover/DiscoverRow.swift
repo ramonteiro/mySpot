@@ -30,7 +30,7 @@ struct DiscoverRow: View {
             Text(spot.emoji)
                 .font(.system(size: 50))
                 .overlay(Circle()
-                            .stroke(Color.green, lineWidth: 1)
+                            .stroke(Color.red, lineWidth: 1)
                             .frame(width: UIScreen.main.bounds.width * 0.16, height: UIScreen.main.bounds.height * (60/812), alignment: .center)
                 )
         }

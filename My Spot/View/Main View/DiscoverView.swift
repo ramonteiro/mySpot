@@ -157,10 +157,10 @@ struct DiscoverView: View {
     private var listSpots: some View {
         ScrollViewReader { prox in
                 List {
-                ForEach(searchResults, id: \.self) { spot in
-                    NavigationLink(destination: DiscoverDetailView(spot: spot)) {
-                        DiscoverRow(spot: spot)
-                            .id(spot)
+                    ForEach(searchResults.indices, id: \.self) { index in
+                    NavigationLink(destination: DiscoverDetailView(index: index)) {
+                        DiscoverRow(spot: searchResults[index])
+                            .id(searchResults[index])
                     }
                 }
             }

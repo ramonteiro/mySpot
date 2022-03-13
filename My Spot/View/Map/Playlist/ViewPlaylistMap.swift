@@ -171,6 +171,7 @@ struct DetailsSheet: View {
     
     var spot: Spot
     @EnvironmentObject var mapViewModel: MapViewModel
+    @Environment(\.presentationMode) var presentationMode
     
     var body: some View {
         NavigationView {
@@ -199,6 +200,17 @@ struct DetailsSheet: View {
                     }
                     .navigationTitle(spot.name!)
                     .listRowSeparator(.hidden)
+                    .toolbar {
+                        ToolbarItemGroup(placement: .navigationBarLeading) {
+                            Button {
+                                presentationMode.wrappedValue.dismiss()
+                            } label: {
+                                Image(systemName: "arrowshape.turn.up.backward").imageScale(.large)
+                            }
+                            .buttonStyle(.borderedProminent)
+                            .accentColor(.red)
+                        }
+                    }
                 }
             }
         }

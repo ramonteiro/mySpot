@@ -17,7 +17,7 @@ import CoreData
 
 struct DiscoverDetailView: View {
     
-    var spot: SpotFromCloud
+    var index: Int
     @Environment(\.presentationMode) var presentationMode
     @Environment(\.managedObjectContext) var moc
     @FetchRequest(sortDescriptors: []) var likedIds: FetchedResults<Likes>
@@ -29,14 +29,13 @@ struct DiscoverDetailView: View {
     @State private var isSaving = false
     @State private var likeButton = "hand.thumbsup"
     @State private var newName = ""
-    @State private var likes = 0
     @State private var imageLoaded: Bool = false
     @State private var isSaved: Bool = false
     @FocusState private var nameIsFocused: Bool
     
     var body: some View {
         Form {
-            if let url = spot.imageURL, let data = try? Data(contentsOf: url), let image = UIImage(data: data) {
+            if let url = cloudViewModel.spots[index].imageURL, let data = try? Data(contentsOf: url), let image = UIImage(data: data) {
                 Image(uiImage: image)
                     .resizable()
                     .scaledToFit()
@@ -53,17 +52,17 @@ struct DiscoverDetailView: View {
                     imageLoaded = false
                 }
             }
-            Text("Found by: \(spot.founder)\nOn \(spot.date)\nTag: \(spot.type)").font(.subheadline).foregroundColor(.gray)
+            Text("Found by: \(cloudViewModel.spots[index].founder)\nOn \(cloudViewModel.spots[index].date)\nTag: \(cloudViewModel.spots[index].type)").font(.subheadline).foregroundColor(.gray)
             Section(header: Text("Description")) {
-                Text(spot.description)
+                Text(cloudViewModel.spots[index].description)
             }
             Section(header: Text("Location")) {
-                ViewSingleSpotOnMap(singlePin: [SinglePin(name: spot.name, coordinate: spot.location.coordinate)])
+                ViewSingleSpotOnMap(singlePin: [SinglePin(name: cloudViewModel.spots[index].name, coordinate: cloudViewModel.spots[index].location.coordinate)])
                     .aspectRatio(contentMode: .fit)
                     .cornerRadius(15)
-                Button("Take Me To \(spot.name)") {
-                    let routeMeTo = MKMapItem(placemark: MKPlacemark(coordinate: CLLocationCoordinate2D(latitude: spot.location.coordinate.latitude, longitude: spot.location.coordinate.longitude)))
-                    routeMeTo.name = spot.name
+                Button("Take Me To \(cloudViewModel.spots[index].name)") {
+                    let routeMeTo = MKMapItem(placemark: MKPlacemark(coordinate: CLLocationCoordinate2D(latitude: cloudViewModel.spots[index].location.coordinate.latitude, longitude: cloudViewModel.spots[index].location.coordinate.longitude)))
+                    routeMeTo.name = cloudViewModel.spots[index].name
                     routeMeTo.openInMaps(launchOptions: nil)
                 }
                 .accentColor(.blue)
@@ -97,18 +96,13 @@ struct DiscoverDetailView: View {
             }
         }
         .onAppear() {
-            nameInTitle = spot.name
+            nameInTitle = cloudViewModel.spots[index].name
             isSaving = false
             imageLoaded = false
             newName = ""
-            likes = spot.likes
             var didlike = false
-            print("\(likedIds.count)")
             for i in likedIds {
-                print(i.likedId ?? "none?")
-            }
-            for i in likedIds {
-                if i.likedId == String(spot.location.coordinate.latitude + spot.location.coordinate.longitude) + spot.name {
+                if i.likedId == String(cloudViewModel.spots[index].location.coordinate.latitude + cloudViewModel.spots[index].location.coordinate.longitude) + cloudViewModel.spots[index].name {
                     didlike = true
                     break
                 }
@@ -126,29 +120,29 @@ struct DiscoverDetailView: View {
                 .accentColor(.blue)
             }
             ToolbarItemGroup(placement: .navigationBarTrailing) {
-                Text("\(likes)")
+                Text("\(cloudViewModel.spots[index].likes)")
                     .fontWeight(.bold)
                     .foregroundColor(.red)
                     .offset(x: 26)
                 Button(action: {
                     if (likeButton == "hand.thumbsup") {
                         let newLike = Likes(context: moc)
-                        newLike.likedId = String(spot.location.coordinate.latitude + spot.location.coordinate.longitude) + spot.name
+                        newLike.likedId = String(cloudViewModel.spots[index].location.coordinate.latitude + cloudViewModel.spots[index].location.coordinate.longitude) + cloudViewModel.spots[index].name
                         try? moc.save()
                         likeButton = "hand.thumbsup.fill"
-                        cloudViewModel.likeSpot(spot: spot, like: true)
-                        likes += 1
+                        cloudViewModel.likeSpot(spot: cloudViewModel.spots[index], like: true)
+                        cloudViewModel.spots[index].likes += 1
                     } else {
                         for i in likedIds {
-                            if (i.likedId == String(spot.location.coordinate.latitude + spot.location.coordinate.longitude) + spot.name) {
+                            if (i.likedId == String(cloudViewModel.spots[index].location.coordinate.latitude + cloudViewModel.spots[index].location.coordinate.longitude) + cloudViewModel.spots[index].name) {
                                 moc.delete(i)
                                 try? moc.save()
                                 break
                             }
                         }
                         likeButton = "hand.thumbsup"
-                        cloudViewModel.likeSpot(spot: spot, like: false)
-                        likes -= 1
+                        cloudViewModel.likeSpot(spot: cloudViewModel.spots[index], like: false)
+                        cloudViewModel.spots[index].likes -= 1
                     }
                 }, label: {
                     Image(systemName: likeButton)
@@ -164,7 +158,7 @@ struct DiscoverDetailView: View {
     
     private func isSpotInCoreData() -> [Spot] {
         let fetchRequest: NSFetchRequest<Spot> = Spot.fetchRequest()
-        fetchRequest.predicate = NSPredicate(format: "dbid == %@", spot.record.recordID.recordName as CVarArg)
+        fetchRequest.predicate = NSPredicate(format: "dbid == %@", cloudViewModel.spots[index].record.recordID.recordName as CVarArg)
         do {
             let spotsFound: [Spot] = try moc.fetch(fetchRequest)
             return spotsFound
@@ -174,20 +168,20 @@ struct DiscoverDetailView: View {
     }
     
     private func save() {
-        let url = spot.imageURL
+        let url = cloudViewModel.spots[index].imageURL
         if let data = try? Data(contentsOf: url), let image = UIImage(data: data) {
             let newSpot = Spot(context: moc)
-            newSpot.founder = spot.founder
-            newSpot.details = spot.description
+            newSpot.founder = cloudViewModel.spots[index].founder
+            newSpot.details = cloudViewModel.spots[index].description
             newSpot.image = image
             newSpot.name = newName
-            newSpot.x = spot.location.coordinate.latitude
-            newSpot.y = spot.location.coordinate.longitude
+            newSpot.x = cloudViewModel.spots[index].location.coordinate.latitude
+            newSpot.y = cloudViewModel.spots[index].location.coordinate.longitude
             newSpot.isPublic = false
-            newSpot.type = spot.type
-            newSpot.date = spot.date
+            newSpot.type = cloudViewModel.spots[index].type
+            newSpot.date = cloudViewModel.spots[index].date
             newSpot.id = UUID()
-            newSpot.dbid = spot.record.recordID.recordName
+            newSpot.dbid = cloudViewModel.spots[index].record.recordID.recordName
             try? moc.save()
         }
     }

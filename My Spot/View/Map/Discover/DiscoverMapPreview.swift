@@ -14,23 +14,14 @@ struct DiscoverMapPreview: View {
     @State private var imageLoaded: Bool = false
     
     var body: some View {
-        HStack(alignment: .bottom, spacing: 0) {
-            VStack(alignment: .leading, spacing: 16) {
-                displayImage
-                displayName
-            }
-            
-            VStack(spacing: 0) {
-                Text(spot.description)
-                    .frame(height: UIScreen.main.bounds.height * (120/812))
-                    .truncationMode(.tail)
-            }
+        HStack {
+            displayImage
+            displayName
         }
         .padding(20)
         .background(
             RoundedRectangle(cornerRadius: 10)
                 .fill(.ultraThinMaterial)
-                .offset(y: 65)
         )
         .cornerRadius(10)
     }
@@ -41,7 +32,7 @@ struct DiscoverMapPreview: View {
                 Image(uiImage: image)
                     .resizable()
                     .scaledToFill()
-                    .frame(width: UIScreen.main.bounds.width * (100/375), height: UIScreen.main.bounds.height * (100/812))
+                    .frame(width: UIScreen.main.bounds.width * (150/375), height: UIScreen.main.bounds.height * (150/812))
                     .cornerRadius(10)
                     .onAppear {
                         imageLoaded = true
@@ -58,25 +49,20 @@ struct DiscoverMapPreview: View {
             }
         }
         .padding(6)
-        .background(Color.green)
+        .background(.red)
         .cornerRadius(10)
     }
     
     private var displayName: some View {
-        VStack(alignment: .leading, spacing: 4) {
+        VStack(spacing: 4) {
             Text(spot.name)
                 .fontWeight(.bold)
             
             Text("By: \(spot.founder)")
                 .font(.subheadline)
-            
-            HStack {
-                Image(systemName: "hand.thumbsup.fill")
-                    .font(.subheadline)
-                Text("\(spot.likes)")
-                    .font(.subheadline)
-            }
+                .padding()
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
+        .frame(width: 125)
+        .frame(alignment: .top)
     }
 }

@@ -18,6 +18,6 @@ struct SpotFromCloud: Hashable, Identifiable {
     let type: String
     let emoji: String
     let imageURL: URL
-    let likes: Int
+    var likes: Int
     let record: CKRecord
 }

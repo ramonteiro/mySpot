@@ -20,7 +20,7 @@ enum Endpoints {
 }
 
 enum MaxCharLength {
-    static let names = 13
+    static let names = 20
     static let emojis = 1
     static let description = 1200
 }

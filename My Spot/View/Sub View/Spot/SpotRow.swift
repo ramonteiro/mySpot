@@ -17,11 +17,7 @@ struct SpotRow: View {
 
     var body: some View {
         if (checkIfItemExist()) {
-            if (spot.isPublic) {
-                displayGreenCircleImage
-            } else {
-                displayRedCircleImage
-            }
+            displayRedCircleImage
         }
     }
     
@@ -39,6 +35,12 @@ struct SpotRow: View {
                 Text(spot.name ?? "")
                 Text("By: \(spot.founder ?? "")").font(.subheadline).foregroundColor(.gray)
                 Text("On: \(spot.date ?? "")").font(.subheadline).foregroundColor(.gray)
+                if (spot.isPublic) {
+                    HStack {
+                        Text("Public").font(.subheadline).foregroundColor(.gray)
+                        Image(systemName: "globe").font(.subheadline).foregroundColor(.gray)
+                    }
+                }
             }
             Spacer()
             Image(uiImage: spot.image!)
@@ -47,22 +49,6 @@ struct SpotRow: View {
                 .frame(width: UIScreen.main.bounds.width * 0.16, height: UIScreen.main.bounds.height * (60/812), alignment: .center)
                 .overlay(Circle().stroke(Color.red, lineWidth: 1))
              
-        }
-    }
-    
-    private var displayGreenCircleImage: some View {
-        HStack {
-            VStack(alignment: .leading) {
-                Text(spot.name ?? "")
-                Text("By: \(spot.founder ?? "")").font(.subheadline).foregroundColor(.gray)
-                Text("On: \(spot.date ?? "")").font(.subheadline).foregroundColor(.gray)
-            }
-            Spacer()
-            Image(uiImage: spot.image!)
-                .resizable()
-                .clipShape(Circle())
-                .frame(width: UIScreen.main.bounds.width * 0.16, height: UIScreen.main.bounds.height * (60/812), alignment: .center)
-                .overlay(Circle().stroke(Color.green, lineWidth: 1))
         }
     }
 }

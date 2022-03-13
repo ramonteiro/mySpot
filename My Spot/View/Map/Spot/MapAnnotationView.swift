@@ -14,7 +14,7 @@ import SwiftUI
 
 struct MapAnnotationView: View {
     @ObservedObject var spot: Spot
-    @State private var colors:Color = .red
+
     var body: some View {
         ZStack {
             if (spot.playlist == nil) {
@@ -26,13 +26,13 @@ struct MapAnnotationView: View {
                         .font(.headline)
                         .foregroundColor(Color(UIColor.systemBackground))
                         .padding(6)
-                        .background(colors)
+                        .background(.red)
                         .cornerRadius(36)
                     
                     Image(systemName: "triangle.fill")
                         .resizable()
                         .scaledToFit()
-                        .foregroundColor(colors)
+                        .foregroundColor(.red)
                         .frame(width: UIScreen.main.bounds.width * (10/375), height: UIScreen.main.bounds.height * (10/812))
                         .rotationEffect(Angle(degrees: 180))
                         .offset(y: -1)
@@ -46,7 +46,7 @@ struct MapAnnotationView: View {
                             .frame(width: UIScreen.main.bounds.width * 9.5/100, height: UIScreen.main.bounds.height * (40/812), alignment: .center)
                             .offset(y: 8)
                         Circle()
-                            .stroke(colors, lineWidth: 2)
+                            .stroke(.red, lineWidth: 2)
                             .frame(width: UIScreen.main.bounds.width * 9.5/100, height: UIScreen.main.bounds.height * (40/812), alignment: .center)
                             .padding(6)
                             .offset(y: 8)
@@ -58,16 +58,11 @@ struct MapAnnotationView: View {
                     Image(systemName: "triangle.fill")
                         .resizable()
                         .scaledToFit()
-                        .foregroundColor(colors)
+                        .foregroundColor(.red)
                         .frame(width: UIScreen.main.bounds.width * (10/375), height: UIScreen.main.bounds.height * (10/812))
                         .rotationEffect(Angle(degrees: 180))
                         .padding(.bottom , UIScreen.main.bounds.height * (40/812))
                 }
-            }
-        }
-        .onAppear {
-            if spot.isPublic {
-                colors = .green
             }
         }
     }

@@ -86,6 +86,12 @@ struct DetailView: View {
                         .aspectRatio(contentMode: .fit)
                         .cornerRadius(15)
                     Text("Found by: \(spot.founder!)\nOn \(spot.date!)\nTag: \(spot.type!)").font(.subheadline).foregroundColor(.gray)
+                    if (spot.isPublic) {
+                        HStack {
+                            Text("Public").font(.subheadline).foregroundColor(.gray)
+                            Image(systemName: "globe").font(.subheadline).foregroundColor(.gray)
+                        }
+                    }
                     Section(header: Text("Description")) {
                         Text(spot.details!)
                     }
@@ -111,7 +117,7 @@ struct DetailView: View {
                         Button("Edit") {
                             isEditing = true
                         }
-                        .disabled(!hasInternet || (!spot.isPublic && isFromDB()) || (spot.isPublic && !cloudViewModel.isSignedInToiCloud))
+                        .disabled(!hasInternet && spot.isPublic && !cloudViewModel.isSignedInToiCloud)
                         .accentColor(.red)
                     }
                 }
@@ -191,7 +197,7 @@ struct DetailView: View {
             if (!wasPublic) {
                 Section(header: Text("Share Spot")) {
                     displayIsPublicPrompt
-                        .disabled(!hasInternet)
+                        .disabled(!hasInternet || (!wasPublic && isFromDB()))
                 }
             } else {
                 Section(header: Text("Emoji")) {
