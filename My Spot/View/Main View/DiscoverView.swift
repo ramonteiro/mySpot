@@ -11,7 +11,6 @@
  */
 
 import SwiftUI
-import Network
 import MapKit
 
 struct DiscoverView: View {
@@ -20,14 +19,11 @@ struct DiscoverView: View {
     @EnvironmentObject var cloudViewModel: CloudKitViewModel
     @EnvironmentObject var tabController: TabController
     
-    @State private var hasInternet = true
     @State private var showingMapSheet = false
     @State private var isLoading = false
     @State private var searchText = ""
     @State private var searchLocationName = ""
     @State private var sortBy = "Sort By: Closest"
-    
-    let monitor = NWPathMonitor()
     
     // find spot names from db that contain searchtext
     private var searchResults: [SpotFromCloud] {
@@ -40,12 +36,11 @@ struct DiscoverView: View {
     
     var body: some View {
         NavigationView {
-            if (hasInternet) {
+            if (cloudViewModel.hasInternet) {
                 if (cloudViewModel.isSignedInToiCloud) {
-                displaySpotsFromDB
+                    displaySpotsFromDB
                 } else {
                     displaySignInToIcloudPrompt
-                        .navigationTitle("Discover Spots")
                 }
             } else {
                 Text("No Internet Connection Found")
@@ -54,7 +49,6 @@ struct DiscoverView: View {
         }
         .accentColor(.red)
         .onAppear {
-            checkForInternetConnection()
             mapViewModel.searchingHere = mapViewModel.region
             if (cloudViewModel.spots.count == 0) {
                 loadSpotsFromDB(location: CLLocation(latitude: mapViewModel.searchingHere.center.latitude, longitude: mapViewModel.searchingHere.center.longitude))
@@ -91,18 +85,7 @@ struct DiscoverView: View {
                 Spacer()
             }
         }
-    }
-    
-    private func checkForInternetConnection() {
-        monitor.pathUpdateHandler = { path in
-            if path.status != .satisfied {
-                hasInternet = false
-            } else {
-                hasInternet = true
-            }
-        }
-        let queue = DispatchQueue(label: "Monitor")
-        monitor.start(queue: queue)
+        .navigationTitle("Discover Spots")
     }
     
     private func loadSpotsFromDB(location: CLLocation) {
@@ -117,27 +100,6 @@ struct DiscoverView: View {
     private var displaySpotsFromDB: some View {
         ZStack {
             listSpots
-                .navigationTitle("Discover Spots")
-                .toolbar {
-                    ToolbarItemGroup(placement: .navigationBarTrailing) {
-                        HStack {
-                            Button {
-                                mapViewModel.checkLocationAuthorization()
-                                loadSpotsFromDB(location: CLLocation(latitude: mapViewModel.searchingHere.center.latitude, longitude: mapViewModel.searchingHere.center.longitude))
-                                
-                            } label: {
-                                Image(systemName: "arrow.triangle.2.circlepath")
-                            }
-                            
-                            Button(action: {
-                                showingMapSheet.toggle()
-                            }) {
-                                Image(systemName: "map").imageScale(.large)
-                            }
-                            .sheet(isPresented: $showingMapSheet, content: { ViewDiscoverSpots() })
-                        }
-                    }
-                }
             if (isLoading) {
                 ZStack {
                     ProgressView("Loading Spots")
@@ -176,6 +138,27 @@ struct DiscoverView: View {
             .onChange(of: mapViewModel.searchingHere.center.longitude) { _ in
                 mapViewModel.getPlacmarkOfLocation(location: CLLocation(latitude: mapViewModel.searchingHere.center.latitude, longitude: mapViewModel.searchingHere.center.longitude)) { location in
                     searchLocationName = location
+                }
+            }
+        }
+        .navigationTitle("Discover Spots")
+        .toolbar {
+            ToolbarItemGroup(placement: .navigationBarTrailing) {
+                HStack {
+                    Button {
+                        mapViewModel.checkLocationAuthorization()
+                        loadSpotsFromDB(location: CLLocation(latitude: mapViewModel.searchingHere.center.latitude, longitude: mapViewModel.searchingHere.center.longitude))
+                        
+                    } label: {
+                        Image(systemName: "arrow.triangle.2.circlepath")
+                    }
+                    
+                    Button(action: {
+                        showingMapSheet.toggle()
+                    }) {
+                        Image(systemName: "map").imageScale(.large)
+                    }
+                    .sheet(isPresented: $showingMapSheet, content: { ViewDiscoverSpots() })
                 }
             }
         }

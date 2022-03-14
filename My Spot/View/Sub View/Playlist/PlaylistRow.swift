@@ -14,7 +14,7 @@ import SwiftUI
 
 struct PlaylistRow: View {
     @ObservedObject var playlist: Playlist
-
+    
     var body: some View {
         if (checkIfItemExist()) {
             HStack {

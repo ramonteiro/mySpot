@@ -7,26 +7,15 @@
 
 /*
  keeps code typesafe
+ also allows for quick changes across code
  */
 
 import Foundation
-
-enum Constants {
-    static let baseURL = "https://myspot-vapor.herokuapp.com/"
-}
-
-enum Endpoints {
-    static let spots = "spots"
-}
 
 enum MaxCharLength {
     static let names = 20
     static let emojis = 1
     static let description = 1200
-}
-
-enum Passwords {
-    static let delete = "ik"
 }
 
 enum UserDefaultKeys {

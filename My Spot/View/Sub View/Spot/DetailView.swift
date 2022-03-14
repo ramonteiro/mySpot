@@ -13,7 +13,6 @@
 import SwiftUI
 import Combine
 import MapKit
-import Network
 
 struct DetailView: View {
     
@@ -26,7 +25,6 @@ struct DetailView: View {
     @EnvironmentObject var tabController: TabController
     
     @State private var showingEditAlert = false
-    @State private var hasInternet = true
     @State private var isEditing = false
     @State private var name = ""
     @State private var isPublic = false
@@ -37,13 +35,15 @@ struct DetailView: View {
     @State private var descript = ""
     @State private var nameInTitle = ""
     
-    @FocusState private var nameIsFocused: Bool
-    @FocusState private var emojiIsFocused: Bool
-    @FocusState private var descriptIsFocused: Bool
-    @FocusState private var founderIsFocused: Bool
-    @FocusState private var typeIsFocused: Bool
+    enum Field {
+        case name
+        case descript
+        case founder
+        case emoji
+        case type
+    }
     
-    let monitor = NWPathMonitor()
+    @FocusState private var focusState: Field?
     
     var body: some View {
         if (!isEditing) {
@@ -71,7 +71,6 @@ struct DetailView: View {
                     }
                 }
                 .onAppear() {
-                    checkForInternetConnection()
                     wasPublic = spot.isPublic
                 }
         }
@@ -117,7 +116,7 @@ struct DetailView: View {
                         Button("Edit") {
                             isEditing = true
                         }
-                        .disabled(!hasInternet && spot.isPublic && !cloudViewModel.isSignedInToiCloud)
+                        .disabled(!cloudViewModel.hasInternet && spot.isPublic && !cloudViewModel.isSignedInToiCloud)
                         .accentColor(.red)
                     }
                 }
@@ -143,25 +142,16 @@ struct DetailView: View {
     
     private var displayIsPublicPrompt: some View {
         VStack {
-            Toggle("Public", isOn: $isPublic)
+            Toggle("Public", isOn: $isPublic.animation())
             if (isPublic) {
                 EmojiTextField(text: $emoji, placeholder: "Enter Emoji")
-                                .onReceive(Just(emoji), perform: { _ in
-                                    self.emoji = String(self.emoji.onlyEmoji().prefix(MaxCharLength.emojis))
-                                })
-                    .focused($emojiIsFocused)
+                    .onReceive(Just(emoji), perform: { _ in
+                        self.emoji = String(self.emoji.onlyEmoji().prefix(MaxCharLength.emojis))
+                    })
+                    .submitLabel(.done)
+                    .focused($focusState, equals: .emoji)
             }
         }
-    }
-    
-    private func checkForInternetConnection() {
-        monitor.pathUpdateHandler = { path in
-            if path.status != .satisfied {
-                hasInternet = false
-            }
-        }
-        let queue = DispatchQueue(label: "Monitor")
-        monitor.start(queue: queue)
     }
     
     private var displayEditingMode: some View {
@@ -173,11 +163,13 @@ struct DetailView: View {
                             name = String(name.prefix(MaxCharLength.names))
                         }
                     }
-                    .focused($nameIsFocused)
+                    .focused($focusState, equals: .name)
+                    .submitLabel(.next)
             }
             Section(header: Text("Founder's Name")) {
                 TextField("\(spot.founder!)", text: $founder)
-                    .focused($founderIsFocused)
+                    .focused($focusState, equals: .founder)
+                    .submitLabel(.next)
                     .onReceive(Just(founder)) { _ in
                         if (founder.count > MaxCharLength.names) {
                             founder = String(founder.prefix(MaxCharLength.names))
@@ -186,8 +178,8 @@ struct DetailView: View {
             }
             Section(header: Text("Tag")) {
                 TextField("\(spot.type!)", text: $type)
-                    
-                    .focused($typeIsFocused)
+                    .focused($focusState, equals: .type)
+                    .submitLabel(.next)
                     .onReceive(Just(type)) { _ in
                         if (type.count > MaxCharLength.names) {
                             type = String(founder.prefix(MaxCharLength.names))
@@ -197,7 +189,7 @@ struct DetailView: View {
             if (!wasPublic) {
                 Section(header: Text("Share Spot")) {
                     displayIsPublicPrompt
-                        .disabled(!hasInternet || (!wasPublic && isFromDB()))
+                        .disabled(!cloudViewModel.hasInternet || (!wasPublic && isFromDB()))
                 }
             } else {
                 Section(header: Text("Emoji")) {
@@ -205,7 +197,8 @@ struct DetailView: View {
                         .onReceive(Just(emoji), perform: { _ in
                             self.emoji = String(self.emoji.onlyEmoji().prefix(MaxCharLength.emojis))
                         })
-                        .focused($emojiIsFocused)
+                        .submitLabel(.done)
+                        .focused($focusState, equals: .emoji)
                         .onAppear {
                             emoji = spot.emoji!
                         }
@@ -216,7 +209,8 @@ struct DetailView: View {
                     TextEditor(text: $descript)
                     Text(descript).opacity(0).padding(.all, 8)
                 }
-                .focused($descriptIsFocused)
+                .focused($focusState, equals: .descript)
+                .submitLabel(.done)
                 .onReceive(Just(descript)) { _ in
                     if (descript.count > MaxCharLength.description) {
                         descript = String(descript.prefix(MaxCharLength.description))
@@ -238,7 +232,7 @@ struct DetailView: View {
                 }
                 .alert("Would you like to keep any changes made?", isPresented: $showingEditAlert) {
                     Button("Keep") {
-                        if ((name != "" && descript != "" && founder != "" && !isPublic) || (isPublic && name != "" && descript != "" && founder != "" && emoji != "") || !cloudViewModel.isSignedInToiCloud || !hasInternet) {
+                        if ((name != "" && descript != "" && founder != "" && !isPublic) || (isPublic && name != "" && descript != "" && founder != "" && emoji != "") || !cloudViewModel.isSignedInToiCloud || !cloudViewModel.hasInternet) {
                             if (wasPublic) {
                                 isPublic = true
                             }
@@ -278,11 +272,7 @@ struct DetailView: View {
             }
             ToolbarItemGroup(placement: .keyboard) {
                 Button("Done") {
-                    nameIsFocused = false
-                    descriptIsFocused = false
-                    founderIsFocused = false
-                    emojiIsFocused = false
-                    typeIsFocused = false
+                    focusState = nil
                 }
             }
         }

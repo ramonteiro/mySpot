@@ -13,7 +13,6 @@
 import SwiftUI
 import MapKit
 import Combine
-import Network
 
 struct AddSpotSheet: View {
     
@@ -23,7 +22,6 @@ struct AddSpotSheet: View {
     @EnvironmentObject var cloudViewModel: CloudKitViewModel
     
     @State private var showingAlert = false
-    @State private var hasInternet = true
     @State private var name = ""
     @State private var founder = ""
     @State private var descript = ""
@@ -35,14 +33,16 @@ struct AddSpotSheet: View {
     @State private var emoji = ""
     @State private var imageSelected = UIImage()
     
-    @FocusState private var nameIsFocused: Bool
-    @FocusState private var descriptIsFocused: Bool
-    @FocusState private var founderIsFocused: Bool
-    @FocusState private var emojiIsFocused: Bool
-    @FocusState private var typeIsFocused: Bool
+    enum Field {
+        case name
+        case descript
+        case founder
+        case emoji
+        case type
+    }
     
-    let monitor = NWPathMonitor()
-
+    @FocusState private var focusState: Field?
+    
     var body: some View {
         ZStack {
             if (mapViewModel.getIsAuthorized()) {
@@ -59,7 +59,7 @@ struct AddSpotSheet: View {
                         }
                         Section(header: Text("Share Spot")) {
                             displayIsPublicPrompt
-                                .disabled(!hasInternet || !cloudViewModel.isSignedInToiCloud)
+                                .disabled(!cloudViewModel.hasInternet || !cloudViewModel.isSignedInToiCloud)
                         }
                         Section(header: Text("Spot Description")) {
                             displayDescriptionPrompt
@@ -78,6 +78,18 @@ struct AddSpotSheet: View {
                             displayPhotoButton
                         }
                     }
+                    .onSubmit {
+                        switch focusState {
+                        case .name:
+                            focusState = .founder
+                        case .founder:
+                            focusState = .type
+                        case .type:
+                            focusState = .descript
+                        default:
+                            focusState = nil
+                        }
+                    }
                     .onAppear {
                         if (UserDefaults.standard.valueExists(forKey: UserDefaultKeys.founder) && founder == "") {
                             founder = UserDefaults.standard.value(forKey: UserDefaultKeys.founder) as! String
@@ -92,16 +104,12 @@ struct AddSpotSheet: View {
                     .toolbar {
                         ToolbarItemGroup(placement: .keyboard) {
                             Button("Done") {
-                                nameIsFocused = false
-                                founderIsFocused = false
-                                descriptIsFocused = false
-                                typeIsFocused = false
-                                emojiIsFocused = false
+                                focusState = nil
                             }
                         }
                         ToolbarItemGroup(placement: .navigationBarTrailing) {
                             Button("Save") {
-                                if (!hasInternet) {
+                                if (!cloudViewModel.hasInternet) {
                                     isPublic = false
                                 }
                                 if (isPublic) {
@@ -126,9 +134,6 @@ struct AddSpotSheet: View {
                         }
                     }
                 }
-                .onAppear() {
-                    checkForInternetConnection()
-                }
                 .interactiveDismissDisabled()
             } else {
                 VStack {
@@ -143,27 +148,13 @@ struct AddSpotSheet: View {
         }
     }
     
-    private func checkForInternetConnection() {
-        monitor.pathUpdateHandler = { path in
-            if path.status != .satisfied {
-                hasInternet = false
-            }
-        }
-        let queue = DispatchQueue(label: "Monitor")
-        monitor.start(queue: queue)
-    }
-    
     private var displayPhotoButton: some View {
         Button(action: {
             changeProfileImage = true
             openCameraRoll = true
-            founderIsFocused = false
-            nameIsFocused = false
-            descriptIsFocused = false
-            emojiIsFocused = false
-            typeIsFocused = false
+            focusState = nil
             
-                
+            
         }, label: {
             if ((changeProfileImage && imageSelected.cgImage != nil) || (changeProfileImage && imageSelected.ciImage != nil)) {
                 Image(uiImage: imageSelected)
@@ -180,7 +171,8 @@ struct AddSpotSheet: View {
     
     private var displaySpotTag: some View {
         TextField("Enter Tag", text: $type, prompt: Text("ex: Skating").font(.subheadline).foregroundColor(.gray))
-            .focused($typeIsFocused)
+            .focused($focusState, equals: .type)
+            .submitLabel(.next)
             .onReceive(Just(type)) { _ in
                 if (type.count > MaxCharLength.names) {
                     type = String(founder.prefix(MaxCharLength.names))
@@ -193,7 +185,8 @@ struct AddSpotSheet: View {
             TextEditor(text: $descript)
             Text(descript).opacity(0).padding(.all, 8)
         }
-        .focused($descriptIsFocused)
+        .focused($focusState, equals: .descript)
+        .submitLabel(.done)
         .onReceive(Just(descript)) { _ in
             if (descript.count > MaxCharLength.description) {
                 descript = String(descript.prefix(MaxCharLength.description))
@@ -203,20 +196,23 @@ struct AddSpotSheet: View {
     
     private var displayIsPublicPrompt: some View {
         VStack {
-            Toggle("Public", isOn: $isPublic)
+            Toggle("Public", isOn: $isPublic.animation())
             if (isPublic) {
                 EmojiTextField(text: $emoji, placeholder: "Enter Emoji")
-                                .onReceive(Just(emoji), perform: { _ in
-                                    self.emoji = String(self.emoji.onlyEmoji().prefix(MaxCharLength.emojis))
-                                })
-                    .focused($emojiIsFocused)
+                    .onReceive(Just(emoji), perform: { _ in
+                        self.emoji = String(self.emoji.onlyEmoji().prefix(MaxCharLength.emojis))
+                    })
+                    .submitLabel(.done)
+                    .focused($focusState, equals: .emoji)
             }
         }
+        .disabled(!cloudViewModel.hasInternet || !cloudViewModel.isSignedInToiCloud)
     }
     
     private var displayFounderPrompt: some View {
         TextField("Enter Founder Name", text: $founder)
-            .focused($founderIsFocused)
+            .focused($focusState, equals: .founder)
+            .submitLabel(.next)
             .onReceive(Just(founder)) { _ in
                 if (founder.count > MaxCharLength.names) {
                     founder = String(founder.prefix(MaxCharLength.names))
@@ -226,14 +222,15 @@ struct AddSpotSheet: View {
     
     private var displayNamePrompt: some View {
         TextField("Enter Spot Name", text: $name)
-            .focused($nameIsFocused)
+            .focused($focusState, equals: .name)
+            .submitLabel(.next)
             .onReceive(Just(name)) { _ in
                 if (name.count > MaxCharLength.names) {
                     name = String(name.prefix(MaxCharLength.names))
                 }
             }
     }
-
+    
     private func isEmojiNeeded() -> Bool {
         if isPublic {
             return emoji == ""
@@ -247,12 +244,12 @@ struct AddSpotSheet: View {
     }
     
     private func getDate()->String{
-         let time = Date()
-         let timeFormatter = DateFormatter()
+        let time = Date()
+        let timeFormatter = DateFormatter()
         timeFormatter.dateFormat = "MMM d, yyyy"
-         let stringDate = timeFormatter.string(from: time)
-         return stringDate
-        }
+        let stringDate = timeFormatter.string(from: time)
+        return stringDate
+    }
     
     private func save() {
         UserDefaults.standard.set(founder, forKey: UserDefaultKeys.founder)
@@ -332,7 +329,7 @@ extension UIImage {
         let newWidth = self.size.width * scale
         let newSize = CGSize(width: newWidth, height: newHeight)
         let renderer = UIGraphicsImageRenderer(size: newSize)
-
+        
         return renderer.image { _ in
             self.draw(in: CGRect(origin: .zero, size: newSize))
         }
@@ -340,9 +337,9 @@ extension UIImage {
 }
 
 extension UserDefaults {
-
+    
     func valueExists(forKey key: String) -> Bool {
         return object(forKey: key) != nil
     }
-
+    
 }

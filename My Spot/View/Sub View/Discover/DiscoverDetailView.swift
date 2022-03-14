@@ -72,7 +72,9 @@ struct DiscoverDetailView: View {
                 Section(header: Text("Save To My Spots")) {
                     if (!isSaving) {
                         Button("Save") {
-                            isSaving = true
+                            withAnimation {
+                                isSaving = true
+                            }
                         }
                         .disabled(!imageLoaded)
                         .accentColor(.blue)
@@ -80,10 +82,15 @@ struct DiscoverDetailView: View {
                     if (isSaving) {
                         TextField("Enter Spot Name", text: $newName)
                             .focused($nameIsFocused)
+                            .submitLabel(.done)
                             .onReceive(Just(newName)) { _ in
                                 if (newName.count > MaxCharLength.names) {
                                     newName = String(newName.prefix(MaxCharLength.names))
                                 }
+                            }
+                            .onSubmit {
+                                save()
+                                isSaved = true
                             }
                         Button("Save") {
                             save()

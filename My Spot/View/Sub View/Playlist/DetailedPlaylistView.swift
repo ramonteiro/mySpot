@@ -33,20 +33,18 @@ struct DetailPlaylistView: View {
     @State private var filteredSpots: [Spot] = []
     @State private var locationIcon = "location"
     
-    @FocusState private var nameIsFocused: Bool
-    @FocusState private var emojiIsFocused: Bool
+    enum Field {
+        case name
+        case emoji
+    }
+    
+    @FocusState private var focusState: Field?
     
     var body: some View {
         if (!isEditing) {
             displayDetailedView
-                .onChange(of: tabController.playlistPopToRoot) { _ in
-                    presentationMode.wrappedValue.dismiss()
-                }
         } else {
             displayEditingMode
-                .onChange(of: tabController.playlistPopToRoot) { _ in
-                    presentationMode.wrappedValue.dismiss()
-                }
         }
     }
     
@@ -72,7 +70,7 @@ struct DetailPlaylistView: View {
         }
         filteredSpots.remove(atOffsets: offsets)
     }
-
+    
     private func saveChanges() {
         playlist.name = name
         playlist.emoji = emoji
@@ -91,6 +89,9 @@ struct DetailPlaylistView: View {
             } else {
                 displayMessageNoSpotsFound
             }
+        }
+        .onChange(of: tabController.playlistPopToRoot) { _ in
+            presentationMode.wrappedValue.dismiss()
         }
         .onAppear() {
             setFilteringType()
@@ -175,7 +176,7 @@ struct DetailPlaylistView: View {
             }
         }
     }
-                
+    
     private func distanceBetween(x1: Double, x2: Double, y1: Double, y2: Double) -> Double {
         return (((x2 - x1) * (x2 - x1))+((y2 - y1) * (y2 - y1))).squareRoot()
     }
@@ -211,14 +212,27 @@ struct DetailPlaylistView: View {
                             name = String(name.prefix(MaxCharLength.names))
                         }
                     }
-                    .focused($nameIsFocused)
+                    .focused($focusState, equals: .name)
+                    .submitLabel(.next)
             }
             Section(header: Text("Emoji ID")) {
                 EmojiTextField(text: $emoji, placeholder: "Enter Emoji")
-                                .onReceive(Just(emoji), perform: { _ in
-                                    self.emoji = String(self.emoji.onlyEmoji().prefix(MaxCharLength.emojis))
-                                })
-                    .focused($emojiIsFocused)
+                    .onReceive(Just(emoji), perform: { _ in
+                        self.emoji = String(self.emoji.onlyEmoji().prefix(MaxCharLength.emojis))
+                    })
+                    .focused($focusState, equals: .emoji)
+                    .submitLabel(.done)
+            }
+        }
+        .onChange(of: tabController.playlistPopToRoot) { _ in
+            presentationMode.wrappedValue.dismiss()
+        }
+        .onSubmit {
+            switch focusState {
+            case .name:
+                focusState = .emoji
+            default:
+                focusState = nil
             }
         }
         .navigationTitle(name)
@@ -249,8 +263,7 @@ struct DetailPlaylistView: View {
             }
             ToolbarItemGroup(placement: .keyboard) {
                 Button("Done") {
-                    nameIsFocused = false
-                    emojiIsFocused = false
+                    focusState = nil
                 }
             }
         }

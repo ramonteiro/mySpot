@@ -37,22 +37,22 @@ struct PlaylistView: View {
                 }
                 .navigationTitle("Playlists")
                 .navigationBarItems(trailing:
-                Button(action: {
-                showingAddPlaylistSheet.toggle()
+                                        Button(action: {
+                    showingAddPlaylistSheet.toggle()
                 }) {
                     Image(systemName: "plus").imageScale(.large)
                 }
-                .sheet(isPresented: $showingAddPlaylistSheet, content: AddPlaylistSheet.init)
-            )
+                                        .sheet(isPresented: $showingAddPlaylistSheet, content: AddPlaylistSheet.init)
+                )
                 if playlists.count == 0 {
-                    displayNoPlaylistPrompt
+                    noPlaylistPrompt
                 }
             }
         }
         .accentColor(.red)
     }
     
-    private var displayNoPlaylistPrompt: some View {
+    private var noPlaylistPrompt: some View {
         VStack(spacing: 6) {
             HStack {
                 Spacer()
@@ -67,7 +67,7 @@ struct PlaylistView: View {
         }
     }
     
-    func delete(at offsets: IndexSet) {
+    private func delete(at offsets: IndexSet) {
         offsets.forEach { i in
             if (playlists[i].spotArr.count > 0) {
                 for place in playlists[i].spotArr {

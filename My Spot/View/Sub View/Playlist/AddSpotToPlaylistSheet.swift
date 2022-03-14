@@ -13,6 +13,7 @@
 import SwiftUI
 
 struct AddSpotToPlaylistSheet: View {
+    
     @FetchRequest(sortDescriptors: []) var spots: FetchedResults<Spot>
     @Environment(\.presentationMode) var presentationMode
     @Environment(\.managedObjectContext) var moc

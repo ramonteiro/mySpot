@@ -13,7 +13,6 @@
 import SwiftUI
 import MapKit
 import CoreData
-import Foundation
 
 struct MySpotsView: View {
     
@@ -33,63 +32,8 @@ struct MySpotsView: View {
         NavigationView {
             if (locationIcon == LocationForSorting.locationOn) { //sorted by location
                 listFiltered
-                    .navigationTitle("My Spots")
-                    .navigationBarItems(trailing:
-                    HStack {
-                        Button(action: {
-                            showingMapSheet.toggle()
-                        }) {
-                            Image(systemName: "map").imageScale(.large)
-                        }
-                        .sheet(isPresented: $showingMapSheet) {
-                            ViewMapSpots()
-                        }
-                        .disabled(spots.isEmpty)
-                        Button(action: {
-                            if (locationIcon == LocationForSorting.locationOn) {
-                                locationIcon = LocationForSorting.locationOff
-                                UserDefaults.standard.set(false, forKey: UserDefaultKeys.isFilterByLocation)
-                            }
-                        showingAddSheet.toggle()
-                        }) {
-                            Image(systemName: "plus").imageScale(.large)
-                        }
-                        .sheet(isPresented: $showingAddSheet) {
-                            AddSpotSheet()
-                        }
-                    })
-                    .navigationBarItems(leading: displayLocationIcon.disabled(!mapViewModel.isAuthorized))
-                    .accentColor(.red)
             } else { // unsorted
                 listUnfiltered
-                    .navigationTitle("My Spots")
-                    .navigationBarItems(trailing:
-                    HStack {
-                        Button(action: {
-                            showingMapSheet.toggle()
-                        }) {
-                            Image(systemName: "map").imageScale(.large)
-                        }
-                        .disabled(spots.isEmpty)
-                        .sheet(isPresented: $showingMapSheet) {
-                            ViewMapSpots()
-                        }
-                        Button(action: {
-                            if (locationIcon == LocationForSorting.locationOn) {
-                                locationIcon = LocationForSorting.locationOff
-                                UserDefaults.standard.set(false, forKey: UserDefaultKeys.isFilterByLocation)
-                            }
-                        showingAddSheet.toggle()
-                        }) {
-                            Image(systemName: "plus").imageScale(.large)
-                        }
-                        .sheet(isPresented: $showingAddSheet) {
-                            AddSpotSheet()
-                        }
-                    }
-                    )
-                    .navigationBarItems(leading: displayLocationIcon.disabled(!mapViewModel.isAuthorized))
-                    .accentColor(.red)
             }
         }
         .onAppear {
@@ -130,6 +74,34 @@ struct MySpotsView: View {
                 }
             }
         }
+        .navigationTitle("My Spots")
+        .navigationBarItems(trailing:
+        HStack {
+            Button(action: {
+                showingMapSheet.toggle()
+            }) {
+                Image(systemName: "map").imageScale(.large)
+            }
+            .disabled(spots.isEmpty)
+            .sheet(isPresented: $showingMapSheet) {
+                ViewMapSpots()
+            }
+            Button(action: {
+                if (locationIcon == LocationForSorting.locationOn) {
+                    locationIcon = LocationForSorting.locationOff
+                    UserDefaults.standard.set(false, forKey: UserDefaultKeys.isFilterByLocation)
+                }
+            showingAddSheet.toggle()
+            }) {
+                Image(systemName: "plus").imageScale(.large)
+            }
+            .sheet(isPresented: $showingAddSheet) {
+                AddSpotSheet()
+            }
+        }
+        )
+        .navigationBarItems(leading: displayLocationIcon.disabled(!mapViewModel.isAuthorized))
+        .accentColor(.red)
     }
     
     private var listFiltered: some View {
@@ -164,6 +136,33 @@ struct MySpotsView: View {
                 }
             }
         }
+        .navigationTitle("My Spots")
+        .navigationBarItems(trailing:
+        HStack {
+            Button(action: {
+                showingMapSheet.toggle()
+            }) {
+                Image(systemName: "map").imageScale(.large)
+            }
+            .sheet(isPresented: $showingMapSheet) {
+                ViewMapSpots()
+            }
+            .disabled(spots.isEmpty)
+            Button(action: {
+                if (locationIcon == LocationForSorting.locationOn) {
+                    locationIcon = LocationForSorting.locationOff
+                    UserDefaults.standard.set(false, forKey: UserDefaultKeys.isFilterByLocation)
+                }
+            showingAddSheet.toggle()
+            }) {
+                Image(systemName: "plus").imageScale(.large)
+            }
+            .sheet(isPresented: $showingAddSheet) {
+                AddSpotSheet()
+            }
+        })
+        .navigationBarItems(leading: displayLocationIcon.disabled(!mapViewModel.isAuthorized))
+        .accentColor(.red)
     }
     
     private func filter() {
@@ -230,7 +229,7 @@ struct MySpotsView: View {
         filteredSpots.remove(atOffsets: offsets)
     }
     
-    func delete(at offsets: IndexSet) {
+    private func delete(at offsets: IndexSet) {
         offsets.forEach { i in
             DispatchQueue.main.async {
                 moc.delete(spots[i])

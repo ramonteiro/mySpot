@@ -40,6 +40,14 @@ struct AddPlaylistSheet: View {
                     emojiPrompt
                 }
             }
+            .onSubmit {
+                switch focusState {
+                case .name:
+                    focusState = .emoji
+                default:
+                    focusState = nil
+                }
+            }
             .accentColor(.red)
             .navigationTitle("Create Playlist")
             .toolbar {
