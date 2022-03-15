@@ -16,8 +16,11 @@ struct My_SpotApp: App {
     // initialize mapViewModel
     @StateObject private var mapViewModel = MapViewModel()
     
-    //initialize iCloudViewModel
+    // initialize iCloudViewModel
     @StateObject private var cloudViewModel = CloudKitViewModel()
+    
+    // initialize Network Monitor
+    @StateObject private var networkViewModel = NetworkMonitor()
     
     var body: some Scene {
         WindowGroup {
@@ -25,6 +28,7 @@ struct My_SpotApp: App {
                 .environment(\.managedObjectContext, dataController.container.viewContext)
                 .environmentObject(mapViewModel)
                 .environmentObject(cloudViewModel)
+                .environmentObject(networkViewModel)
         }
     }
 }

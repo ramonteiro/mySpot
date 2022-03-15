@@ -26,7 +26,7 @@ extension Spot {
     @NSManaged public var isPublic: Bool
     @NSManaged public var date: String?
     @NSManaged public var founder: String?
-    @NSManaged public var type: String?
+    @NSManaged public var tags: String?
     @NSManaged public var dbid: String?
     @NSManaged public var emoji: String?
     @NSManaged public var playlist: Playlist?

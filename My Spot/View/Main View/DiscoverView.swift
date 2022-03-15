@@ -18,6 +18,7 @@ struct DiscoverView: View {
     @EnvironmentObject var mapViewModel: MapViewModel
     @EnvironmentObject var cloudViewModel: CloudKitViewModel
     @EnvironmentObject var tabController: TabController
+    @EnvironmentObject var networkViewModel: NetworkMonitor
     
     @State private var showingMapSheet = false
     @State private var isLoading = false
@@ -27,7 +28,7 @@ struct DiscoverView: View {
     
     // find spot names from db that contain searchtext
     private var searchResults: [SpotFromCloud] {
-            if searchText.isEmpty {
+        if searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
                 return cloudViewModel.spots
             } else {
                 return cloudViewModel.spots.filter { $0.name.lowercased().contains(searchText.lowercased()) || $0.type.lowercased().contains(searchText.lowercased()) || $0.founder.lowercased().contains(searchText.lowercased()) || $0.emoji.contains(searchText)}
@@ -36,17 +37,13 @@ struct DiscoverView: View {
     
     var body: some View {
         NavigationView {
-            if (cloudViewModel.hasInternet) {
-                if (cloudViewModel.isSignedInToiCloud) {
-                    displaySpotsFromDB
-                } else {
-                    displaySignInToIcloudPrompt
-                }
+            if (networkViewModel.hasInternet && cloudViewModel.isSignedInToiCloud) {
+                displaySpotsFromDB
             } else {
-                Text("No Internet Connection Found")
-                    .navigationTitle("Discover Spots")
+                displayError
             }
         }
+        .navigationTitle("Discover Spots")
         .accentColor(.red)
         .onAppear {
             mapViewModel.searchingHere = mapViewModel.region
@@ -55,6 +52,16 @@ struct DiscoverView: View {
             }
             mapViewModel.getPlacmarkOfLocation(location: CLLocation(latitude: mapViewModel.searchingHere.center.latitude, longitude: mapViewModel.searchingHere.center.longitude)) { location in
                 searchLocationName = location
+            }
+        }
+    }
+    
+    private var displayError: some View {
+        ZStack {
+            if (!networkViewModel.hasInternet) {
+                Text("No Internet Connection Found")
+            } else if (!cloudViewModel.isSignedInToiCloud) {
+                displaySignInToIcloudPrompt
             }
         }
     }
@@ -85,7 +92,6 @@ struct DiscoverView: View {
                 Spacer()
             }
         }
-        .navigationTitle("Discover Spots")
     }
     
     private func loadSpotsFromDB(location: CLLocation) {

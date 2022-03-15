@@ -7,31 +7,15 @@
 
 import SwiftUI
 import CloudKit
-import Network
 
 class CloudKitViewModel: ObservableObject {
     
     @Published var isSignedInToiCloud: Bool = false
     @Published var error: String = ""
     @Published var spots: [SpotFromCloud] = []
-    @Published var hasInternet = false
-    let monitor = NWPathMonitor()
     
     init() {
         getiCloudStatus()
-        checkForInternetConnection()
-    }
-    
-    private func checkForInternetConnection() {
-        monitor.pathUpdateHandler = { path in
-            if path.status != .satisfied {
-                self.hasInternet = false
-            } else {
-                self.hasInternet = true
-            }
-        }
-        let queue = DispatchQueue(label: "Monitor")
-        monitor.start(queue: queue)
     }
     
     func getiCloudStatus() {

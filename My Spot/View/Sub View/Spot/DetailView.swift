@@ -19,6 +19,7 @@ struct DetailView: View {
     var fromPlaylist: Bool
     @EnvironmentObject var cloudViewModel: CloudKitViewModel
     @EnvironmentObject var mapViewModel: MapViewModel
+    @EnvironmentObject var networkViewModel: NetworkMonitor
     @ObservedObject var spot:Spot
     @Environment(\.managedObjectContext) var moc
     @Environment(\.presentationMode) var presentationMode
@@ -27,20 +28,23 @@ struct DetailView: View {
     @State private var showingEditAlert = false
     @State private var isEditing = false
     @State private var name = ""
+    @State private var tags = ""
     @State private var isPublic = false
     @State private var wasPublic = false
     @State private var emoji = ""
-    @State private var type = ""
     @State private var founder = ""
     @State private var descript = ""
     @State private var nameInTitle = ""
+    
+    private var keepDisabled: Bool {
+        !((!name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && !descript.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && !founder.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && !isPublic) || (isPublic && !name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && !descript.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && !founder.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && !emoji.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty) || !cloudViewModel.isSignedInToiCloud || !networkViewModel.hasInternet)
+    }
     
     enum Field {
         case name
         case descript
         case founder
         case emoji
-        case type
     }
     
     @FocusState private var focusState: Field?
@@ -84,7 +88,7 @@ struct DetailView: View {
                         .resizable()
                         .aspectRatio(contentMode: .fit)
                         .cornerRadius(15)
-                    Text("Found by: \(spot.founder!)\nOn \(spot.date!)\nTag: \(spot.type!)").font(.subheadline).foregroundColor(.gray)
+                    Text("Found by: \(spot.founder!)\nOn \(spot.date!)\nTag: \(spot.tags!)").font(.subheadline).foregroundColor(.gray)
                     if (spot.isPublic) {
                         HStack {
                             Text("Public").font(.subheadline).foregroundColor(.gray)
@@ -116,7 +120,7 @@ struct DetailView: View {
                         Button("Edit") {
                             isEditing = true
                         }
-                        .disabled(!cloudViewModel.hasInternet && spot.isPublic && !cloudViewModel.isSignedInToiCloud)
+                        .disabled(!networkViewModel.hasInternet && spot.isPublic && !cloudViewModel.isSignedInToiCloud)
                         .accentColor(.red)
                     }
                 }
@@ -148,7 +152,7 @@ struct DetailView: View {
                     .onReceive(Just(emoji), perform: { _ in
                         self.emoji = String(self.emoji.onlyEmoji().prefix(MaxCharLength.emojis))
                     })
-                    .submitLabel(.done)
+                    .submitLabel(.next)
                     .focused($focusState, equals: .emoji)
             }
         }
@@ -157,39 +161,41 @@ struct DetailView: View {
     private var displayEditingMode: some View {
         Form {
             Section(header: Text("Spot Name")) {
-                TextField("\(spot.name!)", text: $name)
+                TextField("Enter Spot Name", text: $name)
                     .onReceive(Just(name)) { _ in
                         if (name.count > MaxCharLength.names) {
                             name = String(name.prefix(MaxCharLength.names))
                         }
                     }
+                    .onAppear {
+                        name = spot.name!
+                    }
                     .focused($focusState, equals: .name)
                     .submitLabel(.next)
             }
             Section(header: Text("Founder's Name")) {
-                TextField("\(spot.founder!)", text: $founder)
+                TextField("Enter Founder's Name", text: $founder)
                     .focused($focusState, equals: .founder)
                     .submitLabel(.next)
+                    .textContentType(.givenName)
+                    .onAppear {
+                        founder = spot.founder!
+                    }
                     .onReceive(Just(founder)) { _ in
                         if (founder.count > MaxCharLength.names) {
                             founder = String(founder.prefix(MaxCharLength.names))
                         }
                     }
             }
-            Section(header: Text("Tag")) {
-                TextField("\(spot.type!)", text: $type)
-                    .focused($focusState, equals: .type)
-                    .submitLabel(.next)
-                    .onReceive(Just(type)) { _ in
-                        if (type.count > MaxCharLength.names) {
-                            type = String(founder.prefix(MaxCharLength.names))
-                        }
-                    }
-            }
             if (!wasPublic) {
                 Section(header: Text("Share Spot")) {
-                    displayIsPublicPrompt
-                        .disabled(!cloudViewModel.hasInternet || (!wasPublic && isFromDB()))
+                    if (networkViewModel.hasInternet && !isFromDB()) {
+                        displayIsPublicPrompt
+                    } else if (!networkViewModel.hasInternet) {
+                        Text("Internet Is Required To Share Spot.")
+                    } else if (isFromDB()) {
+                        Text("Saved Spots Cannot Be Reposted.")
+                    }
                 }
             } else {
                 Section(header: Text("Emoji")) {
@@ -197,7 +203,7 @@ struct DetailView: View {
                         .onReceive(Just(emoji), perform: { _ in
                             self.emoji = String(self.emoji.onlyEmoji().prefix(MaxCharLength.emojis))
                         })
-                        .submitLabel(.done)
+                        .submitLabel(.next)
                         .focused($focusState, equals: .emoji)
                         .onAppear {
                             emoji = spot.emoji!
@@ -209,8 +215,10 @@ struct DetailView: View {
                     TextEditor(text: $descript)
                     Text(descript).opacity(0).padding(.all, 8)
                 }
+                .onAppear {
+                    descript = spot.details!
+                }
                 .focused($focusState, equals: .descript)
-                .submitLabel(.done)
                 .onReceive(Just(descript)) { _ in
                     if (descript.count > MaxCharLength.description) {
                         descript = String(descript.prefix(MaxCharLength.description))
@@ -218,13 +226,23 @@ struct DetailView: View {
                 }
             }
         }
+        .onSubmit {
+            switch focusState {
+            case .name:
+                focusState = .founder
+            case .founder:
+                if (wasPublic || isPublic) {
+                    focusState = .emoji
+                } else {
+                    focusState = .descript
+                }
+            case .emoji:
+                focusState = .descript
+            default:
+                focusState = nil
+            }
+        }
         .navigationTitle(name)
-        .onAppear(perform: {
-            name = spot.name!
-            founder = spot.founder!
-            descript = spot.details!
-            type = spot.type!
-        })
         .toolbar {
             ToolbarItemGroup(placement: .navigationBarTrailing) {
                 Button("Done") {
@@ -232,58 +250,82 @@ struct DetailView: View {
                 }
                 .alert("Would you like to keep any changes made?", isPresented: $showingEditAlert) {
                     Button("Keep") {
-                        if ((name != "" && descript != "" && founder != "" && !isPublic) || (isPublic && name != "" && descript != "" && founder != "" && emoji != "") || !cloudViewModel.isSignedInToiCloud || !cloudViewModel.hasInternet) {
-                            if (wasPublic) {
-                                isPublic = true
-                            }
-                            if (isPublic && wasPublic) {
-                                updatePublic()
-                                saveChanges()
-                            } else if (!wasPublic && isPublic) {
-                                savePublic()
-                            } else {
-                                saveChanges()
-                            }
-                            isEditing = false
+                        if (wasPublic) {
+                            isPublic = true
                         }
-                        if (name == "") {
-                            name = "NAME IS REQUIRED"
+                        tags = descript.findTags()
+                        if (isPublic && wasPublic) {
+                            updatePublic()
+                            saveChanges()
+                        } else if (!wasPublic && isPublic) {
+                            savePublic()
+                        } else {
+                            saveChanges()
                         }
-                        if (founder == "") {
-                            founder = "FOUNDER IS REQUIRED"
-                        }
-                        if (descript == "") {
-                            descript = "DESCRIPT IS REQUIRED"
-                        }
-                        if (isPublic && emoji == "") {
-                            emoji = "🚫"
-                        }
-                    }
+                        isEditing = false
+                    }.disabled(keepDisabled)
                     Button("Discard", role: .destructive) {
                         isEditing = false
                         name = ""
                         founder = ""
                         descript = ""
                         emoji = ""
-                        type = ""
+                        tags = ""
                     }
                 }
                 .accentColor(.red)
             }
             ToolbarItemGroup(placement: .keyboard) {
-                Button("Done") {
-                    focusState = nil
+                HStack {
+                    Button {
+                        switch focusState {
+                        case .descript:
+                            if (isPublic || wasPublic) {
+                                focusState = .emoji
+                            } else {
+                                focusState = .founder
+                            }
+                        case .founder:
+                            focusState = .name
+                        case .emoji:
+                            focusState = .founder
+                        default:
+                            focusState = nil
+                        }
+                    } label: {
+                        Image(systemName: "chevron.up")
+                    }
+                    .disabled(focusState == .name)
+                    Button {
+                        switch focusState {
+                        case .name:
+                            focusState = .founder
+                        case .founder:
+                            if (isPublic || wasPublic) {
+                                focusState = .emoji
+                            } else {
+                                focusState = .descript
+                            }
+                        case .emoji:
+                            focusState = .descript
+                        default:
+                            focusState = nil
+                        }
+                    } label: {
+                        Image(systemName: "chevron.down")
+                    }
+                    .disabled(focusState == .descript)
+                    Spacer()
+                    Button("Done") {
+                        focusState = nil
+                    }
                 }
             }
         }
     }
     
     private func updatePublic() {
-        if (type == "") {
-            cloudViewModel.updateSpotPublic(spot: spot, newName: name, newDescription: descript, newFounder: founder, newType: "none", newEmoji: emoji)
-        } else {
-            cloudViewModel.updateSpotPublic(spot: spot, newName: name, newDescription: descript, newFounder: founder, newType: type, newEmoji: emoji)
-        }
+        cloudViewModel.updateSpotPublic(spot: spot, newName: name, newDescription: descript, newFounder: founder, newType: tags, newEmoji: emoji)
     }
     
     private func close() {
@@ -306,21 +348,12 @@ struct DetailView: View {
         if (isPublic) {
             spot.emoji = emoji
         }
-        if (type == "") {
-            spot.type = "none"
-        } else {
-            spot.type = type
-        }
+        spot.tags = tags
         try? moc.save()
     }
     
     private func savePublic() {
-        let id: String
-        if (type == "") {
-            id = cloudViewModel.addSpotToPublic(name: name, founder: founder, date: spot.date!, x: spot.x, y: spot.y, description: descript, type: "none", image: spot.image!, emoji: emoji)
-        } else {
-            id = cloudViewModel.addSpotToPublic(name: name, founder: founder, date: spot.date!, x: spot.x, y: spot.y, description: descript, type: type, image: spot.image!, emoji: emoji)
-        }
+        let id = cloudViewModel.addSpotToPublic(name: name, founder: founder, date: spot.date!, x: spot.x, y: spot.y, description: descript, type: tags, image: spot.image!, emoji: emoji)
         spot.name = name
         spot.details = descript
         spot.founder = founder
@@ -328,11 +361,7 @@ struct DetailView: View {
         if (isPublic) {
             spot.emoji = emoji
         }
-        if (type == "") {
-            spot.type = "none"
-        } else {
-            spot.type = type
-        }
+        spot.tags = tags
         spot.dbid = id
         try? moc.save()
     }

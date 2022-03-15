@@ -267,7 +267,7 @@ struct DetailsDiscoverSheet: View {
                                 save()
                             }
                             .accentColor(.blue)
-                            .disabled(newName == "")
+                            .disabled(newName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
                         }
                     }
                 }
@@ -360,7 +360,7 @@ struct DetailsDiscoverSheet: View {
             newSpot.x = cloudViewModel.spots[index].location.coordinate.latitude
             newSpot.y = cloudViewModel.spots[index].location.coordinate.longitude
             newSpot.isPublic = false
-            newSpot.type = cloudViewModel.spots[index].type
+            newSpot.tags = cloudViewModel.spots[index].type
             newSpot.date = cloudViewModel.spots[index].date
             newSpot.id = UUID()
             newSpot.dbid = cloudViewModel.spots[index].record.recordID.recordName

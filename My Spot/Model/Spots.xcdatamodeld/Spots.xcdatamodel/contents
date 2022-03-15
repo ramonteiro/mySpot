@@ -19,14 +19,14 @@
         <attribute name="image" optional="YES" attributeType="Transformable" valueTransformerName="UIImageTransformer" customClassName="UIImage"/>
         <attribute name="isPublic" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
         <attribute name="name" attributeType="String"/>
-        <attribute name="type" optional="YES" attributeType="String"/>
+        <attribute name="tags" optional="YES" attributeType="String"/>
         <attribute name="x" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
         <attribute name="y" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
         <relationship name="playlist" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Playlist" inverseName="spot" inverseEntity="Playlist"/>
     </entity>
     <elements>
+        <element name="Likes" positionX="-54" positionY="90" width="128" height="44"/>
         <element name="Playlist" positionX="-63" positionY="54" width="128" height="14"/>
         <element name="Spot" positionX="-63" positionY="-18" width="128" height="224"/>
-        <element name="Likes" positionX="-54" positionY="90" width="128" height="44"/>
     </elements>
 </model>

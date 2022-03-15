@@ -17,6 +17,8 @@ struct ViewMapSpots: View {
     @Environment(\.presentationMode) var presentationMode
     @FetchRequest(sortDescriptors: []) var spots: FetchedResults<Spot>
     @EnvironmentObject var mapViewModel: MapViewModel
+    @EnvironmentObject var cloudViewModel: CloudKitViewModel
+    @EnvironmentObject var networkViewModel: NetworkMonitor
     @State private var selection = 0
     @State private var transIn: Edge = .leading
     @State private var transOut: Edge = .bottom
@@ -25,11 +27,15 @@ struct ViewMapSpots: View {
 
     var body: some View {
         ZStack {
-            displayMap
-        }
-        .onAppear {
-            withAnimation {
-                spotRegion = mapViewModel.region
+            if (networkViewModel.hasInternet) {
+                displayMap
+                    .onAppear {
+                        withAnimation {
+                            spotRegion = mapViewModel.region
+                        }
+                    }
+            } else {
+                Text("No Internet Connection Found")
             }
         }
     }

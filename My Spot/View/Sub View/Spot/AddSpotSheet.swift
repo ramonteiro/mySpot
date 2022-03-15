@@ -20,25 +20,31 @@ struct AddSpotSheet: View {
     @Environment(\.managedObjectContext) var moc
     @EnvironmentObject var mapViewModel: MapViewModel
     @EnvironmentObject var cloudViewModel: CloudKitViewModel
+    @EnvironmentObject var networkViewModel: NetworkMonitor
     
     @State private var showingAlert = false
     @State private var name = ""
     @State private var founder = ""
     @State private var descript = ""
-    @State private var type = ""
+    @State private var tags = ""
     @State private var isPublic = false
     @State private var changeProfileImage = false
     @State private var openCameraRoll = false
     @State private var canSubmitPic = false
     @State private var emoji = ""
+    @State private var long = 1.0
+    @State private var lat = 1.0
     @State private var imageSelected = UIImage()
+    
+    private var disableSave: Bool {
+        name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || descript.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || canSubmitPic == false || founder.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || isEmojiNeeded() || (isPublic && !cloudViewModel.isSignedInToiCloud)
+    }
     
     enum Field {
         case name
         case descript
         case founder
         case emoji
-        case type
     }
     
     @FocusState private var focusState: Field?
@@ -46,95 +52,148 @@ struct AddSpotSheet: View {
     var body: some View {
         ZStack {
             if (mapViewModel.getIsAuthorized()) {
-                NavigationView {
-                    Form {
-                        Section(header: Text("Spot Name")) {
-                            displayNamePrompt
-                        }
-                        Section(header: Text("Founder's Name")) {
-                            displayFounderPrompt
-                        }
-                        Section(header: Text("Spot Tag")) {
-                            displaySpotTag
-                        }
-                        Section(header: Text("Share Spot")) {
-                            displayIsPublicPrompt
-                                .disabled(!cloudViewModel.hasInternet || !cloudViewModel.isSignedInToiCloud)
-                        }
-                        Section(header: Text("Spot Description")) {
-                            displayDescriptionPrompt
-                        }
-                        Section(header: Text("Date Found")) {
-                            Text(getDate())
-                        }
-                        Section(header: Text("Spot Location")) {
-                            Text("Latitude: \(getLongitude())")
-                            Text("Longitude: \(getLatitude())")
-                            NavigationLink(destination: ViewOnlyUserOnMap()) {
-                                Text("Show Map")
+                if (getLatitude() != 1.0) {
+                    NavigationView {
+                        Form {
+                            Section(header: Text("Spot Name")) {
+                                displayNamePrompt
+                            }
+                            Section(header: Text("Founder's Name")) {
+                                displayFounderPrompt
+                            }
+                            Section(header: Text("Share Spot")) {
+                                if (networkViewModel.hasInternet) {
+                                    displayIsPublicPrompt
+                                } else {
+                                    Text("Internet Is Required To Share Spot.")
+                                }
+                            }
+                            Section(header: Text("Spot Description")) {
+                                displayDescriptionPrompt
+                            }
+                            Section(header: Text("Date Found")) {
+                                Text(getDate())
+                            }
+                            Section(header: Text("Spot Location")) {
+                                ViewOnlyUserOnMap()
+                                    .aspectRatio(contentMode: .fit)
+                                    .cornerRadius(15)
+                            }
+                            Section(header: Text("Photo of Spot")) {
+                                displayPhotoButton
                             }
                         }
-                        Section(header: Text("Photo of Spot")) {
-                            displayPhotoButton
-                        }
-                    }
-                    .onSubmit {
-                        switch focusState {
-                        case .name:
-                            focusState = .founder
-                        case .founder:
-                            focusState = .type
-                        case .type:
-                            focusState = .descript
-                        default:
-                            focusState = nil
-                        }
-                    }
-                    .onAppear {
-                        if (UserDefaults.standard.valueExists(forKey: UserDefaultKeys.founder) && founder == "") {
-                            founder = UserDefaults.standard.value(forKey: UserDefaultKeys.founder) as! String
-                        }
-                    }
-                    .accentColor(.red)
-                    .sheet(isPresented: $openCameraRoll) {
-                        TakePhoto(selectedImage: $imageSelected, sourceType: .camera)
-                            .ignoresSafeArea()
-                    }
-                    .navigationTitle("Create Spot")
-                    .toolbar {
-                        ToolbarItemGroup(placement: .keyboard) {
-                            Button("Done") {
+                        .onSubmit {
+                            switch focusState {
+                            case .name:
+                                focusState = .founder
+                            case .founder:
+                                if (isPublic) {
+                                    focusState = .emoji
+                                } else {
+                                    focusState = .descript
+                                }
+                            case .emoji:
+                                focusState = .descript
+                            default:
                                 focusState = nil
                             }
                         }
-                        ToolbarItemGroup(placement: .navigationBarTrailing) {
-                            Button("Save") {
-                                if (!cloudViewModel.hasInternet) {
-                                    isPublic = false
-                                }
-                                if (isPublic) {
-                                    savePublic()
-                                } else {
-                                    save()
-                                    close()
-                                }
+                        .onAppear {
+                            if (UserDefaults.standard.valueExists(forKey: UserDefaultKeys.founder) && founder.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty) {
+                                founder = UserDefaults.standard.value(forKey: UserDefaultKeys.founder) as! String
                             }
-                            .padding()
-                            .disabled(name == "" || descript == "" || canSubmitPic == false || founder == "" || isEmojiNeeded() || (isPublic && !cloudViewModel.isSignedInToiCloud))
                         }
-                        ToolbarItemGroup(placement: .navigationBarLeading) {
-                            Button("Delete") {
-                                showingAlert = true
+                        .accentColor(.red)
+                        .sheet(isPresented: $openCameraRoll) {
+                            TakePhoto(selectedImage: $imageSelected, sourceType: .camera)
+                                .ignoresSafeArea()
+                        }
+                        .navigationTitle("Create Spot")
+                        .toolbar {
+                            ToolbarItemGroup(placement: .keyboard) {
+                                HStack {
+                                    Button {
+                                        switch focusState {
+                                        case .founder:
+                                            focusState = .name
+                                        case .emoji:
+                                            focusState = .founder
+                                        case .descript:
+                                            if (isPublic) {
+                                                focusState = .emoji
+                                            } else {
+                                                focusState = .founder
+                                            }
+                                        default:
+                                            focusState = nil
+                                        }
+                                    } label: {
+                                        Image(systemName: "chevron.up")
+                                    }
+                                    .disabled(focusState == .name)
+                                    Button {
+                                        switch focusState {
+                                        case .name:
+                                            focusState = .founder
+                                        case .founder:
+                                            if (isPublic) {
+                                                focusState = .emoji
+                                            } else {
+                                                focusState = .descript
+                                            }
+                                        case .emoji:
+                                            focusState = .descript
+                                        default:
+                                            focusState = nil
+                                        }
+                                    } label: {
+                                        Image(systemName: "chevron.down")
+                                    }
+                                    .disabled(focusState == .descript)
+                                    Spacer()
+                                    Button("Done") {
+                                        focusState = nil
+                                    }
+                                }
                             }
-                            .alert("Are you sure you want to delete spot?", isPresented: $showingAlert) {
-                                Button("Yes", role: .destructive) { close() }
+                            ToolbarItemGroup(placement: .navigationBarTrailing) {
+                                Button("Save") {
+                                    if (!networkViewModel.hasInternet) {
+                                        isPublic = false
+                                    }
+                                    tags = descript.findTags()
+                                    if (isPublic) {
+                                        savePublic()
+                                    } else {
+                                        save()
+                                        close()
+                                    }
+                                }
+                                .padding()
+                                .disabled(disableSave)
                             }
-                            .padding()
-                            .accentColor(.red)
+                            ToolbarItemGroup(placement: .navigationBarLeading) {
+                                Button("Delete") {
+                                    showingAlert = true
+                                }
+                                .alert("Are you sure you want to delete spot?", isPresented: $showingAlert) {
+                                    Button("Yes", role: .destructive) { close() }
+                                }
+                                .padding()
+                                .accentColor(.red)
+                            }
                         }
                     }
+                    .onAppear {
+                        lat = getLatitude()
+                        long = getLongitude()
+                    }
+                    .interactiveDismissDisabled()
+                } else {
+                    Text("No Internet Connection Found.")
+                    Text("Internet Is Required to Find Location.").font(.subheadline).foregroundColor(.gray)
                 }
-                .interactiveDismissDisabled()
             } else {
                 VStack {
                     Text("Location services are not enabled for mySpot.")
@@ -169,24 +228,12 @@ struct AddSpotSheet: View {
         })
     }
     
-    private var displaySpotTag: some View {
-        TextField("Enter Tag", text: $type, prompt: Text("ex: Skating").font(.subheadline).foregroundColor(.gray))
-            .focused($focusState, equals: .type)
-            .submitLabel(.next)
-            .onReceive(Just(type)) { _ in
-                if (type.count > MaxCharLength.names) {
-                    type = String(founder.prefix(MaxCharLength.names))
-                }
-            }
-    }
-    
     private var displayDescriptionPrompt: some View {
         ZStack {
             TextEditor(text: $descript)
             Text(descript).opacity(0).padding(.all, 8)
         }
         .focused($focusState, equals: .descript)
-        .submitLabel(.done)
         .onReceive(Just(descript)) { _ in
             if (descript.count > MaxCharLength.description) {
                 descript = String(descript.prefix(MaxCharLength.description))
@@ -196,23 +243,27 @@ struct AddSpotSheet: View {
     
     private var displayIsPublicPrompt: some View {
         VStack {
-            Toggle("Public", isOn: $isPublic.animation())
-            if (isPublic) {
-                EmojiTextField(text: $emoji, placeholder: "Enter Emoji")
-                    .onReceive(Just(emoji), perform: { _ in
-                        self.emoji = String(self.emoji.onlyEmoji().prefix(MaxCharLength.emojis))
-                    })
-                    .submitLabel(.done)
-                    .focused($focusState, equals: .emoji)
+            if (cloudViewModel.isSignedInToiCloud) {
+                Toggle("Public", isOn: $isPublic.animation())
+                if (isPublic) {
+                    EmojiTextField(text: $emoji, placeholder: "Enter Emoji")
+                        .onReceive(Just(emoji), perform: { _ in
+                            self.emoji = String(self.emoji.onlyEmoji().prefix(MaxCharLength.emojis))
+                        })
+                        .submitLabel(.next)
+                        .focused($focusState, equals: .emoji)
+                }
+            } else if (!cloudViewModel.isSignedInToiCloud) {
+                Text("You Must Be Signed In To Icloud To Disover And Share Spots")
             }
         }
-        .disabled(!cloudViewModel.hasInternet || !cloudViewModel.isSignedInToiCloud)
     }
     
     private var displayFounderPrompt: some View {
         TextField("Enter Founder Name", text: $founder)
             .focused($focusState, equals: .founder)
             .submitLabel(.next)
+            .textContentType(.givenName)
             .onReceive(Just(founder)) { _ in
                 if (founder.count > MaxCharLength.names) {
                     founder = String(founder.prefix(MaxCharLength.names))
@@ -233,7 +284,7 @@ struct AddSpotSheet: View {
     
     private func isEmojiNeeded() -> Bool {
         if isPublic {
-            return emoji == ""
+            return emoji.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
         } else {
             return false
         }
@@ -258,47 +309,31 @@ struct AddSpotSheet: View {
         newSpot.details = descript
         newSpot.image = imageSelected
         newSpot.name = name
-        newSpot.x = getLatitude()
-        newSpot.y = getLongitude()
-        newSpot.isPublic = isPublic
+        newSpot.x = lat
+        newSpot.y = long
+        newSpot.isPublic = false
         newSpot.date = getDate()
-        if (isPublic) {
-            newSpot.emoji = emoji
-        }
-        if (type == "") {
-            newSpot.type = "none"
-        } else {
-            newSpot.type = type
-        }
+        newSpot.tags = tags
         newSpot.id = UUID()
         try? moc.save()
     }
     
     private func savePublic() {
-        let id: String
-        if (type == "") {
-            id = cloudViewModel.addSpotToPublic(name: name, founder: founder, date: getDate(), x: getLatitude(), y: getLongitude(), description: descript, type: "none", image: imageSelected, emoji: emoji)
-        } else {
-            id = cloudViewModel.addSpotToPublic(name: name, founder: founder, date: getDate(), x: getLatitude(), y: getLongitude(), description: descript, type: type, image: imageSelected, emoji: emoji)
-        }
+        let id = cloudViewModel.addSpotToPublic(name: name, founder: founder, date: getDate(), x: lat, y: long, description: descript, type: tags, image: imageSelected, emoji: emoji)
         UserDefaults.standard.set(founder, forKey: UserDefaultKeys.founder)
         let newSpot = Spot(context: moc)
         newSpot.founder = founder
         newSpot.details = descript
         newSpot.image = imageSelected
         newSpot.name = name
-        newSpot.x = getLatitude()
-        newSpot.y = getLongitude()
+        newSpot.x = lat
+        newSpot.y = long
         newSpot.isPublic = isPublic
         if (isPublic) {
             newSpot.emoji = emoji
         }
         newSpot.date = getDate()
-        if (type == "") {
-            newSpot.type = "none"
-        } else {
-            newSpot.type = type
-        }
+        newSpot.tags = tags
         newSpot.id = UUID()
         newSpot.dbid = id
         try? moc.save()
@@ -320,26 +355,4 @@ struct AddSpotSheet: View {
             return 1.0
         }
     }
-}
-
-// compresses uiimage to send to firebase storage
-extension UIImage {
-    func aspectFittedToHeight(_ newHeight: CGFloat) -> UIImage {
-        let scale = newHeight / self.size.height
-        let newWidth = self.size.width * scale
-        let newSize = CGSize(width: newWidth, height: newHeight)
-        let renderer = UIGraphicsImageRenderer(size: newSize)
-        
-        return renderer.image { _ in
-            self.draw(in: CGRect(origin: .zero, size: newSize))
-        }
-    }
-}
-
-extension UserDefaults {
-    
-    func valueExists(forKey key: String) -> Bool {
-        return object(forKey: key) != nil
-    }
-    
 }

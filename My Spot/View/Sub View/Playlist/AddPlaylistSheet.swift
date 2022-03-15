@@ -23,6 +23,10 @@ struct AddPlaylistSheet: View {
     @State private var emoji = ""
     @State private var isEmoji: Bool = true
     
+    private var disableSave: Bool {
+        name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || emoji.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+    }
+    
     enum Field {
         case emoji
         case name
@@ -52,7 +56,32 @@ struct AddPlaylistSheet: View {
             .navigationTitle("Create Playlist")
             .toolbar {
                 ToolbarItemGroup(placement: .keyboard) {
-                    doneButton
+                    HStack {
+                        Button {
+                            switch focusState {
+                            case .emoji:
+                                focusState = .name
+                            default:
+                                focusState = nil
+                            }
+                        } label: {
+                            Image(systemName: "chevron.up")
+                        }
+                        .disabled(focusState == .name)
+                        Button {
+                            switch focusState {
+                            case .name:
+                                focusState = .emoji
+                            default:
+                                focusState = nil
+                            }
+                        } label: {
+                            Image(systemName: "chevron.down")
+                        }
+                        .disabled(focusState == .emoji)
+                        Spacer()
+                        doneButton
+                    }
                 }
                 ToolbarItemGroup(placement: .navigationBarTrailing) {
                     saveButton
@@ -89,7 +118,7 @@ struct AddPlaylistSheet: View {
             close()
         }
         .padding()
-        .disabled(name == "" || emoji == "")
+        .disabled(disableSave)
     }
     
     private var deleteButton: some View {

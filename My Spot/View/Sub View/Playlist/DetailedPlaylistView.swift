@@ -206,20 +206,26 @@ struct DetailPlaylistView: View {
     private var displayEditingMode: some View {
         Form {
             Section(header: Text("Playlist Name")) {
-                TextField("\(playlist.name!)", text: $name)
+                TextField("Enter Playlist Name", text: $name)
                     .onReceive(Just(name)) { _ in
                         if (name.count > MaxCharLength.names) {
                             name = String(name.prefix(MaxCharLength.names))
                         }
                     }
+                    .onAppear {
+                        name = playlist.name!
+                    }
                     .focused($focusState, equals: .name)
                     .submitLabel(.next)
             }
-            Section(header: Text("Emoji ID")) {
+            Section(header: Text("Emoji")) {
                 EmojiTextField(text: $emoji, placeholder: "Enter Emoji")
                     .onReceive(Just(emoji), perform: { _ in
                         self.emoji = String(self.emoji.onlyEmoji().prefix(MaxCharLength.emojis))
                     })
+                    .onAppear {
+                        emoji = playlist.emoji!
+                    }
                     .focused($focusState, equals: .emoji)
                     .submitLabel(.done)
             }
@@ -236,10 +242,6 @@ struct DetailPlaylistView: View {
             }
         }
         .navigationTitle(name)
-        .onAppear(perform: {
-            name = playlist.name!
-            emoji = playlist.emoji!
-        })
         .toolbar {
             ToolbarItemGroup(placement: .navigationBarTrailing) {
                 Button("Done") {
@@ -247,23 +249,40 @@ struct DetailPlaylistView: View {
                 }
                 .alert("Would you like to keep any changes made?", isPresented: $showingEditAlert) {
                     Button("Keep") {
-                        if (name != "" && emoji != "") {
-                            saveChanges()
-                        }
-                        if (name == "") {
-                            name = "NAME IS REQUIRED"
-                        }
-                        if (emoji == "") {
-                            emoji = "🚫"
-                        }
-                    }
+                        saveChanges()
+                    }.disabled(name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || emoji.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
                     Button("Discard", role: .destructive) { isEditing = false }
                 }
                 .accentColor(.red)
             }
             ToolbarItemGroup(placement: .keyboard) {
-                Button("Done") {
-                    focusState = nil
+                HStack {
+                    Button {
+                        switch focusState {
+                        case .emoji:
+                            focusState = .name
+                        default:
+                            focusState = nil
+                        }
+                    } label: {
+                        Image(systemName: "chevron.up")
+                    }
+                    .disabled(focusState == .name)
+                    Button {
+                        switch focusState {
+                        case .name:
+                            focusState = .emoji
+                        default:
+                            focusState = nil
+                        }
+                    } label: {
+                        Image(systemName: "chevron.down")
+                    }
+                    .disabled(focusState == .emoji)
+                    Spacer()
+                    Button("Done") {
+                        focusState = nil
+                    }
                 }
             }
         }

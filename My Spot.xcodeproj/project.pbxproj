@@ -48,6 +48,8 @@
 		C515042527D7CAC6009F0DCD /* UIEmojiTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = C515042227D7CAC6009F0DCD /* UIEmojiTextField.swift */; };
 		C515042927D8540A009F0DCD /* TabController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C515042827D8540A009F0DCD /* TabController.swift */; };
 		C515042C27D95225009F0DCD /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C515042B27D95225009F0DCD /* LaunchScreen.storyboard */; };
+		C56F499F27E05CE300BCBB8F /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = C56F499E27E05CE300BCBB8F /* Extensions.swift */; };
+		C56F49A127E05FDF00BCBB8F /* NetworkMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = C56F49A027E05FDF00BCBB8F /* NetworkMonitor.swift */; };
 		C5F44E8D27DD3818001E9E32 /* Likes+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5F44E8B27DD3818001E9E32 /* Likes+CoreDataClass.swift */; };
 		C5F44E8E27DD3818001E9E32 /* Likes+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5F44E8C27DD3818001E9E32 /* Likes+CoreDataProperties.swift */; };
 /* End PBXBuildFile section */
@@ -97,6 +99,8 @@
 		C515042827D8540A009F0DCD /* TabController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabController.swift; sourceTree = "<group>"; };
 		C515042A27D95154009F0DCD /* My-Spot-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "My-Spot-Info.plist"; sourceTree = SOURCE_ROOT; };
 		C515042B27D95225009F0DCD /* LaunchScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
+		C56F499E27E05CE300BCBB8F /* Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
+		C56F49A027E05FDF00BCBB8F /* NetworkMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkMonitor.swift; sourceTree = "<group>"; };
 		C5F44E8B27DD3818001E9E32 /* Likes+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Likes+CoreDataClass.swift"; sourceTree = "<group>"; };
 		C5F44E8C27DD3818001E9E32 /* Likes+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Likes+CoreDataProperties.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -297,6 +301,8 @@
 				C515042127D7CAC6009F0DCD /* TakePhoto.swift */,
 				C515042227D7CAC6009F0DCD /* UIEmojiTextField.swift */,
 				C515042827D8540A009F0DCD /* TabController.swift */,
+				C56F499E27E05CE300BCBB8F /* Extensions.swift */,
+				C56F49A027E05FDF00BCBB8F /* NetworkMonitor.swift */,
 			);
 			path = Helper;
 			sourceTree = "<group>";
@@ -382,6 +388,7 @@
 				C515041C27D7CAAA009F0DCD /* ViewDiscoverSpots.swift in Sources */,
 				C51503F427D7CA1D009F0DCD /* MapViewModel.swift in Sources */,
 				C51503FC27D7CA60009F0DCD /* MySpotsView.swift in Sources */,
+				C56F49A127E05FDF00BCBB8F /* NetworkMonitor.swift in Sources */,
 				C515041B27D7CAAA009F0DCD /* MapAnnotationDiscover.swift in Sources */,
 				C51503AE27D7C347009F0DCD /* My_SpotApp.swift in Sources */,
 				C51503FD27D7CA60009F0DCD /* DiscoverView.swift in Sources */,
@@ -407,6 +414,7 @@
 				C5F44E8D27DD3818001E9E32 /* Likes+CoreDataClass.swift in Sources */,
 				C5F44E8E27DD3818001E9E32 /* Likes+CoreDataProperties.swift in Sources */,
 				C515041027D7CA87009F0DCD /* AddPlaylistSheet.swift in Sources */,
+				C56F499F27E05CE300BCBB8F /* Extensions.swift in Sources */,
 				C51503DE27D7C856009F0DCD /* SpotFromCloud.swift in Sources */,
 				C51503FE27D7CA60009F0DCD /* PlaylistView.swift in Sources */,
 				C515040227D7CA72009F0DCD /* SpotRow.swift in Sources */,
