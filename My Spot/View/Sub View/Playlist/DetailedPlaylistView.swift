@@ -106,7 +106,6 @@ struct DetailPlaylistView: View {
                 .sheet(isPresented: $showingEditSheet) {
                     PlaylistEditSheet(playlist: playlist)
                 }
-                .accentColor(.red)
             }
         }
     }

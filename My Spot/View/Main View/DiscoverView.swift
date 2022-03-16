@@ -28,11 +28,11 @@ struct DiscoverView: View {
     // find spot names from db that contain searchtext
     private var searchResults: [SpotFromCloud] {
         if searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-                return cloudViewModel.spots
-            } else {
-                return cloudViewModel.spots.filter { $0.name.lowercased().contains(searchText.lowercased()) || $0.type.lowercased().contains(searchText.lowercased()) || $0.founder.lowercased().contains(searchText.lowercased()) || $0.emoji.contains(searchText)}
-            }
+            return cloudViewModel.spots
+        } else {
+            return cloudViewModel.spots.filter { $0.name.lowercased().contains(searchText.lowercased()) || $0.type.lowercased().contains(searchText.lowercased()) || $0.founder.lowercased().contains(searchText.lowercased()) || $0.emoji.contains(searchText)}
         }
+    }
     
     var body: some View {
         NavigationView {
@@ -43,7 +43,6 @@ struct DiscoverView: View {
             }
         }
         .navigationTitle("Discover Spots")
-        .accentColor(.red)
         .onAppear {
             mapViewModel.searchingHere = mapViewModel.region
             if (cloudViewModel.spots.count == 0) {
@@ -118,12 +117,21 @@ struct DiscoverView: View {
     
     private var listSpots: some View {
         ScrollViewReader { prox in
-                List {
-                    ForEach(searchResults.indices, id: \.self) { index in
+            List {
+                ForEach(searchResults.indices, id: \.self) { index in
                     NavigationLink(destination: DiscoverDetailView(index: index)) {
                         DiscoverRow(spot: searchResults[index])
                             .id(searchResults[index])
                     }
+                }
+            }
+            .onAppear {
+                cloudViewModel.canRefresh = true
+            }
+            .if(cloudViewModel.canRefresh && cloudViewModel.spots.count != 0) { view in
+                view.refreshable {
+                    mapViewModel.checkLocationAuthorization()
+                    loadSpotsFromDB(location: CLLocation(latitude: mapViewModel.searchingHere.center.latitude, longitude: mapViewModel.searchingHere.center.longitude))
                 }
             }
             .onChange(of: tabController.discoverPopToRoot) { _ in
@@ -146,9 +154,9 @@ struct DiscoverView: View {
             ToolbarItemGroup(placement: .navigationBarTrailing) {
                 HStack {
                     Button {
-                        mapViewModel.checkLocationAuthorization()
-                        loadSpotsFromDB(location: CLLocation(latitude: mapViewModel.searchingHere.center.latitude, longitude: mapViewModel.searchingHere.center.longitude))
-                        
+                        for _ in 1...60 {
+                            cloudViewModel.addSpotToPublic(name: "testname", founder: "isaac", date: "Mar 16, 2022", locationName: "Peoria", x: -113.0, y: 34.5, description: "this is description #tags", type: "tags", image: UIImage(systemName: "location")!, emoji: "🪂")
+                        }
                     } label: {
                         Image(systemName: "arrow.triangle.2.circlepath")
                     }

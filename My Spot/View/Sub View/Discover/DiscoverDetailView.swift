@@ -25,6 +25,8 @@ struct DiscoverDetailView: View {
     @EnvironmentObject var mapViewModel: MapViewModel
     @EnvironmentObject var cloudViewModel: CloudKitViewModel
     
+    @State private var message = ""
+    @State private var showingMailSheet = false
     @State private var nameInTitle = ""
     @State private var isSaving = false
     @State private var likeButton = "hand.thumbsup"
@@ -67,7 +69,17 @@ struct DiscoverDetailView: View {
                 }
                 .accentColor(.blue)
             }
-            .accentColor(.red)
+            Section(header: Text("report")) {
+                Button("Report") {
+                    showingMailSheet = true
+                }
+                .disabled(!MailView.canSendMail)
+                .sheet(isPresented: $showingMailSheet) {
+                    MailView(message: $message) { result in
+                        print(result)
+                    }
+                }
+            }
             if (isSpotInCoreData().count == 0 && !isSaved) {
                 Section(header: Text("Save To My Spots")) {
                     if (!isSaving) {
@@ -117,6 +129,8 @@ struct DiscoverDetailView: View {
             if (didlike) {
                 likeButton = "hand.thumbsup.fill"
             }
+            message = "The public spot with id: " + cloudViewModel.spots[index].id + ", has the following issue(s):\n"
+            cloudViewModel.canRefresh = false
         }
         .navigationTitle(nameInTitle)
         .toolbar {
@@ -157,10 +171,9 @@ struct DiscoverDetailView: View {
                 }, label: {
                     Image(systemName: likeButton)
                 })
-                .accentColor(.red)
                 .padding()
                 Button {
-                    shareSheet()
+                    cloudViewModel.shareSheet(index: index)
                 } label: {
                     Image(systemName: "square.and.arrow.up")
                 }
@@ -169,18 +182,6 @@ struct DiscoverDetailView: View {
         }
         .onChange(of: tabController.discoverPopToRoot) { _ in
             presentationMode.wrappedValue.dismiss()
-        }
-    }
-    
-    private func shareSheet() {
-        let url = URL(string: "myspot://" + (cloudViewModel.spots[index].id))
-        let activityView = UIActivityViewController(activityItems: ["Check out \"\(cloudViewModel.spots[index].name)\(cloudViewModel.spots[index].emoji)\" on My Spot! ", url!], applicationActivities: nil)
-
-        let allScenes = UIApplication.shared.connectedScenes
-        let scene = allScenes.first { $0.activationState == .foregroundActive }
-
-        if let windowScene = scene as? UIWindowScene {
-            windowScene.keyWindow?.rootViewController?.present(activityView, animated: true, completion: nil)
         }
     }
     

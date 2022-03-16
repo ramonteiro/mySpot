@@ -159,7 +159,6 @@ struct ViewPlaylistMap: View {
                 }
             }
         }
-        .accentColor(.red)
         .sheet(isPresented: $showingDetailsSheet) {
             DetailsSheet(spot: playlist.spotArr[selection])
         }
@@ -208,7 +207,6 @@ struct DetailsSheet: View {
                                 Image(systemName: "arrowshape.turn.up.backward").imageScale(.large)
                             }
                             .buttonStyle(.borderedProminent)
-                            .accentColor(.red)
                         }
                     }
                 }

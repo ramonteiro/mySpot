@@ -27,6 +27,7 @@ struct AddSpotSheet: View {
     @State private var founder = ""
     @State private var descript = ""
     @State private var tags = ""
+    @State private var locationName = ""
     @State private var isPublic = false
     @State private var changeProfileImage = false
     @State private var openCameraRoll = false
@@ -104,7 +105,6 @@ struct AddSpotSheet: View {
                                 founder = UserDefaults.standard.value(forKey: UserDefaultKeys.founder) as! String
                             }
                         }
-                        .accentColor(.red)
                         .sheet(isPresented: $openCameraRoll) {
                             TakePhoto(selectedImage: $imageSelected, sourceType: .camera)
                                 .ignoresSafeArea()
@@ -181,13 +181,15 @@ struct AddSpotSheet: View {
                                     Button("Yes", role: .destructive) { close() }
                                 }
                                 .padding()
-                                .accentColor(.red)
                             }
                         }
                     }
                     .onAppear {
                         lat = getLatitude()
                         long = getLongitude()
+                        mapViewModel.getPlacmarkOfLocation(location: CLLocation(latitude: lat, longitude: long), completionHandler: { location in
+                            locationName = location
+                        })
                     }
                     .interactiveDismissDisabled()
                 } else {
@@ -202,7 +204,6 @@ struct AddSpotSheet: View {
                         UIApplication.shared.open(URL(string: UIApplication.openSettingsURLString)!)
                     }
                 }
-                .accentColor(.red)
             }
         }
     }
@@ -314,12 +315,13 @@ struct AddSpotSheet: View {
         newSpot.isPublic = false
         newSpot.date = getDate()
         newSpot.tags = tags
+        newSpot.locationName = locationName
         newSpot.id = UUID()
         try? moc.save()
     }
     
     private func savePublic() {
-        let id = cloudViewModel.addSpotToPublic(name: name, founder: founder, date: getDate(), x: lat, y: long, description: descript, type: tags, image: imageSelected, emoji: emoji)
+        let id = cloudViewModel.addSpotToPublic(name: name, founder: founder, date: getDate(), locationName: locationName, x: lat, y: long, description: descript, type: tags, image: imageSelected, emoji: emoji)
         UserDefaults.standard.set(founder, forKey: UserDefaultKeys.founder)
         let newSpot = Spot(context: moc)
         newSpot.founder = founder
@@ -328,12 +330,11 @@ struct AddSpotSheet: View {
         newSpot.name = name
         newSpot.x = lat
         newSpot.y = long
-        newSpot.isPublic = isPublic
-        if (isPublic) {
-            newSpot.emoji = emoji
-        }
+        newSpot.isPublic = true
+        newSpot.emoji = emoji
         newSpot.date = getDate()
         newSpot.tags = tags
+        newSpot.locationName = locationName
         newSpot.id = UUID()
         newSpot.dbid = id
         try? moc.save()

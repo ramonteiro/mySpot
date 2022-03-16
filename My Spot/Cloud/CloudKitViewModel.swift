@@ -14,6 +14,8 @@ class CloudKitViewModel: ObservableObject {
     @Published var error: String = ""
     @Published var spots: [SpotFromCloud] = []
     @Published var shared: [SpotFromCloud] = []
+    @Published var userID: String = ""
+    @Published var canRefresh = false
     
     init() {
         getiCloudStatus()
@@ -43,8 +45,10 @@ class CloudKitViewModel: ObservableObject {
                 guard let image = record["image"] as? CKAsset else { return }
                 guard let likes = record["likes"] as? Int else { return }
                 guard let id = record["id"] as? String else { return }
+                guard let locationName = record["locationName"] as? String else { return }
+                guard let user = record["userID"] as? String else { return }
                 let imageURL = image.fileURL
-                returnedSpots.append(SpotFromCloud(id: id, name: name, founder: founder, description: description, date: date, location: location, type: type, emoji: emoji, imageURL: imageURL ?? URL(fileURLWithPath: "none"), likes: likes, record: record))
+                returnedSpots.append(SpotFromCloud(id: id, name: name, founder: founder, description: description, date: date, location: location, type: type, emoji: emoji, imageURL: imageURL ?? URL(fileURLWithPath: "none"), likes: likes, locationName: locationName, userID: user, record: record))
             case .failure(let error):
                 print("FETCH ERROR: \(error)")
             }
@@ -66,6 +70,7 @@ class CloudKitViewModel: ObservableObject {
                     self?.error = CloudKitError.iCloudAccountNotDetermined.rawValue
                 case .available:
                     self?.isSignedInToiCloud = true
+                    self?.fetchUserID()
                 case .restricted:
                     self?.error = CloudKitError.iCloudAccountRestricted.rawValue
                 case .noAccount:
@@ -94,16 +99,18 @@ class CloudKitViewModel: ObservableObject {
             return resizedImage
     }
     
-    func addSpotToPublic(name: String, founder: String, date: String, x: Double, y: Double, description: String, type: String, image: UIImage, emoji: String) -> String {
+    func addSpotToPublic(name: String, founder: String, date: String, locationName: String, x: Double, y: Double, description: String, type: String, image: UIImage, emoji: String) -> String {
         let newSpot = CKRecord(recordType: "Spots")
         newSpot["name"] = name
         newSpot["founder"] = founder
         newSpot["description"] = description
         newSpot["date"] = date
+        newSpot["locationName"] = locationName
         newSpot["location"] = CLLocation(latitude: x, longitude: y)
         newSpot["type"] = type
         newSpot["emoji"] = emoji
         newSpot["id"] = UUID().uuidString
+        newSpot["userID"] = userID
         newSpot["likes"] = 0
         
         if let imageData = compressImage(image: image).pngData() {
@@ -121,6 +128,16 @@ class CloudKitViewModel: ObservableObject {
             }
         }
         return ""
+    }
+    
+    private func fetchUserID() {
+        CKContainer.default().fetchUserRecordID { [weak self] returnedID, returnedError in
+            DispatchQueue.main.async {
+                if let id = returnedID {
+                    self?.userID = id.recordName
+                }
+            }
+        }
     }
     
     private func saveSpotPublic(record: CKRecord) {
@@ -155,8 +172,10 @@ class CloudKitViewModel: ObservableObject {
                 guard let image = record["image"] as? CKAsset else { return }
                 guard let likes = record["likes"] as? Int else { return }
                 guard let id = record["id"] as? String else { return }
+                guard let locationName = record["locationName"] as? String else { return }
+                guard let user = record["userID"] as? String else { return }
                 let imageURL = image.fileURL
-                returnedSpots.append(SpotFromCloud(id: id, name: name, founder: founder, description: description, date: date, location: location, type: type, emoji: emoji, imageURL: imageURL ?? URL(fileURLWithPath: "none"), likes: likes, record: record))
+                returnedSpots.append(SpotFromCloud(id: id, name: name, founder: founder, description: description, date: date, location: location, type: type, emoji: emoji, imageURL: imageURL ?? URL(fileURLWithPath: "none"), likes: likes, locationName: locationName, userID: user, record: record))
             case .failure(let error):
                 print("FETCH ERROR: \(error)")
             }
@@ -225,8 +244,10 @@ class CloudKitViewModel: ObservableObject {
                 guard let image = record["image"] as? CKAsset else { return }
                 guard let likes = record["likes"] as? Int else { return }
                 guard let id = record["id"] as? String else { return }
+                guard let locationName = record["locationName"] as? String else { return }
+                guard let user = record["userID"] as? String else { return }
                 let imageURL = image.fileURL
-                returnedSpots.append(SpotFromCloud(id: id, name: name, founder: founder, description: description, date: date, location: location, type: type, emoji: emoji, imageURL: imageURL ?? URL(fileURLWithPath: "none"), likes: likes, record: record))
+                returnedSpots.append(SpotFromCloud(id: id, name: name, founder: founder, description: description, date: date, location: location, type: type, emoji: emoji, imageURL: imageURL ?? URL(fileURLWithPath: "none"), likes: likes, locationName: locationName, userID: user, record: record))
             case .failure(let error):
                 print("FETCH ERROR: \(error)")
             }
@@ -254,6 +275,18 @@ class CloudKitViewModel: ObservableObject {
             DispatchQueue.main.async {
                 self?.spots.remove(at: index)
             }
+        }
+    }
+    
+    func shareSheet(index i: Int) {
+        let url = URL(string: "myspot://" + (spots[i].id))
+        let activityView = UIActivityViewController(activityItems: ["Check out, \"\(spots[i].name)\(spots[i].emoji)\" on My Spot! ", url!, "\n\nIf you don't have My Spot, get it on the Appstore here: ", URL(string: "https://apps.apple.com/us/app/my-spot-exploration/id1613618373")!], applicationActivities: nil)
+
+        let allScenes = UIApplication.shared.connectedScenes
+        let scene = allScenes.first { $0.activationState == .foregroundActive }
+
+        if let windowScene = scene as? UIWindowScene {
+            windowScene.keyWindow?.rootViewController?.present(activityView, animated: true, completion: nil)
         }
     }
 }

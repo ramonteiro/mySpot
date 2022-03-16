@@ -49,7 +49,6 @@ struct PlaylistView: View {
                 }
             }
         }
-        .accentColor(.red)
     }
     
     private var noPlaylistPrompt: some View {

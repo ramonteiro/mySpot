@@ -79,7 +79,6 @@ struct DetailView: View {
                             SpotEditSheet(spot: spot)
                         }
                         .disabled(!networkViewModel.hasInternet && spot.isPublic && !cloudViewModel.isSignedInToiCloud)
-                        .accentColor(.red)
                     }
                 }
             }

@@ -43,7 +43,6 @@ struct AddSpotToPlaylistSheet: View {
                     }
             }
         }
-        .accentColor(.red)
         .toolbar {
             ToolbarItemGroup(placement: .navigationBarTrailing) {
                 Button("Done") {
@@ -62,7 +61,6 @@ struct AddSpotToPlaylistSheet: View {
             Text("No Spots Available To Add")
             Spacer()
         }
-        .accentColor(.red)
         .toolbar {
             ToolbarItemGroup(placement: .navigationBarTrailing) {
                 Button("Done") {

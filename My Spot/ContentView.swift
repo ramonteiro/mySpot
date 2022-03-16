@@ -23,21 +23,18 @@ struct ContentView: View {
                     Text("My Spots")
                 }
                 .tag(Tab.spots)
-                .accentColor(.red)
             DiscoverView()
                 .tabItem() {
                     Image(systemName: "magnifyingglass")
                     Text("Discover")
                 }
                 .tag(Tab.discover)
-                .accentColor(.red)
             PlaylistView()
                 .tabItem() {
                     Image(systemName: "books.vertical")
                     Text("Playlists")
                 }
                 .tag(Tab.playlists)
-                .accentColor(.red)
         }
         .onChange(of: scenePhase, perform: { newValue in
             if newValue == .active {
@@ -84,7 +81,6 @@ struct ContentView: View {
                 showSharedSpotSheet = true
             }
         }
-        .accentColor(.red)
         .environmentObject(tabController)
     }
 }

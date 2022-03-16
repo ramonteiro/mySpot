@@ -101,7 +101,6 @@ struct MySpotsView: View {
         }
         )
         .navigationBarItems(leading: displayLocationIcon.disabled(!mapViewModel.isAuthorized))
-        .accentColor(.red)
     }
     
     private var listFiltered: some View {
@@ -162,7 +161,6 @@ struct MySpotsView: View {
             }
         })
         .navigationBarItems(leading: displayLocationIcon.disabled(!mapViewModel.isAuthorized))
-        .accentColor(.red)
     }
     
     private func filter() {

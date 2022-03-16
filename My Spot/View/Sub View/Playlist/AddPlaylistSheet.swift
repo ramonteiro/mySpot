@@ -52,7 +52,6 @@ struct AddPlaylistSheet: View {
                     focusState = nil
                 }
             }
-            .accentColor(.red)
             .navigationTitle("Create Playlist")
             .toolbar {
                 ToolbarItemGroup(placement: .keyboard) {
@@ -129,7 +128,6 @@ struct AddPlaylistSheet: View {
             Button("Yes", role: .destructive) { close() }
         }
         .padding()
-        .accentColor(.red)
     }
     
     private var playlistNamePrompt: some View {

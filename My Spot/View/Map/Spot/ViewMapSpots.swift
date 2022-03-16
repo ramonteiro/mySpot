@@ -164,7 +164,6 @@ struct ViewMapSpots: View {
                 }
             }
         }
-        .accentColor(.red)
         .sheet(isPresented: $showingDetailsSheet) {
             DetailsSheet(spot: spots[selection])
         }

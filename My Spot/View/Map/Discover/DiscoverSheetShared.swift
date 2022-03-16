@@ -119,7 +119,6 @@ struct DiscoverSheetShared: View {
                         } label: {
                             Image(systemName: "arrowshape.turn.up.backward").imageScale(.large)
                         }
-                        .accentColor(.red)
                     }
                     ToolbarItemGroup(placement: .navigationBarTrailing) {
                         Text("\(cloudViewModel.shared[0].likes)")
@@ -150,7 +149,6 @@ struct DiscoverSheetShared: View {
                         }, label: {
                             Image(systemName: likeButton)
                         })
-                        .accentColor(.red)
                         .padding()
                     }
                 }

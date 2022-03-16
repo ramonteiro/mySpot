@@ -29,6 +29,7 @@ extension Spot {
     @NSManaged public var tags: String?
     @NSManaged public var dbid: String?
     @NSManaged public var emoji: String?
+    @NSManaged public var locationName: String?
     @NSManaged public var playlist: Playlist?
     
     public var wrappedName: String {

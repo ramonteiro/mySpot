@@ -173,7 +173,6 @@ struct ViewDiscoverSpots: View {
                 }
             }
         }
-        .accentColor(.red)
         .sheet(isPresented: $showingDetailsSheet) {
             DetailsDiscoverSheet(index: selection)
         }
@@ -303,7 +302,6 @@ struct DetailsDiscoverSheet: View {
                         Image(systemName: "arrowshape.turn.up.backward").imageScale(.large)
                     }
                     .buttonStyle(.borderedProminent)
-                    .accentColor(.red)
                 }
                 ToolbarItemGroup(placement: .navigationBarTrailing) {
                     Text("\(cloudViewModel.spots[index].likes)")
@@ -334,7 +332,6 @@ struct DetailsDiscoverSheet: View {
                     }, label: {
                         Image(systemName: likeButton)
                     })
-                    .accentColor(.red)
                     .padding()
                 }
             }

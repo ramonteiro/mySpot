@@ -22,6 +22,5 @@ struct ViewOnlyUserOnMap: View {
             Map(coordinateRegion: $mapViewModel.region, showsUserLocation: true)
             .ignoresSafeArea()
         }
-        .accentColor(.red)
     }
 }

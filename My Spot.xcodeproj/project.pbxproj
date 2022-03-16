@@ -53,6 +53,7 @@
 		C515042C27D95225009F0DCD /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C515042B27D95225009F0DCD /* LaunchScreen.storyboard */; };
 		C56F499F27E05CE300BCBB8F /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = C56F499E27E05CE300BCBB8F /* Extensions.swift */; };
 		C56F49A127E05FDF00BCBB8F /* NetworkMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = C56F49A027E05FDF00BCBB8F /* NetworkMonitor.swift */; };
+		C587027427E27F1900DFB6C4 /* MailViewCallback.swift in Sources */ = {isa = PBXBuildFile; fileRef = C587027327E27F1900DFB6C4 /* MailViewCallback.swift */; };
 		C5F44E8D27DD3818001E9E32 /* Likes+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5F44E8B27DD3818001E9E32 /* Likes+CoreDataClass.swift */; };
 		C5F44E8E27DD3818001E9E32 /* Likes+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5F44E8C27DD3818001E9E32 /* Likes+CoreDataProperties.swift */; };
 /* End PBXBuildFile section */
@@ -107,6 +108,7 @@
 		C515042B27D95225009F0DCD /* LaunchScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
 		C56F499E27E05CE300BCBB8F /* Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
 		C56F49A027E05FDF00BCBB8F /* NetworkMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkMonitor.swift; sourceTree = "<group>"; };
+		C587027327E27F1900DFB6C4 /* MailViewCallback.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MailViewCallback.swift; sourceTree = "<group>"; };
 		C5F44E8B27DD3818001E9E32 /* Likes+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Likes+CoreDataClass.swift"; sourceTree = "<group>"; };
 		C5F44E8C27DD3818001E9E32 /* Likes+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Likes+CoreDataProperties.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -312,6 +314,7 @@
 				C515042827D8540A009F0DCD /* TabController.swift */,
 				C56F499E27E05CE300BCBB8F /* Extensions.swift */,
 				C56F49A027E05FDF00BCBB8F /* NetworkMonitor.swift */,
+				C587027327E27F1900DFB6C4 /* MailViewCallback.swift */,
 			);
 			path = Helper;
 			sourceTree = "<group>";
@@ -409,6 +412,7 @@
 				C51503F527D7CA1D009F0DCD /* ViewOnlyUserOnMap.swift in Sources */,
 				C515041A27D7CAAA009F0DCD /* DiscoverMapPreview.swift in Sources */,
 				C515042427D7CAC6009F0DCD /* TakePhoto.swift in Sources */,
+				C587027427E27F1900DFB6C4 /* MailViewCallback.swift in Sources */,
 				C515040727D7CA7B009F0DCD /* DiscoverRow.swift in Sources */,
 				C515042527D7CAC6009F0DCD /* UIEmojiTextField.swift in Sources */,
 				C515040E27D7CA87009F0DCD /* PlaylistRow.swift in Sources */,

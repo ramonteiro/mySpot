@@ -154,7 +154,6 @@ struct SpotEditSheet: View {
                         tags = ""
                         presentationMode.wrappedValue.dismiss()
                     }
-                    .accentColor(.red)
                 }
                 ToolbarItemGroup(placement: .keyboard) {
                     HStack {
@@ -230,7 +229,7 @@ struct SpotEditSheet: View {
     }
     
     private func savePublic() {
-        let id = cloudViewModel.addSpotToPublic(name: name, founder: founder, date: spot.date!, x: spot.x, y: spot.y, description: descript, type: tags, image: spot.image!, emoji: emoji)
+        let id = cloudViewModel.addSpotToPublic(name: name, founder: founder, date: spot.date!, locationName: spot.locationName ?? "", x: spot.x, y: spot.y, description: descript, type: tags, image: spot.image!, emoji: emoji)
         spot.name = name
         spot.details = descript
         spot.founder = founder

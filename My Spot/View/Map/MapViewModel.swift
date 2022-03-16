@@ -94,10 +94,10 @@ final class MapViewModel: NSObject, ObservableObject, CLLocationManagerDelegate 
                 } else if let ocean = place?.ocean {
                     completionHandler(ocean)
                 } else {
-                    completionHandler(" ")
+                    completionHandler("")
                 }
             } else {
-                completionHandler(" ")
+                completionHandler("")
             }
         }
     }

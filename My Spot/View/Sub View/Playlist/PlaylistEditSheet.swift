@@ -67,7 +67,6 @@ struct PlaylistEditSheet: View {
                         emoji = ""
                         presentationMode.wrappedValue.dismiss()
                     }
-                    .accentColor(.red)
                 }
                 ToolbarItemGroup(placement: .navigationBarTrailing) {
                     Button("Save") {
