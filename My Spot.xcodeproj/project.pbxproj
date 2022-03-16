@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		C502D4F927E1A02C0057A65C /* PlaylistEditSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = C502D4F827E1A02C0057A65C /* PlaylistEditSheet.swift */; };
+		C502D4FB27E1A6310057A65C /* SpotEditSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = C502D4FA27E1A6310057A65C /* SpotEditSheet.swift */; };
 		C51503AE27D7C347009F0DCD /* My_SpotApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = C51503AD27D7C347009F0DCD /* My_SpotApp.swift */; };
 		C51503B027D7C347009F0DCD /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C51503AF27D7C347009F0DCD /* ContentView.swift */; };
 		C51503B227D7C349009F0DCD /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C51503B127D7C349009F0DCD /* Assets.xcassets */; };
@@ -55,6 +57,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		C502D4F827E1A02C0057A65C /* PlaylistEditSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistEditSheet.swift; sourceTree = "<group>"; };
+		C502D4FA27E1A6310057A65C /* SpotEditSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpotEditSheet.swift; sourceTree = "<group>"; };
 		C51503AA27D7C347009F0DCD /* My Spot.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "My Spot.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		C51503AD27D7C347009F0DCD /* My_SpotApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = My_SpotApp.swift; sourceTree = "<group>"; };
 		C51503AF27D7C347009F0DCD /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -270,6 +274,7 @@
 				C515040027D7CA72009F0DCD /* AddSpotSheet.swift */,
 				C515040127D7CA72009F0DCD /* DetailView.swift */,
 				C51503FF27D7CA72009F0DCD /* SpotRow.swift */,
+				C502D4FA27E1A6310057A65C /* SpotEditSheet.swift */,
 			);
 			path = Spot;
 			sourceTree = "<group>";
@@ -290,6 +295,7 @@
 				C515040B27D7CA87009F0DCD /* AddSpotToPlaylistSheet.swift */,
 				C515040927D7CA87009F0DCD /* DetailedPlaylistView.swift */,
 				C515040A27D7CA87009F0DCD /* PlaylistRow.swift */,
+				C502D4F827E1A02C0057A65C /* PlaylistEditSheet.swift */,
 			);
 			path = Playlist;
 			sourceTree = "<group>";
@@ -382,6 +388,7 @@
 				C515040827D7CA7B009F0DCD /* DiscoverDetailView.swift in Sources */,
 				C515042327D7CAC6009F0DCD /* Constants.swift in Sources */,
 				C51503E127D7C856009F0DCD /* Spot+CoreDataClass.swift in Sources */,
+				C502D4FB27E1A6310057A65C /* SpotEditSheet.swift in Sources */,
 				C51503E427D7C856009F0DCD /* Spots.xcdatamodeld in Sources */,
 				C51503E227D7C856009F0DCD /* Spot+CoreDataProperties.swift in Sources */,
 				C51503B027D7C347009F0DCD /* ContentView.swift in Sources */,
@@ -419,6 +426,7 @@
 				C51503FE27D7CA60009F0DCD /* PlaylistView.swift in Sources */,
 				C515040227D7CA72009F0DCD /* SpotRow.swift in Sources */,
 				C51503DF27D7C856009F0DCD /* Playlist+CoreDataClass.swift in Sources */,
+				C502D4F927E1A02C0057A65C /* PlaylistEditSheet.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -11,41 +11,25 @@
  */
 
 import SwiftUI
-import Combine
 import MapKit
 
 struct DetailPlaylistView: View {
     
     @ObservedObject var playlist: Playlist
     @EnvironmentObject var mapViewModel: MapViewModel
-    @EnvironmentObject var cloudViewModel: CloudKitViewModel
     @Environment(\.managedObjectContext) var moc
     @Environment(\.presentationMode) var presentationMode
     @EnvironmentObject var tabController: TabController
     
-    @State private var showingEditAlert = false
-    @State private var isEditing = false
-    @State private var name = ""
-    @State private var emoji = ""
     @State private var showingAddSpotToPlaylistSheet = false
     @State private var showingRemoveSpotToPlaylistSheet = false
+    @State private var showingEditSheet = false
     @State private var showingMapSheet = false
     @State private var filteredSpots: [Spot] = []
     @State private var locationIcon = "location"
     
-    enum Field {
-        case name
-        case emoji
-    }
-    
-    @FocusState private var focusState: Field?
-    
     var body: some View {
-        if (!isEditing) {
-            displayDetailedView
-        } else {
-            displayEditingMode
-        }
+        displayDetailedView
     }
     
     private func delete(at offsets: IndexSet) {
@@ -69,13 +53,6 @@ struct DetailPlaylistView: View {
             }
         }
         filteredSpots.remove(atOffsets: offsets)
-    }
-    
-    private func saveChanges() {
-        playlist.name = name
-        playlist.emoji = emoji
-        try? moc.save()
-        isEditing = false
     }
     
     private var displayDetailedView: some View {
@@ -124,7 +101,10 @@ struct DetailPlaylistView: View {
                     AddSpotToPlaylistSheet(currPlaylist: playlist)
                 }
                 Button("Edit") {
-                    isEditing = true
+                    showingEditSheet = true
+                }
+                .sheet(isPresented: $showingEditSheet) {
+                    PlaylistEditSheet(playlist: playlist)
                 }
                 .accentColor(.red)
             }
@@ -200,91 +180,6 @@ struct DetailPlaylistView: View {
                 }
             }
             .onDelete(perform: self.delete)
-        }
-    }
-    
-    private var displayEditingMode: some View {
-        Form {
-            Section(header: Text("Playlist Name")) {
-                TextField("Enter Playlist Name", text: $name)
-                    .onReceive(Just(name)) { _ in
-                        if (name.count > MaxCharLength.names) {
-                            name = String(name.prefix(MaxCharLength.names))
-                        }
-                    }
-                    .onAppear {
-                        name = playlist.name!
-                    }
-                    .focused($focusState, equals: .name)
-                    .submitLabel(.next)
-            }
-            Section(header: Text("Emoji")) {
-                EmojiTextField(text: $emoji, placeholder: "Enter Emoji")
-                    .onReceive(Just(emoji), perform: { _ in
-                        self.emoji = String(self.emoji.onlyEmoji().prefix(MaxCharLength.emojis))
-                    })
-                    .onAppear {
-                        emoji = playlist.emoji!
-                    }
-                    .focused($focusState, equals: .emoji)
-                    .submitLabel(.done)
-            }
-        }
-        .onChange(of: tabController.playlistPopToRoot) { _ in
-            presentationMode.wrappedValue.dismiss()
-        }
-        .onSubmit {
-            switch focusState {
-            case .name:
-                focusState = .emoji
-            default:
-                focusState = nil
-            }
-        }
-        .navigationTitle(name)
-        .toolbar {
-            ToolbarItemGroup(placement: .navigationBarTrailing) {
-                Button("Done") {
-                    showingEditAlert = true
-                }
-                .alert("Would you like to keep any changes made?", isPresented: $showingEditAlert) {
-                    Button("Keep") {
-                        saveChanges()
-                    }.disabled(name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || emoji.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
-                    Button("Discard", role: .destructive) { isEditing = false }
-                }
-                .accentColor(.red)
-            }
-            ToolbarItemGroup(placement: .keyboard) {
-                HStack {
-                    Button {
-                        switch focusState {
-                        case .emoji:
-                            focusState = .name
-                        default:
-                            focusState = nil
-                        }
-                    } label: {
-                        Image(systemName: "chevron.up")
-                    }
-                    .disabled(focusState == .name)
-                    Button {
-                        switch focusState {
-                        case .name:
-                            focusState = .emoji
-                        default:
-                            focusState = nil
-                        }
-                    } label: {
-                        Image(systemName: "chevron.down")
-                    }
-                    .disabled(focusState == .emoji)
-                    Spacer()
-                    Button("Done") {
-                        focusState = nil
-                    }
-                }
-            }
         }
     }
     
