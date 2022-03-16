@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		C502D4F927E1A02C0057A65C /* PlaylistEditSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = C502D4F827E1A02C0057A65C /* PlaylistEditSheet.swift */; };
 		C502D4FB27E1A6310057A65C /* SpotEditSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = C502D4FA27E1A6310057A65C /* SpotEditSheet.swift */; };
+		C502D4FD27E1B63D0057A65C /* DiscoverSheetShared.swift in Sources */ = {isa = PBXBuildFile; fileRef = C502D4FC27E1B63D0057A65C /* DiscoverSheetShared.swift */; };
 		C51503AE27D7C347009F0DCD /* My_SpotApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = C51503AD27D7C347009F0DCD /* My_SpotApp.swift */; };
 		C51503B027D7C347009F0DCD /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C51503AF27D7C347009F0DCD /* ContentView.swift */; };
 		C51503B227D7C349009F0DCD /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C51503B127D7C349009F0DCD /* Assets.xcassets */; };
@@ -59,6 +60,7 @@
 /* Begin PBXFileReference section */
 		C502D4F827E1A02C0057A65C /* PlaylistEditSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistEditSheet.swift; sourceTree = "<group>"; };
 		C502D4FA27E1A6310057A65C /* SpotEditSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpotEditSheet.swift; sourceTree = "<group>"; };
+		C502D4FC27E1B63D0057A65C /* DiscoverSheetShared.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiscoverSheetShared.swift; sourceTree = "<group>"; };
 		C51503AA27D7C347009F0DCD /* My Spot.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "My Spot.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		C51503AD27D7C347009F0DCD /* My_SpotApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = My_SpotApp.swift; sourceTree = "<group>"; };
 		C51503AF27D7C347009F0DCD /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -264,6 +266,7 @@
 				C515041727D7CAAA009F0DCD /* DiscoverMapPreview.swift */,
 				C515041827D7CAAA009F0DCD /* MapAnnotationDiscover.swift */,
 				C515041927D7CAAA009F0DCD /* ViewDiscoverSpots.swift */,
+				C502D4FC27E1B63D0057A65C /* DiscoverSheetShared.swift */,
 			);
 			path = Discover;
 			sourceTree = "<group>";
@@ -423,6 +426,7 @@
 				C515041027D7CA87009F0DCD /* AddPlaylistSheet.swift in Sources */,
 				C56F499F27E05CE300BCBB8F /* Extensions.swift in Sources */,
 				C51503DE27D7C856009F0DCD /* SpotFromCloud.swift in Sources */,
+				C502D4FD27E1B63D0057A65C /* DiscoverSheetShared.swift in Sources */,
 				C51503FE27D7CA60009F0DCD /* PlaylistView.swift in Sources */,
 				C515040227D7CA72009F0DCD /* SpotRow.swift in Sources */,
 				C51503DF27D7C856009F0DCD /* Playlist+CoreDataClass.swift in Sources */,

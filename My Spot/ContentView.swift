@@ -13,6 +13,7 @@ struct ContentView: View {
     @EnvironmentObject var cloudViewModel: CloudKitViewModel
     @EnvironmentObject var mapViewModel: MapViewModel
     @StateObject private var tabController = TabController()
+    @State private var showSharedSpotSheet = false
     
     var body: some View {
         TabView(selection: $tabController.activeTab) {
@@ -72,6 +73,16 @@ struct ContentView: View {
             
             // set last changed tab
             tabController.lastPressedTab = selection
+        }
+        .sheet(isPresented: $showSharedSpotSheet, onDismiss: {
+            cloudViewModel.shared = []
+        }, content: {
+            DiscoverSheetShared()
+        })
+        .onChange(of: cloudViewModel.shared.count) { newValue in
+            if newValue == 1 {
+                showSharedSpotSheet = true
+            }
         }
         .accentColor(.red)
         .environmentObject(tabController)

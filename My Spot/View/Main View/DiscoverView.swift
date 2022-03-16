@@ -21,7 +21,6 @@ struct DiscoverView: View {
     @EnvironmentObject var networkViewModel: NetworkMonitor
     
     @State private var showingMapSheet = false
-    @State private var isLoading = false
     @State private var searchText = ""
     @State private var searchLocationName = ""
     @State private var sortBy = "Sort By: Closest"
@@ -92,12 +91,10 @@ struct DiscoverView: View {
                 Spacer()
             }
         }
+        .navigationTitle("Discover Spots")
     }
     
     private func loadSpotsFromDB(location: CLLocation) {
-        if (cloudViewModel.spots.count == 0) {
-            isLoading = true
-        }
         DispatchQueue.main.async {
             cloudViewModel.fetchSpotPublic(userLocation: location, type: "none")
         }
@@ -106,7 +103,7 @@ struct DiscoverView: View {
     private var displaySpotsFromDB: some View {
         ZStack {
             listSpots
-            if (isLoading) {
+            if (cloudViewModel.spots.count == 0) {
                 ZStack {
                     ProgressView("Loading Spots")
                         .padding()
@@ -114,9 +111,6 @@ struct DiscoverView: View {
                             RoundedRectangle(cornerRadius: 10)
                                 .fill(Color(UIColor.systemBackground))
                         )
-                }
-                .onChange(of: cloudViewModel.spots.count) { newValue in
-                    isLoading = false
                 }
             }
         }

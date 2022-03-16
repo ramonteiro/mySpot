@@ -288,10 +288,13 @@ struct DetailsDiscoverSheet: View {
             .listRowSeparator(.hidden)
             .toolbar {
                 ToolbarItemGroup(placement: .keyboard) {
-                    Button("Done") {
-                        nameIsFocused = false
+                    HStack {
+                        Spacer()
+                        Button("Done") {
+                            nameIsFocused = false
+                        }
+                        .accentColor(.blue)
                     }
-                    .accentColor(.blue)
                 }
                 ToolbarItemGroup(placement: .navigationBarLeading) {
                     Button {

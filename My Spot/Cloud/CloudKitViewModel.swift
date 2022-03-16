@@ -13,9 +13,49 @@ class CloudKitViewModel: ObservableObject {
     @Published var isSignedInToiCloud: Bool = false
     @Published var error: String = ""
     @Published var spots: [SpotFromCloud] = []
+    @Published var shared: [SpotFromCloud] = []
     
     init() {
         getiCloudStatus()
+    }
+    
+    func checkDeepLink(url: URL) {
+        
+        guard let host = URLComponents(url: url, resolvingAgainstBaseURL: true)?.host else {
+            return
+        }
+        let pred = NSPredicate(format: "id == %@", host)
+        let query = CKQuery(recordType: "Spots", predicate: pred)
+        let operation = CKQueryOperation(query: query)
+        var returnedSpots: [SpotFromCloud] = []
+        shared = []
+        
+        operation.recordMatchedBlock = { (returnedRecordID, returnedResult) in
+            switch returnedResult {
+            case .success(let record):
+                guard let name = record["name"] as? String else { return }
+                guard let founder = record["founder"] as? String else { return }
+                guard let description = record["description"] as? String else { return }
+                guard let date = record["date"] as? String else { return }
+                guard let location = record["location"] as? CLLocation else { return }
+                guard let type = record["type"] as? String else { return }
+                guard let emoji = record["emoji"] as? String else { return }
+                guard let image = record["image"] as? CKAsset else { return }
+                guard let likes = record["likes"] as? Int else { return }
+                guard let id = record["id"] as? String else { return }
+                let imageURL = image.fileURL
+                returnedSpots.append(SpotFromCloud(id: id, name: name, founder: founder, description: description, date: date, location: location, type: type, emoji: emoji, imageURL: imageURL ?? URL(fileURLWithPath: "none"), likes: likes, record: record))
+            case .failure(let error):
+                print("FETCH ERROR: \(error)")
+            }
+        }
+        
+        operation.queryResultBlock = { [weak self] cur in
+            DispatchQueue.main.async {
+                self?.shared = returnedSpots
+            }
+        }
+        addOperation(operation: operation)
     }
     
     func getiCloudStatus() {
@@ -114,8 +154,9 @@ class CloudKitViewModel: ObservableObject {
                 guard let emoji = record["emoji"] as? String else { return }
                 guard let image = record["image"] as? CKAsset else { return }
                 guard let likes = record["likes"] as? Int else { return }
+                guard let id = record["id"] as? String else { return }
                 let imageURL = image.fileURL
-                returnedSpots.append(SpotFromCloud(id: UUID(), name: name, founder: founder, description: description, date: date, location: location, type: type, emoji: emoji, imageURL: imageURL ?? URL(fileURLWithPath: "none"), likes: likes, record: record))
+                returnedSpots.append(SpotFromCloud(id: id, name: name, founder: founder, description: description, date: date, location: location, type: type, emoji: emoji, imageURL: imageURL ?? URL(fileURLWithPath: "none"), likes: likes, record: record))
             case .failure(let error):
                 print("FETCH ERROR: \(error)")
             }
@@ -183,8 +224,9 @@ class CloudKitViewModel: ObservableObject {
                 guard let emoji = record["emoji"] as? String else { return }
                 guard let image = record["image"] as? CKAsset else { return }
                 guard let likes = record["likes"] as? Int else { return }
+                guard let id = record["id"] as? String else { return }
                 let imageURL = image.fileURL
-                returnedSpots.append(SpotFromCloud(id: UUID(), name: name, founder: founder, description: description, date: date, location: location, type: type, emoji: emoji, imageURL: imageURL ?? URL(fileURLWithPath: "none"), likes: likes, record: record))
+                returnedSpots.append(SpotFromCloud(id: id, name: name, founder: founder, description: description, date: date, location: location, type: type, emoji: emoji, imageURL: imageURL ?? URL(fileURLWithPath: "none"), likes: likes, record: record))
             case .failure(let error):
                 print("FETCH ERROR: \(error)")
             }

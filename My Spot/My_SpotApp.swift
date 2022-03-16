@@ -10,6 +10,8 @@ import SwiftUI
 @main
 struct My_SpotApp: App {
     
+    @State private var showSharedSpotSheet = false
+    
     // initialize core data
     @StateObject private var dataController = CoreDataManager()
     
@@ -29,6 +31,9 @@ struct My_SpotApp: App {
                 .environmentObject(mapViewModel)
                 .environmentObject(cloudViewModel)
                 .environmentObject(networkViewModel)
+                .onOpenURL { url in
+                    cloudViewModel.checkDeepLink(url: url)
+                }
         }
     }
 }

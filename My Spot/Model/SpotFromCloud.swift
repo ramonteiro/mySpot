@@ -9,7 +9,7 @@ import Foundation
 import CloudKit
 
 struct SpotFromCloud: Hashable, Identifiable {
-    let id: UUID?
+    let id: String
     let name: String
     let founder: String
     let description: String

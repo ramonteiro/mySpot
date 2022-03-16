@@ -121,10 +121,13 @@ struct DiscoverDetailView: View {
         .navigationTitle(nameInTitle)
         .toolbar {
             ToolbarItemGroup(placement: .keyboard) {
-                Button("Done") {
-                    nameIsFocused = false
+                HStack {
+                    Spacer()
+                    Button("Done") {
+                        nameIsFocused = false
+                    }
+                    .accentColor(.blue)
                 }
-                .accentColor(.blue)
             }
             ToolbarItemGroup(placement: .navigationBarTrailing) {
                 Text("\(cloudViewModel.spots[index].likes)")
@@ -156,10 +159,28 @@ struct DiscoverDetailView: View {
                 })
                 .accentColor(.red)
                 .padding()
+                Button {
+                    shareSheet()
+                } label: {
+                    Image(systemName: "square.and.arrow.up")
+                }
+
             }
         }
         .onChange(of: tabController.discoverPopToRoot) { _ in
             presentationMode.wrappedValue.dismiss()
+        }
+    }
+    
+    private func shareSheet() {
+        let url = URL(string: "myspot://" + (cloudViewModel.spots[index].id))
+        let activityView = UIActivityViewController(activityItems: ["Check out \"\(cloudViewModel.spots[index].name)\(cloudViewModel.spots[index].emoji)\" on My Spot! ", url!], applicationActivities: nil)
+
+        let allScenes = UIApplication.shared.connectedScenes
+        let scene = allScenes.first { $0.activationState == .foregroundActive }
+
+        if let windowScene = scene as? UIWindowScene {
+            windowScene.keyWindow?.rootViewController?.present(activityView, animated: true, completion: nil)
         }
     }
     
