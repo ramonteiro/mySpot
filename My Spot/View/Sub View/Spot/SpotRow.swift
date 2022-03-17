@@ -14,7 +14,9 @@ import SwiftUI
 
 struct SpotRow: View {
     @ObservedObject var spot: Spot
-
+    @State private var scope:String = "Private"
+    @State private var tags: [String] = []
+    
     var body: some View {
         if (checkIfItemExist()) {
             displayRedCircleImage
@@ -31,24 +33,70 @@ struct SpotRow: View {
     
     private var displayRedCircleImage: some View {
         HStack {
+            Image(uiImage: spot.image!)
+                .resizable()
+                .scaledToFill()
+                .frame(width: 100, height: 120)
+                .cornerRadius(20)
+                .shadow(color: .black, radius: 5)
+            
             VStack(alignment: .leading) {
-                Text(spot.name ?? "")
-                Text("By: \(spot.founder ?? "")").font(.subheadline).foregroundColor(.gray)
-                Text("On: \(spot.date ?? "")").font(.subheadline).foregroundColor(.gray)
-                if (spot.isPublic) {
-                    HStack {
-                        Text("Public").font(.subheadline).foregroundColor(.gray)
-                        Image(systemName: "globe").font(.subheadline).foregroundColor(.gray)
+                Text("\(spot.name ?? "")\(spot.emoji ?? "")")
+                    .font(.headline)
+                    .fontWeight(.bold)
+                    .lineLimit(2)
+                
+                Text("By: \(spot.founder ?? "")")
+                    .font(.subheadline)
+                    .foregroundColor(Color.gray)
+                
+                Text("\(spot.date ?? "")")
+                    .font(.subheadline)
+                    .foregroundColor(Color.gray)
+                
+                HStack(alignment: .center) {
+                    Image(systemName: "globe")
+                        .font(.subheadline)
+                        .foregroundColor(Color.gray)
+                    Text("\(scope)")
+                        .font(.subheadline)
+                        .foregroundColor(Color.gray)
+                }
+                
+                HStack(alignment: .center) {
+                    Image(systemName: "mappin")
+                        .foregroundColor(Color.gray)
+                        .font(.subheadline)
+                    Text(spot.locationName ?? "")
+                        .foregroundColor(Color.gray)
+                        .font(.subheadline)
+                }
+                
+                if (!(spot.tags?.isEmpty ?? true)) {
+                    ScrollView(.horizontal) {
+                        HStack {
+                            ForEach(tags, id: \.self) { tag in
+                                Text(tag)
+                                    .font(.system(size: 12, weight: .regular))
+                                    .lineLimit(2)
+                                    .foregroundColor(.white)
+                                    .padding(5)
+                                    .background(.tint)
+                                    .cornerRadius(5)
+                            }
+                        }
                     }
                 }
             }
-            Spacer()
-            Image(uiImage: spot.image!)
-                .resizable()
-                .clipShape(Circle())
-                .frame(width: UIScreen.main.bounds.width * 0.16, height: UIScreen.main.bounds.height * (60/812), alignment: .center)
-                .overlay(Circle().stroke(Color.red, lineWidth: 1))
-             
+            .padding(.leading, 5)
+        }
+        .onAppear {
+            tags = spot.tags?.components(separatedBy: ", ") ?? []
+            if (spot.isPublic) {
+                scope = "Public"
+            } else {
+                scope = "Private"
+            }
         }
     }
 }

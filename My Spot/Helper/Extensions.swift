@@ -59,3 +59,7 @@ extension View {
         }
     }
 }
+
+extension Color {
+    static let darkgray = Color("darkGray")
+}

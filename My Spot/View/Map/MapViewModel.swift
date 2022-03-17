@@ -89,6 +89,8 @@ final class MapViewModel: NSObject, ObservableObject, CLLocationManagerDelegate 
                 let place = placemarker?[0]
                 if let local = place?.locality {
                     completionHandler(local)
+                } else if let state = place?.administrativeArea {
+                    completionHandler(state)
                 } else if let country = place?.country {
                     completionHandler(country)
                 } else if let ocean = place?.ocean {

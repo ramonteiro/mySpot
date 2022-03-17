@@ -14,25 +14,96 @@ import SwiftUI
 
 struct DiscoverRow: View {
     var spot: SpotFromCloud
+    @State private var tags: [String] = []
 
     var body: some View {
         HStack {
+            if let url = spot.imageURL, let data = try? Data(contentsOf: url), let image = UIImage(data: data) {
+                Image(uiImage: image)
+                    .resizable()
+                    .scaledToFill()
+                    .frame(width: 100, height: 120)
+                    .cornerRadius(20)
+                    .shadow(color: .black, radius: 5)
+            } else {
+                ProgressView("Loading Image")
+                    .frame(width: 100, height: 120, alignment: .center)
+                    .cornerRadius(20)
+            }
+            
             VStack(alignment: .leading) {
-                Text(spot.name)
-                Text("By: \(spot.founder)").font(.subheadline).foregroundColor(.gray)
-                Text("On: \(spot.date)").font(.subheadline).foregroundColor(.gray)
-                HStack() {
-                    Image(systemName: "hand.thumbsup.fill").font(.subheadline).foregroundColor(.gray)
-                    Text("\(spot.likes)").font(.subheadline).foregroundColor(.gray)
+                Text("\(spot.name)\(spot.emoji)")
+                    .font(.headline)
+                    .fontWeight(.bold)
+                    .lineLimit(2)
+                
+                Text("By: \(spot.founder)")
+                    .font(.subheadline)
+                    .foregroundColor(Color.gray)
+                
+                Text("\(spot.date)")
+                    .font(.subheadline)
+                    .foregroundColor(Color.gray)
+                
+                HStack(alignment: .center) {
+                    Image(systemName: "hand.thumbsup.fill")
+                        .font(.subheadline)
+                        .foregroundColor(Color.gray)
+                    Text("\(spot.likes)")
+                        .font(.subheadline)
+                        .foregroundColor(Color.gray)
+                }
+                
+                HStack(alignment: .center) {
+                    Image(systemName: "mappin")
+                        .foregroundColor(Color.gray)
+                        .font(.subheadline)
+                    Text(spot.locationName)
+                        .foregroundColor(Color.gray)
+                        .font(.subheadline)
+                }
+                
+                if (!(spot.type.isEmpty)) {
+                    ScrollView(.horizontal) {
+                        HStack {
+                            ForEach(tags, id: \.self) { tag in
+                                Text(tag)
+                                    .font(.system(size: 12, weight: .regular))
+                                    .lineLimit(2)
+                                    .foregroundColor(.white)
+                                    .padding(5)
+                                    .background(.tint)
+                                    .cornerRadius(5)
+                            }
+                        }
+                    }
                 }
             }
-            Spacer()
-            Text(spot.emoji)
-                .font(.system(size: 50))
-                .overlay(Circle()
-                            .stroke(Color.red, lineWidth: 1)
-                            .frame(width: UIScreen.main.bounds.width * 0.16, height: UIScreen.main.bounds.height * (60/812), alignment: .center)
-                )
+            .padding(.leading, 5)
+        }
+        .onAppear {
+            tags = spot.type.components(separatedBy: ", ")
         }
     }
 }
+
+/*
+ HStack {
+     VStack(alignment: .leading) {
+         Text(spot.name)
+         Text("By: \(spot.founder)").font(.subheadline).foregroundColor(.gray)
+         Text("On: \(spot.date)").font(.subheadline).foregroundColor(.gray)
+         HStack() {
+             Image(systemName: "hand.thumbsup.fill").font(.subheadline).foregroundColor(.gray)
+             Text("\(spot.likes)").font(.subheadline).foregroundColor(.gray)
+         }
+     }
+     Spacer()
+     Text(spot.emoji)
+         .font(.system(size: 50))
+         .overlay(Circle()
+                     .stroke(Color.red, lineWidth: 1)
+                     .frame(width: UIScreen.main.bounds.width * 0.16, height: UIScreen.main.bounds.height * (60/812), alignment: .center)
+         )
+ }
+ */

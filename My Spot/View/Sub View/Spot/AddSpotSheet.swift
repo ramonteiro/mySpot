@@ -41,7 +41,7 @@ struct AddSpotSheet: View {
         name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || descript.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || canSubmitPic == false || founder.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || isEmojiNeeded() || (isPublic && !cloudViewModel.isSignedInToiCloud)
     }
     
-    enum Field {
+    private enum Field {
         case name
         case descript
         case founder

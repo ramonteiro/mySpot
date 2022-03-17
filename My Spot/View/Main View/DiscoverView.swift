@@ -23,8 +23,7 @@ struct DiscoverView: View {
     @State private var showingMapSheet = false
     @State private var searchText = ""
     @State private var searchLocationName = ""
-    @State private var sortBy = "Sort By: Closest"
-    
+
     // find spot names from db that contain searchtext
     private var searchResults: [SpotFromCloud] {
         if searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
@@ -152,22 +151,12 @@ struct DiscoverView: View {
         .navigationTitle("Discover Spots")
         .toolbar {
             ToolbarItemGroup(placement: .navigationBarTrailing) {
-                HStack {
-                    Button {
-                        for _ in 1...60 {
-                            cloudViewModel.addSpotToPublic(name: "testname", founder: "isaac", date: "Mar 16, 2022", locationName: "Peoria", x: -113.0, y: 34.5, description: "this is description #tags", type: "tags", image: UIImage(systemName: "location")!, emoji: "🪂")
-                        }
-                    } label: {
-                        Image(systemName: "arrow.triangle.2.circlepath")
-                    }
-                    
                     Button(action: {
                         showingMapSheet.toggle()
                     }) {
                         Image(systemName: "map").imageScale(.large)
                     }
                     .sheet(isPresented: $showingMapSheet, content: { ViewDiscoverSpots() })
-                }
             }
         }
     }
