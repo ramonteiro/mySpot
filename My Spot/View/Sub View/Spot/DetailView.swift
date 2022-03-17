@@ -65,7 +65,7 @@ struct DetailView: View {
                             routeMeTo.name = spot.name!
                             routeMeTo.openInMaps(launchOptions: nil)
                         }
-                        .accentColor(.blue)
+                        .tint(.blue)
                     }
                 }
                 .navigationTitle(spot.name!)

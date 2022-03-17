@@ -243,7 +243,7 @@ struct DetailsDiscoverSheet: View {
                         routeMeTo.name = cloudViewModel.spots[index].name
                         routeMeTo.openInMaps(launchOptions: nil)
                     }
-                    .accentColor(.blue)
+                    .tint(.blue)
                 }
                 if (isSpotInCoreData().count == 0 && !isSaved) {
                     Section(header: Text("Save To My Spots")) {
@@ -252,7 +252,7 @@ struct DetailsDiscoverSheet: View {
                                 isSaving = true
                             }
                             .disabled(!imageLoaded)
-                            .accentColor(.blue)
+                            .tint(.blue)
                         }
                         if (isSaving) {
                             TextField("Enter Spot Name", text: $newName)
@@ -265,7 +265,7 @@ struct DetailsDiscoverSheet: View {
                             Button("Save") {
                                 save()
                             }
-                            .accentColor(.blue)
+                            .tint(.blue)
                             .disabled(newName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
                         }
                     }
@@ -292,7 +292,7 @@ struct DetailsDiscoverSheet: View {
                         Button("Done") {
                             nameIsFocused = false
                         }
-                        .accentColor(.blue)
+                        .tint(.blue)
                     }
                 }
                 ToolbarItemGroup(placement: .navigationBarLeading) {

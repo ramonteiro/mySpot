@@ -130,6 +130,7 @@ struct AddSpotSheet: View {
                                         }
                                     } label: {
                                         Image(systemName: "chevron.up")
+                                            .tint(.blue)
                                     }
                                     .disabled(focusState == .name)
                                     Button {
@@ -149,12 +150,14 @@ struct AddSpotSheet: View {
                                         }
                                     } label: {
                                         Image(systemName: "chevron.down")
+                                            .tint(.blue)
                                     }
                                     .disabled(focusState == .descript)
                                     Spacer()
                                     Button("Done") {
                                         focusState = nil
                                     }
+                                    .tint(.blue)
                                 }
                             }
                             ToolbarItemGroup(placement: .navigationBarTrailing) {
@@ -170,6 +173,7 @@ struct AddSpotSheet: View {
                                         close()
                                     }
                                 }
+                                .tint(.blue)
                                 .padding()
                                 .disabled(disableSave)
                             }
@@ -178,7 +182,8 @@ struct AddSpotSheet: View {
                                     showingAlert = true
                                 }
                                 .alert("Are you sure you want to delete spot?", isPresented: $showingAlert) {
-                                    Button("Yes", role: .destructive) { close() }
+                                    Button("Delete", role: .destructive) { close() }
+                                        .tint(.blue)
                                 }
                                 .padding()
                             }

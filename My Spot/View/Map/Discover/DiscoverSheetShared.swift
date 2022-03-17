@@ -61,7 +61,7 @@ struct DiscoverSheetShared: View {
                             routeMeTo.name = cloudViewModel.shared[0].name
                             routeMeTo.openInMaps(launchOptions: nil)
                         }
-                        .accentColor(.blue)
+                        .tint(.blue)
                     }
                     if (isSpotInCoreData().count == 0 && !isSaved) {
                         Section(header: Text("Save To My Spots")) {
@@ -70,7 +70,7 @@ struct DiscoverSheetShared: View {
                                     isSaving = true
                                 }
                                 .disabled(!imageLoaded)
-                                .accentColor(.blue)
+                                .tint(.blue)
                             }
                             if (isSaving) {
                                 TextField("Enter Spot Name", text: $newName)
@@ -83,7 +83,7 @@ struct DiscoverSheetShared: View {
                                 Button("Save") {
                                     save()
                                 }
-                                .accentColor(.blue)
+                                .tint(.blue)
                                 .disabled(newName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
                             }
                         }
@@ -110,7 +110,7 @@ struct DiscoverSheetShared: View {
                             Button("Done") {
                                 nameIsFocused = false
                             }
-                            .accentColor(.blue)
+                            .tint(.blue)
                         }
                     }
                     ToolbarItemGroup(placement: .navigationBarLeading) {

@@ -142,7 +142,8 @@ struct SpotEditSheet: View {
                         }
                         presentationMode.wrappedValue.dismiss()
                     }
-                    .accentColor(.blue)
+                    .padding(.trailing)
+                    .tint(.blue)
                     .disabled(keepDisabled)
                 }
                 ToolbarItemGroup(placement: .navigationBarLeading) {
@@ -154,6 +155,7 @@ struct SpotEditSheet: View {
                         tags = ""
                         presentationMode.wrappedValue.dismiss()
                     }
+                    .padding(.leading)
                 }
                 ToolbarItemGroup(placement: .keyboard) {
                     HStack {
@@ -174,6 +176,7 @@ struct SpotEditSheet: View {
                             }
                         } label: {
                             Image(systemName: "chevron.up")
+                                .tint(.blue)
                         }
                         .disabled(focusState == .name)
                         Button {
@@ -193,12 +196,14 @@ struct SpotEditSheet: View {
                             }
                         } label: {
                             Image(systemName: "chevron.down")
+                                .tint(.blue)
                         }
                         .disabled(focusState == .descript)
                         Spacer()
                         Button("Done") {
                             focusState = nil
                         }
+                        .tint(.blue)
                     }
                 }
             }

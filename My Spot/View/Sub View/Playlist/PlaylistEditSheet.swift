@@ -67,13 +67,15 @@ struct PlaylistEditSheet: View {
                         emoji = ""
                         presentationMode.wrappedValue.dismiss()
                     }
+                    .padding(.leading)
                 }
                 ToolbarItemGroup(placement: .navigationBarTrailing) {
                     Button("Save") {
                         saveChanges()
                     }
+                    .padding(.trailing)
                     .disabled(name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || emoji.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
-                    .accentColor(.blue)
+                    .tint(.blue)
                 }
                 ToolbarItemGroup(placement: .keyboard) {
                     HStack {
@@ -86,6 +88,7 @@ struct PlaylistEditSheet: View {
                             }
                         } label: {
                             Image(systemName: "chevron.up")
+                                .tint(.blue)
                         }
                         .disabled(focusState == .name)
                         Button {
@@ -97,12 +100,14 @@ struct PlaylistEditSheet: View {
                             }
                         } label: {
                             Image(systemName: "chevron.down")
+                                .tint(.blue)
                         }
                         .disabled(focusState == .emoji)
                         Spacer()
                         Button("Done") {
                             focusState = nil
                         }
+                        .tint(.blue)
                     }
                 }
         }

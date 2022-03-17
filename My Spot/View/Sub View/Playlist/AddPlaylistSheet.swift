@@ -65,6 +65,7 @@ struct AddPlaylistSheet: View {
                             }
                         } label: {
                             Image(systemName: "chevron.up")
+                                .tint(.blue)
                         }
                         .disabled(focusState == .name)
                         Button {
@@ -76,10 +77,12 @@ struct AddPlaylistSheet: View {
                             }
                         } label: {
                             Image(systemName: "chevron.down")
+                                .tint(.blue)
                         }
                         .disabled(focusState == .emoji)
                         Spacer()
                         doneButton
+                            .tint(.blue)
                     }
                 }
                 ToolbarItemGroup(placement: .navigationBarTrailing) {
@@ -116,6 +119,7 @@ struct AddPlaylistSheet: View {
             save()
             close()
         }
+        .tint(.blue)
         .padding()
         .disabled(disableSave)
     }
@@ -125,7 +129,8 @@ struct AddPlaylistSheet: View {
             showingAlert = true
         }
         .alert("Are you sure you want to delete playlist?", isPresented: $showingAlert) {
-            Button("Yes", role: .destructive) { close() }
+            Button("Delete", role: .destructive) { close() }
+                .tint(.blue)
         }
         .padding()
     }

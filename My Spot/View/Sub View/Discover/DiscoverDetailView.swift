@@ -67,7 +67,7 @@ struct DiscoverDetailView: View {
                     routeMeTo.name = cloudViewModel.spots[index].name
                     routeMeTo.openInMaps(launchOptions: nil)
                 }
-                .accentColor(.blue)
+                .tint(.blue)
             }
             Section(header: Text("report")) {
                 Button("Report") {
@@ -89,7 +89,7 @@ struct DiscoverDetailView: View {
                             }
                         }
                         .disabled(!imageLoaded)
-                        .accentColor(.blue)
+                        .tint(.blue)
                     }
                     if (isSaving) {
                         TextField("Enter Spot Name", text: $newName)
@@ -140,7 +140,7 @@ struct DiscoverDetailView: View {
                     Button("Done") {
                         nameIsFocused = false
                     }
-                    .accentColor(.blue)
+                    .tint(.blue)
                 }
             }
             ToolbarItemGroup(placement: .navigationBarTrailing) {
