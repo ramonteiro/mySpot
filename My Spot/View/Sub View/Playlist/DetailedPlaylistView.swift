@@ -29,7 +29,15 @@ struct DetailPlaylistView: View {
     @State private var locationIcon = "location"
     
     var body: some View {
-        displayDetailedView
+        if (playlistExist()) {
+            displayDetailedView
+        }
+    }
+    
+    private func playlistExist() -> Bool {
+        guard let _ = playlist.name else {return false}
+        guard let _ = playlist.emoji else {return false}
+        return true
     }
     
     private func delete(at offsets: IndexSet) {

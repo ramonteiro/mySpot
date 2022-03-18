@@ -234,7 +234,8 @@ struct SpotEditSheet: View {
     }
     
     private func savePublic() {
-        let id = cloudViewModel.addSpotToPublic(name: name, founder: founder, date: spot.date!, locationName: spot.locationName ?? "", x: spot.x, y: spot.y, description: descript, type: tags, image: spot.image!, emoji: emoji)
+        guard let imageData = spot.image?.pngData() else { return }
+        let id = cloudViewModel.addSpotToPublic(name: name, founder: founder, date: spot.date!, locationName: spot.locationName ?? "", x: spot.x, y: spot.y, description: descript, type: tags, image: imageData, emoji: emoji)
         spot.name = name
         spot.details = descript
         spot.founder = founder

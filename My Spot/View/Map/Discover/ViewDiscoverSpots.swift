@@ -68,9 +68,11 @@ struct ViewDiscoverSpots: View {
     
     private var displayRouteButon: some View {
         Button(action: {
-            let routeMeTo = MKMapItem(placemark: MKPlacemark(coordinate: cloudViewModel.spots[selection].location.coordinate))
-            routeMeTo.name = cloudViewModel.spots[selection].name
-            routeMeTo.openInMaps(launchOptions: nil)
+            if (cloudViewModel.spots.count > 0 && cloudViewModel.spots.count >= selection + 1) {
+                let routeMeTo = MKMapItem(placemark: MKPlacemark(coordinate: cloudViewModel.spots[selection].location.coordinate))
+                routeMeTo.name = cloudViewModel.spots[selection].name
+                routeMeTo.openInMaps(launchOptions: nil)
+            }
         }) {
             Image(systemName: "point.topleft.down.curvedto.point.bottomright.up").imageScale(.large)
         }
@@ -103,17 +105,19 @@ struct ViewDiscoverSpots: View {
         ZStack {
             Map(coordinateRegion: $spotRegion, interactionModes: [.pan, .zoom], showsUserLocation: mapViewModel.getIsAuthorized(), annotationItems: cloudViewModel.spots, annotationContent: { location in
                 MapAnnotation(coordinate: location.location.coordinate) {
-                    MapAnnotationDiscover(spot: location)
-                        .scaleEffect(cloudViewModel.spots[selection] == location ? 1.2 : 0.9)
-                        .shadow(radius: 8)
-                        .onTapGesture {
-                            transIn = .bottom
-                            transOut = .bottom
-                            selection = cloudViewModel.spots.firstIndex(of: location) ?? 0
-                            withAnimation {
-                                spotRegion = MKCoordinateRegion(center: cloudViewModel.spots[selection].location.coordinate, span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01))
+                    if (cloudViewModel.spots.count > 0 && cloudViewModel.spots.count >= selection + 1) {
+                        MapAnnotationDiscover(spot: location)
+                            .scaleEffect(cloudViewModel.spots[selection] == location ? 1.2 : 0.9)
+                            .shadow(radius: 8)
+                            .onTapGesture {
+                                transIn = .bottom
+                                transOut = .bottom
+                                selection = cloudViewModel.spots.firstIndex(of: location) ?? 0
+                                withAnimation {
+                                    spotRegion = MKCoordinateRegion(center: cloudViewModel.spots[selection].location.coordinate, span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01))
+                                }
                             }
-                        }
+                    }
                 }
             })
             .ignoresSafeArea()
@@ -143,31 +147,33 @@ struct ViewDiscoverSpots: View {
                 Spacer()
                 
                 ZStack {
-                    ForEach(cloudViewModel.spots, id: \.self) { spot in
-                        if (spot == cloudViewModel.spots[selection]) {
-                            DiscoverMapPreview(spot: spot)
-                                .shadow(color: Color.black.opacity(0.3), radius: 10)
-                                .padding()
-                                .onTapGesture {
-                                    showingDetailsSheet.toggle()
-                                }
-                                .transition(.asymmetric(insertion: .move(edge: transIn), removal: .move(edge: transOut)))
-                                .gesture(DragGesture(minimumDistance: 0, coordinateSpace: .local)
-                                            .onEnded({ value in
-                                                withAnimation {
-                                                    if value.translation.width < 0 {
-                                                        transIn = .trailing
-                                                        transOut = .bottom
-                                                        increaseSelection()
-                                                    }
-
-                                                    if value.translation.width > 0 {
-                                                        transIn = .leading
-                                                        transOut = .bottom
-                                                        decreaseSelection()
-                                                    }
+                    if (cloudViewModel.spots.count > 0 && cloudViewModel.spots.count >= selection + 1) {
+                        ForEach(cloudViewModel.spots, id: \.self) { spot in
+                            if (spot == cloudViewModel.spots[selection]) {
+                                DiscoverMapPreview(spot: spot)
+                                    .shadow(color: Color.black.opacity(0.3), radius: 10)
+                                    .padding()
+                                    .onTapGesture {
+                                        showingDetailsSheet.toggle()
+                                    }
+                                    .transition(.asymmetric(insertion: .move(edge: transIn), removal: .move(edge: transOut)))
+                                    .gesture(DragGesture(minimumDistance: 0, coordinateSpace: .local)
+                                        .onEnded({ value in
+                                            withAnimation {
+                                                if value.translation.width < 0 {
+                                                    transIn = .trailing
+                                                    transOut = .bottom
+                                                    increaseSelection()
                                                 }
-                                            }))
+                                                
+                                                if value.translation.width > 0 {
+                                                    transIn = .leading
+                                                    transOut = .bottom
+                                                    decreaseSelection()
+                                                }
+                                            }
+                                        }))
+                            }
                         }
                     }
                 }
@@ -308,30 +314,7 @@ struct DetailsDiscoverSheet: View {
                         .fontWeight(.bold)
                         .foregroundColor(.red)
                         .offset(x: 26)
-                    Button(action: {
-                        if (likeButton == "hand.thumbsup") {
-                            let newLike = Likes(context: moc)
-                            newLike.likedId = String(cloudViewModel.spots[index].location.coordinate.latitude + cloudViewModel.spots[index].location.coordinate.longitude) + cloudViewModel.spots[index].name
-                            try? moc.save()
-                            likeButton = "hand.thumbsup.fill"
-                            cloudViewModel.likeSpot(spot: cloudViewModel.spots[index], like: true)
-                            cloudViewModel.spots[index].likes += 1
-                        } else {
-                            for i in likedIds {
-                                if (i.likedId == String(cloudViewModel.spots[index].location.coordinate.latitude + cloudViewModel.spots[index].location.coordinate.longitude) + cloudViewModel.spots[index].name) {
-                                    moc.delete(i)
-                                    try? moc.save()
-                                    break
-                                }
-                            }
-                            likeButton = "hand.thumbsup"
-                            cloudViewModel.likeSpot(spot: cloudViewModel.spots[index], like: false)
-                            cloudViewModel.spots[index].likes -= 1
-                        }
-                        
-                    }, label: {
-                        Image(systemName: likeButton)
-                    })
+                    
                     .padding()
                 }
             }

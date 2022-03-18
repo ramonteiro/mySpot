@@ -313,7 +313,11 @@ struct AddSpotSheet: View {
         let newSpot = Spot(context: moc)
         newSpot.founder = founder
         newSpot.details = descript
-        newSpot.image = imageSelected
+        if let imageData = cloudViewModel.compressImage(image: imageSelected).pngData() {
+            newSpot.image = UIImage(data: imageData)
+        } else {
+            return
+        }
         newSpot.name = name
         newSpot.x = lat
         newSpot.y = long
@@ -326,24 +330,28 @@ struct AddSpotSheet: View {
     }
     
     private func savePublic() {
-        let id = cloudViewModel.addSpotToPublic(name: name, founder: founder, date: getDate(), locationName: locationName, x: lat, y: long, description: descript, type: tags, image: imageSelected, emoji: emoji)
-        UserDefaults.standard.set(founder, forKey: UserDefaultKeys.founder)
-        let newSpot = Spot(context: moc)
-        newSpot.founder = founder
-        newSpot.details = descript
-        newSpot.image = imageSelected
-        newSpot.name = name
-        newSpot.x = lat
-        newSpot.y = long
-        newSpot.isPublic = true
-        newSpot.emoji = emoji
-        newSpot.date = getDate()
-        newSpot.tags = tags
-        newSpot.locationName = locationName
-        newSpot.id = UUID()
-        newSpot.dbid = id
-        try? moc.save()
-        close()
+        if let imageData = cloudViewModel.compressImage(image: imageSelected).pngData() {
+            let id = cloudViewModel.addSpotToPublic(name: name, founder: founder, date: getDate(), locationName: locationName, x: lat, y: long, description: descript, type: tags, image: imageData, emoji: emoji)
+            UserDefaults.standard.set(founder, forKey: UserDefaultKeys.founder)
+            let newSpot = Spot(context: moc)
+            newSpot.founder = founder
+            newSpot.details = descript
+            newSpot.image = UIImage(data: imageData)
+            newSpot.name = name
+            newSpot.x = lat
+            newSpot.y = long
+            newSpot.isPublic = true
+            newSpot.emoji = emoji
+            newSpot.date = getDate()
+            newSpot.tags = tags
+            newSpot.locationName = locationName
+            newSpot.id = UUID()
+            newSpot.dbid = id
+            try? moc.save()
+            close()
+        } else {
+            return
+        }
     }
     
     private func getLongitude() -> Double {

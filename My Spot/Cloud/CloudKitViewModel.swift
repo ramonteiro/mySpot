@@ -92,14 +92,14 @@ class CloudKitViewModel: ObservableObject {
         case iCloudAccountUnknown
     }
     
-    private func compressImage(image: UIImage) -> UIImage {
+    func compressImage(image: UIImage) -> UIImage {
             let resizedImage = image.aspectFittedToHeight(300)
             resizedImage.jpegData(compressionQuality: 0.9)
 
             return resizedImage
     }
     
-    func addSpotToPublic(name: String, founder: String, date: String, locationName: String, x: Double, y: Double, description: String, type: String, image: UIImage, emoji: String) -> String {
+    func addSpotToPublic(name: String, founder: String, date: String, locationName: String, x: Double, y: Double, description: String, type: String, image: Data, emoji: String) -> String {
         let newSpot = CKRecord(recordType: "Spots")
         newSpot["name"] = name
         newSpot["founder"] = founder
@@ -113,21 +113,18 @@ class CloudKitViewModel: ObservableObject {
         newSpot["userID"] = userID
         newSpot["likes"] = 0
         
-        if let imageData = compressImage(image: image).pngData() {
-            do {
-                let path = NSTemporaryDirectory() + "imageTemp\(UUID().uuidString).png"
-                let url = URL(fileURLWithPath: path)
-                try imageData.write(to: url)
-                let asset = CKAsset(fileURL: url)
-                newSpot["image"] = asset
-                saveSpotPublic(record: newSpot)
-                return newSpot.recordID.recordName
-            } catch {
-                print(error)
-                return ""
-            }
+        do {
+            let path = NSTemporaryDirectory() + "imageTemp\(UUID().uuidString).png"
+            let url = URL(fileURLWithPath: path)
+            try image.write(to: url)
+            let asset = CKAsset(fileURL: url)
+            newSpot["image"] = asset
+            saveSpotPublic(record: newSpot)
+            return newSpot.recordID.recordName
+        } catch {
+            print(error)
+            return ""
         }
-        return ""
     }
     
     private func fetchUserID() {
@@ -208,9 +205,9 @@ class CloudKitViewModel: ObservableObject {
         }
     }
     
-    func likeSpot(spot: SpotFromCloud, like: Bool) {
+    func likeSpot(spot: SpotFromCloud, like: Bool) async -> Bool {
         if (spot.likes < 1 && !like) {
-            return
+            return false
         }
         let record = spot.record
         if (like) {
@@ -218,8 +215,12 @@ class CloudKitViewModel: ObservableObject {
         } else {
             record["likes"]! -= 1
         }
-        saveSpotPublic(record: record)
-        return
+        do {
+            try await CKContainer.default().publicCloudDatabase.save(record)
+            return true
+        } catch {
+            return false
+        }
     }
     
     func fetchMoreSpotsPublic(cursor:CKQueryOperation.Cursor?)  {

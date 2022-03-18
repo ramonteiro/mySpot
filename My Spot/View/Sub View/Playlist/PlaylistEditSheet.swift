@@ -24,96 +24,104 @@ struct PlaylistEditSheet: View {
     @FocusState private var focusState: Field?
     
     var body: some View {
-        NavigationView {
-            Form {
-                Section(header: Text("Playlist Name")) {
-                    TextField("Enter Playlist Name", text: $name)
-                        .onReceive(Just(name)) { _ in
-                            if (name.count > MaxCharLength.names) {
-                                name = String(name.prefix(MaxCharLength.names))
+        if (checkExists()) {
+            NavigationView {
+                Form {
+                    Section(header: Text("Playlist Name")) {
+                        TextField("Enter Playlist Name", text: $name)
+                            .onReceive(Just(name)) { _ in
+                                if (name.count > MaxCharLength.names) {
+                                    name = String(name.prefix(MaxCharLength.names))
+                                }
                             }
-                        }
-                        .onAppear {
-                            name = playlist.name!
-                        }
-                        .focused($focusState, equals: .name)
-                        .submitLabel(.next)
-                }
-                Section(header: Text("Emoji")) {
-                    EmojiTextField(text: $emoji, placeholder: "Enter Emoji")
-                        .onReceive(Just(emoji), perform: { _ in
-                            self.emoji = String(self.emoji.onlyEmoji().prefix(MaxCharLength.emojis))
-                        })
-                        .onAppear {
-                            emoji = playlist.emoji!
-                        }
-                        .focused($focusState, equals: .emoji)
-                        .submitLabel(.done)
-                }
-            }
-            .onSubmit {
-                switch focusState {
-                case .name:
-                    focusState = .emoji
-                default:
-                    focusState = nil
-                }
-            }
-            .navigationTitle(name)
-            .toolbar {
-                ToolbarItemGroup(placement: .navigationBarLeading) {
-                    Button("Cancel") {
-                        name = ""
-                        emoji = ""
-                        presentationMode.wrappedValue.dismiss()
+                            .onAppear {
+                                name = playlist.name!
+                            }
+                            .focused($focusState, equals: .name)
+                            .submitLabel(.next)
                     }
-                    .padding(.leading)
-                }
-                ToolbarItemGroup(placement: .navigationBarTrailing) {
-                    Button("Save") {
-                        saveChanges()
+                    Section(header: Text("Emoji")) {
+                        EmojiTextField(text: $emoji, placeholder: "Enter Emoji")
+                            .onReceive(Just(emoji), perform: { _ in
+                                self.emoji = String(self.emoji.onlyEmoji().prefix(MaxCharLength.emojis))
+                            })
+                            .onAppear {
+                                emoji = playlist.emoji!
+                            }
+                            .focused($focusState, equals: .emoji)
+                            .submitLabel(.done)
                     }
-                    .padding(.trailing)
-                    .disabled(name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || emoji.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
-                    .tint(.blue)
                 }
-                ToolbarItemGroup(placement: .keyboard) {
-                    HStack {
-                        Button {
-                            switch focusState {
-                            case .emoji:
-                                focusState = .name
-                            default:
-                                focusState = nil
-                            }
-                        } label: {
-                            Image(systemName: "chevron.up")
-                                .tint(.blue)
+                .onSubmit {
+                    switch focusState {
+                    case .name:
+                        focusState = .emoji
+                    default:
+                        focusState = nil
+                    }
+                }
+                .navigationTitle(name)
+                .toolbar {
+                    ToolbarItemGroup(placement: .navigationBarLeading) {
+                        Button("Cancel") {
+                            name = ""
+                            emoji = ""
+                            presentationMode.wrappedValue.dismiss()
                         }
-                        .disabled(focusState == .name)
-                        Button {
-                            switch focusState {
-                            case .name:
-                                focusState = .emoji
-                            default:
-                                focusState = nil
-                            }
-                        } label: {
-                            Image(systemName: "chevron.down")
-                                .tint(.blue)
+                        .padding(.leading)
+                    }
+                    ToolbarItemGroup(placement: .navigationBarTrailing) {
+                        Button("Save") {
+                            saveChanges()
                         }
-                        .disabled(focusState == .emoji)
-                        Spacer()
-                        Button("Done") {
-                            focusState = nil
-                        }
+                        .padding(.trailing)
+                        .disabled(name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || emoji.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
                         .tint(.blue)
                     }
-                }
-        }
+                    ToolbarItemGroup(placement: .keyboard) {
+                        HStack {
+                            Button {
+                                switch focusState {
+                                case .emoji:
+                                    focusState = .name
+                                default:
+                                    focusState = nil
+                                }
+                            } label: {
+                                Image(systemName: "chevron.up")
+                                    .tint(.blue)
+                            }
+                            .disabled(focusState == .name)
+                            Button {
+                                switch focusState {
+                                case .name:
+                                    focusState = .emoji
+                                default:
+                                    focusState = nil
+                                }
+                            } label: {
+                                Image(systemName: "chevron.down")
+                                    .tint(.blue)
+                            }
+                            .disabled(focusState == .emoji)
+                            Spacer()
+                            Button("Done") {
+                                focusState = nil
+                            }
+                            .tint(.blue)
+                        }
+                    }
+            }
+            }
         }
     }
     
+    private func checkExists() -> Bool {
+        guard let _ = playlist.name else {return false}
+        guard let _ = playlist.emoji else {return false}
+        return true
+    }
+ 
     private func saveChanges() {
         playlist.name = name
         playlist.emoji = emoji

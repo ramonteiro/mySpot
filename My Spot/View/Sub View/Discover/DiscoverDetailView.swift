@@ -36,6 +36,7 @@ struct DiscoverDetailView: View {
     @State private var image: UIImage?
     @State private var showingImage = false
     @State private var showingSaveSheet = false
+    @State private var didLike = false
     @FocusState private var nameIsFocused: Bool
     
     var body: some View {
@@ -111,31 +112,51 @@ struct DiscoverDetailView: View {
                                 }
                                 .offset(x: 15, y: 30)
                                 Button {
+                                    let spot = cloudViewModel.spots[index]
                                     if (likeButton == "heart") {
-                                        let newLike = Likes(context: moc)
-                                        newLike.likedId = String(cloudViewModel.spots[index].location.coordinate.latitude + cloudViewModel.spots[index].location.coordinate.longitude) + cloudViewModel.spots[index].name
-                                        try? moc.save()
-                                        likeButton = "heart.fill"
-                                        cloudViewModel.likeSpot(spot: cloudViewModel.spots[index], like: true)
-                                        cloudViewModel.spots[index].likes += 1
-                                    } else {
-                                        for i in likedIds {
-                                            if (i.likedId == String(cloudViewModel.spots[index].location.coordinate.latitude + cloudViewModel.spots[index].location.coordinate.longitude) + cloudViewModel.spots[index].name) {
-                                                moc.delete(i)
-                                                try? moc.save()
-                                                break
+                                        Task {
+                                            didLike = await cloudViewModel.likeSpot(spot: spot, like: true)
+                                            if (didLike) {
+                                                DispatchQueue.main.async {
+                                                    let newLike = Likes(context: moc)
+                                                    newLike.likedId = String(cloudViewModel.spots[index].location.coordinate.latitude + cloudViewModel.spots[index].location.coordinate.longitude) + cloudViewModel.spots[index].name
+                                                    try? moc.save()
+                                                    likeButton = "heart.fill"
+                                                    cloudViewModel.spots[index].likes += 1
+                                                    didLike = false
+                                                }
                                             }
                                         }
-                                        likeButton = "heart"
-                                        cloudViewModel.likeSpot(spot: cloudViewModel.spots[index], like: false)
-                                        cloudViewModel.spots[index].likes -= 1
+                                    } else {
+                                        Task {
+                                            didLike = await cloudViewModel.likeSpot(spot: spot, like: false)
+                                            if (didLike) {
+                                                DispatchQueue.main.async {
+                                                    for i in likedIds {
+                                                        if (i.likedId == String(cloudViewModel.spots[index].location.coordinate.latitude + cloudViewModel.spots[index].location.coordinate.longitude) + cloudViewModel.spots[index].name) {
+                                                            moc.delete(i)
+                                                            try? moc.save()
+                                                            break
+                                                        }
+                                                    }
+                                                    likeButton = "heart"
+                                                    cloudViewModel.spots[index].likes -= 1
+                                                    didLike = false
+                                                }
+                                            }
+                                        }
                                     }
                                 } label: {
-                                    Image(systemName: likeButton)
-                                        .foregroundColor(.white)
-                                        .font(.system(size: 30, weight: .regular))
-                                        .padding(15)
-                                        .shadow(color: .black, radius: 5)
+                                    if (!didLike) {
+                                        Image(systemName: likeButton)
+                                            .foregroundColor(.white)
+                                            .font(.system(size: 30, weight: .regular))
+                                            .padding(15)
+                                            .shadow(color: .black, radius: 5)
+                                    } else {
+                                        ProgressView()
+                                            .padding(15)
+                                    }
                                 }
                                 .offset(x: -10, y: 30)
                             }
@@ -287,7 +308,7 @@ struct DiscoverDetailView: View {
                 }
             }
             .padding(.top, 20)
-            .padding(.bottom, 100)
+            .padding(.bottom, (100 * UIScreen.screenWidth)/375)
             .sheet(isPresented: $showingMailSheet) {
                 MailView(message: $message) { returnedMail in
                     print(returnedMail)
@@ -295,13 +316,13 @@ struct DiscoverDetailView: View {
             }
         }
         .frame(maxWidth: .infinity)
-        .frame(height: 500)
+        .frame(height: (500 * UIScreen.screenWidth)/375)
         .background(
             RoundedRectangle(cornerRadius: 40)
                 .foregroundColor(Color(UIColor.secondarySystemBackground))
                 .shadow(color: .black, radius: 5)
         )
-        .offset(y: 200)
+        .offset(y: (200 * UIScreen.screenWidth)/375)
     }
     
     private func isSpotInCoreData() -> [Spot] {

@@ -125,30 +125,7 @@ struct DiscoverSheetShared: View {
                             .fontWeight(.bold)
                             .foregroundColor(.red)
                             .offset(x: 26)
-                        Button(action: {
-                            if (likeButton == "hand.thumbsup") {
-                                let newLike = Likes(context: moc)
-                                newLike.likedId = String(cloudViewModel.shared[0].location.coordinate.latitude + cloudViewModel.shared[0].location.coordinate.longitude) + cloudViewModel.shared[0].name
-                                try? moc.save()
-                                likeButton = "hand.thumbsup.fill"
-                                cloudViewModel.likeSpot(spot: cloudViewModel.shared[0], like: true)
-                                cloudViewModel.shared[0].likes += 1
-                            } else {
-                                for i in likedIds {
-                                    if (i.likedId == String(cloudViewModel.shared[0].location.coordinate.latitude + cloudViewModel.shared[0].location.coordinate.longitude) + cloudViewModel.shared[0].name) {
-                                        moc.delete(i)
-                                        try? moc.save()
-                                        break
-                                    }
-                                }
-                                likeButton = "hand.thumbsup"
-                                cloudViewModel.likeSpot(spot: cloudViewModel.shared[0], like: false)
-                                cloudViewModel.shared[0].likes -= 1
-                            }
-                            
-                        }, label: {
-                            Image(systemName: likeButton)
-                        })
+                        
                         .padding()
                     }
                 }

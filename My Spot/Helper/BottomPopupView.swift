@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import Combine
 
 struct NamePopupView: View {
     
@@ -36,6 +37,20 @@ struct NamePopupView: View {
                 .padding([.leading, .trailing], 10)
                 .background(Color.gray.opacity(0.3))
                 .cornerRadius(10)
+                .submitLabel(.done)
+                .onReceive(Just(text)) { _ in
+                    if (text.count > MaxCharLength.names) {
+                        text = String(text.prefix(MaxCharLength.names))
+                    }
+                }
+                .onSubmit {
+                    if (!text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty) {
+                        saved = true
+                    } else {
+                        text = ""
+                    }
+                    isPresented = false
+                }
             HStack {
                 Spacer()
                 Button(action: {

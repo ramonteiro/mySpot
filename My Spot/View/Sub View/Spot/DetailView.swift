@@ -28,17 +28,28 @@ struct DetailView: View {
     @State private var showingImage = false
     
     var body: some View {
-        displaySpot
-            .onChange(of: tabController.playlistPopToRoot) { _ in
-                if (fromPlaylist) {
-                    presentationMode.wrappedValue.dismiss()
+        if (checkExists()) {
+            displaySpot
+                .onChange(of: tabController.playlistPopToRoot) { _ in
+                    if (fromPlaylist) {
+                        presentationMode.wrappedValue.dismiss()
+                    }
                 }
+                .onChange(of: tabController.spotPopToRoot) { _ in
+                    if (!fromPlaylist) {
+                        presentationMode.wrappedValue.dismiss()
+                    }
             }
-            .onChange(of: tabController.spotPopToRoot) { _ in
-                if (!fromPlaylist) {
-                    presentationMode.wrappedValue.dismiss()
-                }
-            }
+        }
+    }
+    
+    private func checkExists() -> Bool {
+        guard let _ = spot.name else {return false}
+        guard let _ = spot.locationName else {return false}
+        guard let _ = spot.date else {return false}
+        guard let _ = spot.details else {return false}
+        guard let _ = spot.founder else {return false}
+        return true
     }
     
     private var displaySpot: some View {
@@ -208,16 +219,16 @@ struct DetailView: View {
                     .font(.system(size: 15, weight: .light))
                     .foregroundColor(Color.gray)
             }
-            .padding(.bottom, 100)
+            .padding(.bottom, (100 * UIScreen.screenWidth)/375)
         }
         .frame(maxWidth: .infinity)
-        .frame(height: 500)
+        .frame(height: (500 * UIScreen.screenWidth)/375)
         .background(
             RoundedRectangle(cornerRadius: 40)
                 .foregroundColor(Color(UIColor.secondarySystemBackground))
                 .shadow(color: .black, radius: 5)
         )
-        .offset(y: 200)
+        .offset(y: (200 * UIScreen.screenWidth)/375)
     }
     
     private func isExisting() -> Bool {
@@ -226,9 +237,5 @@ struct DetailView: View {
         } else {
             return false
         }
-    }
-    
-    private func close() {
-        presentationMode.wrappedValue.dismiss()
     }
 }

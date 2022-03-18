@@ -58,33 +58,9 @@ struct PlaylistRow: View {
     }
     
     func checkIfItemExist() -> Bool {
-        if let _ = playlist.name {
-            return true
-        } else {
-            return false
-        }
+        guard let _ = playlist.name else {return false}
+        guard let _ = playlist.emoji else {return false}
+        return true
     }
 }
 
-/*
- HStack {
-     VStack(alignment: .leading) {
-         Text(playlist.name!)
-         if (playlist.spotArr.count > 1) {
-             Text("\(playlist.spotArr.count) spots").font(.subheadline).foregroundColor(.gray)
-         } else if (playlist.spotArr.count == 1) {
-             Text("\(playlist.spotArr.count) spot").font(.subheadline).foregroundColor(.gray)
-         } else {
-             Text("Empty Playlist").font(.subheadline).foregroundColor(.gray)
-         }
-     }
-     Spacer()
-     Text(playlist.emoji!)
-         .font(.system(size: 50))
-         .overlay(Circle()
-             .stroke(Color.red, lineWidth: 1)
-             .frame(width: UIScreen.main.bounds.width * 0.16, height: UIScreen.main.bounds.height * (60/812), alignment: .center)
-         )
-         .padding()
- }
- */
