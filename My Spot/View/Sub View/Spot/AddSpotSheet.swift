@@ -183,7 +183,6 @@ struct AddSpotSheet: View {
                                 }
                                 .alert("Are you sure you want to delete spot?", isPresented: $showingAlert) {
                                     Button("Delete", role: .destructive) { close() }
-                                        .tint(.blue)
                                 }
                                 .padding()
                             }
@@ -230,6 +229,7 @@ struct AddSpotSheet: View {
             } else {
                 Text("Add Photo")
                     .onAppear(perform: {canSubmitPic = false})
+                    .foregroundColor(.blue)
             }
         })
     }

@@ -118,9 +118,11 @@ struct DiscoverView: View {
         ScrollViewReader { prox in
             List {
                 ForEach(searchResults.indices, id: \.self) { index in
-                    NavigationLink(destination: DiscoverDetailView(index: index)) {
-                        DiscoverRow(spot: searchResults[index])
-                            .id(searchResults[index])
+                    ZStack {
+                        NavigationLink(destination: DiscoverDetailView(index: index)) {
+                            DiscoverRow(spot: searchResults[index])
+                                .id(searchResults[index])
+                        }
                     }
                 }
             }

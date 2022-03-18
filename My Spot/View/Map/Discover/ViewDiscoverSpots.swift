@@ -61,7 +61,7 @@ struct ViewDiscoverSpots: View {
         } else {
             selection-=1
         }
-        withAnimation {
+        withAnimation() {
             spotRegion = MKCoordinateRegion(center: cloudViewModel.spots[selection].location.coordinate, span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01))
         }
     }

@@ -24,6 +24,10 @@ struct My_SpotApp: App {
     // initialize Network Monitor
     @StateObject private var networkViewModel = NetworkMonitor()
     
+    init() {
+        UIView.appearance(whenContainedInInstancesOf: [UIAlertController.self]).tintColor = .systemBlue
+    }
+    
     var body: some Scene {
         WindowGroup {
             ContentView()

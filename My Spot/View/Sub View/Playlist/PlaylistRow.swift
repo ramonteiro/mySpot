@@ -37,7 +37,7 @@ struct PlaylistRow: View {
                     }
                     
                     if !(playlist.spotArr.count == 0) {
-                        ScrollView(.horizontal) {
+                        ScrollView(.horizontal, showsIndicators: false) {
                             HStack {
                                 ForEach(playlist.spotArr, id: \.self) { spot in
                                     Text(spot.name ?? "")

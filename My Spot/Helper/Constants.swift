@@ -31,6 +31,6 @@ enum LocationForSorting {
 }
 
 enum CloudKitConst {
-    static let maxLoadPerFetch = 1
-    static let maxLoadTotal = 14
+    static let maxLoadPerFetch = 4
+    static let maxLoadTotal = 16
 }

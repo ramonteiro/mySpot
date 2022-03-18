@@ -225,7 +225,7 @@ class CloudKitViewModel: ObservableObject {
     func fetchMoreSpotsPublic(cursor:CKQueryOperation.Cursor?)  {
 
         guard let cursorChecked = cursor else { return }
-        if spots.count > CloudKitConst.maxLoadTotal {
+        if spots.count > CloudKitConst.maxLoadTotal - 1 {
             return
         }
         let queryoperation = CKQueryOperation(cursor: cursorChecked)

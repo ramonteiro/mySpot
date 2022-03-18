@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		C501FC1827E3FAB7008FEFA1 /* ZoomableScrollView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C501FC1727E3FAB7008FEFA1 /* ZoomableScrollView.swift */; };
+		C501FC1A27E41FF1008FEFA1 /* ImagePopUp.swift in Sources */ = {isa = PBXBuildFile; fileRef = C501FC1927E41FF1008FEFA1 /* ImagePopUp.swift */; };
+		C501FC1C27E4419A008FEFA1 /* BottomPopupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C501FC1B27E4419A008FEFA1 /* BottomPopupView.swift */; };
 		C502D4F927E1A02C0057A65C /* PlaylistEditSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = C502D4F827E1A02C0057A65C /* PlaylistEditSheet.swift */; };
 		C502D4FB27E1A6310057A65C /* SpotEditSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = C502D4FA27E1A6310057A65C /* SpotEditSheet.swift */; };
 		C502D4FD27E1B63D0057A65C /* DiscoverSheetShared.swift in Sources */ = {isa = PBXBuildFile; fileRef = C502D4FC27E1B63D0057A65C /* DiscoverSheetShared.swift */; };
@@ -59,6 +62,9 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		C501FC1727E3FAB7008FEFA1 /* ZoomableScrollView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZoomableScrollView.swift; sourceTree = "<group>"; };
+		C501FC1927E41FF1008FEFA1 /* ImagePopUp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagePopUp.swift; sourceTree = "<group>"; };
+		C501FC1B27E4419A008FEFA1 /* BottomPopupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BottomPopupView.swift; sourceTree = "<group>"; };
 		C502D4F827E1A02C0057A65C /* PlaylistEditSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistEditSheet.swift; sourceTree = "<group>"; };
 		C502D4FA27E1A6310057A65C /* SpotEditSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpotEditSheet.swift; sourceTree = "<group>"; };
 		C502D4FC27E1B63D0057A65C /* DiscoverSheetShared.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiscoverSheetShared.swift; sourceTree = "<group>"; };
@@ -315,6 +321,9 @@
 				C56F499E27E05CE300BCBB8F /* Extensions.swift */,
 				C56F49A027E05FDF00BCBB8F /* NetworkMonitor.swift */,
 				C587027327E27F1900DFB6C4 /* MailViewCallback.swift */,
+				C501FC1727E3FAB7008FEFA1 /* ZoomableScrollView.swift */,
+				C501FC1927E41FF1008FEFA1 /* ImagePopUp.swift */,
+				C501FC1B27E4419A008FEFA1 /* BottomPopupView.swift */,
 			);
 			path = Helper;
 			sourceTree = "<group>";
@@ -391,6 +400,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				C515042927D8540A009F0DCD /* TabController.swift in Sources */,
+				C501FC1A27E41FF1008FEFA1 /* ImagePopUp.swift in Sources */,
 				C515040827D7CA7B009F0DCD /* DiscoverDetailView.swift in Sources */,
 				C515042327D7CAC6009F0DCD /* Constants.swift in Sources */,
 				C51503E127D7C856009F0DCD /* Spot+CoreDataClass.swift in Sources */,
@@ -404,6 +414,7 @@
 				C56F49A127E05FDF00BCBB8F /* NetworkMonitor.swift in Sources */,
 				C515041B27D7CAAA009F0DCD /* MapAnnotationDiscover.swift in Sources */,
 				C51503AE27D7C347009F0DCD /* My_SpotApp.swift in Sources */,
+				C501FC1827E3FAB7008FEFA1 /* ZoomableScrollView.swift in Sources */,
 				C51503FD27D7CA60009F0DCD /* DiscoverView.swift in Sources */,
 				C51503DD27D7C856009F0DCD /* UIImageTransformer.swift in Sources */,
 				C515040F27D7CA87009F0DCD /* AddSpotToPlaylistSheet.swift in Sources */,
@@ -424,6 +435,7 @@
 				C51503E327D7C856009F0DCD /* CoreDataManager.swift in Sources */,
 				C515041527D7CAA3009F0DCD /* SpotMapPreview.swift in Sources */,
 				C515040327D7CA72009F0DCD /* AddSpotSheet.swift in Sources */,
+				C501FC1C27E4419A008FEFA1 /* BottomPopupView.swift in Sources */,
 				C515041627D7CAA3009F0DCD /* MapAnnotationView.swift in Sources */,
 				C5F44E8D27DD3818001E9E32 /* Likes+CoreDataClass.swift in Sources */,
 				C5F44E8E27DD3818001E9E32 /* Likes+CoreDataProperties.swift in Sources */,

@@ -73,7 +73,7 @@ struct SpotRow: View {
                 }
                 
                 if (!(spot.tags?.isEmpty ?? true)) {
-                    ScrollView(.horizontal) {
+                    ScrollView(.horizontal, showsIndicators: false) {
                         HStack {
                             ForEach(tags, id: \.self) { tag in
                                 Text(tag)

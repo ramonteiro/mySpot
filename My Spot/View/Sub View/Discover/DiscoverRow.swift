@@ -46,7 +46,7 @@ struct DiscoverRow: View {
                     .foregroundColor(Color.gray)
                 
                 HStack(alignment: .center) {
-                    Image(systemName: "hand.thumbsup.fill")
+                    Image(systemName: "heart.fill")
                         .font(.subheadline)
                         .foregroundColor(Color.gray)
                     Text("\(spot.likes)")
@@ -64,7 +64,7 @@ struct DiscoverRow: View {
                 }
                 
                 if (!(spot.type.isEmpty)) {
-                    ScrollView(.horizontal) {
+                    ScrollView(.horizontal, showsIndicators: false) {
                         HStack {
                             ForEach(tags, id: \.self) { tag in
                                 Text(tag)
@@ -86,24 +86,3 @@ struct DiscoverRow: View {
         }
     }
 }
-
-/*
- HStack {
-     VStack(alignment: .leading) {
-         Text(spot.name)
-         Text("By: \(spot.founder)").font(.subheadline).foregroundColor(.gray)
-         Text("On: \(spot.date)").font(.subheadline).foregroundColor(.gray)
-         HStack() {
-             Image(systemName: "hand.thumbsup.fill").font(.subheadline).foregroundColor(.gray)
-             Text("\(spot.likes)").font(.subheadline).foregroundColor(.gray)
-         }
-     }
-     Spacer()
-     Text(spot.emoji)
-         .font(.system(size: 50))
-         .overlay(Circle()
-                     .stroke(Color.red, lineWidth: 1)
-                     .frame(width: UIScreen.main.bounds.width * 0.16, height: UIScreen.main.bounds.height * (60/812), alignment: .center)
-         )
- }
- */

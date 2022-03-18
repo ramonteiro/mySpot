@@ -130,7 +130,6 @@ struct AddPlaylistSheet: View {
         }
         .alert("Are you sure you want to delete playlist?", isPresented: $showingAlert) {
             Button("Delete", role: .destructive) { close() }
-                .tint(.blue)
         }
         .padding()
     }

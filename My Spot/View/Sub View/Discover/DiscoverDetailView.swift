@@ -23,166 +23,285 @@ struct DiscoverDetailView: View {
     @FetchRequest(sortDescriptors: []) var likedIds: FetchedResults<Likes>
     @EnvironmentObject var tabController: TabController
     @EnvironmentObject var mapViewModel: MapViewModel
+    @EnvironmentObject var networkViewModel: NetworkMonitor
     @EnvironmentObject var cloudViewModel: CloudKitViewModel
     
     @State private var message = ""
     @State private var showingMailSheet = false
-    @State private var nameInTitle = ""
     @State private var isSaving = false
-    @State private var likeButton = "hand.thumbsup"
+    @State private var likeButton = "heart"
     @State private var newName = ""
-    @State private var imageLoaded: Bool = false
     @State private var isSaved: Bool = false
+    @State private var tags: [String] = []
+    @State private var image: UIImage?
+    @State private var showingImage = false
+    @State private var showingSaveSheet = false
     @FocusState private var nameIsFocused: Bool
     
     var body: some View {
-        Form {
-            if let url = cloudViewModel.spots[index].imageURL, let data = try? Data(contentsOf: url), let image = UIImage(data: data) {
-                Image(uiImage: image)
-                    .resizable()
-                    .scaledToFit()
-                    .onAppear {
-                        imageLoaded = true
+        ZStack {
+            if(cloudViewModel.spots.count > 0 && cloudViewModel.spots.count >= index + 1) {
+                ZStack {
+                    VStack {
+                        Image(uiImage: (image ?? UIImage(systemName: "exclamationmark.triangle.fill"))!)
+                            .resizable()
+                            .scaledToFit()
+                            .offset(y: -100)
+                        Spacer()
                     }
-            } else {
-                HStack {
-                    Spacer()
-                    ProgressView("Loading Image")
-                    Spacer()
+                    detailSheet
+                    HStack {
+                        Button {
+                            withAnimation {
+                                showingImage.toggle()
+                            }
+                        } label: {
+                            Image(systemName: "arrow.up.left.and.arrow.down.right")
+                                .font(.system(size: 15, weight: .regular))
+                                .padding(5)
+                                .foregroundColor(.white)
+                        }
+                        .background(.ultraThinMaterial)
+                        .clipShape(Circle())
+                        .offset(x: 20, y: -80)
+                        Spacer()
+                        Button {
+                            withAnimation {
+                                showingSaveSheet = true
+                            }
+                        } label: {
+                            Image(systemName: "icloud.and.arrow.down")
+                                .font(.system(size: 30, weight: .regular))
+                                .padding(15)
+                                .foregroundColor(.white)
+                        }
+                        .background(
+                            Circle()
+                                .foregroundColor(.accentColor)
+                                .shadow(color: .black, radius: 5)
+                        )
+                        .disabled(isSpotInCoreData().count != 0 || isSaved)
+                        .offset(x: -20, y: -60)
+                    }
+                    HStack {
+                        VStack {
+                            Button {
+                                presentationMode.wrappedValue.dismiss()
+                            } label: {
+                                Image(systemName: "arrow.left")
+                                    .foregroundColor(.white)
+                                    .font(.system(size: 30, weight: .regular))
+                                    .padding(15)
+                                    .shadow(color: .black, radius: 5)
+                            }
+                            .offset(y: 30)
+                            Spacer()
+                        }
+                        Spacer()
+                        VStack {
+                            HStack {
+                                Button {
+                                    cloudViewModel.shareSheet(index: index)
+                                } label: {
+                                    Image(systemName: "square.and.arrow.up")
+                                        .foregroundColor(.white)
+                                        .font(.system(size: 30, weight: .regular))
+                                        .padding(15)
+                                        .shadow(color: .black, radius: 5)
+                                }
+                                .offset(x: 15, y: 30)
+                                Button {
+                                    if (likeButton == "heart") {
+                                        let newLike = Likes(context: moc)
+                                        newLike.likedId = String(cloudViewModel.spots[index].location.coordinate.latitude + cloudViewModel.spots[index].location.coordinate.longitude) + cloudViewModel.spots[index].name
+                                        try? moc.save()
+                                        likeButton = "heart.fill"
+                                        cloudViewModel.likeSpot(spot: cloudViewModel.spots[index], like: true)
+                                        cloudViewModel.spots[index].likes += 1
+                                    } else {
+                                        for i in likedIds {
+                                            if (i.likedId == String(cloudViewModel.spots[index].location.coordinate.latitude + cloudViewModel.spots[index].location.coordinate.longitude) + cloudViewModel.spots[index].name) {
+                                                moc.delete(i)
+                                                try? moc.save()
+                                                break
+                                            }
+                                        }
+                                        likeButton = "heart"
+                                        cloudViewModel.likeSpot(spot: cloudViewModel.spots[index], like: false)
+                                        cloudViewModel.spots[index].likes -= 1
+                                    }
+                                } label: {
+                                    Image(systemName: likeButton)
+                                        .foregroundColor(.white)
+                                        .font(.system(size: 30, weight: .regular))
+                                        .padding(15)
+                                        .shadow(color: .black, radius: 5)
+                                }
+                                .offset(x: -10, y: 30)
+                            }
+                            Spacer()
+                        }
+                    }
+                    if (showingImage) {
+                        ImagePopUp(showingImage: $showingImage, image: (image ?? UIImage(systemName: "exclamationmark.triangle.fill"))!)
+                            .transition(.scale)
+                    }
+                }
+                .ignoresSafeArea(.all, edges: .top)
+                .onChange(of: tabController.discoverPopToRoot) { _ in
+                    presentationMode.wrappedValue.dismiss()
+                }
+                .onChange(of: isSaving) { newValue in
+                    if newValue {
+                        save()
+                    }
                 }
                 .onAppear {
-                    imageLoaded = false
-                }
-            }
-            Text("Found by: \(cloudViewModel.spots[index].founder)\nOn \(cloudViewModel.spots[index].date)\nTag: \(cloudViewModel.spots[index].type)").font(.subheadline).foregroundColor(.gray)
-            Section(header: Text("Description")) {
-                Text(cloudViewModel.spots[index].description)
-            }
-            Section(header: Text("Location")) {
-                ViewSingleSpotOnMap(singlePin: [SinglePin(name: cloudViewModel.spots[index].name, coordinate: cloudViewModel.spots[index].location.coordinate)])
-                    .aspectRatio(contentMode: .fit)
-                    .cornerRadius(15)
-                Button("Take Me To \(cloudViewModel.spots[index].name)") {
-                    let routeMeTo = MKMapItem(placemark: MKPlacemark(coordinate: CLLocationCoordinate2D(latitude: cloudViewModel.spots[index].location.coordinate.latitude, longitude: cloudViewModel.spots[index].location.coordinate.longitude)))
-                    routeMeTo.name = cloudViewModel.spots[index].name
-                    routeMeTo.openInMaps(launchOptions: nil)
-                }
-                .tint(.blue)
-            }
-            Section(header: Text("report")) {
-                Button("Report") {
-                    showingMailSheet = true
-                }
-                .disabled(!MailView.canSendMail)
-                .sheet(isPresented: $showingMailSheet) {
-                    MailView(message: $message) { result in
-                        print(result)
+                    tags = cloudViewModel.spots[index].type.components(separatedBy: ", ")
+                    let url = cloudViewModel.spots[index].imageURL
+                    if let data = try? Data(contentsOf: url), let image = UIImage(data: data) {
+                        self.image = image
                     }
-                }
-            }
-            if (isSpotInCoreData().count == 0 && !isSaved) {
-                Section(header: Text("Save To My Spots")) {
-                    if (!isSaving) {
-                        Button("Save") {
-                            withAnimation {
-                                isSaving = true
-                            }
+                    isSaving = false
+                    newName = ""
+                    var didlike = false
+                    for i in likedIds {
+                        if i.likedId == String(cloudViewModel.spots[index].location.coordinate.latitude + cloudViewModel.spots[index].location.coordinate.longitude) + cloudViewModel.spots[index].name {
+                            didlike = true
+                            break
                         }
-                        .disabled(!imageLoaded)
-                        .tint(.blue)
                     }
-                    if (isSaving) {
-                        TextField("Enter Spot Name", text: $newName)
-                            .focused($nameIsFocused)
-                            .submitLabel(.done)
-                            .onReceive(Just(newName)) { _ in
-                                if (newName.count > MaxCharLength.names) {
-                                    newName = String(newName.prefix(MaxCharLength.names))
-                                }
-                            }
-                            .onSubmit {
-                                save()
-                                isSaved = true
-                            }
-                        Button("Save") {
-                            save()
-                            isSaved = true
-                        }
-                        .accentColor(.blue)
-                        .disabled(newName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                    if (didlike) {
+                        likeButton = "heart.fill"
                     }
-                }
+                    message = "The public spot with id: " + cloudViewModel.spots[index].id + ", has the following issue(s):\n"
+                    cloudViewModel.canRefresh = false
+            }
             }
         }
-        .onAppear() {
-            nameInTitle = cloudViewModel.spots[index].name
-            isSaving = false
-            imageLoaded = false
-            newName = ""
-            var didlike = false
-            for i in likedIds {
-                if i.likedId == String(cloudViewModel.spots[index].location.coordinate.latitude + cloudViewModel.spots[index].location.coordinate.longitude) + cloudViewModel.spots[index].name {
-                    didlike = true
-                    break
-                }
+        .popup(isPresented: $showingSaveSheet) {
+            BottomPopupView {
+                NamePopupView(isPresented: $showingSaveSheet, text: $newName, saved: $isSaving)
             }
-            if (didlike) {
-                likeButton = "hand.thumbsup.fill"
-            }
-            message = "The public spot with id: " + cloudViewModel.spots[index].id + ", has the following issue(s):\n"
-            cloudViewModel.canRefresh = false
         }
-        .navigationTitle(nameInTitle)
-        .toolbar {
-            ToolbarItemGroup(placement: .keyboard) {
-                HStack {
-                    Spacer()
-                    Button("Done") {
-                        nameIsFocused = false
-                    }
-                    .tint(.blue)
-                }
+        .navigationBarHidden(true)
+        .edgesIgnoringSafeArea(.top)
+    }
+    
+    private var detailSheet: some View {
+        ScrollView(showsIndicators: false) {
+            
+            
+            HStack {
+                Image(systemName: "mappin")
+                    .font(.system(size: 15, weight: .light))
+                    .foregroundColor(Color.gray)
+                Text("\(cloudViewModel.spots[index].locationName)")
+                    .font(.system(size: 15, weight: .light))
+                    .foregroundColor(Color.gray)
+                    .padding(.leading, 1)
+                Spacer()
             }
-            ToolbarItemGroup(placement: .navigationBarTrailing) {
+            .padding([.top, .leading, .trailing], 30)
+            
+            
+            HStack {
+                Text("\(cloudViewModel.spots[index].name)")
+                    .font(.system(size: 45, weight: .heavy))
+                Spacer()
+            }
+            .padding(.leading, 30)
+            .padding(.trailing, 5)
+            
+            HStack {
+                Text("By: \(cloudViewModel.spots[index].founder)")
+                    .font(.system(size: 15, weight: .light))
+                    .foregroundColor(Color.gray)
+                Spacer()
+                Text("\(cloudViewModel.spots[index].date)")
+                    .font(.system(size: 15, weight: .light))
+                    .foregroundColor(Color.gray)
+            }
+            .padding([.leading, .trailing], 30)
+            
+            HStack {
+                Image(systemName: "heart.fill")
+                    .font(.system(size: 15, weight: .light))
+                    .foregroundColor(Color.gray)
                 Text("\(cloudViewModel.spots[index].likes)")
-                    .fontWeight(.bold)
-                    .foregroundColor(.red)
-                    .offset(x: 26)
-                Button(action: {
-                    if (likeButton == "hand.thumbsup") {
-                        let newLike = Likes(context: moc)
-                        newLike.likedId = String(cloudViewModel.spots[index].location.coordinate.latitude + cloudViewModel.spots[index].location.coordinate.longitude) + cloudViewModel.spots[index].name
-                        try? moc.save()
-                        likeButton = "hand.thumbsup.fill"
-                        cloudViewModel.likeSpot(spot: cloudViewModel.spots[index], like: true)
-                        cloudViewModel.spots[index].likes += 1
-                    } else {
-                        for i in likedIds {
-                            if (i.likedId == String(cloudViewModel.spots[index].location.coordinate.latitude + cloudViewModel.spots[index].location.coordinate.longitude) + cloudViewModel.spots[index].name) {
-                                moc.delete(i)
-                                try? moc.save()
-                                break
-                            }
+                    .font(.system(size: 15, weight: .light))
+                    .foregroundColor(Color.gray)
+                    .padding(.leading, 1)
+                Spacer()
+            }
+            .padding([.leading, .trailing], 30)
+            .offset(y: 5)
+            
+            if (!cloudViewModel.spots[index].type.isEmpty) {
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack {
+                        ForEach(tags, id: \.self) { tag in
+                            Text(tag)
+                                .font(.system(size: 12, weight: .regular))
+                                .lineLimit(2)
+                                .foregroundColor(.white)
+                                .padding(5)
+                                .background(.tint)
+                                .cornerRadius(5)
                         }
-                        likeButton = "hand.thumbsup"
-                        cloudViewModel.likeSpot(spot: cloudViewModel.spots[index], like: false)
-                        cloudViewModel.spots[index].likes -= 1
                     }
-                }, label: {
-                    Image(systemName: likeButton)
-                })
-                .padding()
-                Button {
-                    cloudViewModel.shareSheet(index: index)
-                } label: {
-                    Image(systemName: "square.and.arrow.up")
                 }
-
+                .padding([.leading, .trailing], 30)
+                .offset(y: 5)
+            }
+            HStack(spacing: 5) {
+                Text(cloudViewModel.spots[index].description)
+                Spacer()
+            }
+            .padding(.top, 10)
+            .padding([.leading, .trailing], 30)
+            
+            ViewSingleSpotOnMap(singlePin: [SinglePin(name: cloudViewModel.spots[index].name, coordinate: cloudViewModel.spots[index].location.coordinate)])
+                .aspectRatio(contentMode: .fit)
+                .cornerRadius(15)
+                .padding([.leading, .trailing], 30)
+            
+            Button {
+                let routeMeTo = MKMapItem(placemark: MKPlacemark(coordinate: cloudViewModel.spots[index].location.coordinate))
+                routeMeTo.name = cloudViewModel.spots[index].name
+                routeMeTo.openInMaps(launchOptions: nil)
+            } label: {
+                Text("Take Me To \(cloudViewModel.spots[index].name)")
+                    .padding(.horizontal)
+            }
+            .buttonStyle(.borderedProminent)
+            .padding(.top, 10)
+            .padding([.leading, .trailing], 30)
+            
+            Button {
+                showingMailSheet = true
+            } label: {
+                HStack {
+                    Text("Report Spot")
+                    Image(systemName: "exclamationmark.triangle.fill")
+                }
+            }
+            .padding(.top, 20)
+            .padding(.bottom, 100)
+            .sheet(isPresented: $showingMailSheet) {
+                MailView(message: $message) { returnedMail in
+                    print(returnedMail)
+                }
             }
         }
-        .onChange(of: tabController.discoverPopToRoot) { _ in
-            presentationMode.wrappedValue.dismiss()
-        }
+        .frame(maxWidth: .infinity)
+        .frame(height: 500)
+        .background(
+            RoundedRectangle(cornerRadius: 40)
+                .foregroundColor(Color(UIColor.secondarySystemBackground))
+                .shadow(color: .black, radius: 5)
+        )
+        .offset(y: 200)
     }
     
     private func isSpotInCoreData() -> [Spot] {
@@ -197,21 +316,20 @@ struct DiscoverDetailView: View {
     }
     
     private func save() {
-        let url = cloudViewModel.spots[index].imageURL
-        if let data = try? Data(contentsOf: url), let image = UIImage(data: data) {
-            let newSpot = Spot(context: moc)
-            newSpot.founder = cloudViewModel.spots[index].founder
-            newSpot.details = cloudViewModel.spots[index].description
-            newSpot.image = image
-            newSpot.name = newName
-            newSpot.x = cloudViewModel.spots[index].location.coordinate.latitude
-            newSpot.y = cloudViewModel.spots[index].location.coordinate.longitude
-            newSpot.isPublic = false
-            newSpot.tags = cloudViewModel.spots[index].type
-            newSpot.date = cloudViewModel.spots[index].date
-            newSpot.id = UUID()
-            newSpot.dbid = cloudViewModel.spots[index].record.recordID.recordName
-            try? moc.save()
-        }
+        let newSpot = Spot(context: moc)
+        newSpot.founder = cloudViewModel.spots[index].founder
+        newSpot.details = cloudViewModel.spots[index].description
+        newSpot.image = image
+        newSpot.locationName = cloudViewModel.spots[index].locationName
+        newSpot.name = newName
+        newSpot.x = cloudViewModel.spots[index].location.coordinate.latitude
+        newSpot.y = cloudViewModel.spots[index].location.coordinate.longitude
+        newSpot.isPublic = false
+        newSpot.tags = cloudViewModel.spots[index].type
+        newSpot.date = cloudViewModel.spots[index].date
+        newSpot.id = UUID()
+        newSpot.dbid = cloudViewModel.spots[index].record.recordID.recordName
+        try? moc.save()
+        isSaved = true
     }
 }
