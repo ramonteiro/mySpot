@@ -80,6 +80,40 @@ struct DetailPlaylistView: View {
                 displayMessageNoSpotsFound
             }
         }
+        .navigationTitle((playlist.name ?? "") + (playlist.emoji ?? ""))
+        .navigationBarBackButtonHidden(true)
+        .toolbar {
+            ToolbarItemGroup(placement: .navigationBarTrailing) {
+                HStack {
+                    Button{
+                        showingMapSheet.toggle()
+                    } label: {
+                        Image(systemName: "map").imageScale(.large)
+                    }
+                    .disabled(playlist.spotArr.count == 0)
+                    .sheet(isPresented: $showingMapSheet) {
+                        ViewPlaylistMap(playlist: playlist)
+                    }
+                    Button{
+                        showingAddSpotToPlaylistSheet = true
+                    } label: {
+                        Image(systemName: "plus").imageScale(.large)
+                    }
+                    .sheet(isPresented: $showingAddSpotToPlaylistSheet, onDismiss: setFilteringType) {
+                        AddSpotToPlaylistSheet(currPlaylist: playlist)
+                    }
+                    Button("Edit") {
+                        showingEditSheet = true
+                    }
+                    .sheet(isPresented: $showingEditSheet) {
+                        PlaylistEditSheet(playlist: playlist)
+                    }
+                }
+            }
+            ToolbarItemGroup(placement: .navigationBarLeading) {
+                displayLocationIcon
+            }
+        }
         .onChange(of: tabController.playlistPopToRoot) { _ in
             presentationMode.wrappedValue.dismiss()
         }
@@ -193,40 +227,6 @@ struct DetailPlaylistView: View {
                 .onDelete(perform: self.deleteFiltered)
             }
             .searchable(text: $searchText, prompt: "Search \(playlist.name ?? "")\(playlist.emoji ?? "")")
-        }
-        .navigationTitle((playlist.name ?? "") + (playlist.emoji ?? ""))
-        .navigationBarBackButtonHidden(true)
-        .toolbar {
-            ToolbarItemGroup(placement: .navigationBarTrailing) {
-                HStack {
-                    Button{
-                        showingMapSheet.toggle()
-                    } label: {
-                        Image(systemName: "map").imageScale(.large)
-                    }
-                    .disabled(playlist.spotArr.count == 0)
-                    .sheet(isPresented: $showingMapSheet) {
-                        ViewPlaylistMap(playlist: playlist)
-                    }
-                    Button{
-                        showingAddSpotToPlaylistSheet = true
-                    } label: {
-                        Image(systemName: "plus").imageScale(.large)
-                    }
-                    .sheet(isPresented: $showingAddSpotToPlaylistSheet, onDismiss: setFilteringType) {
-                        AddSpotToPlaylistSheet(currPlaylist: playlist)
-                    }
-                    Button("Edit") {
-                        showingEditSheet = true
-                    }
-                    .sheet(isPresented: $showingEditSheet) {
-                        PlaylistEditSheet(playlist: playlist)
-                    }
-                }
-            }
-            ToolbarItemGroup(placement: .navigationBarLeading) {
-                displayLocationIcon
-            }
         }
     }
     

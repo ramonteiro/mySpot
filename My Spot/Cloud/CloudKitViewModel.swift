@@ -270,7 +270,7 @@ class CloudKitViewModel: ObservableObject {
     
     func shareSheet(index i: Int) {
         let url = URL(string: "myspot://" + (spots[i].id))
-        let activityView = UIActivityViewController(activityItems: ["Check out, \"\(spots[i].name))\" on My Spot! ", url!, "\n\nIf you don't have My Spot, get it on the Appstore here: ", URL(string: "https://apps.apple.com/us/app/my-spot-exploration/id1613618373")!], applicationActivities: nil)
+        let activityView = UIActivityViewController(activityItems: ["Check out, \"\(spots[i].name)\" on My Spot! ", url!, "\n\nIf you don't have My Spot, get it on the Appstore here: ", URL(string: "https://apps.apple.com/us/app/my-spot-exploration/id1613618373")!], applicationActivities: nil)
 
         let allScenes = UIApplication.shared.connectedScenes
         let scene = allScenes.first { $0.activationState == .foregroundActive }
