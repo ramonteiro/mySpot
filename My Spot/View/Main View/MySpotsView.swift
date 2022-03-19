@@ -25,91 +25,79 @@ struct MySpotsView: View {
     
     @State private var showingAddSheet = false
     @State private var showingMapSheet = false
-    @State private var locationIcon = "location"
     @State private var filteredSpots: [Spot] = []
     @State private var searchText = ""
+    @State private var sortBy = "Name"
     
-    var searchResults: [Spot] {
+    private var searchResults: [Spot] {
             if searchText.isEmpty {
                 return filteredSpots
             } else {
-                return filteredSpots.filter { $0.name!.contains(searchText) }
+                return filteredSpots.filter { $0.name!.lowercased().contains(searchText.lowercased()) || $0.tags!.lowercased().contains(searchText.lowercased()) || $0.founder!.lowercased().contains(searchText.lowercased())}
             }
         }
     
     var body: some View {
         NavigationView {
-            if (locationIcon == LocationForSorting.locationOn) { //sorted by location
-                listFiltered
-            } else { // unsorted
-                listUnfiltered
-            }
+            listFiltered
+                .onChange(of: sortBy) { sortType in
+                    if (sortType == "Name") {
+                        sortName()
+                    } else if (sortType == "Newest") {
+                        sortDate()
+                    } else if (sortType == "Closest") {
+                        sortClosest()
+                    }
+                }
         }
         .onAppear {
+            mapViewModel.checkLocationAuthorization()
             setFilteringType()
-            filter()
         }
     }
     
-    private var listUnfiltered: some View {
-        ZStack {
-            List {
-                ForEach(spots) { spot in
-                    NavigationLink(destination: DetailView(fromPlaylist: false, spot: spot)) {
-                        SpotRow(spot: spot)
-                    }
-                }
-                .onDelete(perform: self.delete)
-            }
-            if (spots.count == 0) {
-                VStack(spacing: 6) {
-                    HStack {
-                        Spacer()
-                        Text("No Spots Here Yet!")
-                        Spacer()
-                    }
-                    HStack {
-                        Spacer()
-                        Text("Add Some With The Plus Button Above").font(.subheadline).foregroundColor(.gray)
-                        Spacer()
-                    }
-                    HStack {
-                        Spacer()
-                        (Text("Tip: Press ") + Text(Image(systemName: "location")) + Text(" to filter by your location."))
-                            .font(.subheadline)
-                            .foregroundColor(.gray)
-                        Spacer()
-                    }
-                }
+    private func sortClosest() {
+        filteredSpots = filteredSpots.sorted { (spot1, spot2) -> Bool in
+            guard let UserY = mapViewModel.locationManager?.location?.coordinate.longitude else { return true }
+            guard let UserX = mapViewModel.locationManager?.location?.coordinate.latitude else { return true }
+            let distanceFromSpot1 = distanceBetween(x1: UserX, x2: spot1.x, y1: UserY, y2: spot1.y)
+            let distanceFromSpot2 = distanceBetween(x1: UserX, x2: spot2.x, y1: UserY, y2: spot2.y)
+            return distanceFromSpot1 < distanceFromSpot2
+        }
+        sortBy = "Closest"
+        UserDefaults.standard.set(sortBy, forKey: "savedSort")
+    }
+    
+    private func sortName() {
+        filteredSpots = filteredSpots.sorted { (spot1, spot2) -> Bool in
+            guard let name1 = spot1.name else { return true }
+            guard let name2 = spot2.name else { return true }
+            if (name1 < name2) {
+                return true
+            } else {
+                return false
             }
         }
-        .navigationTitle("My Spots")
-        .navigationBarItems(trailing:
-        HStack {
-            Button(action: {
-                showingMapSheet.toggle()
-            }) {
-                Image(systemName: "map").imageScale(.large)
-            }
-            .disabled(spots.isEmpty)
-            .sheet(isPresented: $showingMapSheet) {
-                ViewMapSpots()
-            }
-            Button(action: {
-                if (locationIcon == LocationForSorting.locationOn) {
-                    locationIcon = LocationForSorting.locationOff
-                    UserDefaults.standard.set(false, forKey: UserDefaultKeys.isFilterByLocation)
-                }
-            showingAddSheet.toggle()
-            }) {
-                Image(systemName: "plus").imageScale(.large)
-            }
-            .sheet(isPresented: $showingAddSheet) {
-                AddSpotSheet()
+        sortBy = "Name"
+        UserDefaults.standard.set(sortBy, forKey: "savedSort")
+    }
+    
+    private func sortDate() {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "MMM d, yyyy"
+        filteredSpots = filteredSpots.sorted { (spot1, spot2) -> Bool in
+            guard let dateString1 = spot1.date else { return true }
+            guard let dateString2 = spot2.date else { return true }
+            guard let date1 = dateFormatter.date(from: dateString1) else { return true }
+            guard let date2 = dateFormatter.date(from: dateString2) else { return true }
+            if (date1 > date2) {
+                return true
+            } else {
+                return false
             }
         }
-        )
-        .navigationBarItems(leading: displayLocationIcon.disabled(!mapViewModel.isAuthorized))
+        sortBy = "Newest"
+        UserDefaults.standard.set(sortBy, forKey: "savedSort")
     }
     
     private var listFiltered: some View {
@@ -122,7 +110,7 @@ struct MySpotsView: View {
                 }
                 .onDelete(perform: self.deleteFiltered)
             }
-            .searchable(text: $searchText)
+            .searchable(text: $searchText, prompt: "Search All Spots")
             if (spots.count == 0) {
                 VStack(spacing: 6) {
                     HStack {
@@ -146,41 +134,30 @@ struct MySpotsView: View {
             }
         }
         .navigationTitle("My Spots")
-        .navigationBarItems(trailing:
-        HStack {
-            Button(action: {
-                showingMapSheet.toggle()
-            }) {
-                Image(systemName: "map").imageScale(.large)
-            }
-            .sheet(isPresented: $showingMapSheet) {
-                ViewMapSpots()
-            }
-            .disabled(spots.isEmpty)
-            Button(action: {
-                if (locationIcon == LocationForSorting.locationOn) {
-                    locationIcon = LocationForSorting.locationOff
-                    UserDefaults.standard.set(false, forKey: UserDefaultKeys.isFilterByLocation)
+        .toolbar {
+            ToolbarItemGroup(placement: .navigationBarTrailing) {
+                HStack {
+                    Button{
+                        showingMapSheet.toggle()
+                    } label: {
+                        Image(systemName: "map").imageScale(.large)
+                    }
+                    .sheet(isPresented: $showingMapSheet) {
+                        ViewMapSpots()
+                    }
+                    .disabled(spots.isEmpty)
+                    Button {
+                        showingAddSheet.toggle()
+                    } label: {
+                        Image(systemName: "plus").imageScale(.large)
+                    }
+                    .sheet(isPresented: $showingAddSheet, onDismiss: setFilteringType) {
+                        AddSpotSheet()
+                    }
                 }
-            showingAddSheet.toggle()
-            }) {
-                Image(systemName: "plus").imageScale(.large)
             }
-            .sheet(isPresented: $showingAddSheet) {
-                AddSpotSheet()
-            }
-        })
-        .navigationBarItems(leading: displayLocationIcon.disabled(!mapViewModel.isAuthorized))
-    }
-    
-    private func filter() {
-        if (locationIcon == LocationForSorting.locationOn) {
-            filteredSpots = spots.sorted { (spot1, spot2) -> Bool in
-                guard let UserY = mapViewModel.locationManager?.location?.coordinate.longitude else { return true }
-                guard let UserX = mapViewModel.locationManager?.location?.coordinate.latitude else { return true }
-                let distanceFromSpot1 = distanceBetween(x1: UserX, x2: spot1.x, y1: UserY, y2: spot1.y)
-                let distanceFromSpot2 = distanceBetween(x1: UserX, x2: spot2.x, y1: UserY, y2: spot2.y)
-                return distanceFromSpot1 < distanceFromSpot2
+            ToolbarItemGroup(placement: .navigationBarLeading) {
+                displayLocationIcon
             }
         }
     }
@@ -190,35 +167,90 @@ struct MySpotsView: View {
     }
     
     private func setFilteringType() {
-        if (UserDefaults.standard.valueExists(forKey: UserDefaultKeys.isFilterByLocation)) {
-            if (UserDefaults.standard.value(forKey: UserDefaultKeys.isFilterByLocation) as! Bool == false) {
-                locationIcon = LocationForSorting.locationOff
-            } else {
-                locationIcon = LocationForSorting.locationOn
+        if (UserDefaults.standard.valueExists(forKey: "savedSort")) {
+            sortBy = UserDefaults.standard.string(forKey: "savedSort") ?? "Name"
+            if (sortBy == "Name") {
+                filteredSpots = spots.sorted { (spot1, spot2) -> Bool in
+                    guard let name1 = spot1.name else { return true }
+                    guard let name2 = spot2.name else { return true }
+                    if (name1 < name2) {
+                        return true
+                    } else {
+                        return false
+                    }
+                }
+            } else if (sortBy == "Newest") {
+                let dateFormatter = DateFormatter()
+                dateFormatter.dateFormat = "MMM d, yyyy"
+                filteredSpots = spots.sorted { (spot1, spot2) -> Bool in
+                    guard let dateString1 = spot1.date else { return true }
+                    guard let dateString2 = spot2.date else { return true }
+                    guard let date1 = dateFormatter.date(from: dateString1) else { return true }
+                    guard let date2 = dateFormatter.date(from: dateString2) else { return true }
+                    if (date1 > date2) {
+                        return true
+                    } else {
+                        return false
+                    }
+                }
+            } else if (sortBy == "Closest" && mapViewModel.isAuthorized) {
+                filteredSpots = spots.sorted { (spot1, spot2) -> Bool in
+                    guard let UserY = mapViewModel.locationManager?.location?.coordinate.longitude else { return true }
+                    guard let UserX = mapViewModel.locationManager?.location?.coordinate.latitude else { return true }
+                    let distanceFromSpot1 = distanceBetween(x1: UserX, x2: spot1.x, y1: UserY, y2: spot1.y)
+                    let distanceFromSpot2 = distanceBetween(x1: UserX, x2: spot2.x, y1: UserY, y2: spot2.y)
+                    return distanceFromSpot1 < distanceFromSpot2
+                }
+            } else if (sortBy == "Closest" && !mapViewModel.isAuthorized) {
+                filteredSpots = spots.sorted { (spot1, spot2) -> Bool in
+                    guard let name1 = spot1.name else { return true }
+                    guard let name2 = spot2.name else { return true }
+                    if (name1 < name2) {
+                        return true
+                    } else {
+                        return false
+                    }
+                }
+                sortBy = "Name"
+                UserDefaults.standard.set(sortBy, forKey: "savedSort")
             }
         } else {
-            locationIcon = LocationForSorting.locationOff
+            filteredSpots = spots.sorted { (spot1, spot2) -> Bool in
+                guard let name1 = spot1.name else { return true }
+                guard let name2 = spot2.name else { return true }
+                if (name1 < name2) {
+                    return true
+                } else {
+                    return false
+                }
+            }
+            sortBy = "Closest"
+            UserDefaults.standard.set(sortBy, forKey: "savedSort")
         }
     }
     
     private var displayLocationIcon: some View {
-        Button(action: {
-            if (locationIcon == LocationForSorting.locationOn) {
-                locationIcon = LocationForSorting.locationOff
-                UserDefaults.standard.set(false, forKey: UserDefaultKeys.isFilterByLocation)
-            } else {
-                mapViewModel.checkLocationAuthorization()
-                locationIcon = LocationForSorting.locationOn
-                UserDefaults.standard.set(true, forKey: UserDefaultKeys.isFilterByLocation)
-                filter()
+        Menu {
+            Button {
+                sortClosest()
+            } label: {
+                Text("Closest")
             }
-        }) {
-            Image(systemName: locationIcon).imageScale(.large)
-        }
-        .onChange(of: mapViewModel.isAuthorized) { newValue in
-            if (!newValue) {
-                locationIcon = LocationForSorting.locationOff
-                UserDefaults.standard.set(false, forKey: UserDefaultKeys.isFilterByLocation)
+            .disabled(!mapViewModel.isAuthorized)
+            Button {
+                sortDate()
+            } label: {
+                Text("Newest")
+            }
+            Button {
+                sortName()
+            } label: {
+                Text("Name")
+            }
+        } label: {
+            HStack {
+                Image(systemName: "chevron.up.chevron.down")
+                Text("\(sortBy)")
             }
         }
     }
@@ -235,14 +267,5 @@ struct MySpotsView: View {
             }
         }
         filteredSpots.remove(atOffsets: offsets)
-    }
-    
-    private func delete(at offsets: IndexSet) {
-        offsets.forEach { i in
-            DispatchQueue.main.async {
-                moc.delete(spots[i])
-                try? moc.save()
-            }
-        }
     }
 }

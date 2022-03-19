@@ -70,3 +70,15 @@ extension View {
         }
     }
 }
+
+// overrides uigestures to allow for swipe to pop navigation view WITH backbutton hidden
+extension UINavigationController: UIGestureRecognizerDelegate {
+    override open func viewDidLoad() {
+        super.viewDidLoad()
+        interactivePopGestureRecognizer?.delegate = self
+    }
+
+    public func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
+        return viewControllers.count > 1
+    }
+}

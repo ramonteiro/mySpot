@@ -27,12 +27,6 @@ enum UserDefaultKeys {
     static let lastKnownUserLocationY = "lastKnownUserLocationY"
 }
 
-// defines systemname image
-enum LocationForSorting {
-    static let locationOff = "location"
-    static let locationOn = "location.fill"
-}
-
 // defines cloudkit public db fetch amount
 enum CloudKitConst {
     static let maxLoadPerFetch = 4

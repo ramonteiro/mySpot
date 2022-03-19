@@ -26,7 +26,16 @@ struct DetailPlaylistView: View {
     @State private var showingEditSheet = false
     @State private var showingMapSheet = false
     @State private var filteredSpots: [Spot] = []
-    @State private var locationIcon = "location"
+    @State private var searchText = ""
+    @State private var sortBy = "Name"
+    
+    private var searchResults: [Spot] {
+            if searchText.isEmpty {
+                return filteredSpots
+            } else {
+                return filteredSpots.filter { $0.name!.lowercased().contains(searchText.lowercased()) || $0.tags!.lowercased().contains(searchText.lowercased()) || $0.founder!.lowercased().contains(searchText.lowercased())}
+            }
+        }
     
     var body: some View {
         if (playlistExist()) {
@@ -38,15 +47,6 @@ struct DetailPlaylistView: View {
         guard let _ = playlist.name else {return false}
         guard let _ = playlist.emoji else {return false}
         return true
-    }
-    
-    private func delete(at offsets: IndexSet) {
-        offsets.forEach { i in
-            DispatchQueue.main.async {
-                playlist.spotArr[i].playlist = nil
-                try? moc.save()
-            }
-        }
     }
     
     private func deleteFiltered(at offsets: IndexSet) {
@@ -66,11 +66,16 @@ struct DetailPlaylistView: View {
     private var displayDetailedView: some View {
         ZStack {
             if (playlist.spotArr.count > 0) {
-                if (locationIcon == LocationForSorting.locationOn) {
-                    listFiltered
-                } else {
-                    listUnfiltered
-                }
+                listFiltered
+                    .onChange(of: sortBy) { sortType in
+                        if (sortType == "Name") {
+                            sortName()
+                        } else if (sortType == "Newest") {
+                            sortDate()
+                        } else if (sortType == "Closest") {
+                            sortClosest()
+                        }
+                    }
             } else {
                 displayMessageNoSpotsFound
             }
@@ -79,89 +84,98 @@ struct DetailPlaylistView: View {
             presentationMode.wrappedValue.dismiss()
         }
         .onAppear() {
+            mapViewModel.checkLocationAuthorization()
             setFilteringType()
-            filter()
-        }
-        .navigationTitle((playlist.name ?? "") + (playlist.emoji ?? ""))
-        .listRowSeparator(.hidden)
-        .navigationBarItems(leading: displayLocationIcon.disabled(!mapViewModel.isAuthorized))
-        .toolbar {
-            ToolbarItemGroup(placement: .navigationBarTrailing) {
-                Button(action: {
-                    showingMapSheet.toggle()
-                }) {
-                    Image(systemName: "map").imageScale(.large)
-                }
-                .disabled(playlist.spotArr.count == 0)
-                .sheet(isPresented: $showingMapSheet) {
-                    ViewPlaylistMap(playlist: playlist)
-                }
-                Button(action: {
-                    if (locationIcon == LocationForSorting.locationOn) {
-                        locationIcon = LocationForSorting.locationOff
-                        UserDefaults.standard.set(false, forKey: UserDefaultKeys.isFilterByLocation)
-                    }
-                    showingAddSpotToPlaylistSheet = true
-                }) {
-                    Image(systemName: "plus").imageScale(.large)
-                }
-                .sheet(isPresented: $showingAddSpotToPlaylistSheet) {
-                    AddSpotToPlaylistSheet(currPlaylist: playlist)
-                }
-                Button("Edit") {
-                    showingEditSheet = true
-                }
-                .sheet(isPresented: $showingEditSheet) {
-                    PlaylistEditSheet(playlist: playlist)
-                }
-            }
         }
     }
     
     private var displayLocationIcon: some View {
-        Button(action: {
-            if (locationIcon == LocationForSorting.locationOn) {
-                locationIcon = LocationForSorting.locationOff
-                UserDefaults.standard.set(false, forKey: UserDefaultKeys.isFilterByLocation)
-            } else {
-                mapViewModel.checkLocationAuthorization()
-                locationIcon = LocationForSorting.locationOn
-                UserDefaults.standard.set(true, forKey: UserDefaultKeys.isFilterByLocation)
-                filter()
+        Menu {
+            Button {
+                sortClosest()
+            } label: {
+                Text("Closest")
             }
-        }) {
-            Image(systemName: locationIcon).imageScale(.large)
-        }
-        .onChange(of: mapViewModel.isAuthorized) { newValue in
-            if (!newValue) {
-                locationIcon = LocationForSorting.locationOff
-                UserDefaults.standard.set(false, forKey: UserDefaultKeys.isFilterByLocation)
+            .disabled(!mapViewModel.isAuthorized)
+            Button {
+                sortDate()
+            } label: {
+                Text("Newest")
+            }
+            Button {
+                sortName()
+            } label: {
+                Text("Name")
+            }
+        } label: {
+            HStack {
+                Image(systemName: "chevron.up.chevron.down")
+                Text("\(sortBy)")
             }
         }
     }
     
     private func setFilteringType() {
-        if (UserDefaults.standard.valueExists(forKey: UserDefaultKeys.isFilterByLocation)) {
-            if (UserDefaults.standard.value(forKey: UserDefaultKeys.isFilterByLocation) as! Bool == false) {
-                locationIcon = LocationForSorting.locationOff
+            if (UserDefaults.standard.valueExists(forKey: "savedSort")) {
+                sortBy = UserDefaults.standard.string(forKey: "savedSort") ?? "Name"
+                if (sortBy == "Name") {
+                    filteredSpots = playlist.spotArr.sorted { (spot1, spot2) -> Bool in
+                        guard let name1 = spot1.name else { return true }
+                        guard let name2 = spot2.name else { return true }
+                        if (name1 < name2) {
+                            return true
+                        } else {
+                            return false
+                        }
+                    }
+                } else if (sortBy == "Newest") {
+                    let dateFormatter = DateFormatter()
+                    dateFormatter.dateFormat = "MMM d, yyyy"
+                    filteredSpots = playlist.spotArr.sorted { (spot1, spot2) -> Bool in
+                        guard let dateString1 = spot1.date else { return true }
+                        guard let dateString2 = spot2.date else { return true }
+                        guard let date1 = dateFormatter.date(from: dateString1) else { return true }
+                        guard let date2 = dateFormatter.date(from: dateString2) else { return true }
+                        if (date1 > date2) {
+                            return true
+                        } else {
+                            return false
+                        }
+                    }
+                } else if (sortBy == "Closest" && mapViewModel.isAuthorized) {
+                    filteredSpots = playlist.spotArr.sorted { (spot1, spot2) -> Bool in
+                        guard let UserY = mapViewModel.locationManager?.location?.coordinate.longitude else { return true }
+                        guard let UserX = mapViewModel.locationManager?.location?.coordinate.latitude else { return true }
+                        let distanceFromSpot1 = distanceBetween(x1: UserX, x2: spot1.x, y1: UserY, y2: spot1.y)
+                        let distanceFromSpot2 = distanceBetween(x1: UserX, x2: spot2.x, y1: UserY, y2: spot2.y)
+                        return distanceFromSpot1 < distanceFromSpot2
+                    }
+                } else if (sortBy == "Closest" && !mapViewModel.isAuthorized) {
+                    filteredSpots = playlist.spotArr.sorted { (spot1, spot2) -> Bool in
+                        guard let name1 = spot1.name else { return true }
+                        guard let name2 = spot2.name else { return true }
+                        if (name1 < name2) {
+                            return true
+                        } else {
+                            return false
+                        }
+                    }
+                    sortBy = "Name"
+                    UserDefaults.standard.set(sortBy, forKey: "savedSort")
+                }
             } else {
-                locationIcon = LocationForSorting.locationOn
+                filteredSpots = playlist.spotArr.sorted { (spot1, spot2) -> Bool in
+                    guard let name1 = spot1.name else { return true }
+                    guard let name2 = spot2.name else { return true }
+                    if (name1 < name2) {
+                        return true
+                    } else {
+                        return false
+                    }
+                }
+                sortBy = "Closest"
+                UserDefaults.standard.set(sortBy, forKey: "savedSort")
             }
-        } else {
-            locationIcon = LocationForSorting.locationOff
-        }
-    }
-    
-    private func filter() {
-        if (locationIcon == LocationForSorting.locationOn) {
-            filteredSpots = playlist.spotArr.sorted { (spot1, spot2) -> Bool in
-                guard let UserY = mapViewModel.locationManager?.location?.coordinate.longitude else { return true }
-                guard let UserX = mapViewModel.locationManager?.location?.coordinate.latitude else { return true }
-                let distanceFromSpot1 = distanceBetween(x1: UserX, x2: spot1.x, y1: UserY, y2: spot1.y)
-                let distanceFromSpot2 = distanceBetween(x1: UserX, x2: spot2.x, y1: UserY, y2: spot2.y)
-                return distanceFromSpot1 < distanceFromSpot2
-            }
-        }
     }
     
     private func distanceBetween(x1: Double, x2: Double, y1: Double, y2: Double) -> Double {
@@ -169,24 +183,50 @@ struct DetailPlaylistView: View {
     }
     
     private var listFiltered: some View {
-        List {
-            ForEach(filteredSpots) { spot in
-                NavigationLink(destination: DetailView(fromPlaylist: true, spot: spot)) {
-                    SpotRow(spot: spot)
+        ZStack {
+            List {
+                ForEach(searchResults) { spot in
+                    NavigationLink(destination: DetailView(fromPlaylist: true, spot: spot)) {
+                        SpotRow(spot: spot)
+                    }
                 }
+                .onDelete(perform: self.deleteFiltered)
             }
-            .onDelete(perform: self.deleteFiltered)
+            .searchable(text: $searchText, prompt: "Search \(playlist.name ?? "")\(playlist.emoji ?? "")")
         }
-    }
-    
-    private var listUnfiltered: some View {
-        List {
-            ForEach(playlist.spotArr) { spot in
-                NavigationLink(destination: DetailView(fromPlaylist: true, spot: spot)) {
-                    SpotRow(spot: spot)
+        .navigationTitle((playlist.name ?? "") + (playlist.emoji ?? ""))
+        .navigationBarBackButtonHidden(true)
+        .toolbar {
+            ToolbarItemGroup(placement: .navigationBarTrailing) {
+                HStack {
+                    Button{
+                        showingMapSheet.toggle()
+                    } label: {
+                        Image(systemName: "map").imageScale(.large)
+                    }
+                    .disabled(playlist.spotArr.count == 0)
+                    .sheet(isPresented: $showingMapSheet) {
+                        ViewPlaylistMap(playlist: playlist)
+                    }
+                    Button{
+                        showingAddSpotToPlaylistSheet = true
+                    } label: {
+                        Image(systemName: "plus").imageScale(.large)
+                    }
+                    .sheet(isPresented: $showingAddSpotToPlaylistSheet, onDismiss: setFilteringType) {
+                        AddSpotToPlaylistSheet(currPlaylist: playlist)
+                    }
+                    Button("Edit") {
+                        showingEditSheet = true
+                    }
+                    .sheet(isPresented: $showingEditSheet) {
+                        PlaylistEditSheet(playlist: playlist)
+                    }
                 }
             }
-            .onDelete(perform: self.delete)
+            ToolbarItemGroup(placement: .navigationBarLeading) {
+                displayLocationIcon
+            }
         }
     }
     
@@ -203,5 +243,49 @@ struct DetailPlaylistView: View {
                 Spacer()
             }
         }
+    }
+    
+    private func sortClosest() {
+        filteredSpots = filteredSpots.sorted { (spot1, spot2) -> Bool in
+            guard let UserY = mapViewModel.locationManager?.location?.coordinate.longitude else { return true }
+            guard let UserX = mapViewModel.locationManager?.location?.coordinate.latitude else { return true }
+            let distanceFromSpot1 = distanceBetween(x1: UserX, x2: spot1.x, y1: UserY, y2: spot1.y)
+            let distanceFromSpot2 = distanceBetween(x1: UserX, x2: spot2.x, y1: UserY, y2: spot2.y)
+            return distanceFromSpot1 < distanceFromSpot2
+        }
+        sortBy = "Closest"
+        UserDefaults.standard.set(sortBy, forKey: "savedSort")
+    }
+    
+    private func sortName() {
+        filteredSpots = filteredSpots.sorted { (spot1, spot2) -> Bool in
+            guard let name1 = spot1.name else { return true }
+            guard let name2 = spot2.name else { return true }
+            if (name1 < name2) {
+                return true
+            } else {
+                return false
+            }
+        }
+        sortBy = "Name"
+        UserDefaults.standard.set(sortBy, forKey: "savedSort")
+    }
+    
+    private func sortDate() {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "MMM d, yyyy"
+        filteredSpots = filteredSpots.sorted { (spot1, spot2) -> Bool in
+            guard let dateString1 = spot1.date else { return true }
+            guard let dateString2 = spot2.date else { return true }
+            guard let date1 = dateFormatter.date(from: dateString1) else { return true }
+            guard let date2 = dateFormatter.date(from: dateString2) else { return true }
+            if (date1 > date2) {
+                return true
+            } else {
+                return false
+            }
+        }
+        sortBy = "Newest"
+        UserDefaults.standard.set(sortBy, forKey: "savedSort")
     }
 }
