@@ -27,7 +27,7 @@ struct NamePopupView: View {
                     Image(systemName: "xmark")
                         .imageScale(.small)
                         .frame(width: 32, height: 32)
-                        .background(.ultraThinMaterial)
+                        .background(.gray.opacity(0.5))
                         .cornerRadius(16)
                         .foregroundColor(.white)
                 })
@@ -54,11 +54,7 @@ struct NamePopupView: View {
             HStack {
                 Spacer()
                 Button(action: {
-                    if (!text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty) {
-                        saved = true
-                    } else {
-                        text = ""
-                    }
+                    saved = true
                     isPresented = false
                 }, label: {
                     Text("Save")
@@ -67,6 +63,7 @@ struct NamePopupView: View {
                 .background(Color.accentColor)
                 .foregroundColor(.white)
                 .cornerRadius(10)
+                .disabled(text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
             }
             .padding(.bottom, 20)
         }

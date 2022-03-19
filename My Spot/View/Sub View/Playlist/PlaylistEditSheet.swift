@@ -27,7 +27,7 @@ struct PlaylistEditSheet: View {
         if (checkExists()) {
             NavigationView {
                 Form {
-                    Section(header: Text("Playlist Name")) {
+                    Section(header: Text("Playlist Name*")) {
                         TextField("Enter Playlist Name", text: $name)
                             .onReceive(Just(name)) { _ in
                                 if (name.count > MaxCharLength.names) {
@@ -40,7 +40,7 @@ struct PlaylistEditSheet: View {
                             .focused($focusState, equals: .name)
                             .submitLabel(.next)
                     }
-                    Section(header: Text("Emoji")) {
+                    Section(header: Text("Emoji*")) {
                         EmojiTextField(text: $emoji, placeholder: "Enter Emoji")
                             .onReceive(Just(emoji), perform: { _ in
                                 self.emoji = String(self.emoji.onlyEmoji().prefix(MaxCharLength.emojis))
@@ -89,7 +89,6 @@ struct PlaylistEditSheet: View {
                                 }
                             } label: {
                                 Image(systemName: "chevron.up")
-                                    .tint(.blue)
                             }
                             .disabled(focusState == .name)
                             Button {
@@ -101,14 +100,12 @@ struct PlaylistEditSheet: View {
                                 }
                             } label: {
                                 Image(systemName: "chevron.down")
-                                    .tint(.blue)
                             }
                             .disabled(focusState == .emoji)
                             Spacer()
                             Button("Done") {
                                 focusState = nil
                             }
-                            .tint(.blue)
                         }
                     }
             }

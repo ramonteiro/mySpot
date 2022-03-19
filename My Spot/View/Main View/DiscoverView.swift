@@ -29,7 +29,7 @@ struct DiscoverView: View {
         if searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
             return cloudViewModel.spots
         } else {
-            return cloudViewModel.spots.filter { $0.name.lowercased().contains(searchText.lowercased()) || $0.type.lowercased().contains(searchText.lowercased()) || $0.founder.lowercased().contains(searchText.lowercased()) || $0.emoji.contains(searchText)}
+            return cloudViewModel.spots.filter { $0.name.lowercased().contains(searchText.lowercased()) || $0.type.lowercased().contains(searchText.lowercased()) || $0.founder.lowercased().contains(searchText.lowercased())}
         }
     }
     

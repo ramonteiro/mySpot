@@ -13,7 +13,6 @@
         <attribute name="date" optional="YES" attributeType="String"/>
         <attribute name="dbid" optional="YES" attributeType="String"/>
         <attribute name="details" optional="YES" attributeType="String"/>
-        <attribute name="emoji" optional="YES" attributeType="String"/>
         <attribute name="founder" optional="YES" attributeType="String"/>
         <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
         <attribute name="image" optional="YES" attributeType="Transformable" valueTransformerName="UIImageTransformer" customClassName="UIImage"/>
@@ -28,6 +27,6 @@
     <elements>
         <element name="Likes" positionX="-54" positionY="90" width="128" height="44"/>
         <element name="Playlist" positionX="-63" positionY="54" width="128" height="14"/>
-        <element name="Spot" positionX="-63" positionY="-18" width="128" height="239"/>
+        <element name="Spot" positionX="-63" positionY="-18" width="128" height="224"/>
     </elements>
 </model>

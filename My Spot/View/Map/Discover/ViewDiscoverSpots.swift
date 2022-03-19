@@ -22,10 +22,7 @@ struct ViewDiscoverSpots: View {
     @EnvironmentObject var cloudViewModel: CloudKitViewModel
     @State private var selection = 0
     @State private var originalRegion = MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: 33.714712646421, longitude: -112.29072718706581), span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01))
-    @State private var transIn: Edge = .leading
-    @State private var transOut: Edge = .bottom
     @State private var showingDetailsSheet = false
-    @State private var fadeInOut = false
     @State private var spotRegion: MKCoordinateRegion = MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: 33.714712646421, longitude: -112.29072718706581), span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01))
     
     var body: some View {
@@ -33,37 +30,13 @@ struct ViewDiscoverSpots: View {
             displayMap
         }
         .onAppear {
-            withAnimation {
-                spotRegion = mapViewModel.searchingHere
-            }
+            spotRegion = mapViewModel.searchingHere
             originalRegion = spotRegion
         }
     }
 
     func close() {
         presentationMode.wrappedValue.dismiss()
-    }
-    
-    private func increaseSelection() {
-        if cloudViewModel.spots.count == selection+1 {
-            selection = 0
-        } else {
-            selection+=1
-        }
-        withAnimation {
-            spotRegion = MKCoordinateRegion(center: cloudViewModel.spots[selection].location.coordinate, span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01))
-        }
-    }
-    
-    private func decreaseSelection() {
-        if 0 > selection-1 {
-            selection = cloudViewModel.spots.count-1
-        } else {
-            selection-=1
-        }
-        withAnimation() {
-            spotRegion = MKCoordinateRegion(center: cloudViewModel.spots[selection].location.coordinate, span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01))
-        }
     }
     
     private var displayRouteButon: some View {
@@ -106,12 +79,10 @@ struct ViewDiscoverSpots: View {
             Map(coordinateRegion: $spotRegion, interactionModes: [.pan, .zoom], showsUserLocation: mapViewModel.getIsAuthorized(), annotationItems: cloudViewModel.spots, annotationContent: { location in
                 MapAnnotation(coordinate: location.location.coordinate) {
                     if (cloudViewModel.spots.count > 0 && cloudViewModel.spots.count >= selection + 1) {
-                        MapAnnotationDiscover(spot: location)
+                        MapAnnotationDiscover(spot: location, isSelected: cloudViewModel.spots[selection] == location)
                             .scaleEffect(cloudViewModel.spots[selection] == location ? 1.2 : 0.9)
                             .shadow(radius: 8)
                             .onTapGesture {
-                                transIn = .bottom
-                                transOut = .bottom
                                 selection = cloudViewModel.spots.firstIndex(of: location) ?? 0
                                 withAnimation {
                                     spotRegion = MKCoordinateRegion(center: cloudViewModel.spots[selection].location.coordinate, span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01))
@@ -147,40 +118,28 @@ struct ViewDiscoverSpots: View {
                 Spacer()
                 
                 ZStack {
-                    if (cloudViewModel.spots.count > 0 && cloudViewModel.spots.count >= selection + 1) {
-                        ForEach(cloudViewModel.spots, id: \.self) { spot in
-                            if (spot == cloudViewModel.spots[selection]) {
-                                DiscoverMapPreview(spot: spot)
-                                    .shadow(color: Color.black.opacity(0.3), radius: 10)
-                                    .padding()
-                                    .onTapGesture {
-                                        showingDetailsSheet.toggle()
-                                    }
-                                    .transition(.asymmetric(insertion: .move(edge: transIn), removal: .move(edge: transOut)))
-                                    .gesture(DragGesture(minimumDistance: 0, coordinateSpace: .local)
-                                        .onEnded({ value in
-                                            withAnimation {
-                                                if value.translation.width < 0 {
-                                                    transIn = .trailing
-                                                    transOut = .bottom
-                                                    increaseSelection()
-                                                }
-                                                
-                                                if value.translation.width > 0 {
-                                                    transIn = .leading
-                                                    transOut = .bottom
-                                                    decreaseSelection()
-                                                }
-                                            }
-                                        }))
-                            }
+                    TabView(selection: $selection) {
+                        ForEach(cloudViewModel.spots.indices, id: \.self) { index in
+                            DiscoverMapPreview(spot: cloudViewModel.spots[index])
+                                .tag(index)
+                                .shadow(color: Color.black.opacity(0.3), radius: 10)
+                                .onTapGesture {
+                                    showingDetailsSheet.toggle()
+                                }
                         }
+                    }
+                    .tabViewStyle(.page(indexDisplayMode: .never))
+                    .frame(height: UIScreen.screenHeight * 0.25)
+                }
+                .onChange(of: selection) { _ in
+                    withAnimation {
+                        spotRegion = MKCoordinateRegion(center: cloudViewModel.spots[selection].location.coordinate, span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01))
                     }
                 }
             }
         }
         .sheet(isPresented: $showingDetailsSheet) {
-            DetailsDiscoverSheet(index: selection)
+            DiscoverDetailView(index: selection)
         }
     }
     
@@ -194,161 +153,5 @@ struct ViewDiscoverSpots: View {
         }
         .shadow(color: Color.black.opacity(0.3), radius: 10)
         .buttonStyle(.borderedProminent)
-    }
-}
-
-
-struct DetailsDiscoverSheet: View {
-    
-    var index: Int
-    @Environment(\.presentationMode) var presentationMode
-    @Environment(\.managedObjectContext) var moc
-    @FetchRequest(sortDescriptors: []) var likedIds: FetchedResults<Likes>
-    @EnvironmentObject var mapViewModel: MapViewModel
-    @EnvironmentObject var cloudViewModel: CloudKitViewModel
-    
-    @State private var isSaving = false
-    @State private var likes = 0
-    @State private var likeButton = "hand.thumbsup"
-    @State private var newName = ""
-    @State private var imageLoaded: Bool = false
-    @State private var isSaved: Bool = false
-    @FocusState private var nameIsFocused: Bool
-    
-    var body: some View {
-        NavigationView {
-            Form {
-                if let url = cloudViewModel.spots[index].imageURL, let data = try? Data(contentsOf: url), let image = UIImage(data: data) {
-                    Image(uiImage: image)
-                        .resizable()
-                        .aspectRatio(contentMode: .fit)
-                        .cornerRadius(15)
-                        .onAppear {
-                            imageLoaded = true
-                        }
-                } else {
-                    HStack {
-                        Spacer()
-                        ProgressView("Loading Image")
-                        Spacer()
-                    }
-                    .onAppear {
-                        imageLoaded = false
-                    }
-                }
-                Text("Found by: \(cloudViewModel.spots[index].founder)\nOn \(cloudViewModel.spots[index].date)\nTag: \(cloudViewModel.spots[index].type)").font(.subheadline).foregroundColor(.gray)
-                Section(header: Text("Description")) {
-                    Text(cloudViewModel.spots[index].description)
-                }
-                Section(header: Text("Location")) {
-                    ViewSingleSpotOnMap(singlePin: [SinglePin(name: cloudViewModel.spots[index].name, coordinate: CLLocationCoordinate2D(latitude: cloudViewModel.spots[index].location.coordinate.latitude, longitude: cloudViewModel.spots[index].location.coordinate.longitude))])
-                        .aspectRatio(contentMode: .fit)
-                        .cornerRadius(15)
-                    Button("Take Me To \(cloudViewModel.spots[index].name)") {
-                        let routeMeTo = MKMapItem(placemark: MKPlacemark(coordinate: cloudViewModel.spots[index].location.coordinate))
-                        routeMeTo.name = cloudViewModel.spots[index].name
-                        routeMeTo.openInMaps(launchOptions: nil)
-                    }
-                    .tint(.blue)
-                }
-                if (isSpotInCoreData().count == 0 && !isSaved) {
-                    Section(header: Text("Save To My Spots")) {
-                        if (!isSaving) {
-                            Button("Save") {
-                                isSaving = true
-                            }
-                            .disabled(!imageLoaded)
-                            .tint(.blue)
-                        }
-                        if (isSaving) {
-                            TextField("Enter Spot Name", text: $newName)
-                                .focused($nameIsFocused)
-                                .onReceive(Just(newName)) { _ in
-                                    if (newName.count > MaxCharLength.names) {
-                                        newName = String(newName.prefix(MaxCharLength.names))
-                                    }
-                                }
-                            Button("Save") {
-                                save()
-                            }
-                            .tint(.blue)
-                            .disabled(newName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
-                        }
-                    }
-                }
-            }
-            .onAppear {
-                var didlike = false
-                for i in likedIds {
-                    if i.likedId == String(cloudViewModel.spots[index].location.coordinate.latitude + cloudViewModel.spots[index].location.coordinate.longitude) + cloudViewModel.spots[index].name {
-                        didlike = true
-                        break
-                    }
-                }
-                if (didlike) {
-                    likeButton = "hand.thumbsup.fill"
-                }
-            }
-            .navigationTitle(cloudViewModel.spots[index].name)
-            .listRowSeparator(.hidden)
-            .toolbar {
-                ToolbarItemGroup(placement: .keyboard) {
-                    HStack {
-                        Spacer()
-                        Button("Done") {
-                            nameIsFocused = false
-                        }
-                        .tint(.blue)
-                    }
-                }
-                ToolbarItemGroup(placement: .navigationBarLeading) {
-                    Button {
-                        presentationMode.wrappedValue.dismiss()
-                    } label: {
-                        Image(systemName: "arrowshape.turn.up.backward").imageScale(.large)
-                    }
-                    .buttonStyle(.borderedProminent)
-                }
-                ToolbarItemGroup(placement: .navigationBarTrailing) {
-                    Text("\(cloudViewModel.spots[index].likes)")
-                        .fontWeight(.bold)
-                        .foregroundColor(.red)
-                        .offset(x: 26)
-                    
-                    .padding()
-                }
-            }
-        }
-    }
-        
-    private func isSpotInCoreData() -> [Spot] {
-        let fetchRequest: NSFetchRequest<Spot> = Spot.fetchRequest()
-        fetchRequest.predicate = NSPredicate(format: "dbid == %@", cloudViewModel.spots[index].record.recordID.recordName as CVarArg)
-        do {
-            let spotsFound: [Spot] = try moc.fetch(fetchRequest)
-            return spotsFound
-        } catch {
-            return []
-        }
-    }
-    
-    private func save() {
-        let url = cloudViewModel.spots[index].imageURL
-        if let data = try? Data(contentsOf: url), let image = UIImage(data: data) {
-            let newSpot = Spot(context: moc)
-            newSpot.founder = cloudViewModel.spots[index].founder
-            newSpot.details = cloudViewModel.spots[index].description
-            newSpot.image = image
-            newSpot.name = newName
-            newSpot.x = cloudViewModel.spots[index].location.coordinate.latitude
-            newSpot.y = cloudViewModel.spots[index].location.coordinate.longitude
-            newSpot.isPublic = false
-            newSpot.tags = cloudViewModel.spots[index].type
-            newSpot.date = cloudViewModel.spots[index].date
-            newSpot.id = UUID()
-            newSpot.dbid = cloudViewModel.spots[index].record.recordID.recordName
-            try? moc.save()
-            isSaved = true
-        }
     }
 }

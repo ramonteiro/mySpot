@@ -14,6 +14,7 @@ import SwiftUI
 
 struct MapAnnotationView: View {
     @ObservedObject var spot: Spot
+    var isSelected: Bool
 
     var body: some View {
         ZStack {
@@ -37,6 +38,10 @@ struct MapAnnotationView: View {
                         .rotationEffect(Angle(degrees: 180))
                         .offset(y: -1)
                         .padding(.bottom , UIScreen.main.bounds.height * (40/812))
+                    if (isSelected) {
+                        Text(spot.name ?? "")
+                            .offset(y: -30)
+                    }
                 }
             } else {
                 VStack(spacing: 0) {
@@ -62,6 +67,10 @@ struct MapAnnotationView: View {
                         .frame(width: UIScreen.main.bounds.width * (10/375), height: UIScreen.main.bounds.height * (10/812))
                         .rotationEffect(Angle(degrees: 180))
                         .padding(.bottom , UIScreen.main.bounds.height * (40/812))
+                    if (isSelected) {
+                        Text(spot.name ?? "")
+                            .offset(y: -30)
+                    }
                 }
             }
         }

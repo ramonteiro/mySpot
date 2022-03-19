@@ -20,8 +20,6 @@ struct ViewMapSpots: View {
     @EnvironmentObject var cloudViewModel: CloudKitViewModel
     @EnvironmentObject var networkViewModel: NetworkMonitor
     @State private var selection = 0
-    @State private var transIn: Edge = .leading
-    @State private var transOut: Edge = .bottom
     @State private var showingDetailsSheet = false
     @State private var spotRegion: MKCoordinateRegion = MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: 33.714712646421, longitude: -112.29072718706581), span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01))
 
@@ -30,9 +28,7 @@ struct ViewMapSpots: View {
             if (networkViewModel.hasInternet) {
                 displayMap
                     .onAppear {
-                        withAnimation {
-                            spotRegion = mapViewModel.region
-                        }
+                        spotRegion = mapViewModel.region
                     }
             } else {
                 Text("No Internet Connection Found")
@@ -42,28 +38,6 @@ struct ViewMapSpots: View {
 
     func close() {
         presentationMode.wrappedValue.dismiss()
-    }
-    
-    private func increaseSelection() {
-        if spots.count == selection+1 {
-            selection = 0
-        } else {
-            selection+=1
-        }
-        withAnimation {
-            spotRegion = MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: spots[selection].x, longitude: spots[selection].y), span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01))
-        }
-    }
-    
-    private func decreaseSelection() {
-        if 0 > selection-1 {
-            selection = spots.count-1
-        } else {
-            selection-=1
-        }
-        withAnimation {
-            spotRegion = MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: spots[selection].x, longitude: spots[selection].y), span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01))
-        }
     }
     
     private var displayRouteButon: some View {
@@ -103,12 +77,10 @@ struct ViewMapSpots: View {
         ZStack {
             Map(coordinateRegion: $spotRegion, interactionModes: [.pan, .zoom], showsUserLocation: mapViewModel.getIsAuthorized(), annotationItems: spots, annotationContent: { location in
                 MapAnnotation(coordinate: CLLocationCoordinate2D(latitude: location.x, longitude: location.y)) {
-                    MapAnnotationView(spot: location)
+                    MapAnnotationView(spot: location, isSelected: spots[selection] == location)
                         .scaleEffect(spots[selection] == location ? 1.2 : 0.9)
                         .shadow(radius: 8)
                         .onTapGesture {
-                            transIn = .bottom
-                            transOut = .bottom
                             selection = spots.firstIndex(of: location) ?? 0
                             withAnimation {
                                 spotRegion = MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: spots[selection].x, longitude: spots[selection].y), span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01))
@@ -134,38 +106,28 @@ struct ViewMapSpots: View {
                 Spacer()
                 
                 ZStack {
-                    ForEach(spots) { spot in
-                        if (spot == spots[selection]) {
-                            SpotMapPreview(spot: spot)
+                    TabView(selection: $selection) {
+                        ForEach(spots.indices, id: \.self) { index in
+                            SpotMapPreview(spot: spots[index])
+                                .tag(index)
                                 .shadow(color: Color.black.opacity(0.3), radius: 10)
-                                .padding()
                                 .onTapGesture {
                                     showingDetailsSheet.toggle()
                                 }
-                                .transition(.asymmetric(insertion: .move(edge: transIn), removal: .move(edge: transOut)))
-                                .gesture(DragGesture(minimumDistance: 0, coordinateSpace: .local)
-                                            .onEnded({ value in
-                                                withAnimation {
-                                                    if value.translation.width < 0 {
-                                                        transIn = .trailing
-                                                        transOut = .bottom
-                                                        increaseSelection()
-                                                    }
-
-                                                    if value.translation.width > 0 {
-                                                        transIn = .leading
-                                                        transOut = .bottom
-                                                        decreaseSelection()
-                                                    }
-                                                }
-                                            }))
                         }
+                    }
+                    .tabViewStyle(.page(indexDisplayMode: .never))
+                    .frame(height: UIScreen.screenHeight * 0.25)
+                }
+                .onChange(of: selection) { _ in
+                    withAnimation {
+                        spotRegion = MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: spots[selection].x, longitude: spots[selection].y), span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01))
                     }
                 }
             }
         }
         .sheet(isPresented: $showingDetailsSheet) {
-            DetailsSheet(spot: spots[selection])
+            DetailView(fromPlaylist: false, spot: spots[selection])
         }
     }
 }

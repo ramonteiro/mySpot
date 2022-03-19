@@ -82,7 +82,7 @@ struct DetailPlaylistView: View {
             setFilteringType()
             filter()
         }
-        .navigationTitle(playlist.name! + playlist.emoji!)
+        .navigationTitle((playlist.name ?? "") + (playlist.emoji ?? ""))
         .listRowSeparator(.hidden)
         .navigationBarItems(leading: displayLocationIcon.disabled(!mapViewModel.isAuthorized))
         .toolbar {

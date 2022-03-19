@@ -23,7 +23,6 @@ struct DiscoverDetailView: View {
     @FetchRequest(sortDescriptors: []) var likedIds: FetchedResults<Likes>
     @EnvironmentObject var tabController: TabController
     @EnvironmentObject var mapViewModel: MapViewModel
-    @EnvironmentObject var networkViewModel: NetworkMonitor
     @EnvironmentObject var cloudViewModel: CloudKitViewModel
     
     @State private var message = ""

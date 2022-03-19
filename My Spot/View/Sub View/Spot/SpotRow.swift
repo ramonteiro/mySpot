@@ -41,7 +41,7 @@ struct SpotRow: View {
                 .shadow(color: .black, radius: 5)
             
             VStack(alignment: .leading) {
-                Text("\(spot.name ?? "")\(spot.emoji ?? "")")
+                Text("\(spot.name ?? "")")
                     .font(.headline)
                     .fontWeight(.bold)
                     .lineLimit(2)

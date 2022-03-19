@@ -20,7 +20,6 @@ struct SpotEditSheet: View {
     @State private var tags = ""
     @State private var isPublic = false
     @State private var wasPublic = false
-    @State private var emoji = ""
     @State private var founder = ""
     @State private var descript = ""
     @State private var nameInTitle = ""
@@ -30,19 +29,18 @@ struct SpotEditSheet: View {
         case name
         case descript
         case founder
-        case emoji
     }
     
     @FocusState private var focusState: Field?
     
     private var keepDisabled: Bool {
-        !((!name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && !descript.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && !founder.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && !isPublic) || (isPublic && !name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && !descript.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && !founder.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && !emoji.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty) || !cloudViewModel.isSignedInToiCloud || !networkViewModel.hasInternet)
+        !((!name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && !founder.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && !isPublic) || (isPublic && !name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && !founder.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty) || !cloudViewModel.isSignedInToiCloud || !networkViewModel.hasInternet)
     }
     
     var body: some View {
         NavigationView {
             Form {
-                Section(header: Text("Spot Name")) {
+                Section(header: Text("Spot Name*")) {
                     TextField("Enter Spot Name", text: $name)
                         .onReceive(Just(name)) { _ in
                             if (name.count > MaxCharLength.names) {
@@ -55,41 +53,34 @@ struct SpotEditSheet: View {
                         .focused($focusState, equals: .name)
                         .submitLabel(.next)
                 }
-                Section(header: Text("Founder's Name")) {
-                    TextField("Enter Founder's Name", text: $founder)
-                        .focused($focusState, equals: .founder)
-                        .submitLabel(.next)
-                        .textContentType(.givenName)
-                        .onAppear {
-                            founder = spot.founder!
-                        }
-                        .onReceive(Just(founder)) { _ in
-                            if (founder.count > MaxCharLength.names) {
-                                founder = String(founder.prefix(MaxCharLength.names))
-                            }
-                        }
-                }
-                if (!wasPublic) {
-                    Section(header: Text("Share Spot")) {
-                        if (networkViewModel.hasInternet && !isFromDB()) {
-                            displayIsPublicPrompt
-                        } else if (!networkViewModel.hasInternet) {
-                            Text("Internet Is Required To Share Spot.")
-                        } else if (isFromDB()) {
-                            Text("Saved Spots Cannot Be Reposted.")
-                        }
-                    }
-                } else {
-                    Section(header: Text("Emoji")) {
-                        EmojiTextField(text: $emoji, placeholder: "Enter Emoji")
-                            .onReceive(Just(emoji), perform: { _ in
-                                self.emoji = String(self.emoji.onlyEmoji().prefix(MaxCharLength.emojis))
-                            })
+                if !isFromDB() {
+                    Section(header: Text("Founder's Name*")) {
+                        TextField("Enter Founder's Name", text: $founder)
+                            .focused($focusState, equals: .founder)
                             .submitLabel(.next)
-                            .focused($focusState, equals: .emoji)
+                            .textContentType(.givenName)
                             .onAppear {
-                                emoji = spot.emoji!
+                                founder = spot.founder!
                             }
+                            .onReceive(Just(founder)) { _ in
+                                if (founder.count > MaxCharLength.names) {
+                                    founder = String(founder.prefix(MaxCharLength.names))
+                                }
+                            }
+                    }
+                    if (!wasPublic) {
+                        Section(header: Text("Share Spot")) {
+                            if (networkViewModel.hasInternet) {
+                                displayIsPublicPrompt
+                            } else if (!networkViewModel.hasInternet) {
+                                Text("Internet Is Required To Share Spot.")
+                                    .font(.subheadline)
+                                    .foregroundColor(.gray)
+                                    .onAppear {
+                                        isPublic = false
+                                    }
+                            }
+                        }
                     }
                 }
                 Section(header: Text("Spot Description")) {
@@ -113,12 +104,6 @@ struct SpotEditSheet: View {
                 case .name:
                     focusState = .founder
                 case .founder:
-                    if (wasPublic || isPublic) {
-                        focusState = .emoji
-                    } else {
-                        focusState = .descript
-                    }
-                case .emoji:
                     focusState = .descript
                 default:
                     focusState = nil
@@ -151,7 +136,6 @@ struct SpotEditSheet: View {
                         name = ""
                         founder = ""
                         descript = ""
-                        emoji = ""
                         tags = ""
                         presentationMode.wrappedValue.dismiss()
                     }
@@ -162,21 +146,14 @@ struct SpotEditSheet: View {
                         Button {
                             switch focusState {
                             case .descript:
-                                if (isPublic || wasPublic) {
-                                    focusState = .emoji
-                                } else {
-                                    focusState = .founder
-                                }
+                                focusState = .founder
                             case .founder:
                                 focusState = .name
-                            case .emoji:
-                                focusState = .founder
                             default:
                                 focusState = nil
                             }
                         } label: {
                             Image(systemName: "chevron.up")
-                                .tint(.blue)
                         }
                         .disabled(focusState == .name)
                         Button {
@@ -184,26 +161,18 @@ struct SpotEditSheet: View {
                             case .name:
                                 focusState = .founder
                             case .founder:
-                                if (isPublic || wasPublic) {
-                                    focusState = .emoji
-                                } else {
-                                    focusState = .descript
-                                }
-                            case .emoji:
                                 focusState = .descript
                             default:
                                 focusState = nil
                             }
                         } label: {
                             Image(systemName: "chevron.down")
-                                .tint(.blue)
                         }
                         .disabled(focusState == .descript)
                         Spacer()
                         Button("Done") {
                             focusState = nil
                         }
-                        .tint(.blue)
                     }
                 }
             }
@@ -226,43 +195,27 @@ struct SpotEditSheet: View {
         spot.details = descript
         spot.founder = founder
         spot.isPublic = isPublic
-        if (isPublic) {
-            spot.emoji = emoji
-        }
         spot.tags = tags
         try? moc.save()
     }
     
     private func savePublic() {
         guard let imageData = spot.image?.pngData() else { return }
-        let id = cloudViewModel.addSpotToPublic(name: name, founder: founder, date: spot.date!, locationName: spot.locationName ?? "", x: spot.x, y: spot.y, description: descript, type: tags, image: imageData, emoji: emoji)
+        let id = cloudViewModel.addSpotToPublic(name: name, founder: founder, date: spot.date!, locationName: spot.locationName ?? "", x: spot.x, y: spot.y, description: descript, type: tags, image: imageData)
         spot.name = name
         spot.details = descript
         spot.founder = founder
         spot.isPublic = isPublic
-        if (isPublic) {
-            spot.emoji = emoji
-        }
         spot.tags = tags
         spot.dbid = id
         try? moc.save()
     }
     
     private func updatePublic() {
-        cloudViewModel.updateSpotPublic(spot: spot, newName: name, newDescription: descript, newFounder: founder, newType: tags, newEmoji: emoji)
+        cloudViewModel.updateSpotPublic(spot: spot, newName: name, newDescription: descript, newFounder: founder, newType: tags)
     }
     
     private var displayIsPublicPrompt: some View {
-        VStack {
-            Toggle("Public", isOn: $isPublic.animation())
-            if (isPublic) {
-                EmojiTextField(text: $emoji, placeholder: "Enter Emoji")
-                    .onReceive(Just(emoji), perform: { _ in
-                        self.emoji = String(self.emoji.onlyEmoji().prefix(MaxCharLength.emojis))
-                    })
-                    .submitLabel(.next)
-                    .focused($focusState, equals: .emoji)
-            }
-        }
+        Toggle("Public", isOn: $isPublic)
     }
 }

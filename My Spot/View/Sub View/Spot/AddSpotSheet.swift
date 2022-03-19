@@ -32,20 +32,18 @@ struct AddSpotSheet: View {
     @State private var changeProfileImage = false
     @State private var openCameraRoll = false
     @State private var canSubmitPic = false
-    @State private var emoji = ""
     @State private var long = 1.0
     @State private var lat = 1.0
     @State private var imageSelected = UIImage()
     
     private var disableSave: Bool {
-        name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || descript.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || canSubmitPic == false || founder.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || isEmojiNeeded() || (isPublic && !cloudViewModel.isSignedInToiCloud)
+        name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || canSubmitPic == false || founder.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || (isPublic && !cloudViewModel.isSignedInToiCloud)
     }
     
     private enum Field {
         case name
         case descript
         case founder
-        case emoji
     }
     
     @FocusState private var focusState: Field?
@@ -56,17 +54,27 @@ struct AddSpotSheet: View {
                 if (getLatitude() != 1.0) {
                     NavigationView {
                         Form {
-                            Section(header: Text("Spot Name")) {
+                            Section(header: Text("Spot Name*")) {
                                 displayNamePrompt
                             }
-                            Section(header: Text("Founder's Name")) {
+                            Section(header: Text("Founder's Name*")) {
                                 displayFounderPrompt
+                                    .onAppear {
+                                        if (UserDefaults.standard.valueExists(forKey: UserDefaultKeys.founder) && founder.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty) {
+                                            founder = UserDefaults.standard.value(forKey: UserDefaultKeys.founder) as! String
+                                        }
+                                    }
                             }
                             Section(header: Text("Share Spot")) {
                                 if (networkViewModel.hasInternet) {
                                     displayIsPublicPrompt
                                 } else {
                                     Text("Internet Is Required To Share Spot.")
+                                        .font(.subheadline)
+                                        .foregroundColor(.gray)
+                                        .onAppear {
+                                            isPublic = false
+                                        }
                                 }
                             }
                             Section(header: Text("Spot Description")) {
@@ -75,12 +83,12 @@ struct AddSpotSheet: View {
                             Section(header: Text("Date Found")) {
                                 Text(getDate())
                             }
-                            Section(header: Text("Spot Location")) {
+                            Section(header: Text("Spot Location \(locationName)")) {
                                 ViewOnlyUserOnMap()
                                     .aspectRatio(contentMode: .fit)
                                     .cornerRadius(15)
                             }
-                            Section(header: Text("Photo of Spot")) {
+                            Section(header: Text("Photo of Spot*")) {
                                 displayPhotoButton
                             }
                         }
@@ -89,20 +97,9 @@ struct AddSpotSheet: View {
                             case .name:
                                 focusState = .founder
                             case .founder:
-                                if (isPublic) {
-                                    focusState = .emoji
-                                } else {
-                                    focusState = .descript
-                                }
-                            case .emoji:
                                 focusState = .descript
                             default:
                                 focusState = nil
-                            }
-                        }
-                        .onAppear {
-                            if (UserDefaults.standard.valueExists(forKey: UserDefaultKeys.founder) && founder.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty) {
-                                founder = UserDefaults.standard.value(forKey: UserDefaultKeys.founder) as! String
                             }
                         }
                         .sheet(isPresented: $openCameraRoll) {
@@ -117,20 +114,13 @@ struct AddSpotSheet: View {
                                         switch focusState {
                                         case .founder:
                                             focusState = .name
-                                        case .emoji:
-                                            focusState = .founder
                                         case .descript:
-                                            if (isPublic) {
-                                                focusState = .emoji
-                                            } else {
-                                                focusState = .founder
-                                            }
+                                            focusState = .founder
                                         default:
                                             focusState = nil
                                         }
                                     } label: {
                                         Image(systemName: "chevron.up")
-                                            .tint(.blue)
                                     }
                                     .disabled(focusState == .name)
                                     Button {
@@ -138,26 +128,18 @@ struct AddSpotSheet: View {
                                         case .name:
                                             focusState = .founder
                                         case .founder:
-                                            if (isPublic) {
-                                                focusState = .emoji
-                                            } else {
-                                                focusState = .descript
-                                            }
-                                        case .emoji:
                                             focusState = .descript
                                         default:
                                             focusState = nil
                                         }
                                     } label: {
                                         Image(systemName: "chevron.down")
-                                            .tint(.blue)
                                     }
                                     .disabled(focusState == .descript)
                                     Spacer()
                                     Button("Done") {
                                         focusState = nil
                                     }
-                                    .tint(.blue)
                                 }
                             }
                             ToolbarItemGroup(placement: .navigationBarTrailing) {
@@ -194,6 +176,7 @@ struct AddSpotSheet: View {
                         mapViewModel.getPlacmarkOfLocation(location: CLLocation(latitude: lat, longitude: long), completionHandler: { location in
                             locationName = location
                         })
+                        mapViewModel.checkLocationAuthorization()
                     }
                     .interactiveDismissDisabled()
                 } else {
@@ -229,7 +212,6 @@ struct AddSpotSheet: View {
             } else {
                 Text("Add Photo")
                     .onAppear(perform: {canSubmitPic = false})
-                    .foregroundColor(.blue)
             }
         })
     }
@@ -250,15 +232,7 @@ struct AddSpotSheet: View {
     private var displayIsPublicPrompt: some View {
         VStack {
             if (cloudViewModel.isSignedInToiCloud) {
-                Toggle("Public", isOn: $isPublic.animation())
-                if (isPublic) {
-                    EmojiTextField(text: $emoji, placeholder: "Enter Emoji")
-                        .onReceive(Just(emoji), perform: { _ in
-                            self.emoji = String(self.emoji.onlyEmoji().prefix(MaxCharLength.emojis))
-                        })
-                        .submitLabel(.next)
-                        .focused($focusState, equals: .emoji)
-                }
+                Toggle("Public", isOn: $isPublic)
             } else if (!cloudViewModel.isSignedInToiCloud) {
                 Text("You Must Be Signed In To Icloud To Disover And Share Spots")
             }
@@ -286,14 +260,6 @@ struct AddSpotSheet: View {
                     name = String(name.prefix(MaxCharLength.names))
                 }
             }
-    }
-    
-    private func isEmojiNeeded() -> Bool {
-        if isPublic {
-            return emoji.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
-        } else {
-            return false
-        }
     }
     
     private func close() {
@@ -331,7 +297,7 @@ struct AddSpotSheet: View {
     
     private func savePublic() {
         if let imageData = cloudViewModel.compressImage(image: imageSelected).pngData() {
-            let id = cloudViewModel.addSpotToPublic(name: name, founder: founder, date: getDate(), locationName: locationName, x: lat, y: long, description: descript, type: tags, image: imageData, emoji: emoji)
+            let id = cloudViewModel.addSpotToPublic(name: name, founder: founder, date: getDate(), locationName: locationName, x: lat, y: long, description: descript, type: tags, image: imageData)
             UserDefaults.standard.set(founder, forKey: UserDefaultKeys.founder)
             let newSpot = Spot(context: moc)
             newSpot.founder = founder
@@ -341,7 +307,6 @@ struct AddSpotSheet: View {
             newSpot.x = lat
             newSpot.y = long
             newSpot.isPublic = true
-            newSpot.emoji = emoji
             newSpot.date = getDate()
             newSpot.tags = tags
             newSpot.locationName = locationName

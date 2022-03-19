@@ -29,36 +29,12 @@ struct ViewPlaylistMap: View {
             displayMap
         }
         .onAppear {
-            withAnimation {
-                spotRegion = mapViewModel.region
-            }
+            spotRegion = mapViewModel.region
         }
     }
     
     private func close() {
         presentationMode.wrappedValue.dismiss()
-    }
-    
-    private func increaseSelection() {
-        if playlist.spotArr.count == selection+1 {
-            selection = 0
-        } else {
-            selection+=1
-        }
-        withAnimation {
-            spotRegion = MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: playlist.spotArr[selection].x, longitude: playlist.spotArr[selection].y), span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01))
-        }
-    }
-    
-    private func decreaseSelection() {
-        if 0 > selection-1 {
-            selection = playlist.spotArr.count-1
-        } else {
-            selection-=1
-        }
-        withAnimation {
-            spotRegion = MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: playlist.spotArr[selection].x, longitude: playlist.spotArr[selection].y), span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01))
-        }
     }
     
     private var displayRouteButon: some View {
@@ -98,12 +74,10 @@ struct ViewPlaylistMap: View {
         ZStack {
             Map(coordinateRegion: $spotRegion, interactionModes: [.pan, .zoom], showsUserLocation: mapViewModel.getIsAuthorized(), annotationItems: playlist.spotArr, annotationContent: { location in
                 MapAnnotation(coordinate: CLLocationCoordinate2D(latitude: location.x, longitude: location.y)) {
-                    MapAnnotationView(spot: location)
+                    MapAnnotationView(spot: location, isSelected: playlist.spotArr[selection] == location)
                         .scaleEffect(playlist.spotArr[selection] == location ? 1.2 : 0.9)
                         .shadow(radius: 8)
                         .onTapGesture {
-                            transIn = .bottom
-                            transOut = .bottom
                             selection = playlist.spotArr.firstIndex(of: location) ?? 0
                             withAnimation {
                                 spotRegion = MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: playlist.spotArr[selection].x, longitude: playlist.spotArr[selection].y), span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01))
@@ -129,97 +103,28 @@ struct ViewPlaylistMap: View {
                 Spacer()
                 
                 ZStack {
-                    ForEach(playlist.spotArr) { spot in
-                        if (spot == playlist.spotArr[selection]) {
-                            SpotMapPreview(spot: spot)
+                    TabView(selection: $selection) {
+                        ForEach(playlist.spotArr.indices, id: \.self) { index in
+                            SpotMapPreview(spot: playlist.spotArr[index])
+                                .tag(index)
                                 .shadow(color: Color.black.opacity(0.3), radius: 10)
-                                .padding()
                                 .onTapGesture {
                                     showingDetailsSheet.toggle()
                                 }
-                                .transition(.asymmetric(insertion: .move(edge: transIn), removal: .move(edge: transOut)))
-                                .gesture(DragGesture(minimumDistance: 0, coordinateSpace: .local)
-                                            .onEnded({ value in
-                                                withAnimation {
-                                                    if value.translation.width < 0 {
-                                                        transIn = .trailing
-                                                        transOut = .bottom
-                                                        increaseSelection()
-                                                    }
-
-                                                    if value.translation.width > 0 {
-                                                        transIn = .leading
-                                                        transOut = .bottom
-                                                        decreaseSelection()
-                                                    }
-                                                }
-                                            }))
                         }
+                    }
+                    .tabViewStyle(.page(indexDisplayMode: .never))
+                    .frame(height: UIScreen.screenHeight * 0.25)
+                }
+                .onChange(of: selection) { _ in
+                    withAnimation {
+                        spotRegion = MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: playlist.spotArr[selection].x, longitude: playlist.spotArr[selection].y), span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01))
                     }
                 }
             }
         }
         .sheet(isPresented: $showingDetailsSheet) {
-            DetailsSheet(spot: playlist.spotArr[selection])
+            DetailView(fromPlaylist: true, spot: playlist.spotArr[selection])
         }
     }
 }
-
-
-struct DetailsSheet: View {
-    
-    var spot: Spot
-    @EnvironmentObject var mapViewModel: MapViewModel
-    @Environment(\.presentationMode) var presentationMode
-    
-    var body: some View {
-        NavigationView {
-            ZStack {
-                if (isExisting()) {
-                    Form {
-                        Image(uiImage: spot.image!)
-                            .resizable()
-                            .aspectRatio(contentMode: .fit)
-                            .cornerRadius(15)
-                        Text("Found by: \(spot.founder!)\nOn \(spot.date!)").font(.subheadline).foregroundColor(.gray)
-                        Section(header: Text("Description")) {
-                            Text(spot.details!)
-                        }
-                        Section(header: Text("Location")) {
-                            ViewSingleSpotOnMap(singlePin: [SinglePin(name: spot.name!, coordinate: CLLocationCoordinate2D(latitude: spot.x, longitude: spot.y))])
-                                .aspectRatio(contentMode: .fit)
-                                .cornerRadius(15)
-                            Button("Take Me To \(spot.name!)") {
-                                let routeMeTo = MKMapItem(placemark: MKPlacemark(coordinate: CLLocationCoordinate2D(latitude: spot.x, longitude: spot.y)))
-                                routeMeTo.name = spot.name!
-                                routeMeTo.openInMaps(launchOptions: nil)
-                            }
-                            .tint(.blue)
-                        }
-                    }
-                    .navigationTitle(spot.name!)
-                    .listRowSeparator(.hidden)
-                    .toolbar {
-                        ToolbarItemGroup(placement: .navigationBarLeading) {
-                            Button {
-                                presentationMode.wrappedValue.dismiss()
-                            } label: {
-                                Image(systemName: "arrowshape.turn.up.backward").imageScale(.large)
-                            }
-                            .buttonStyle(.borderedProminent)
-                        }
-                    }
-                }
-            }
-        }
-    }
-    
-    private func isExisting() -> Bool {
-        if let _ = spot.name {
-            return true
-        } else {
-            return false
-        }
-    }
-}
-

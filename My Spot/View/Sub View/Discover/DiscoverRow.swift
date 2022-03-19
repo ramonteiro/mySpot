@@ -32,7 +32,7 @@ struct DiscoverRow: View {
             }
             
             VStack(alignment: .leading) {
-                Text("\(spot.name)\(spot.emoji)")
+                Text("\(spot.name)")
                     .font(.headline)
                     .fontWeight(.bold)
                     .lineLimit(2)

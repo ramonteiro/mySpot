@@ -37,10 +37,10 @@ struct AddPlaylistSheet: View {
     var body: some View {
         NavigationView {
             Form {
-                Section(header: Text("Playlist Name")) {
+                Section(header: Text("Playlist Name*")) {
                     playlistNamePrompt
                 }
-                Section(header: Text("Emoji ID")) {
+                Section(header: Text("Emoji ID*")) {
                     emojiPrompt
                 }
             }
@@ -65,7 +65,6 @@ struct AddPlaylistSheet: View {
                             }
                         } label: {
                             Image(systemName: "chevron.up")
-                                .tint(.blue)
                         }
                         .disabled(focusState == .name)
                         Button {
@@ -77,12 +76,10 @@ struct AddPlaylistSheet: View {
                             }
                         } label: {
                             Image(systemName: "chevron.down")
-                                .tint(.blue)
                         }
                         .disabled(focusState == .emoji)
                         Spacer()
                         doneButton
-                            .tint(.blue)
                     }
                 }
                 ToolbarItemGroup(placement: .navigationBarTrailing) {

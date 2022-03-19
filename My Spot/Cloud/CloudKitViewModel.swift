@@ -41,14 +41,13 @@ class CloudKitViewModel: ObservableObject {
                 guard let date = record["date"] as? String else { return }
                 guard let location = record["location"] as? CLLocation else { return }
                 guard let type = record["type"] as? String else { return }
-                guard let emoji = record["emoji"] as? String else { return }
                 guard let image = record["image"] as? CKAsset else { return }
                 guard let likes = record["likes"] as? Int else { return }
                 guard let id = record["id"] as? String else { return }
                 guard let locationName = record["locationName"] as? String else { return }
                 guard let user = record["userID"] as? String else { return }
                 let imageURL = image.fileURL
-                returnedSpots.append(SpotFromCloud(id: id, name: name, founder: founder, description: description, date: date, location: location, type: type, emoji: emoji, imageURL: imageURL ?? URL(fileURLWithPath: "none"), likes: likes, locationName: locationName, userID: user, record: record))
+                returnedSpots.append(SpotFromCloud(id: id, name: name, founder: founder, description: description, date: date, location: location, type: type, imageURL: imageURL ?? URL(fileURLWithPath: "none"), likes: likes, locationName: locationName, userID: user, record: record))
             case .failure(let error):
                 print("FETCH ERROR: \(error)")
             }
@@ -99,7 +98,7 @@ class CloudKitViewModel: ObservableObject {
             return resizedImage
     }
     
-    func addSpotToPublic(name: String, founder: String, date: String, locationName: String, x: Double, y: Double, description: String, type: String, image: Data, emoji: String) -> String {
+    func addSpotToPublic(name: String, founder: String, date: String, locationName: String, x: Double, y: Double, description: String, type: String, image: Data) -> String {
         let newSpot = CKRecord(recordType: "Spots")
         newSpot["name"] = name
         newSpot["founder"] = founder
@@ -108,7 +107,6 @@ class CloudKitViewModel: ObservableObject {
         newSpot["locationName"] = locationName
         newSpot["location"] = CLLocation(latitude: x, longitude: y)
         newSpot["type"] = type
-        newSpot["emoji"] = emoji
         newSpot["id"] = UUID().uuidString
         newSpot["userID"] = userID
         newSpot["likes"] = 0
@@ -165,14 +163,13 @@ class CloudKitViewModel: ObservableObject {
                 guard let date = record["date"] as? String else { return }
                 guard let location = record["location"] as? CLLocation else { return }
                 guard let type = record["type"] as? String else { return }
-                guard let emoji = record["emoji"] as? String else { return }
                 guard let image = record["image"] as? CKAsset else { return }
                 guard let likes = record["likes"] as? Int else { return }
                 guard let id = record["id"] as? String else { return }
                 guard let locationName = record["locationName"] as? String else { return }
                 guard let user = record["userID"] as? String else { return }
                 let imageURL = image.fileURL
-                returnedSpots.append(SpotFromCloud(id: id, name: name, founder: founder, description: description, date: date, location: location, type: type, emoji: emoji, imageURL: imageURL ?? URL(fileURLWithPath: "none"), likes: likes, locationName: locationName, userID: user, record: record))
+                returnedSpots.append(SpotFromCloud(id: id, name: name, founder: founder, description: description, date: date, location: location, type: type, imageURL: imageURL ?? URL(fileURLWithPath: "none"), likes: likes, locationName: locationName, userID: user, record: record))
             case .failure(let error):
                 print("FETCH ERROR: \(error)")
             }
@@ -190,7 +187,7 @@ class CloudKitViewModel: ObservableObject {
     
     
     
-    func updateSpotPublic(spot: Spot, newName: String, newDescription: String, newFounder: String, newType: String, newEmoji: String) {
+    func updateSpotPublic(spot: Spot, newName: String, newDescription: String, newFounder: String, newType: String) {
         let recordID = CKRecord.ID(recordName: spot.dbid!)
         CKContainer.default().publicCloudDatabase.fetch(withRecordID: recordID) { [weak self] returnedRecord, returnedError in
             DispatchQueue.main.async {
@@ -198,7 +195,6 @@ class CloudKitViewModel: ObservableObject {
                 returnedRecord["name"] = newName
                 returnedRecord["description"] = newDescription
                 returnedRecord["type"] = newType
-                returnedRecord["emoji"] = newEmoji
                 
                 self?.saveSpotPublic(record: returnedRecord)
             }
@@ -241,14 +237,13 @@ class CloudKitViewModel: ObservableObject {
                 guard let date = record["date"] as? String else { return }
                 guard let location = record["location"] as? CLLocation else { return }
                 guard let type = record["type"] as? String else { return }
-                guard let emoji = record["emoji"] as? String else { return }
                 guard let image = record["image"] as? CKAsset else { return }
                 guard let likes = record["likes"] as? Int else { return }
                 guard let id = record["id"] as? String else { return }
                 guard let locationName = record["locationName"] as? String else { return }
                 guard let user = record["userID"] as? String else { return }
                 let imageURL = image.fileURL
-                returnedSpots.append(SpotFromCloud(id: id, name: name, founder: founder, description: description, date: date, location: location, type: type, emoji: emoji, imageURL: imageURL ?? URL(fileURLWithPath: "none"), likes: likes, locationName: locationName, userID: user, record: record))
+                returnedSpots.append(SpotFromCloud(id: id, name: name, founder: founder, description: description, date: date, location: location, type: type, imageURL: imageURL ?? URL(fileURLWithPath: "none"), likes: likes, locationName: locationName, userID: user, record: record))
             case .failure(let error):
                 print("FETCH ERROR: \(error)")
             }
@@ -267,21 +262,9 @@ class CloudKitViewModel: ObservableObject {
         CKContainer.default().publicCloudDatabase.add(operation)
     }
     
-    func deleteSpotPublic(indexSet: IndexSet) {
-        guard let index = indexSet.first else { return }
-        let spot = spots[index]
-        let record = spot.record
-        
-        CKContainer.default().publicCloudDatabase.delete(withRecordID: record.recordID) { [weak self] returnedRecordID, returnedError in
-            DispatchQueue.main.async {
-                self?.spots.remove(at: index)
-            }
-        }
-    }
-    
     func shareSheet(index i: Int) {
         let url = URL(string: "myspot://" + (spots[i].id))
-        let activityView = UIActivityViewController(activityItems: ["Check out, \"\(spots[i].name)\(spots[i].emoji)\" on My Spot! ", url!, "\n\nIf you don't have My Spot, get it on the Appstore here: ", URL(string: "https://apps.apple.com/us/app/my-spot-exploration/id1613618373")!], applicationActivities: nil)
+        let activityView = UIActivityViewController(activityItems: ["Check out, \"\(spots[i].name))\" on My Spot! ", url!, "\n\nIf you don't have My Spot, get it on the Appstore here: ", URL(string: "https://apps.apple.com/us/app/my-spot-exploration/id1613618373")!], applicationActivities: nil)
 
         let allScenes = UIApplication.shared.connectedScenes
         let scene = allScenes.first { $0.activationState == .foregroundActive }
