@@ -16,6 +16,7 @@ class CloudKitViewModel: ObservableObject {
     @Published var shared: [SpotFromCloud] = []
     @Published var userID: String = ""
     @Published var canRefresh = false
+    @Published var isFetching = false
     
     init() {
         getiCloudStatus()
@@ -141,6 +142,7 @@ class CloudKitViewModel: ObservableObject {
     }
     
     func fetchSpotPublic(userLocation: CLLocation, type: String) {
+        isFetching = true
         var pred = NSPredicate(value: true)
         if (type != "none") {
             pred = NSPredicate(format: "name CONTAINS[c] %@", type)
@@ -172,6 +174,7 @@ class CloudKitViewModel: ObservableObject {
                 returnedSpots.append(SpotFromCloud(id: id, name: name, founder: founder, description: description, date: date, location: location, type: type, imageURL: imageURL ?? URL(fileURLWithPath: "none"), likes: likes, locationName: locationName, userID: user, record: record))
             case .failure(let error):
                 print("FETCH ERROR: \(error)")
+                self.isFetching = false
             }
         }
         
@@ -221,7 +224,10 @@ class CloudKitViewModel: ObservableObject {
     
     func fetchMoreSpotsPublic(cursor:CKQueryOperation.Cursor?)  {
 
-        guard let cursorChecked = cursor else { return }
+        guard let cursorChecked = cursor else {
+            isFetching = false
+            return
+        }
         if spots.count > CloudKitConst.maxLoadTotal - 1 {
             return
         }

@@ -23,6 +23,7 @@ struct DiscoverView: View {
     @State private var showingMapSheet = false
     @State private var searchText = ""
     @State private var searchLocationName = ""
+    @State private var sortBy = "Closest"
 
     // find spot names from db that contain searchtext
     private var searchResults: [SpotFromCloud] {
@@ -96,6 +97,7 @@ struct DiscoverView: View {
     private func loadSpotsFromDB(location: CLLocation) {
         DispatchQueue.main.async {
             cloudViewModel.fetchSpotPublic(userLocation: location, type: "none")
+            sortBy = "Closest"
         }
     }
     
@@ -154,17 +156,102 @@ struct DiscoverView: View {
         .navigationTitle("Discover Spots")
         .toolbar {
             ToolbarItemGroup(placement: .navigationBarTrailing) {
-                    Button(action: {
-                        showingMapSheet.toggle()
-                    }) {
-                        Image(systemName: "map").imageScale(.large)
-                    }
-                    .sheet(isPresented: $showingMapSheet, content: { ViewDiscoverSpots() })
+                Button{
+                    showingMapSheet.toggle()
+                } label: {
+                    Image(systemName: "map").imageScale(.large)
+                }
+                .sheet(isPresented: $showingMapSheet) {
+                    ViewDiscoverSpots()
+                }
+            }
+            ToolbarItemGroup(placement: .navigationBarLeading) {
+                if (!cloudViewModel.isFetching) {
+                    displayLocationIcon
+                } else {
+                    ProgressView()
+                }
+            }
+        }
+    }
+    
+    private var displayLocationIcon: some View {
+        Menu {
+            Button {
+                sortLikes()
+            } label: {
+                Text("Likes")
+            }
+            Button {
+                sortClosest()
+            } label: {
+                Text("Closest")
+            }
+            Button {
+                sortDate()
+            } label: {
+                Text("Newest")
+            }
+            Button {
+                sortName()
+            } label: {
+                Text("Name")
+            }
+        } label: {
+            HStack {
+                Image(systemName: "chevron.up.chevron.down")
+                Text("\(sortBy)")
             }
         }
     }
     
     private func distanceBetween(x1: Double, x2: Double, y1: Double, y2: Double) -> Double {
         return (((x2 - x1) * (x2 - x1))+((y2 - y1) * (y2 - y1))).squareRoot()
+    }
+    
+    private func sortClosest() {
+        cloudViewModel.spots = cloudViewModel.spots.sorted { (spot1, spot2) -> Bool in
+            let distanceFromSpot1 = distanceBetween(x1: mapViewModel.searchingHere.center.latitude, x2: spot1.location.coordinate.latitude, y1: mapViewModel.searchingHere.center.longitude, y2: spot1.location.coordinate.longitude)
+            let distanceFromSpot2 = distanceBetween(x1: mapViewModel.searchingHere.center.latitude, x2: spot2.location.coordinate.latitude, y1: mapViewModel.searchingHere.center.longitude, y2: spot2.location.coordinate.longitude)
+            return distanceFromSpot1 < distanceFromSpot2
+        }
+        sortBy = "Closest"
+    }
+    
+    private func sortName() {
+        cloudViewModel.spots = cloudViewModel.spots.sorted { (spot1, spot2) -> Bool in
+            if (spot1.name < spot2.name) {
+                return true
+            } else {
+                return false
+            }
+        }
+        sortBy = "Name"
+    }
+    
+    private func sortDate() {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "MMM d, yyyy"
+        cloudViewModel.spots = cloudViewModel.spots.sorted { (spot1, spot2) -> Bool in
+            guard let date1 = dateFormatter.date(from: spot1.date) else { return true }
+            guard let date2 = dateFormatter.date(from: spot2.date) else { return true }
+            if (date1 > date2) {
+                return true
+            } else {
+                return false
+            }
+        }
+        sortBy = "Newest"
+    }
+    
+    private func sortLikes() {
+        cloudViewModel.spots = cloudViewModel.spots.sorted { (spot1, spot2) -> Bool in
+            if (spot1.likes > spot2.likes) {
+                return true
+            } else {
+                return false
+            }
+        }
+        sortBy = "Likes"
     }
 }
