@@ -123,13 +123,6 @@ struct MySpotsView: View {
                         Text("Add Some With The Plus Button Above").font(.subheadline).foregroundColor(.gray)
                         Spacer()
                     }
-                    HStack {
-                        Spacer()
-                        (Text("Tip: Press ") + Text(Image(systemName: "location")) + Text(" to filter by your location."))
-                            .font(.subheadline)
-                            .foregroundColor(.gray)
-                        Spacer()
-                    }
                 }
             }
         }
