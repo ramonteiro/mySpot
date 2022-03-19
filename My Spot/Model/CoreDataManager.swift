@@ -15,13 +15,15 @@ class CoreDataManager: ObservableObject {
         
         ValueTransformer.setValueTransformer(UIImageTransformer(), forName: NSValueTransformerName("UIImageTransformer"))
         
-        container = NSPersistentContainer(name: "Spots")
+        container = NSPersistentCloudKitContainer(name: "Spots")
         container.loadPersistentStores { description, error in
             if let error = error {
                 fatalError("Unable to init core data \(error)")
             }
         }
         
-        self.container.viewContext.mergePolicy = NSMergePolicy.mergeByPropertyObjectTrump
+        container.viewContext.mergePolicy = NSMergePolicy.mergeByPropertyObjectTrump
+        container.viewContext.automaticallyMergesChangesFromParent = true
     }
+    
 }

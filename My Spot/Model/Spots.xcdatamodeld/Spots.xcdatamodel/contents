@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="20086" systemVersion="21E230" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="20086" systemVersion="21E230" minimumToolsVersion="Automatic" sourceLanguage="Swift" usedWithCloudKit="YES" userDefinedModelVersionIdentifier="">
     <entity name="Likes" representedClassName="Likes" syncable="YES">
         <attribute name="likedId" optional="YES" attributeType="String"/>
     </entity>
@@ -18,7 +18,7 @@
         <attribute name="image" optional="YES" attributeType="Transformable" valueTransformerName="UIImageTransformer" customClassName="UIImage"/>
         <attribute name="isPublic" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
         <attribute name="locationName" optional="YES" attributeType="String"/>
-        <attribute name="name" attributeType="String"/>
+        <attribute name="name" attributeType="String" defaultValueString=""/>
         <attribute name="tags" optional="YES" attributeType="String"/>
         <attribute name="x" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
         <attribute name="y" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
@@ -27,6 +27,6 @@
     <elements>
         <element name="Likes" positionX="-54" positionY="90" width="128" height="44"/>
         <element name="Playlist" positionX="-63" positionY="54" width="128" height="14"/>
-        <element name="Spot" positionX="-63" positionY="-18" width="128" height="224"/>
+        <element name="Spot" positionX="-63" positionY="-18" width="128" height="14"/>
     </elements>
 </model>
