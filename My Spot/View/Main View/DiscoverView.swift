@@ -35,6 +35,7 @@ struct DiscoverView: View {
     
     var body: some View {
         NavigationView {
+            // check if user is signed in to icloud/has internet
             if (networkViewModel.hasInternet && cloudViewModel.isSignedInToiCloud) {
                 displaySpotsFromDB
             } else {

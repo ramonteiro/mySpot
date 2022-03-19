@@ -5,6 +5,10 @@
 //  Created by Isaac Paschall on 3/16/22.
 //
 
+/*
+ a mailview sheet to send email to report on public spots
+ */
+
 import SwiftUI
 import UIKit
 import MessageUI

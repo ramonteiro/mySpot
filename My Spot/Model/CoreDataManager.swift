@@ -9,7 +9,7 @@ import Foundation
 import CoreData
 
 class CoreDataManager: ObservableObject {
-    let container: NSPersistentContainer
+    let container: NSPersistentCloudKitContainer
     
     init() {
         

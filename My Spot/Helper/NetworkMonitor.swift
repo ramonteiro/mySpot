@@ -5,6 +5,9 @@
 //  Created by Isaac Paschall on 3/14/22.
 //
 
+/*
+ monitors network connection
+ */
 import Foundation
 import Network
  

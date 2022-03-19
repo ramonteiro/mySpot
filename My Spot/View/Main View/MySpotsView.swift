@@ -27,6 +27,15 @@ struct MySpotsView: View {
     @State private var showingMapSheet = false
     @State private var locationIcon = "location"
     @State private var filteredSpots: [Spot] = []
+    @State private var searchText = ""
+    
+    var searchResults: [Spot] {
+            if searchText.isEmpty {
+                return filteredSpots
+            } else {
+                return filteredSpots.filter { $0.name!.contains(searchText) }
+            }
+        }
     
     var body: some View {
         NavigationView {
@@ -106,13 +115,14 @@ struct MySpotsView: View {
     private var listFiltered: some View {
         ZStack {
             List {
-                ForEach(filteredSpots) { spot in
+                ForEach(searchResults) { spot in
                     NavigationLink(destination: DetailView(fromPlaylist: false, spot: spot)) {
                         SpotRow(spot: spot)
                     }
                 }
                 .onDelete(perform: self.deleteFiltered)
             }
+            .searchable(text: $searchText)
             if (spots.count == 0) {
                 VStack(spacing: 6) {
                     HStack {

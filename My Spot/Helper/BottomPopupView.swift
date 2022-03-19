@@ -5,6 +5,10 @@
 //  Created by Isaac Paschall on 3/17/22.
 //
 
+/*
+a view that pops up on bottom of screen to prompt user to enter a new name after attempting to save a public spot
+ */
+
 import SwiftUI
 import Combine
 

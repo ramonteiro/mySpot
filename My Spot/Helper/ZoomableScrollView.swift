@@ -5,6 +5,10 @@
 //  Created by Isaac Paschall on 3/17/22.
 //
 
+/*
+ allows for views in content to be zoomable through scrollview magic
+ */
+
 import SwiftUI
 
 struct ZoomableScrollView<Content: View>: UIViewRepresentable {

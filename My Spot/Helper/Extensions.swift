@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-// compresses uiimage to send to cloudkit storage
+// compresses uiimage
 extension UIImage {
     func aspectFittedToHeight(_ newHeight: CGFloat) -> UIImage {
         let scale = newHeight / self.size.height
@@ -21,12 +21,14 @@ extension UIImage {
     }
 }
 
+// check if value exists in userdefaults
 extension UserDefaults {
     func valueExists(forKey key: String) -> Bool {
         return object(forKey: key) != nil
     }
 }
 
+// parses string for hashtags and returns string of comma seperated tags
 extension String {
     func findTags() -> String {
         var arr_hasStrings:String = ""
@@ -49,12 +51,15 @@ extension String {
     }
 }
 
+// defines shortcut to get screen width and height
 extension UIScreen{
    static let screenWidth = UIScreen.main.bounds.size.width
    static let screenHeight = UIScreen.main.bounds.size.height
    static let screenSize = UIScreen.main.bounds.size
 }
 
+
+// allows conditional modifier to views to add certain modifiers, ex (makes text yellowMode if yellow is true): Text("hello").if(yellowmode == true){ view in view.foregroundColor(.yellow) }
 extension View {
 
     @ViewBuilder func `if`<Content: View>(_ condition: @autoclosure () -> Bool, transform: (Self) -> Content) -> some View {
@@ -63,16 +68,5 @@ extension View {
         } else {
             self
         }
-    }
-}
-
-extension UINavigationController: UIGestureRecognizerDelegate {
-    override open func viewDidLoad() {
-        super.viewDidLoad()
-        interactivePopGestureRecognizer?.delegate = self
-    }
-
-    public func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
-        return viewControllers.count > 1
     }
 }

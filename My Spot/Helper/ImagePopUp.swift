@@ -5,6 +5,10 @@
 //  Created by Isaac Paschall on 3/17/22.
 //
 
+/*
+ a view to show full image in a neat window that is zoomable
+ */
+
 import SwiftUI
 
 struct ImagePopUp: View {
@@ -18,6 +22,8 @@ struct ImagePopUp: View {
                     .resizable()
                     .scaledToFill()
             }
+            
+            // pin image sides to nearly the end of any screen size
             .frame(width: UIScreen.screenWidth - 50, height: ((UIScreen.screenWidth - 50) * image.size.height * 0.1)/(image.size.width * 0.1))
             .cornerRadius(30)
             .overlay(
