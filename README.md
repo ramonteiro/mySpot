@@ -43,3 +43,13 @@ My Spot needs the following:
 - MapKit
 - Combine
 - CloudKit
+
+
+******IMPORTANT******
+
+In order to run this project with cloukit:
+
+- you must change signing and capabilities to your own apple developer accont with a container
+- that container must be in entitlements as well
+- the discover tab will load indefinitely until a spot is uploaded as public (is will keep searching for spots until the cloudkit container is empty) 
+- the container must also alow for sorting by creation date and distance in indexes
