@@ -40,7 +40,7 @@ struct ViewPlaylistMap: View {
     private var displayRouteButon: some View {
         Button(action: {
             let routeMeTo = MKMapItem(placemark: MKPlacemark(coordinate: CLLocationCoordinate2D(latitude: playlist.spotArr[selection].x, longitude: playlist.spotArr[selection].y)))
-            routeMeTo.name = playlist.spotArr[selection].name!
+            routeMeTo.name = playlist.spotArr[selection].name ?? "Spot"
             routeMeTo.openInMaps(launchOptions: nil)
         }) {
             Image(systemName: "point.topleft.down.curvedto.point.bottomright.up").imageScale(.large)
@@ -124,7 +124,7 @@ struct ViewPlaylistMap: View {
             }
         }
         .sheet(isPresented: $showingDetailsSheet) {
-            DetailView(fromPlaylist: true, spot: playlist.spotArr[selection])
+            DetailView(canShare: false, fromPlaylist: true, spot: playlist.spotArr[selection])
         }
     }
 }

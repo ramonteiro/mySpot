@@ -43,7 +43,7 @@ struct ViewMapSpots: View {
     private var displayRouteButon: some View {
         Button(action: {
             let routeMeTo = MKMapItem(placemark: MKPlacemark(coordinate: CLLocationCoordinate2D(latitude: spots[selection].x, longitude: spots[selection].y)))
-            routeMeTo.name = spots[selection].name!
+            routeMeTo.name = spots[selection].name ?? "Spot"
             routeMeTo.openInMaps(launchOptions: nil)
         }) {
             Image(systemName: "point.topleft.down.curvedto.point.bottomright.up").imageScale(.large)
@@ -127,7 +127,7 @@ struct ViewMapSpots: View {
             }
         }
         .sheet(isPresented: $showingDetailsSheet) {
-            DetailView(fromPlaylist: false, spot: spots[selection])
+            DetailView(canShare: false, fromPlaylist: false, spot: spots[selection])
         }
     }
 }

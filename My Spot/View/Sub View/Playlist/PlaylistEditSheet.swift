@@ -37,7 +37,7 @@ struct PlaylistEditSheet: View {
                                     }
                                 }
                                 .onAppear {
-                                    name = playlist.name!
+                                    name = playlist.name ?? ""
                                 }
                                 .focused($focusState, equals: .name)
                                 .submitLabel(.next)
@@ -48,7 +48,7 @@ struct PlaylistEditSheet: View {
                                     self.emoji = String(self.emoji.onlyEmoji().prefix(MaxCharLength.emojis))
                                 })
                                 .onAppear {
-                                    emoji = playlist.emoji!
+                                    emoji = playlist.emoji ?? ""
                                 }
                                 .focused($focusState, equals: .emoji)
                                 .submitLabel(.done)

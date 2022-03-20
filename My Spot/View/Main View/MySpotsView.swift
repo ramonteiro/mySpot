@@ -33,7 +33,7 @@ struct MySpotsView: View {
             if searchText.isEmpty {
                 return filteredSpots
             } else {
-                return filteredSpots.filter { $0.name!.lowercased().contains(searchText.lowercased()) || $0.tags!.lowercased().contains(searchText.lowercased()) || $0.founder!.lowercased().contains(searchText.lowercased())}
+                return filteredSpots.filter { ($0.name ?? "").lowercased().contains(searchText.lowercased()) || ($0.tags ?? "").lowercased().contains(searchText.lowercased()) || ($0.founder ?? "").lowercased().contains(searchText.lowercased())}
             }
         }
     
@@ -111,7 +111,7 @@ struct MySpotsView: View {
         ZStack {
             List {
                 ForEach(searchResults) { spot in
-                    NavigationLink(destination: DetailView(fromPlaylist: false, spot: spot)) {
+                    NavigationLink(destination: DetailView(canShare: true, fromPlaylist: false, spot: spot)) {
                         SpotRow(spot: spot)
                     }
                 }

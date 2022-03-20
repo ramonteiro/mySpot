@@ -33,7 +33,7 @@ struct DetailPlaylistView: View {
             if searchText.isEmpty {
                 return filteredSpots
             } else {
-                return filteredSpots.filter { $0.name!.lowercased().contains(searchText.lowercased()) || $0.tags!.lowercased().contains(searchText.lowercased()) || $0.founder!.lowercased().contains(searchText.lowercased())}
+                return filteredSpots.filter { ($0.name ?? "").lowercased().contains(searchText.lowercased()) || ($0.tags ?? "").lowercased().contains(searchText.lowercased()) || ($0.founder ?? "").lowercased().contains(searchText.lowercased())}
             }
         }
     
@@ -220,7 +220,7 @@ struct DetailPlaylistView: View {
         ZStack {
             List {
                 ForEach(searchResults) { spot in
-                    NavigationLink(destination: DetailView(fromPlaylist: true, spot: spot)) {
+                    NavigationLink(destination: DetailView(canShare: true, fromPlaylist: true, spot: spot)) {
                         SpotRow(spot: spot)
                     }
                 }

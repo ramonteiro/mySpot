@@ -37,15 +37,9 @@ class CloudKitViewModel: ObservableObject {
         guard let host = URLComponents(url: url, resolvingAgainstBaseURL: true)?.host else {
             return
         }
-        let pred = NSPredicate(format: "id == %@", host)
-        let query = CKQuery(recordType: "Spots", predicate: pred)
-        let operation = CKQueryOperation(query: query)
-        var returnedSpots: [SpotFromCloud] = []
-        shared = []
-        
-        operation.recordMatchedBlock = { (returnedRecordID, returnedResult) in
-            switch returnedResult {
-            case .success(let record):
+        CKContainer.default().publicCloudDatabase.fetch(withRecordID: CKRecord.ID(recordName: host)) { [weak self] returnedRecord, returnedError in
+            DispatchQueue.main.async {
+                guard let record = returnedRecord else {return}
                 guard let name = record["name"] as? String else { return }
                 guard let founder = record["founder"] as? String else { return }
                 guard let description = record["description"] as? String else { return }
@@ -58,18 +52,9 @@ class CloudKitViewModel: ObservableObject {
                 guard let locationName = record["locationName"] as? String else { return }
                 guard let user = record["userID"] as? String else { return }
                 let imageURL = image.fileURL
-                returnedSpots.append(SpotFromCloud(id: id, name: name, founder: founder, description: description, date: date, location: location, type: type, imageURL: imageURL ?? URL(fileURLWithPath: "none"), likes: likes, locationName: locationName, userID: user, record: record))
-            case .failure(let error):
-                print("FETCH ERROR: \(error)")
+                self?.shared = [SpotFromCloud(id: id, name: name, founder: founder, description: description, date: date, location: location, type: type, imageURL: imageURL ?? URL(fileURLWithPath: "none"), likes: likes, locationName: locationName, userID: user, record: record)]
             }
         }
-        
-        operation.queryResultBlock = { [weak self] cur in
-            DispatchQueue.main.async {
-                self?.shared = returnedSpots
-            }
-        }
-        addOperation(operation: operation)
     }
     
     func getiCloudStatus() {
@@ -280,7 +265,16 @@ class CloudKitViewModel: ObservableObject {
     }
     
     func shareSheet(index i: Int) {
-        let activityView = UIActivityViewController(activityItems: ["Check out, \"\(spots[i].name)\" on My Spot! ", URL(string: "myspot://" + (spots[i].id)) ?? "", "\n\nIf you don't have My Spot, get it on the Appstore here: ", URL(string: "https://apps.apple.com/us/app/my-spot-exploration/id1613618373")!], applicationActivities: nil)
+        let activityView = UIActivityViewController(activityItems: ["Check out, \"\(spots[i].name)\" on My Spot! ", URL(string: "myspot://" + (spots[i].record.recordID.recordName)) ?? "", "\n\nIf you don't have My Spot, get it on the Appstore here: ", URL(string: "https://apps.apple.com/us/app/my-spot-exploration/id1613618373")!], applicationActivities: nil)
+        let allScenes = UIApplication.shared.connectedScenes
+        let scene = allScenes.first { $0.activationState == .foregroundActive }
+        if let windowScene = scene as? UIWindowScene {
+            windowScene.keyWindow?.rootViewController?.present(activityView, animated: true, completion: nil)
+        }
+    }
+    
+    func shareSheetFromLocal(id: String, name: String) {
+        let activityView = UIActivityViewController(activityItems: ["Check out, \"\(name)\" on My Spot! ", URL(string: "myspot://" + (id)) ?? "", "\n\nIf you don't have My Spot, get it on the Appstore here: ", URL(string: "https://apps.apple.com/us/app/my-spot-exploration/id1613618373")!], applicationActivities: nil)
         let allScenes = UIApplication.shared.connectedScenes
         let scene = allScenes.first { $0.activationState == .foregroundActive }
         if let windowScene = scene as? UIWindowScene {

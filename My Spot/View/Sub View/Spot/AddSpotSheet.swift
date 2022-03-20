@@ -191,7 +191,8 @@ struct AddSpotSheet: View {
                     Text("Location services are not enabled for mySpot.")
                     Text("Please enable location in settings.")
                     Button("Settings") {
-                        UIApplication.shared.open(URL(string: UIApplication.openSettingsURLString)!)
+                        guard let url = URL(string: UIApplication.openSettingsURLString) else { return }
+                        UIApplication.shared.open(url)
                     }
                 }
             }

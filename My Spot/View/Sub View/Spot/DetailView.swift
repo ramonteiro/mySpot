@@ -15,6 +15,7 @@ import MapKit
 
 struct DetailView: View {
     
+    var canShare: Bool
     var fromPlaylist: Bool
     @EnvironmentObject var cloudViewModel: CloudKitViewModel
     @EnvironmentObject var mapViewModel: MapViewModel
@@ -27,6 +28,7 @@ struct DetailView: View {
     @State private var tags: [String] = []
     @State private var showingImage = false
     @State private var exists = true
+    @State private var fromDB = false
     
     var body: some View {
         ZStack {
@@ -63,7 +65,7 @@ struct DetailView: View {
             if (exists) {
                 ZStack {
                     VStack {
-                        Image(uiImage: spot.image!)
+                        Image(uiImage: (spot.image ?? UIImage(systemName: "exclamationmark.triangle.fill"))!)
                             .resizable()
                             .scaledToFit()
                             .offset(y: -100)
@@ -106,22 +108,37 @@ struct DetailView: View {
                     }
                     HStack {
                         VStack {
-                            Button {
-                                presentationMode.wrappedValue.dismiss()
-                            } label: {
-                                Image(systemName: "arrow.left")
-                                    .foregroundColor(.white)
-                                    .font(.system(size: 30, weight: .regular))
-                                    .padding(15)
-                                    .shadow(color: .black, radius: 5)
+                            HStack {
+                                Button {
+                                    presentationMode.wrappedValue.dismiss()
+                                } label: {
+                                    Image(systemName: "arrow.left")
+                                        .foregroundColor(.white)
+                                        .font(.system(size: 30, weight: .regular))
+                                        .padding(15)
+                                        .shadow(color: .black, radius: 5)
+                                }
+                                .offset(y: 30)
+                                Spacer()
+                                if (canShare && fromDB) {
+                                    Button {
+                                        cloudViewModel.shareSheetFromLocal(id: spot.dbid ?? "", name: spot.name ?? "")
+                                    } label: {
+                                        Image(systemName: "square.and.arrow.up")
+                                            .foregroundColor(.white)
+                                            .font(.system(size: 30, weight: .regular))
+                                            .padding(15)
+                                            .shadow(color: .black, radius: 5)
+                                    }
+                                    .offset(y: 30)
+                                }
                             }
-                            .offset(y: 30)
                             Spacer()
                         }
                         Spacer()
                     }
                     if (showingImage) {
-                        ImagePopUp(showingImage: $showingImage, image: spot.image!)
+                        ImagePopUp(showingImage: $showingImage, image: (spot.image ?? UIImage(systemName: "exclamationmark.triangle.fill"))!)
                             .transition(.scale)
                     }
                 }
@@ -132,6 +149,9 @@ struct DetailView: View {
                         scope = "Public"
                     } else {
                         scope = "Private"
+                    }
+                    if let _ = spot.dbid {
+                        fromDB = true
                     }
                 }
             }
@@ -158,7 +178,7 @@ struct DetailView: View {
             
             
             HStack {
-                Text("\(spot.name!)")
+                Text("\(spot.name ?? "")")
                     .font(.system(size: 45, weight: .heavy))
                 Spacer()
             }
@@ -166,11 +186,11 @@ struct DetailView: View {
             .padding(.trailing, 5)
             
             HStack {
-                Text("By: \(spot.founder!)")
+                Text("By: \(spot.founder ?? "")")
                     .font(.system(size: 15, weight: .light))
                     .foregroundColor(Color.gray)
                 Spacer()
-                Text("\(spot.date!)")
+                Text("\(spot.date ?? "")")
                     .font(.system(size: 15, weight: .light))
                     .foregroundColor(Color.gray)
             }
@@ -194,23 +214,23 @@ struct DetailView: View {
                 .offset(y: 5)
             }
             HStack(spacing: 5) {
-                Text(spot.details!)
+                Text(spot.details ?? "")
                 Spacer()
             }
             .padding(.top, 10)
             .padding([.leading, .trailing], 30)
             
-            ViewSingleSpotOnMap(singlePin: [SinglePin(name: spot.name!, coordinate: CLLocationCoordinate2D(latitude: spot.x, longitude: spot.y))])
+            ViewSingleSpotOnMap(singlePin: [SinglePin(name: spot.name ?? "", coordinate: CLLocationCoordinate2D(latitude: spot.x, longitude: spot.y))])
                 .aspectRatio(contentMode: .fit)
                 .cornerRadius(15)
                 .padding([.leading, .trailing], 30)
             
             Button {
                 let routeMeTo = MKMapItem(placemark: MKPlacemark(coordinate: CLLocationCoordinate2D(latitude: spot.x, longitude: spot.y)))
-                routeMeTo.name = spot.name!
+                routeMeTo.name = spot.name ?? "Spot"
                 routeMeTo.openInMaps(launchOptions: nil)
             } label: {
-                Text("Take Me To \(spot.name!)")
+                Text("Take Me To \(spot.name ?? "")")
                     .padding(.horizontal)
             }
             .buttonStyle(.borderedProminent)
