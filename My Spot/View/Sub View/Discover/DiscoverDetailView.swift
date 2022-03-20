@@ -25,7 +25,10 @@ struct DiscoverDetailView: View {
     @EnvironmentObject var mapViewModel: MapViewModel
     @EnvironmentObject var cloudViewModel: CloudKitViewModel
     
+    let canShare: Bool
+    @State private var mySpot = false
     @State private var message = ""
+    @State private var deleteAlert = false
     @State private var showingMailSheet = false
     @State private var isSaving = false
     @State private var likeButton = "heart"
@@ -36,6 +39,8 @@ struct DiscoverDetailView: View {
     @State private var showingImage = false
     @State private var showingSaveSheet = false
     @State private var didLike = false
+    @State private var noType = false
+    @State private var spotInCD: [Spot] = []
     @FocusState private var nameIsFocused: Bool
     
     var body: some View {
@@ -80,7 +85,7 @@ struct DiscoverDetailView: View {
                                 .foregroundColor(.accentColor)
                                 .shadow(color: .black, radius: 5)
                         )
-                        .disabled(isSpotInCoreData().count != 0 || isSaved)
+                        .disabled(spotInCD.count != 0 || isSaved)
                         .offset(x: -20, y: -60)
                     }
                     HStack {
@@ -99,17 +104,39 @@ struct DiscoverDetailView: View {
                         }
                         Spacer()
                         VStack {
-                            HStack {
-                                Button {
-                                    cloudViewModel.shareSheet(index: index)
-                                } label: {
-                                    Image(systemName: "square.and.arrow.up")
-                                        .foregroundColor(.white)
-                                        .font(.system(size: 30, weight: .regular))
-                                        .padding(15)
-                                        .shadow(color: .black, radius: 5)
+                            HStack(spacing: -15) {
+                                Spacer()
+                                if (mySpot) {
+                                    Button {
+                                        deleteAlert.toggle()
+                                    } label: {
+                                        Image(systemName: "trash.fill")
+                                            .foregroundColor(.white)
+                                            .font(.system(size: 30, weight: .regular))
+                                            .padding(15)
+                                            .shadow(color: .black, radius: 5)
+                                    }
+                                    .offset(y: 30)
+                                    .alert("Are you sure you want to delete \(cloudViewModel.spots[index].name)?", isPresented: $deleteAlert) {
+                                        Button("Delete", role: .destructive) {
+                                            cloudViewModel.deleteSpot(id: cloudViewModel.spots[index].record.recordID)
+                                            cloudViewModel.spots.remove(at: index)
+                                            presentationMode.wrappedValue.dismiss()
+                                        }
+                                    }
                                 }
-                                .offset(x: 15, y: 30)
+                                if (canShare) {
+                                    Button {
+                                        cloudViewModel.shareSheet(index: index)
+                                    } label: {
+                                        Image(systemName: "square.and.arrow.up")
+                                            .foregroundColor(.white)
+                                            .font(.system(size: 30, weight: .regular))
+                                            .padding(15)
+                                            .shadow(color: .black, radius: 5)
+                                    }
+                                    .offset(y: 30)
+                                }
                                 Button {
                                     let spot = cloudViewModel.spots[index]
                                     if (likeButton == "heart") {
@@ -157,7 +184,7 @@ struct DiscoverDetailView: View {
                                             .padding(15)
                                     }
                                 }
-                                .offset(x: -10, y: 30)
+                                .offset(y: 30)
                             }
                             Spacer()
                         }
@@ -177,6 +204,7 @@ struct DiscoverDetailView: View {
                     }
                 }
                 .onAppear {
+                    mySpot = cloudViewModel.isMySpot(user: cloudViewModel.spots[index].userID)
                     tags = cloudViewModel.spots[index].type.components(separatedBy: ", ")
                     let url = cloudViewModel.spots[index].imageURL
                     if let data = try? Data(contentsOf: url), let image = UIImage(data: data) {
@@ -206,6 +234,10 @@ struct DiscoverDetailView: View {
         }
         .navigationBarHidden(true)
         .edgesIgnoringSafeArea(.top)
+        .onAppear {
+            noType = cloudViewModel.spots[index].type.isEmpty
+            spotInCD = isSpotInCoreData()
+        }
     }
     
     private var detailSheet: some View {
@@ -257,7 +289,7 @@ struct DiscoverDetailView: View {
             .padding([.leading, .trailing], 30)
             .offset(y: 5)
             
-            if (!cloudViewModel.spots[index].type.isEmpty) {
+            if (!noType) {
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack {
                         ForEach(tags, id: \.self) { tag in

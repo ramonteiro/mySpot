@@ -50,9 +50,16 @@ struct MySpotsView: View {
                     }
                 }
         }
+        .navigationViewStyle(.stack)
         .onAppear {
             mapViewModel.checkLocationAuthorization()
             setFilteringType()
+        }
+        .onChange(of: spots.count) { newValue in
+            if (newValue > 0 && filteredSpots.count == 0) {
+                mapViewModel.checkLocationAuthorization()
+                setFilteringType()
+            }
         }
     }
     
@@ -110,6 +117,7 @@ struct MySpotsView: View {
                 }
                 .onDelete(perform: self.deleteFiltered)
             }
+            .animation(.default, value: searchResults)
             .searchable(text: $searchText, prompt: "Search All Spots")
             if (spots.count == 0) {
                 VStack(spacing: 6) {
@@ -227,18 +235,18 @@ struct MySpotsView: View {
             Button {
                 sortClosest()
             } label: {
-                Text("Closest")
+                Text("Sort By Closest")
             }
             .disabled(!mapViewModel.isAuthorized)
             Button {
                 sortDate()
             } label: {
-                Text("Newest")
+                Text("Sort By Newest")
             }
             Button {
                 sortName()
             } label: {
-                Text("Name")
+                Text("Sort By Name")
             }
         } label: {
             HStack {

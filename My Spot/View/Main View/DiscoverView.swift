@@ -43,7 +43,7 @@ struct DiscoverView: View {
                 displayError
             }
         }
-        .navigationTitle("Discover Spots")
+        .navigationViewStyle(.stack)
         .onAppear {
             mapViewModel.searchingHere = mapViewModel.region
             if (cloudViewModel.spots.count == 0) {
@@ -91,7 +91,6 @@ struct DiscoverView: View {
                 Spacer()
             }
         }
-        .navigationTitle("Discover Spots")
     }
     
     private func loadSpotsFromDB(location: CLLocation) {
@@ -121,11 +120,9 @@ struct DiscoverView: View {
         ScrollViewReader { prox in
             List {
                 ForEach(searchResults.indices, id: \.self) { index in
-                    ZStack {
-                        NavigationLink(destination: DiscoverDetailView(index: index)) {
-                            DiscoverRow(spot: searchResults[index])
-                                .id(searchResults[index])
-                        }
+                    NavigationLink(destination: DiscoverDetailView(index: index, canShare: true)) {
+                        DiscoverRow(spot: searchResults[index])
+                            .id(searchResults[index])
                     }
                 }
             }
@@ -141,11 +138,11 @@ struct DiscoverView: View {
             .onChange(of: tabController.discoverPopToRoot) { _ in
                 if (cloudViewModel.spots.count > 0) {
                     withAnimation(.easeInOut) {
-                        prox.scrollTo(cloudViewModel.spots[0])
+                        prox.scrollTo(searchResults[0])
                     }
                 }
             }
-            .animation(.easeIn, value: searchResults.count)
+            .animation(.default, value: searchResults)
             .searchable(text: $searchText, prompt: "Search \(searchLocationName)")
             .onChange(of: mapViewModel.searchingHere.center.longitude) { _ in
                 mapViewModel.getPlacmarkOfLocation(location: CLLocation(latitude: mapViewModel.searchingHere.center.latitude, longitude: mapViewModel.searchingHere.center.longitude)) { location in
@@ -153,9 +150,57 @@ struct DiscoverView: View {
                 }
             }
         }
-        .navigationTitle("Discover Spots")
+        .navigationTitle("Discover")
         .toolbar {
             ToolbarItemGroup(placement: .navigationBarTrailing) {
+                Menu {
+                    Button {
+                        cloudViewModel.maxTotalfetches = 10
+                        UserDefaults.standard.set(10, forKey: "maxTotalFetches")
+                        mapViewModel.checkLocationAuthorization()
+                        loadSpotsFromDB(location: CLLocation(latitude: mapViewModel.searchingHere.center.latitude, longitude: mapViewModel.searchingHere.center.longitude))
+                    } label: {
+                        Text("Load 10 Spots")
+                    }
+                    Button {
+                        cloudViewModel.maxTotalfetches = 20
+                        UserDefaults.standard.set(20, forKey: "maxTotalFetches")
+                        mapViewModel.checkLocationAuthorization()
+                        loadSpotsFromDB(location: CLLocation(latitude: mapViewModel.searchingHere.center.latitude, longitude: mapViewModel.searchingHere.center.longitude))
+                    } label: {
+                        Text("Load 20 Spots")
+                    }
+                    Button {
+                        cloudViewModel.maxTotalfetches = 30
+                        UserDefaults.standard.set(30, forKey: "maxTotalFetches")
+                        mapViewModel.checkLocationAuthorization()
+                        loadSpotsFromDB(location: CLLocation(latitude: mapViewModel.searchingHere.center.latitude, longitude: mapViewModel.searchingHere.center.longitude))
+                    } label: {
+                        Text("Load 30 Spots")
+                    }
+                    Button {
+                        cloudViewModel.maxTotalfetches = 40
+                        UserDefaults.standard.set(40, forKey: "maxTotalFetches")
+                        mapViewModel.checkLocationAuthorization()
+                        loadSpotsFromDB(location: CLLocation(latitude: mapViewModel.searchingHere.center.latitude, longitude: mapViewModel.searchingHere.center.longitude))
+                    } label: {
+                        Text("Load 40 Spots")
+                    }
+                    Button {
+                        cloudViewModel.maxTotalfetches = 50
+                        UserDefaults.standard.set(50, forKey: "maxTotalFetches")
+                        mapViewModel.checkLocationAuthorization()
+                        loadSpotsFromDB(location: CLLocation(latitude: mapViewModel.searchingHere.center.latitude, longitude: mapViewModel.searchingHere.center.longitude))
+                    } label: {
+                        Text("Load 50 Spots")
+                    }
+                } label: {
+                    HStack {
+                        Image(systemName: "line.3.horizontal.decrease")
+                        Text("\(cloudViewModel.maxTotalfetches)")
+                    }
+                }
+
                 Button{
                     showingMapSheet.toggle()
                 } label: {
@@ -180,22 +225,22 @@ struct DiscoverView: View {
             Button {
                 sortLikes()
             } label: {
-                Text("Likes")
+                Text("Sort By Likes")
             }
             Button {
                 sortClosest()
             } label: {
-                Text("Closest")
+                Text("Sort By Closest")
             }
             Button {
                 sortDate()
             } label: {
-                Text("Newest")
+                Text("Sort By Newest")
             }
             Button {
                 sortName()
             } label: {
-                Text("Name")
+                Text("Sort By Name")
             }
         } label: {
             HStack {

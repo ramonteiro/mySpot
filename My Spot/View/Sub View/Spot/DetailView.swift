@@ -26,20 +26,26 @@ struct DetailView: View {
     @State private var scope:String = "Private"
     @State private var tags: [String] = []
     @State private var showingImage = false
+    @State private var exists = true
     
     var body: some View {
-        if (checkExists()) {
-            displaySpot
-                .onChange(of: tabController.playlistPopToRoot) { _ in
-                    if (fromPlaylist) {
-                        presentationMode.wrappedValue.dismiss()
+        ZStack {
+            if (exists) {
+                displaySpot
+                    .onChange(of: tabController.playlistPopToRoot) { _ in
+                        if (fromPlaylist) {
+                            presentationMode.wrappedValue.dismiss()
+                        }
                     }
+                    .onChange(of: tabController.spotPopToRoot) { _ in
+                        if (!fromPlaylist) {
+                            presentationMode.wrappedValue.dismiss()
+                        }
                 }
-                .onChange(of: tabController.spotPopToRoot) { _ in
-                    if (!fromPlaylist) {
-                        presentationMode.wrappedValue.dismiss()
-                    }
             }
+        }
+        .onAppear {
+            exists = checkExists()
         }
     }
     
@@ -54,7 +60,7 @@ struct DetailView: View {
     
     private var displaySpot: some View {
         ZStack {
-            if (isExisting()) {
+            if (exists) {
                 ZStack {
                     VStack {
                         Image(uiImage: spot.image!)
@@ -229,13 +235,5 @@ struct DetailView: View {
                 .shadow(color: .black, radius: 5)
         )
         .offset(y: (200 * UIScreen.screenWidth)/375)
-    }
-    
-    private func isExisting() -> Bool {
-        if let _ = spot.name {
-            return true
-        } else {
-            return false
-        }
     }
 }

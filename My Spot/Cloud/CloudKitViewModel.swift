@@ -17,9 +17,19 @@ class CloudKitViewModel: ObservableObject {
     @Published var userID: String = ""
     @Published var canRefresh = false
     @Published var isFetching = false
+    @Published var maxTotalfetches = 10
     
     init() {
         getiCloudStatus()
+        if (UserDefaults.standard.valueExists(forKey: "maxTotalFetches")) {
+            maxTotalfetches = UserDefaults.standard.value(forKey: "maxTotalFetches") as! Int
+        }
+    }
+    
+    func deleteSpot(id: CKRecord.ID) {
+        CKContainer.default().publicCloudDatabase.delete(withRecordID: id) { returnedID, returnedError in
+            print(returnedID ?? "None")
+        }
     }
     
     func checkDeepLink(url: URL) {
@@ -153,7 +163,7 @@ class CloudKitViewModel: ObservableObject {
         query.sortDescriptors = [distance, creation]
         
         let operation = CKQueryOperation(query: query)
-        operation.resultsLimit = CloudKitConst.maxLoadPerFetch
+        operation.resultsLimit = 10
         var returnedSpots: [SpotFromCloud] = []
         
         operation.recordMatchedBlock = { (returnedRecordID, returnedResult) in
@@ -228,11 +238,12 @@ class CloudKitViewModel: ObservableObject {
             isFetching = false
             return
         }
-        if spots.count > CloudKitConst.maxLoadTotal - 1 {
+        if spots.count > maxTotalfetches - 1 {
+            isFetching = false
             return
         }
         let queryoperation = CKQueryOperation(cursor: cursorChecked)
-        queryoperation.resultsLimit = CloudKitConst.maxLoadPerFetch
+        queryoperation.resultsLimit = 10
         var returnedSpots: [SpotFromCloud] = []
         queryoperation.recordMatchedBlock = { (returnedRecordID, returnedResult) in
             switch returnedResult {
@@ -269,13 +280,18 @@ class CloudKitViewModel: ObservableObject {
     }
     
     func shareSheet(index i: Int) {
-        let url = URL(string: "myspot://" + (spots[i].id))
-        let activityView = UIActivityViewController(activityItems: ["Check out, \"\(spots[i].name)\" on My Spot! ", url!, "\n\nIf you don't have My Spot, get it on the Appstore here: ", URL(string: "https://apps.apple.com/us/app/my-spot-exploration/id1613618373")!], applicationActivities: nil)
-        //activityView.isModalInPresentation = true
+        let activityView = UIActivityViewController(activityItems: ["Check out, \"\(spots[i].name)\" on My Spot! ", URL(string: "myspot://" + (spots[i].id)) ?? "", "\n\nIf you don't have My Spot, get it on the Appstore here: ", URL(string: "https://apps.apple.com/us/app/my-spot-exploration/id1613618373")!], applicationActivities: nil)
         let allScenes = UIApplication.shared.connectedScenes
         let scene = allScenes.first { $0.activationState == .foregroundActive }
         if let windowScene = scene as? UIWindowScene {
             windowScene.keyWindow?.rootViewController?.present(activityView, animated: true, completion: nil)
         }
+    }
+    
+    func isMySpot(user: String) -> Bool {
+        if userID == user {
+            return true
+        }
+        return false
     }
 }

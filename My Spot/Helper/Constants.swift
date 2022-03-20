@@ -27,8 +27,3 @@ enum UserDefaultKeys {
     static let lastKnownUserLocationY = "lastKnownUserLocationY"
 }
 
-// defines cloudkit public db fetch amount
-enum CloudKitConst {
-    static let maxLoadPerFetch = 4
-    static let maxLoadTotal = 20
-}

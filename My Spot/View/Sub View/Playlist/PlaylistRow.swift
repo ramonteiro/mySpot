@@ -14,46 +14,52 @@ import SwiftUI
 
 struct PlaylistRow: View {
     @ObservedObject var playlist: Playlist
+    @State private var exists = true
     
     var body: some View {
-        if (checkIfItemExist()) {
-            HStack {
-                Text(playlist.emoji ?? "❓")
-                    .font(.system(size: 50))
-                    .shadow(color: .black, radius: 5)
-                
-                VStack(alignment: .leading) {
-                    Text("\(playlist.name ?? "")")
-                        .font(.headline)
-                        .fontWeight(.bold)
-                        .lineLimit(2)
+        ZStack {
+            if (exists) {
+                HStack {
+                    Text(playlist.emoji ?? "❓")
+                        .font(.system(size: 50))
+                        .shadow(color: .black, radius: 5)
                     
-                    if (playlist.spotArr.count > 1) {
-                        Text("\(playlist.spotArr.count) spots").font(.subheadline).foregroundColor(.gray)
-                    } else if (playlist.spotArr.count == 1) {
-                        Text("\(playlist.spotArr.count) spot").font(.subheadline).foregroundColor(.gray)
-                    } else {
-                        Text("Empty Playlist").font(.subheadline).foregroundColor(.gray)
-                    }
-                    
-                    if !(playlist.spotArr.count == 0) {
-                        ScrollView(.horizontal, showsIndicators: false) {
-                            HStack {
-                                ForEach(playlist.spotArr, id: \.self) { spot in
-                                    Text(spot.name ?? "")
-                                        .font(.system(size: 12, weight: .regular))
-                                        .lineLimit(2)
-                                        .foregroundColor(.white)
-                                        .padding(5)
-                                        .background(.tint)
-                                        .cornerRadius(5)
+                    VStack(alignment: .leading) {
+                        Text("\(playlist.name ?? "")")
+                            .font(.headline)
+                            .fontWeight(.bold)
+                            .lineLimit(2)
+                        
+                        if (playlist.spotArr.count > 1) {
+                            Text("\(playlist.spotArr.count) spots").font(.subheadline).foregroundColor(.gray)
+                        } else if (playlist.spotArr.count == 1) {
+                            Text("\(playlist.spotArr.count) spot").font(.subheadline).foregroundColor(.gray)
+                        } else {
+                            Text("Empty Playlist").font(.subheadline).foregroundColor(.gray)
+                        }
+                        
+                        if !(playlist.spotArr.count == 0) {
+                            ScrollView(.horizontal, showsIndicators: false) {
+                                HStack {
+                                    ForEach(playlist.spotArr, id: \.self) { spot in
+                                        Text(spot.name ?? "")
+                                            .font(.system(size: 12, weight: .regular))
+                                            .lineLimit(2)
+                                            .foregroundColor(.white)
+                                            .padding(5)
+                                            .background(.tint)
+                                            .cornerRadius(5)
+                                    }
                                 }
                             }
                         }
                     }
+                    .padding(.leading, 5)
                 }
-                .padding(.leading, 5)
             }
+        }
+        .onAppear {
+            exists = checkIfItemExist()
         }
     }
     

@@ -50,8 +50,8 @@ struct AddSpotSheet: View {
     
     var body: some View {
         ZStack {
-            if (mapViewModel.getIsAuthorized()) {
-                if (getLatitude() != 1.0) {
+            if (mapViewModel.isAuthorized) {
+                if (lat != 1.0 && networkViewModel.hasInternet) {
                     NavigationView {
                         Form {
                             Section(header: Text("Spot Name*")) {
@@ -107,6 +107,7 @@ struct AddSpotSheet: View {
                                 .ignoresSafeArea()
                         }
                         .navigationTitle("Create Spot")
+                        .navigationViewStyle(.stack)
                         .toolbar {
                             ToolbarItemGroup(placement: .keyboard) {
                                 HStack {
@@ -180,8 +181,10 @@ struct AddSpotSheet: View {
                     }
                     .interactiveDismissDisabled()
                 } else {
-                    Text("No Internet Connection Found.")
-                    Text("Internet Is Required to Find Location.").font(.subheadline).foregroundColor(.gray)
+                    VStack {
+                        Text("No Internet Connection Found.")
+                        Text("Internet Is Required to Find Location.").font(.subheadline).foregroundColor(.gray)
+                    }
                 }
             } else {
                 VStack {
@@ -192,6 +195,10 @@ struct AddSpotSheet: View {
                     }
                 }
             }
+        }
+        .onAppear {
+            lat = getLatitude()
+            long = getLongitude()
         }
     }
     

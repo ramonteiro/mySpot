@@ -128,18 +128,18 @@ struct DetailPlaylistView: View {
             Button {
                 sortClosest()
             } label: {
-                Text("Closest")
+                Text("Sort By Closest")
             }
             .disabled(!mapViewModel.isAuthorized)
             Button {
                 sortDate()
             } label: {
-                Text("Newest")
+                Text("Sort By Newest")
             }
             Button {
                 sortName()
             } label: {
-                Text("Name")
+                Text("Sort By Name")
             }
         } label: {
             HStack {

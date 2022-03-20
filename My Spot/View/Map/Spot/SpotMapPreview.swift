@@ -40,6 +40,7 @@ struct SpotMapPreview: View {
                     Spacer()
                     HStack {
                         Text(spot.name ?? "")
+                            .foregroundColor(.white)
                             .font(.largeTitle)
                             .fontWeight(.bold)
                         Spacer()

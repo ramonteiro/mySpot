@@ -135,7 +135,7 @@ struct ViewDiscoverSpots: View {
             }
         }
         .sheet(isPresented: $showingDetailsSheet) {
-            DiscoverDetailView(index: selection)
+            DiscoverDetailView(index: selection, canShare: false)
         }
     }
     

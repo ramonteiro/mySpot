@@ -16,10 +16,16 @@ struct SpotRow: View {
     @ObservedObject var spot: Spot
     @State private var scope:String = "Private"
     @State private var tags: [String] = []
+    @State private var exists = true
     
     var body: some View {
-        if (checkIfItemExist()) {
-            displayRedCircleImage
+        ZStack {
+            if (exists) {
+                displayRedCircleImage
+            }
+        }
+        .onAppear {
+            exists = checkIfItemExist()
         }
     }
     
@@ -33,7 +39,7 @@ struct SpotRow: View {
     
     private var displayRedCircleImage: some View {
         HStack {
-            Image(uiImage: spot.image!)
+            Image(uiImage: (spot.image ?? UIImage(systemName: "exclamationmark.triangle.fill"))!)
                 .resizable()
                 .scaledToFill()
                 .frame(width: 100, height: 120)

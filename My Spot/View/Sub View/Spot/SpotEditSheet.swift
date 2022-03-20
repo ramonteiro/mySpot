@@ -23,6 +23,7 @@ struct SpotEditSheet: View {
     @State private var founder = ""
     @State private var descript = ""
     @State private var nameInTitle = ""
+    @State private var fromDB = false
     
     
     private enum Field {
@@ -53,7 +54,7 @@ struct SpotEditSheet: View {
                         .focused($focusState, equals: .name)
                         .submitLabel(.next)
                 }
-                if !isFromDB() {
+                if !fromDB {
                     Section(header: Text("Founder's Name*")) {
                         TextField("Enter Founder's Name", text: $founder)
                             .focused($focusState, equals: .founder)
@@ -110,6 +111,7 @@ struct SpotEditSheet: View {
                 }
             }
             .navigationTitle(name)
+            .navigationViewStyle(.stack)
             .toolbar {
                 ToolbarItemGroup(placement: .navigationBarTrailing) {
                     Button("Save") {
@@ -176,9 +178,12 @@ struct SpotEditSheet: View {
                     }
                 }
             }
-            .onAppear() {
+            .onAppear {
                 wasPublic = spot.isPublic
+            }
         }
+        .onAppear {
+            fromDB = isFromDB()
         }
     }
     

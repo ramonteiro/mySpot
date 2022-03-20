@@ -36,19 +36,24 @@ struct PlaylistView: View {
                     .onDelete(perform: self.delete)
                 }
                 .navigationTitle("Playlists")
-                .navigationBarItems(trailing:
-                                        Button(action: {
-                    showingAddPlaylistSheet.toggle()
-                }) {
-                    Image(systemName: "plus").imageScale(.large)
+                .toolbar {
+                    ToolbarItemGroup(placement: .navigationBarTrailing) {
+                        Button {
+                            showingAddPlaylistSheet.toggle()
+                        } label: {
+                            Image(systemName: "plus").imageScale(.large)
+                        }
+                        .sheet(isPresented: $showingAddPlaylistSheet) {
+                            AddPlaylistSheet()
+                        }
+                    }
                 }
-                                        .sheet(isPresented: $showingAddPlaylistSheet, content: AddPlaylistSheet.init)
-                )
                 if playlists.count == 0 {
                     noPlaylistPrompt
                 }
             }
         }
+        .navigationViewStyle(.stack)
     }
     
     private var noPlaylistPrompt: some View {

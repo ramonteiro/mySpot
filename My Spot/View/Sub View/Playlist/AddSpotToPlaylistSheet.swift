@@ -18,16 +18,26 @@ struct AddSpotToPlaylistSheet: View {
     @Environment(\.presentationMode) var presentationMode
     @Environment(\.managedObjectContext) var moc
     var currPlaylist: Playlist
+    @State private var count = 0
     
     var body: some View {
         NavigationView {
-            if (!spots.isEmpty) {
+            if (!spots.isEmpty && count != 0) {
                 availableSpots
             } else {
                 messageNoSpotsAvailable
             }
         }
+        .navigationViewStyle(.stack)
         .interactiveDismissDisabled()
+        .onAppear {
+            for i in spots {
+                if let _ = i.playlist {
+                    count += 1
+                }
+            }
+            count = spots.count - count
+        }
     }
     
     func close() {
@@ -40,6 +50,7 @@ struct AddSpotToPlaylistSheet: View {
                 SpotRow(spot: spot)
                     .onTapGesture {
                         spot.playlist = currPlaylist
+                        count -= 1
                     }
             }
         }
