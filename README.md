@@ -11,6 +11,7 @@ My Spot is a simple app that allows users to create spots that save photos, loca
 - create spots
 - search for other spots in area
 - create playlists to organize spots
+- spots and playlists are backed up in iCloud and sync across devices
 
 ---Who is My Spot For---
 
@@ -18,7 +19,7 @@ Everyone! Whether you are a skater, hiker, mountain biker, etc, or maybe you jus
 
 ---How to Use My Spot---
 
-Demo Video: https://youtu.be/ps4c8E3vbX0
+Demo Video: https://youtu.be/THxhz0TkbG0
 
 When starting My Spot you are greeted with the my spots tab where you can start by adding a spot. These spots are stored locally in core data unless the public slider is checked in which case it is uploaded to a database hoted in cloudkit.
 
