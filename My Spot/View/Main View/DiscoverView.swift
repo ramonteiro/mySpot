@@ -161,7 +161,7 @@ struct DiscoverView: View {
                 } label: {
                     Image(systemName: "map").imageScale(.large)
                 }
-                .sheet(isPresented: $showingMapSheet) {
+                .fullScreenCover(isPresented: $showingMapSheet) {
                     ViewDiscoverSpots()
                 }
             }

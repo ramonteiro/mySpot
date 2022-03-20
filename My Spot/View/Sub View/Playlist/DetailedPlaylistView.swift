@@ -91,7 +91,7 @@ struct DetailPlaylistView: View {
                         Image(systemName: "map").imageScale(.large)
                     }
                     .disabled(playlist.spotArr.count == 0)
-                    .sheet(isPresented: $showingMapSheet) {
+                    .fullScreenCover(isPresented: $showingMapSheet) {
                         ViewPlaylistMap(playlist: playlist)
                     }
                     Button{

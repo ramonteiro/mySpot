@@ -135,7 +135,7 @@ struct MySpotsView: View {
                     } label: {
                         Image(systemName: "map").imageScale(.large)
                     }
-                    .sheet(isPresented: $showingMapSheet) {
+                    .fullScreenCover(isPresented: $showingMapSheet) {
                         ViewMapSpots()
                     }
                     .disabled(spots.isEmpty)

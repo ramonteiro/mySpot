@@ -26,13 +26,11 @@ struct ViewDiscoverSpots: View {
     @State private var spotRegion: MKCoordinateRegion = MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: 33.714712646421, longitude: -112.29072718706581), span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01))
     
     var body: some View {
-        ZStack {
-            displayMap
-        }
-        .onAppear {
-            spotRegion = mapViewModel.searchingHere
-            originalRegion = spotRegion
-        }
+        displayMap
+            .onAppear {
+                spotRegion = mapViewModel.searchingHere
+                originalRegion = spotRegion
+            }
     }
 
     func close() {
@@ -117,20 +115,18 @@ struct ViewDiscoverSpots: View {
                 .padding()
                 Spacer()
                 
-                ZStack {
-                    TabView(selection: $selection) {
-                        ForEach(cloudViewModel.spots.indices, id: \.self) { index in
-                            DiscoverMapPreview(spot: cloudViewModel.spots[index])
-                                .tag(index)
-                                .shadow(color: Color.black.opacity(0.3), radius: 10)
-                                .onTapGesture {
-                                    showingDetailsSheet.toggle()
-                                }
-                        }
+                TabView(selection: $selection) {
+                    ForEach(cloudViewModel.spots.indices, id: \.self) { index in
+                        DiscoverMapPreview(spot: cloudViewModel.spots[index])
+                            .tag(index)
+                            .shadow(color: Color.black.opacity(0.3), radius: 10)
+                            .onTapGesture {
+                                showingDetailsSheet.toggle()
+                            }
                     }
-                    .tabViewStyle(.page(indexDisplayMode: .never))
-                    .frame(height: UIScreen.screenHeight * 0.25)
                 }
+                .tabViewStyle(.page(indexDisplayMode: .never))
+                .frame(height: UIScreen.screenHeight * 0.25)
                 .onChange(of: selection) { _ in
                     withAnimation {
                         spotRegion = MKCoordinateRegion(center: cloudViewModel.spots[selection].location.coordinate, span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01))
