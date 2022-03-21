@@ -38,13 +38,10 @@ struct DiscoverRow: View {
                 Text("\(spot.name)")
                     .font(.headline)
                     .fontWeight(.bold)
-                    .lineLimit(2)
+                    .lineLimit(1)
                 
                 Text("By: \(spot.founder)")
-                    .font(.subheadline)
-                    .foregroundColor(Color.gray)
-                
-                Text("\(spot.date)")
+                    .lineLimit(1)
                     .font(.subheadline)
                     .foregroundColor(Color.gray)
                 
@@ -86,6 +83,7 @@ struct DiscoverRow: View {
                         }
                     }
                     .padding(.bottom, 7)
+                    .padding(.top, -7)
                 }
             }
             .padding(.leading, 5)

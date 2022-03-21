@@ -53,15 +53,12 @@ struct SpotRow: View {
                 Text("\(spot.name ?? "")")
                     .font(.headline)
                     .fontWeight(.bold)
-                    .lineLimit(2)
+                    .lineLimit(1)
                 
                 Text("By: \(spot.founder ?? "")")
                     .font(.subheadline)
                     .foregroundColor(Color.gray)
-                
-                Text("\(spot.date ?? "")")
-                    .font(.subheadline)
-                    .foregroundColor(Color.gray)
+                    .lineLimit(1)
                 
                 HStack(alignment: .center) {
                     Image(systemName: "globe")
@@ -99,6 +96,7 @@ struct SpotRow: View {
                         }
                     }
                     .padding(.bottom, 7)
+                    .padding(.top, -7)
                 }
             }
             .padding(.leading, 5)
