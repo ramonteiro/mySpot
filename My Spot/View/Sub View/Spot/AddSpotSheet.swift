@@ -172,12 +172,12 @@ struct AddSpotSheet: View {
                         }
                     }
                     .onAppear {
+                        mapViewModel.checkLocationAuthorization()
                         lat = getLatitude()
                         long = getLongitude()
                         mapViewModel.getPlacmarkOfLocation(location: CLLocation(latitude: lat, longitude: long), completionHandler: { location in
                             locationName = location
                         })
-                        mapViewModel.checkLocationAuthorization()
                     }
                     .interactiveDismissDisabled()
                 } else {

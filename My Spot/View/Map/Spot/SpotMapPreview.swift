@@ -24,12 +24,14 @@ struct SpotMapPreview: View {
                 displayImage
                 VStack {
                     HStack {
-                        Image(systemName: "mappin")
-                            .font(.subheadline)
-                            .foregroundColor(.gray)
-                        Text(spot.locationName ?? "")
-                            .font(.subheadline)
-                            .foregroundColor(.gray)
+                        if (!(spot.locationName?.isEmpty ?? true)) {
+                            Image(systemName: "mappin")
+                                .font(.subheadline)
+                                .foregroundColor(.gray)
+                            Text(spot.locationName ?? "")
+                                .font(.subheadline)
+                                .foregroundColor(.gray)
+                        }
                         Spacer()
                         Image(systemName: "globe")
                             .font(.subheadline)

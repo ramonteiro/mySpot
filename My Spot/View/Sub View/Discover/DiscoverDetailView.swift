@@ -56,9 +56,6 @@ struct DiscoverDetailView: View {
                         Image(uiImage: (image ?? UIImage(systemName: "exclamationmark.triangle.fill"))!)
                             .resizable()
                             .scaledToFit()
-                            .if(landscapeOffset == 0, transform: { view in
-                                view.offset(y: -(100 * UIScreen.screenWidth)/375)
-                            })
                         Spacer()
                     }
                     detailSheet
@@ -267,18 +264,19 @@ struct DiscoverDetailView: View {
     private var detailSheet: some View {
         ScrollView(showsIndicators: false) {
             
-            
-            HStack {
-                Image(systemName: "mappin")
-                    .font(.system(size: 15, weight: .light))
-                    .foregroundColor(Color.gray)
-                Text("\(cloudViewModel.spots[index].locationName)")
-                    .font(.system(size: 15, weight: .light))
-                    .foregroundColor(Color.gray)
-                    .padding(.leading, 1)
-                Spacer()
+            if (!cloudViewModel.spots[index].locationName.isEmpty) {
+                HStack {
+                    Image(systemName: "mappin")
+                        .font(.system(size: 15, weight: .light))
+                        .foregroundColor(Color.gray)
+                    Text("\(cloudViewModel.spots[index].locationName)")
+                        .font(.system(size: 15, weight: .light))
+                        .foregroundColor(Color.gray)
+                        .padding(.leading, 1)
+                    Spacer()
+                }
+                .padding([.top, .leading, .trailing], 30)
             }
-            .padding([.top, .leading, .trailing], 30)
             
             
             HStack {

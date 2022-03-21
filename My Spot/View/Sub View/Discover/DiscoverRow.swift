@@ -53,14 +53,15 @@ struct DiscoverRow: View {
                         .font(.subheadline)
                         .foregroundColor(Color.gray)
                 }
-                
-                HStack(alignment: .center) {
-                    Image(systemName: "mappin")
-                        .foregroundColor(Color.gray)
-                        .font(.subheadline)
-                    Text(spot.locationName)
-                        .foregroundColor(Color.gray)
-                        .font(.subheadline)
+                if (!spot.locationName.isEmpty) {
+                    HStack(alignment: .center) {
+                        Image(systemName: "mappin")
+                            .foregroundColor(Color.gray)
+                            .font(.subheadline)
+                        Text(spot.locationName)
+                            .foregroundColor(Color.gray)
+                            .font(.subheadline)
+                    }
                 }
                 if (!distance.isEmpty) {
                     Text("\(distance) away")

@@ -194,18 +194,19 @@ struct DiscoverSheetShared: View {
     private var detailSheet: some View {
         ScrollView(showsIndicators: false) {
             
-            
-            HStack {
-                Image(systemName: "mappin")
-                    .font(.system(size: 15, weight: .light))
-                    .foregroundColor(Color.gray)
-                Text("\(cloudViewModel.shared[0].locationName)")
-                    .font(.system(size: 15, weight: .light))
-                    .foregroundColor(Color.gray)
-                    .padding(.leading, 1)
-                Spacer()
+            if (!cloudViewModel.shared[0].locationName.isEmpty) {
+                HStack {
+                    Image(systemName: "mappin")
+                        .font(.system(size: 15, weight: .light))
+                        .foregroundColor(Color.gray)
+                    Text("\(cloudViewModel.shared[0].locationName)")
+                        .font(.system(size: 15, weight: .light))
+                        .foregroundColor(Color.gray)
+                        .padding(.leading, 1)
+                    Spacer()
+                }
+                .padding([.top, .leading, .trailing], 30)
             }
-            .padding([.top, .leading, .trailing], 30)
             
             
             HStack {

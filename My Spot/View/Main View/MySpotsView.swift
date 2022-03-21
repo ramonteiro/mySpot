@@ -116,7 +116,7 @@ struct MySpotsView: View {
                     NavigationLink(destination: DetailView(canShare: true, fromPlaylist: false, spot: spot)) {
                         SpotRow(spot: spot)
                             .alert(isPresented: self.$showingDeleteAlert) {
-                                Alert(title: Text("Delete \(spot.name ?? "Spot")?"), message: Text(""), primaryButton: .destructive(Text("Delete")) {
+                                Alert(title: Text("Are you sure you want to delete?"), message: Text(""), primaryButton: .destructive(Text("Delete")) {
                                     self.deleteFiltered(at: self.toBeDeleted!)
                                     self.toBeDeleted = nil
                                 }, secondaryButton: .cancel() {

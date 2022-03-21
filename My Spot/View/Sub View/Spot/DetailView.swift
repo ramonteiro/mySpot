@@ -71,9 +71,7 @@ struct DetailView: View {
                         Image(uiImage: (spot.image ?? UIImage(systemName: "exclamationmark.triangle.fill"))!)
                             .resizable()
                             .scaledToFit()
-                            .if(spot.image?.size.height ?? CGFloat(0) > spot.image?.size.width ?? CGFloat(0), transform: { view in
-                                view.offset(y: -(100 * UIScreen.screenWidth)/375)
-                            })
+                            
                         Spacer()
                     }
                     detailSheet
@@ -182,18 +180,19 @@ struct DetailView: View {
     private var detailSheet: some View {
         ScrollView(showsIndicators: false) {
             
-            
-            HStack {
-                Image(systemName: "mappin")
-                    .font(.system(size: 15, weight: .light))
-                    .foregroundColor(Color.gray)
-                Text("\(spot.locationName ?? "")")
-                    .font(.system(size: 15, weight: .light))
-                    .foregroundColor(Color.gray)
-                    .padding(.leading, 1)
-                Spacer()
+            if (!(spot.locationName?.isEmpty ?? true)) {
+                HStack {
+                    Image(systemName: "mappin")
+                        .font(.system(size: 15, weight: .light))
+                        .foregroundColor(Color.gray)
+                    Text("\(spot.locationName ?? "")")
+                        .font(.system(size: 15, weight: .light))
+                        .foregroundColor(Color.gray)
+                        .padding(.leading, 1)
+                    Spacer()
+                }
+                .padding([.top, .leading, .trailing], 30)
             }
-            .padding([.top, .leading, .trailing], 30)
             
             
             HStack {
@@ -270,6 +269,13 @@ struct DetailView: View {
                 Text("\(scope)")
                     .font(.system(size: 15, weight: .light))
                     .foregroundColor(Color.gray)
+                    .onChange(of: spot.isPublic) { newValue in
+                        if (newValue) {
+                            scope = "Public"
+                        } else {
+                            scope = "Private"
+                        }
+                    }
             }
             .padding(.bottom, (100 * UIScreen.screenWidth)/375)
         }

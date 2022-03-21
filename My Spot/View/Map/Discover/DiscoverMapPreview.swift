@@ -23,12 +23,14 @@ struct DiscoverMapPreview: View {
                 displayImage
                 VStack {
                     HStack {
-                        Image(systemName: "mappin")
-                            .font(.subheadline)
-                            .foregroundColor(.gray)
-                        Text(spot.locationName)
-                            .font(.subheadline)
-                            .foregroundColor(.gray)
+                        if (!spot.locationName.isEmpty) {
+                            Image(systemName: "mappin")
+                                .font(.subheadline)
+                                .foregroundColor(.gray)
+                            Text(spot.locationName)
+                                .font(.subheadline)
+                                .foregroundColor(.gray)
+                        }
                         Spacer()
                         Image(systemName: "heart.fill")
                             .font(.subheadline)
