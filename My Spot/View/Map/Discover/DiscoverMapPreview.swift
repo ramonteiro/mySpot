@@ -6,13 +6,15 @@
 //
 
 import SwiftUI
-import MapKit
+import CoreLocation
 
 struct DiscoverMapPreview: View {
     
     let spot: SpotFromCloud
     @State private var tags: [String] = []
     @State private var pad:CGFloat = 20
+    @State private var distance: String = ""
+    @EnvironmentObject var mapViewModel: MapViewModel
     
     var body: some View {
         VStack {
@@ -49,9 +51,15 @@ struct DiscoverMapPreview: View {
                             .font(.subheadline)
                             .foregroundColor(.gray)
                         Spacer()
-                        Text(spot.date)
-                            .font(.subheadline)
-                            .foregroundColor(.gray)
+                        if (!distance.isEmpty) {
+                            Text("\(distance) away")
+                                .foregroundColor(.gray)
+                                .font(.subheadline)
+                        } else {
+                            Text(spot.date)
+                                .font(.subheadline)
+                                .foregroundColor(.gray)
+                        }
                     }
                     .padding(.bottom, pad)
                     if (!(spot.type.isEmpty)) {
@@ -79,6 +87,9 @@ struct DiscoverMapPreview: View {
         }
         .onAppear {
             tags = spot.type.components(separatedBy: ", ")
+            if (mapViewModel.isAuthorized) {
+                calculateDistance()
+            }
         }
     }
     
@@ -101,5 +112,21 @@ struct DiscoverMapPreview: View {
                 .frame(width: UIScreen.screenWidth - 20, height: UIScreen.screenHeight * 0.25)
                 .cornerRadius(40)
         }
+    }
+    
+    private func calculateDistance() {
+        let userLocation = CLLocation(latitude: mapViewModel.region.center.latitude, longitude: mapViewModel.region.center.longitude)
+        let distanceInMeters = userLocation.distance(from: spot.location)
+        if isMetric() {
+            let distanceDouble = distanceInMeters / 1000
+            distance = String(format: "%.1f", distanceDouble) + " km"
+        } else {
+            let distanceDouble = distanceInMeters / 1609.344
+            distance = String(format: "%.1f", distanceDouble) + " mi"
+        }
+        
+    }
+    private func isMetric() -> Bool {
+        return ((Locale.current as NSLocale).object(forKey: NSLocale.Key.usesMetricSystem) as? Bool) ?? true
     }
 }

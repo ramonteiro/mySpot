@@ -123,7 +123,7 @@ struct ViewPlaylistMap: View {
                 }
             }
         }
-        .sheet(isPresented: $showingDetailsSheet) {
+        .fullScreenCover(isPresented: $showingDetailsSheet) {
             DetailView(canShare: false, fromPlaylist: true, spot: playlist.spotArr[selection])
         }
     }

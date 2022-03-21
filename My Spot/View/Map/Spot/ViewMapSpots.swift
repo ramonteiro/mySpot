@@ -126,7 +126,7 @@ struct ViewMapSpots: View {
                 }
             }
         }
-        .sheet(isPresented: $showingDetailsSheet) {
+        .fullScreenCover(isPresented: $showingDetailsSheet) {
             DetailView(canShare: false, fromPlaylist: false, spot: spots[selection])
         }
     }

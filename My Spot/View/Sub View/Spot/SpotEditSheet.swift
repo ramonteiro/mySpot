@@ -35,7 +35,7 @@ struct SpotEditSheet: View {
     @FocusState private var focusState: Field?
     
     private var keepDisabled: Bool {
-        (fromDB && name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty) || (!fromDB && (name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || founder.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty))
+        (fromDB && name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty) || (!fromDB && (name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || founder.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)) || (fromDB && !wasPublic && (name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || founder.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty))
     }
     
     var body: some View {
@@ -55,7 +55,7 @@ struct SpotEditSheet: View {
                             .focused($focusState, equals: .name)
                             .submitLabel(.next)
                     }
-                    if !fromDB {
+                    if !fromDB || !wasPublic {
                         Section(header: Text("Founder's Name*")) {
                             TextField("Enter Founder's Name", text: $founder)
                                 .focused($focusState, equals: .founder)
@@ -104,7 +104,7 @@ struct SpotEditSheet: View {
                 .onSubmit {
                     switch focusState {
                     case .name:
-                        if (fromDB) {
+                        if (fromDB && wasPublic) {
                             focusState = .descript
                         } else {
                             focusState = .founder
@@ -153,7 +153,7 @@ struct SpotEditSheet: View {
                             Button {
                                 switch focusState {
                                 case .descript:
-                                    if (fromDB) {
+                                    if (fromDB && wasPublic) {
                                         focusState = .name
                                     } else {
                                         focusState = .founder
@@ -170,7 +170,7 @@ struct SpotEditSheet: View {
                             Button {
                                 switch focusState {
                                 case .name:
-                                    if (fromDB) {
+                                    if (fromDB && wasPublic) {
                                         focusState = .descript
                                     } else {
                                         focusState = .founder

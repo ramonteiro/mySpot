@@ -28,6 +28,7 @@ struct DetailView: View {
     @State private var scope:String = "Private"
     @State private var tags: [String] = []
     @State private var showingImage = false
+    @State private var distance: String = ""
     @State private var exists = true
     @State private var fromDB = false
     
@@ -121,7 +122,7 @@ struct DetailView: View {
                                 }
                                 .offset(y: 30)
                                 Spacer()
-                                if (canShare && fromDB) {
+                                if (canShare && fromDB && spot.isPublic) {
                                     Button {
                                         cloudViewModel.shareSheetFromLocal(id: spot.dbid ?? "", name: spot.name ?? "")
                                     } label: {
@@ -243,6 +244,13 @@ struct DetailView: View {
             .padding(.top, 10)
             .padding([.leading, .trailing], 30)
             
+            if (!distance.isEmpty) {
+                Text("\(distance) away")
+                    .foregroundColor(.gray)
+                    .font(.system(size: 15, weight: .light))
+                    .padding(.bottom, 1)
+            }
+            
             HStack {
                 Image(systemName: "globe")
                     .font(.system(size: 15, weight: .light))
@@ -261,5 +269,27 @@ struct DetailView: View {
                 .shadow(color: .black, radius: 5)
         )
         .offset(y: (200 * UIScreen.screenWidth)/375)
+        .onAppear {
+            if (mapViewModel.isAuthorized) {
+                calculateDistance()
+            }
+        }
+    }
+    
+    private func calculateDistance() {
+        let userLocation = CLLocation(latitude: mapViewModel.region.center.latitude, longitude: mapViewModel.region.center.longitude)
+        let spotLocation = CLLocation(latitude: spot.x, longitude: spot.y)
+        let distanceInMeters = userLocation.distance(from: spotLocation)
+        if isMetric() {
+            let distanceDouble = distanceInMeters / 1000
+            distance = String(format: "%.1f", distanceDouble) + " km"
+        } else {
+            let distanceDouble = distanceInMeters / 1609.344
+            distance = String(format: "%.1f", distanceDouble) + " mi"
+        }
+        
+    }
+    private func isMetric() -> Bool {
+        return ((Locale.current as NSLocale).object(forKey: NSLocale.Key.usesMetricSystem) as? Bool) ?? true
     }
 }

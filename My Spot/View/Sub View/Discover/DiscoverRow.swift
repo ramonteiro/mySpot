@@ -11,10 +11,13 @@
  */
 
 import SwiftUI
+import CoreLocation
 
 struct DiscoverRow: View {
     var spot: SpotFromCloud
     @State private var tags: [String] = []
+    @State private var distance: String = ""
+    @EnvironmentObject var mapViewModel: MapViewModel
 
     var body: some View {
         HStack {
@@ -62,6 +65,11 @@ struct DiscoverRow: View {
                         .foregroundColor(Color.gray)
                         .font(.subheadline)
                 }
+                if (!distance.isEmpty) {
+                    Text("\(distance) away")
+                        .foregroundColor(Color.gray)
+                        .font(.subheadline)
+                }
                 
                 if (!(spot.type.isEmpty)) {
                     ScrollView(.horizontal, showsIndicators: false) {
@@ -77,12 +85,32 @@ struct DiscoverRow: View {
                             }
                         }
                     }
+                    .padding(.bottom, 7)
                 }
             }
             .padding(.leading, 5)
         }
         .onAppear {
             tags = spot.type.components(separatedBy: ", ")
+            if (mapViewModel.isAuthorized) {
+                calculateDistance()
+            }
         }
+    }
+    
+    private func calculateDistance() {
+        let userLocation = CLLocation(latitude: mapViewModel.region.center.latitude, longitude: mapViewModel.region.center.longitude)
+        let distanceInMeters = userLocation.distance(from: spot.location)
+        if isMetric() {
+            let distanceDouble = distanceInMeters / 1000
+            distance = String(format: "%.1f", distanceDouble) + " km"
+        } else {
+            let distanceDouble = distanceInMeters / 1609.344
+            distance = String(format: "%.1f", distanceDouble) + " mi"
+        }
+        
+    }
+    private func isMetric() -> Bool {
+        return ((Locale.current as NSLocale).object(forKey: NSLocale.Key.usesMetricSystem) as? Bool) ?? true
     }
 }

@@ -134,7 +134,7 @@ struct ViewDiscoverSpots: View {
                 }
             }
         }
-        .sheet(isPresented: $showingDetailsSheet) {
+        .fullScreenCover(isPresented: $showingDetailsSheet) {
             DiscoverDetailView(index: selection, canShare: false)
         }
     }

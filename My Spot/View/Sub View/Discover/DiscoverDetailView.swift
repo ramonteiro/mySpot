@@ -18,16 +18,19 @@ import CoreData
 struct DiscoverDetailView: View {
     
     var index: Int
-    @Environment(\.presentationMode) var presentationMode
+    @FetchRequest(sortDescriptors: []) var spots: FetchedResults<Spot>
     @Environment(\.managedObjectContext) var moc
+    @Environment(\.presentationMode) var presentationMode
     @FetchRequest(sortDescriptors: []) var likedIds: FetchedResults<Likes>
     @EnvironmentObject var tabController: TabController
     @EnvironmentObject var mapViewModel: MapViewModel
     @EnvironmentObject var cloudViewModel: CloudKitViewModel
     
     let canShare: Bool
+    @State private var deletedSpot: [Spot] = []
     @State private var backImage = "chevron.left"
     @State private var mySpot = false
+    @State private var distance: String = ""
     @State private var message = ""
     @State private var deleteAlert = false
     @State private var showingMailSheet = false
@@ -120,6 +123,12 @@ struct DiscoverDetailView: View {
                                     .offset(y: 30)
                                     .alert("Are you sure you want to delete \(cloudViewModel.spots[index].name)?", isPresented: $deleteAlert) {
                                         Button("Delete", role: .destructive) {
+                                            spots.forEach { i in
+                                                if i.dbid == cloudViewModel.spots[index].record.recordID.recordName {
+                                                    i.isPublic = false
+                                                    try? moc.save()
+                                                }
+                                            }
                                             cloudViewModel.deleteSpot(id: cloudViewModel.spots[index].record.recordID)
                                             cloudViewModel.spots.remove(at: index)
                                             presentationMode.wrappedValue.dismiss()
@@ -336,6 +345,13 @@ struct DiscoverDetailView: View {
             .padding(.top, 10)
             .padding([.leading, .trailing], 30)
             
+            if (!distance.isEmpty) {
+                Text("\(distance) away")
+                    .foregroundColor(.gray)
+                    .font(.system(size: 15, weight: .light))
+                    .padding(.bottom, 1)
+            }
+            
             Button {
                 showingMailSheet = true
             } label: {
@@ -350,6 +366,11 @@ struct DiscoverDetailView: View {
                 MailView(message: $message) { returnedMail in
                     print(returnedMail)
                 }
+            }
+        }
+        .onAppear {
+            if (mapViewModel.isAuthorized) {
+                calculateDistance()
             }
         }
         .frame(maxWidth: .infinity)
@@ -389,5 +410,21 @@ struct DiscoverDetailView: View {
         newSpot.dbid = cloudViewModel.spots[index].record.recordID.recordName
         try? moc.save()
         isSaved = true
+    }
+    
+    private func calculateDistance() {
+        let userLocation = CLLocation(latitude: mapViewModel.region.center.latitude, longitude: mapViewModel.region.center.longitude)
+        let distanceInMeters = userLocation.distance(from: cloudViewModel.spots[index].location)
+        if isMetric() {
+            let distanceDouble = distanceInMeters / 1000
+            distance = String(format: "%.1f", distanceDouble) + " km"
+        } else {
+            let distanceDouble = distanceInMeters / 1609.344
+            distance = String(format: "%.1f", distanceDouble) + " mi"
+        }
+        
+    }
+    private func isMetric() -> Bool {
+        return ((Locale.current as NSLocale).object(forKey: NSLocale.Key.usesMetricSystem) as? Bool) ?? true
     }
 }

@@ -11,12 +11,15 @@
  */
 
 import SwiftUI
+import CoreLocation
 
 struct SpotRow: View {
     @ObservedObject var spot: Spot
     @State private var scope:String = "Private"
     @State private var tags: [String] = []
     @State private var exists = true
+    @State private var distance: String = ""
+    @EnvironmentObject var mapViewModel: MapViewModel
     
     var body: some View {
         ZStack {
@@ -77,21 +80,25 @@ struct SpotRow: View {
                         .foregroundColor(Color.gray)
                         .font(.subheadline)
                 }
+                if (!distance.isEmpty) {
+                    Text("\(distance) away")
+                        .foregroundColor(Color.gray)
+                        .font(.subheadline)
+                }
                 
                 if (!(spot.tags?.isEmpty ?? true)) {
                     ScrollView(.horizontal, showsIndicators: false) {
-                        HStack {
-                            ForEach(tags, id: \.self) { tag in
-                                Text(tag)
-                                    .font(.system(size: 12, weight: .regular))
-                                    .lineLimit(2)
-                                    .foregroundColor(.white)
-                                    .padding(5)
-                                    .background(.tint)
-                                    .cornerRadius(5)
-                            }
+                        ForEach(tags, id: \.self) { tag in
+                            Text(tag)
+                                .font(.system(size: 12, weight: .regular))
+                                .lineLimit(2)
+                                .foregroundColor(.white)
+                                .padding(5)
+                                .background(.tint)
+                                .cornerRadius(5)
                         }
                     }
+                    .padding(.bottom, 7)
                 }
             }
             .padding(.leading, 5)
@@ -103,6 +110,26 @@ struct SpotRow: View {
             } else {
                 scope = "Private"
             }
+            if (mapViewModel.isAuthorized) {
+                calculateDistance()
+            }
         }
+    }
+    
+    private func calculateDistance() {
+        let userLocation = CLLocation(latitude: mapViewModel.region.center.latitude, longitude: mapViewModel.region.center.longitude)
+        let spotLocation = CLLocation(latitude: spot.x, longitude: spot.y)
+        let distanceInMeters = userLocation.distance(from: spotLocation)
+        if isMetric() {
+            let distanceDouble = distanceInMeters / 1000
+            distance = String(format: "%.1f", distanceDouble) + " km"
+        } else {
+            let distanceDouble = distanceInMeters / 1609.344
+            distance = String(format: "%.1f", distanceDouble) + " mi"
+        }
+        
+    }
+    private func isMetric() -> Bool {
+        return ((Locale.current as NSLocale).object(forKey: NSLocale.Key.usesMetricSystem) as? Bool) ?? true
     }
 }
