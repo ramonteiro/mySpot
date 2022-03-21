@@ -26,6 +26,7 @@ struct DiscoverDetailView: View {
     @EnvironmentObject var cloudViewModel: CloudKitViewModel
     
     let canShare: Bool
+    @State private var backImage = "chevron.left"
     @State private var mySpot = false
     @State private var message = ""
     @State private var deleteAlert = false
@@ -93,7 +94,7 @@ struct DiscoverDetailView: View {
                             Button {
                                 presentationMode.wrappedValue.dismiss()
                             } label: {
-                                Image(systemName: "arrow.left")
+                                Image(systemName: backImage)
                                     .foregroundColor(.white)
                                     .font(.system(size: 30, weight: .regular))
                                     .padding(15)
@@ -237,6 +238,11 @@ struct DiscoverDetailView: View {
         .onAppear {
             noType = cloudViewModel.spots[index].type.isEmpty
             spotInCD = isSpotInCoreData()
+            if (canShare) {
+                backImage = "chevron.left"
+            } else {
+                backImage = "chevron.down"
+            }
         }
     }
     

@@ -24,6 +24,7 @@ struct DetailView: View {
     @Environment(\.presentationMode) var presentationMode
     @EnvironmentObject var tabController: TabController
     @State private var showingEditSheet = false
+    @State private var backImage = "chevron.left"
     @State private var scope:String = "Private"
     @State private var tags: [String] = []
     @State private var showingImage = false
@@ -112,7 +113,7 @@ struct DetailView: View {
                                 Button {
                                     presentationMode.wrappedValue.dismiss()
                                 } label: {
-                                    Image(systemName: "arrow.left")
+                                    Image(systemName: backImage)
                                         .foregroundColor(.white)
                                         .font(.system(size: 30, weight: .regular))
                                         .padding(15)
@@ -152,6 +153,11 @@ struct DetailView: View {
                     }
                     if let _ = spot.dbid {
                         fromDB = true
+                    }
+                    if (canShare) {
+                        backImage = "chevron.left"
+                    } else {
+                        backImage = "chevron.down"
                     }
                 }
             }

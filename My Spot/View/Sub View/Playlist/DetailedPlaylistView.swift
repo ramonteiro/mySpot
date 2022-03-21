@@ -239,7 +239,17 @@ struct DetailPlaylistView: View {
             }
             HStack {
                 Spacer()
-                Text("Add Some With The Plus Button Above").font(.subheadline).foregroundColor(.gray)
+                HStack {
+                    Text("Add Some With The")
+                        .font(.subheadline)
+                        .foregroundColor(.gray)
+                    Image(systemName: "plus")
+                        .font(.subheadline)
+                        .foregroundColor(.gray)
+                    Text("Button Above")
+                        .font(.subheadline)
+                        .foregroundColor(.gray)
+                }
                 Spacer()
             }
         }
