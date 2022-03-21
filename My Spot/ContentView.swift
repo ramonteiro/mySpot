@@ -71,7 +71,7 @@ struct ContentView: View {
             // set last changed tab
             tabController.lastPressedTab = selection
         }
-        .sheet(isPresented: $showSharedSpotSheet, onDismiss: {
+        .fullScreenCover(isPresented: $showSharedSpotSheet, onDismiss: {
             cloudViewModel.shared = []
         }, content: {
             DiscoverSheetShared()
