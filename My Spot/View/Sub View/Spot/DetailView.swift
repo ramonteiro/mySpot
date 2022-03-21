@@ -31,6 +31,7 @@ struct DetailView: View {
     @State private var distance: String = ""
     @State private var exists = true
     @State private var fromDB = false
+    @State private var landscapeOffset: CGFloat = 0
     
     var body: some View {
         ZStack {
@@ -70,10 +71,15 @@ struct DetailView: View {
                         Image(uiImage: (spot.image ?? UIImage(systemName: "exclamationmark.triangle.fill"))!)
                             .resizable()
                             .scaledToFit()
-                            .offset(y: -100)
+                            .if(spot.image?.size.height ?? CGFloat(0) > spot.image?.size.width ?? CGFloat(0), transform: { view in
+                                view.offset(y: -(100 * UIScreen.screenWidth)/375)
+                            })
                         Spacer()
                     }
                     detailSheet
+                        .if(spot.image?.size.height ?? CGFloat(0) < spot.image?.size.width ?? CGFloat(0), transform: { view in
+                            view.offset(y: landscapeOffset + 50)
+                        })
                     HStack {
                         Button {
                             withAnimation {
@@ -87,7 +93,7 @@ struct DetailView: View {
                         }
                         .background(.ultraThinMaterial)
                         .clipShape(Circle())
-                        .offset(x: 20, y: -80)
+                        .offset(x: 20, y: -80 + landscapeOffset)
                         Spacer()
                         Button {
                             showingEditSheet = true
@@ -102,7 +108,7 @@ struct DetailView: View {
                                 .foregroundColor(.accentColor)
                                 .shadow(color: .black, radius: 5)
                         )
-                        .offset(x: -20, y: -60)
+                        .offset(x: -20, y: -60 + landscapeOffset)
                         .sheet(isPresented: $showingEditSheet) {
                             SpotEditSheet(spot: spot)
                         }
@@ -139,6 +145,7 @@ struct DetailView: View {
                         }
                         Spacer()
                     }
+                    
                     if (showingImage) {
                         ImagePopUp(showingImage: $showingImage, image: (spot.image ?? UIImage(systemName: "exclamationmark.triangle.fill"))!)
                             .transition(.scale)
@@ -165,6 +172,11 @@ struct DetailView: View {
         }
         .navigationBarHidden(true)
         .edgesIgnoringSafeArea(.top)
+        .onAppear {
+            if spot.image?.size.height ?? CGFloat(0) < spot.image?.size.width ?? CGFloat(0) {
+                landscapeOffset = -(60 * UIScreen.screenWidth)/375 - 50
+            }
+        }
     }
     
     private var detailSheet: some View {
@@ -262,7 +274,7 @@ struct DetailView: View {
             .padding(.bottom, (100 * UIScreen.screenWidth)/375)
         }
         .frame(maxWidth: .infinity)
-        .frame(height: (500 * UIScreen.screenWidth)/375)
+        .frame(height: (500 * UIScreen.screenWidth)/375 - landscapeOffset)
         .background(
             RoundedRectangle(cornerRadius: 40)
                 .foregroundColor(Color(UIColor.secondarySystemBackground))

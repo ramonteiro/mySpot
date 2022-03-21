@@ -46,6 +46,7 @@ struct DiscoverDetailView: View {
     @State private var noType = false
     @State private var spotInCD: [Spot] = []
     @FocusState private var nameIsFocused: Bool
+    @State private var landscapeOffset: CGFloat = 0
     
     var body: some View {
         ZStack {
@@ -55,10 +56,15 @@ struct DiscoverDetailView: View {
                         Image(uiImage: (image ?? UIImage(systemName: "exclamationmark.triangle.fill"))!)
                             .resizable()
                             .scaledToFit()
-                            .offset(y: -100)
+                            .if(landscapeOffset == 0, transform: { view in
+                                view.offset(y: -(100 * UIScreen.screenWidth)/375)
+                            })
                         Spacer()
                     }
                     detailSheet
+                        .if(landscapeOffset != 0, transform: { view in
+                            view.offset(y: landscapeOffset + 50)
+                        })
                     HStack {
                         Button {
                             withAnimation {
@@ -72,7 +78,7 @@ struct DiscoverDetailView: View {
                         }
                         .background(.ultraThinMaterial)
                         .clipShape(Circle())
-                        .offset(x: 20, y: -80)
+                        .offset(x: 20, y: -80 + landscapeOffset)
                         Spacer()
                         Button {
                             withAnimation {
@@ -90,7 +96,7 @@ struct DiscoverDetailView: View {
                                 .shadow(color: .black, radius: 5)
                         )
                         .disabled(spotInCD.count != 0 || isSaved)
-                        .offset(x: -20, y: -60)
+                        .offset(x: -20, y: -60 + landscapeOffset)
                     }
                     HStack {
                         VStack {
@@ -219,6 +225,9 @@ struct DiscoverDetailView: View {
                     let url = cloudViewModel.spots[index].imageURL
                     if let data = try? Data(contentsOf: url), let image = UIImage(data: data) {
                         self.image = image
+                        if (image.size.height < image.size.width) {
+                            landscapeOffset = -(60 * UIScreen.screenWidth)/375 - 50
+                        }
                     }
                     isSaving = false
                     newName = ""
@@ -374,7 +383,7 @@ struct DiscoverDetailView: View {
             }
         }
         .frame(maxWidth: .infinity)
-        .frame(height: (500 * UIScreen.screenWidth)/375)
+        .frame(height: (500 * UIScreen.screenWidth)/375 - landscapeOffset)
         .background(
             RoundedRectangle(cornerRadius: 40)
                 .foregroundColor(Color(UIColor.secondarySystemBackground))

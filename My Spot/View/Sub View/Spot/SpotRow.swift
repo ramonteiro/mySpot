@@ -85,14 +85,16 @@ struct SpotRow: View {
                 
                 if (!(spot.tags?.isEmpty ?? true)) {
                     ScrollView(.horizontal, showsIndicators: false) {
-                        ForEach(tags, id: \.self) { tag in
-                            Text(tag)
-                                .font(.system(size: 12, weight: .regular))
-                                .lineLimit(2)
-                                .foregroundColor(.white)
-                                .padding(5)
-                                .background(.tint)
-                                .cornerRadius(5)
+                        HStack {
+                            ForEach(tags, id: \.self) { tag in
+                                Text(tag)
+                                    .font(.system(size: 12, weight: .regular))
+                                    .lineLimit(2)
+                                    .foregroundColor(.white)
+                                    .padding(5)
+                                    .background(.tint)
+                                    .cornerRadius(5)
+                            }
                         }
                     }
                     .padding(.bottom, 7)
