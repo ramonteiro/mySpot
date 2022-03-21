@@ -25,6 +25,8 @@ struct MySpotsView: View {
     
     @State private var showingAddSheet = false
     @State private var showingMapSheet = false
+    @State private var showingDeleteAlert = false
+    @State private var toBeDeleted: IndexSet?
     @State private var filteredSpots: [Spot] = []
     @State private var searchText = ""
     @State private var sortBy = "Name"
@@ -113,9 +115,18 @@ struct MySpotsView: View {
                 ForEach(searchResults) { spot in
                     NavigationLink(destination: DetailView(canShare: true, fromPlaylist: false, spot: spot)) {
                         SpotRow(spot: spot)
+                            .alert(isPresented: self.$showingDeleteAlert) {
+                                Alert(title: Text("Delete \(spot.name ?? "Spot")?"), message: Text(""), primaryButton: .destructive(Text("Delete")) {
+                                    self.deleteFiltered(at: self.toBeDeleted!)
+                                    self.toBeDeleted = nil
+                                }, secondaryButton: .cancel() {
+                                    self.toBeDeleted = nil
+                                }
+                                )
+                            }
                     }
                 }
-                .onDelete(perform: self.deleteFiltered)
+                .onDelete(perform: deleteRow)
             }
             .animation(.default, value: searchResults)
             .searchable(text: $searchText, prompt: "Search All Spots")
@@ -264,6 +275,11 @@ struct MySpotsView: View {
                 Text("\(sortBy)")
             }
         }
+    }
+    
+    private func deleteRow(at indexSet: IndexSet) {
+        self.toBeDeleted = indexSet
+        self.showingDeleteAlert = true
     }
     
     private func deleteFiltered(at offsets: IndexSet) {
