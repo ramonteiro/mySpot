@@ -42,12 +42,19 @@ struct SpotRow: View {
     
     private var displayRedCircleImage: some View {
         HStack {
-            Image(uiImage: (spot.image ?? UIImage(systemName: "exclamationmark.triangle.fill"))!)
-                .resizable()
-                .scaledToFill()
-                .frame(width: 100, height: 120)
-                .cornerRadius(20)
-                .shadow(color: .black, radius: 5)
+            ZStack {
+                Image(uiImage: (spot.image ?? UIImage(systemName: "exclamationmark.triangle.fill"))!)
+                    .resizable()
+                    .scaledToFill()
+                    .frame(width: 100, height: 120)
+                    .cornerRadius(10)
+                    .shadow(color: .black, radius: 5)
+                if let _ = spot.image2 {
+                    Image(systemName: "square.on.square")
+                        .font(.subheadline)
+                        .offset(x: -35, y: -45)
+                }
+            }
             
             VStack(alignment: .leading) {
                 Text("\(spot.name ?? "")")

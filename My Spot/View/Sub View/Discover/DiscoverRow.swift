@@ -21,17 +21,24 @@ struct DiscoverRow: View {
 
     var body: some View {
         HStack {
-            if let url = spot.imageURL, let data = try? Data(contentsOf: url), let image = UIImage(data: data) {
-                Image(uiImage: image)
-                    .resizable()
-                    .scaledToFill()
-                    .frame(width: 100, height: 120)
-                    .cornerRadius(20)
-                    .shadow(color: .black, radius: 5)
-            } else {
-                ProgressView("Loading Image")
-                    .frame(width: 100, height: 120, alignment: .center)
-                    .cornerRadius(20)
+            ZStack {
+                if let url = spot.imageURL, let data = try? Data(contentsOf: url), let image = UIImage(data: data) {
+                    Image(uiImage: image)
+                        .resizable()
+                        .scaledToFill()
+                        .frame(width: 100, height: 120)
+                        .cornerRadius(10)
+                        .shadow(color: .black, radius: 5)
+                } else {
+                    ProgressView("Loading Image")
+                        .frame(width: 100, height: 120, alignment: .center)
+                        .cornerRadius(20)
+                }
+                if (spot.image2URL.relativeString != "none") {
+                    Image(systemName: "square.on.square")
+                        .font(.subheadline)
+                        .offset(x: -35, y: -45)
+                }
             }
             
             VStack(alignment: .leading) {

@@ -31,7 +31,8 @@ struct DetailView: View {
     @State private var distance: String = ""
     @State private var exists = true
     @State private var fromDB = false
-    @State private var landscapeOffset: CGFloat = 0
+    @State private var selection = 0
+    @State private var images: [UIImage] = []
     
     var body: some View {
         ZStack {
@@ -46,7 +47,7 @@ struct DetailView: View {
                         if (!fromPlaylist) {
                             presentationMode.wrappedValue.dismiss()
                         }
-                }
+                    }
             }
         }
         .onAppear {
@@ -65,116 +66,172 @@ struct DetailView: View {
     
     private var displaySpot: some View {
         ZStack {
-            if (exists) {
-                ZStack {
-                    VStack {
-                        Image(uiImage: (spot.image ?? UIImage(systemName: "exclamationmark.triangle.fill"))!)
-                            .resizable()
-                            .scaledToFit()
-                            
-                        Spacer()
-                    }
-                    detailSheet
-                        .if(spot.image?.size.height ?? CGFloat(0) < spot.image?.size.width ?? CGFloat(0), transform: { view in
-                            view.offset(y: landscapeOffset + 50)
-                        })
-                    HStack {
-                        Button {
-                            withAnimation {
-                                showingImage.toggle()
-                            }
-                        } label: {
-                            Image(systemName: "arrow.up.left.and.arrow.down.right")
-                                .font(.system(size: 15, weight: .regular))
-                                .padding(5)
-                                .foregroundColor(.white)
-                        }
-                        .background(.ultraThinMaterial)
-                        .clipShape(Circle())
-                        .offset(x: 20, y: -80 + landscapeOffset)
-                        Spacer()
-                        Button {
-                            showingEditSheet = true
-                        } label: {
-                            Image(systemName: "slider.horizontal.3")
-                                .font(.system(size: 30, weight: .regular))
-                                .padding(15)
-                                .foregroundColor(.white)
-                        }
-                        .background(
-                            Circle()
-                                .foregroundColor(.accentColor)
-                                .shadow(color: .black, radius: 5)
-                        )
-                        .offset(x: -20, y: -60 + landscapeOffset)
-                        .sheet(isPresented: $showingEditSheet) {
-                            SpotEditSheet(spot: spot)
-                        }
-                        .disabled(!networkViewModel.hasInternet && spot.isPublic && !cloudViewModel.isSignedInToiCloud)
-                    }
-                    HStack {
-                        VStack {
-                            HStack {
-                                Button {
-                                    presentationMode.wrappedValue.dismiss()
-                                } label: {
-                                    Image(systemName: backImage)
-                                        .foregroundColor(.white)
-                                        .font(.system(size: 30, weight: .regular))
-                                        .padding(15)
-                                        .shadow(color: .black, radius: 5)
-                                }
-                                .offset(y: 30)
-                                Spacer()
-                                if (canShare && fromDB && spot.isPublic) {
-                                    Button {
-                                        cloudViewModel.shareSheetFromLocal(id: spot.dbid ?? "", name: spot.name ?? "")
-                                    } label: {
-                                        Image(systemName: "square.and.arrow.up")
-                                            .foregroundColor(.white)
-                                            .font(.system(size: 30, weight: .regular))
-                                            .padding(15)
-                                            .shadow(color: .black, radius: 5)
-                                    }
-                                    .offset(y: 30)
-                                }
-                            }
-                            Spacer()
-                        }
-                        Spacer()
-                    }
-                    
-                    if (showingImage) {
-                        ImagePopUp(showingImage: $showingImage, image: (spot.image ?? UIImage(systemName: "exclamationmark.triangle.fill"))!)
-                            .transition(.scale)
-                    }
-                }
-                .ignoresSafeArea(.all, edges: .top)
-                .onAppear {
-                    tags = spot.tags?.components(separatedBy: ", ") ?? []
-                    if (spot.isPublic) {
-                        scope = "Public"
-                    } else {
-                        scope = "Private"
-                    }
-                    if let _ = spot.dbid {
-                        fromDB = true
-                    }
-                    if (canShare) {
-                        backImage = "chevron.left"
-                    } else {
-                        backImage = "chevron.down"
-                    }
-                }
+            displayImage
+            topButtonRow
+            middleButtonRow
+            if (showingImage) {
+                ImagePopUp(showingImage: $showingImage, image: images[selection])
+                    .transition(.scale)
+            }
+        }
+        .ignoresSafeArea(.all, edges: .top)
+        .if(!canShare) { view in
+            view.ignoresSafeArea(.all, edges: [.top, .bottom])
+        }
+        .onAppear {
+            // check for images
+            images.append(spot.image ?? defaultImages.errorImage!)
+            if let _ = spot.image3 {
+                images.append(spot.image2 ?? defaultImages.errorImage!)
+                images.append(spot.image3 ?? defaultImages.errorImage!)
+            } else if let _ = spot.image2 {
+                images.append(spot.image2 ?? defaultImages.errorImage!)
+            }
+            
+            tags = spot.tags?.components(separatedBy: ", ") ?? []
+            if (spot.isPublic) {
+                scope = "Public"
+            } else {
+                scope = "Private"
+            }
+            if let _ = spot.dbid {
+                fromDB = true
+            }
+            if (canShare) {
+                backImage = "chevron.left"
+            } else {
+                backImage = "chevron.down"
             }
         }
         .navigationBarHidden(true)
-        .edgesIgnoringSafeArea(.top)
-        .onAppear {
-            if spot.image?.size.height ?? CGFloat(0) < spot.image?.size.width ?? CGFloat(0) {
-                landscapeOffset = -(60 * UIScreen.screenWidth)/375 - 50
+    }
+    
+    private var displayImage: some View {
+        VStack(spacing: 0) {
+            if (images.count > 1) {
+                multipleImages
+            } else {
+                if (!images.isEmpty) {
+                    Image(uiImage: images[0])
+                        .resizable()
+                        .frame(width: UIScreen.screenWidth, height: UIScreen.screenWidth)
+                        .scaledToFit()
+                        .ignoresSafeArea()
+                } else {
+                    Image(uiImage: defaultImages.errorImage!)
+                        .resizable()
+                        .frame(width: UIScreen.screenWidth, height: UIScreen.screenWidth)
+                        .scaledToFit()
+                        .ignoresSafeArea()
+                }
+            }
+            detailSheet
+        }
+    }
+    
+    private var topButtonRow: some View {
+        VStack(spacing: 0) {
+            HStack(spacing: 0) {
+                backButtonView
+                Spacer()
+                if (canShare && fromDB && spot.isPublic) {
+                    shareButton
+                }
+            }
+            .padding(.top, 30)
+            Spacer()
+        }
+    }
+    
+    private var middleButtonRow: some View {
+        VStack {
+            Spacer()
+                .ignoresSafeArea()
+                .frame(height: UIScreen.screenWidth)
+            HStack {
+                enLargeButton
+                    .padding()
+                    .offset(y: -30)
+                Spacer()
+                editButton
+                    .padding()
+            }
+            .offset(y: -60)
+            Spacer()
+        }
+    }
+    
+    private var multipleImages: some View {
+        TabView(selection: $selection) {
+            ForEach(images.indices, id: \.self) { index in
+                Image(uiImage: images[index]).resizable()
+                    .frame(width: UIScreen.screenWidth, height: UIScreen.screenWidth)
+                    .scaledToFit()
+                    .ignoresSafeArea()
+                    .tag(index)
             }
         }
+        .frame(width: UIScreen.screenWidth, height: UIScreen.screenWidth)
+        .tabViewStyle(.page)
+    }
+    
+    private var enLargeButton: some View {
+        Button {
+            withAnimation {
+                showingImage.toggle()
+            }
+        } label: {
+            Image(systemName: "arrow.up.left.and.arrow.down.right")
+                .font(.system(size: 15, weight: .regular))
+                .padding(5)
+                .foregroundColor(.white)
+        }
+        .background(.ultraThinMaterial)
+        .clipShape(Circle())
+    }
+    
+    private var shareButton: some View {
+        Button {
+            cloudViewModel.shareSheetFromLocal(id: spot.dbid ?? "", name: spot.name ?? "")
+        } label: {
+            Image(systemName: "square.and.arrow.up")
+                .foregroundColor(.white)
+                .font(.system(size: 30, weight: .regular))
+                .padding(15)
+                .shadow(color: .black, radius: 5)
+        }
+    }
+    
+    private var backButtonView: some View {
+        Button {
+            presentationMode.wrappedValue.dismiss()
+        } label: {
+            Image(systemName: backImage)
+                .foregroundColor(.white)
+                .font(.system(size: 30, weight: .regular))
+                .padding(15)
+                .shadow(color: .black, radius: 5)
+        }
+    }
+    
+    private var editButton: some View {
+        Button {
+            showingEditSheet = true
+        } label: {
+            Image(systemName: "slider.horizontal.3")
+                .font(.system(size: 30, weight: .regular))
+                .padding(15)
+                .foregroundColor(.white)
+        }
+        .background(
+            Circle()
+                .foregroundColor(.accentColor)
+                .shadow(color: .black, radius: 5)
+        )
+        .sheet(isPresented: $showingEditSheet) {
+            SpotEditSheet(spot: spot)
+        }
+        .disabled(!networkViewModel.hasInternet && spot.isPublic && !cloudViewModel.isSignedInToiCloud)
     }
     
     private var detailSheet: some View {
@@ -277,16 +334,14 @@ struct DetailView: View {
                         }
                     }
             }
-            .padding(.bottom, (100 * UIScreen.screenWidth)/375)
+            .padding(.bottom, 20)
         }
         .frame(maxWidth: .infinity)
-        .frame(height: (500 * UIScreen.screenWidth)/375 - landscapeOffset)
         .background(
-            RoundedRectangle(cornerRadius: 40)
+            Rectangle()
                 .foregroundColor(Color(UIColor.secondarySystemBackground))
                 .shadow(color: .black, radius: 5)
         )
-        .offset(y: (200 * UIScreen.screenWidth)/375)
         .onAppear {
             if (mapViewModel.isAuthorized) {
                 calculateDistance()
@@ -307,6 +362,7 @@ struct DetailView: View {
         }
         
     }
+    
     private func isMetric() -> Bool {
         return ((Locale.current as NSLocale).object(forKey: NSLocale.Key.usesMetricSystem) as? Bool) ?? true
     }

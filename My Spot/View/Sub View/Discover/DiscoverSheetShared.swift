@@ -77,14 +77,14 @@ struct DiscoverSheetShared: View {
                     }
                     let url2 = cloudViewModel.shared[0].image2URL
                     let url3 = cloudViewModel.shared[0].image3URL
-                    if url3.absoluteString != "none" {
+                    if url3.relativeString != "none" {
                         if let data = try? Data(contentsOf: url2), let image = UIImage(data: data) {
                             self.images.append(image)
                         }
                         if let data = try? Data(contentsOf: url3), let image = UIImage(data: data) {
                             self.images.append(image)
                         }
-                    } else if url2.absoluteString != "none" {
+                    } else if url2.relativeString != "none" {
                         if let data = try? Data(contentsOf: url2), let image = UIImage(data: data) {
                             self.images.append(image)
                         }
@@ -114,7 +114,7 @@ struct DiscoverSheetShared: View {
             }
         }
         .navigationBarHidden(true)
-        .edgesIgnoringSafeArea(.top)
+        .ignoresSafeArea(.all, edges: [.top, .bottom])
         .onAppear {
             noType = cloudViewModel.shared[0].type.isEmpty
             spotInCD = isSpotInCoreData()

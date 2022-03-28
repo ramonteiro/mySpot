@@ -136,11 +136,15 @@ struct AddSpotSheet: View {
                                     List {
                                         ForEach(images ?? [UIImage(systemName: "exclamationmark.triangle")], id: \.self) { images in
                                             if let images = images {
-                                                Image(uiImage: images)
-                                                    .resizable()
-                                                    .scaledToFit()
-                                                    .frame(width: UIScreen.screenWidth / 2, alignment: .center)
-                                                    .cornerRadius(10)
+                                                HStack {
+                                                    Spacer()
+                                                    Image(uiImage: images)
+                                                        .resizable()
+                                                        .scaledToFit()
+                                                        .frame(width: UIScreen.screenWidth / 2, alignment: .center)
+                                                        .cornerRadius(10)
+                                                    Spacer()
+                                                }
                                             }
                                         }
                                         .onMove { indexSet, offset in
@@ -219,7 +223,6 @@ struct AddSpotSheet: View {
                             ToolbarItemGroup(placement: .bottomBar) {
                                 HStack {
                                     Spacer()
-                                    
                                     Button {
                                         showingAddImageAlert = true
                                         focusState = nil
@@ -227,9 +230,6 @@ struct AddSpotSheet: View {
                                         Image(systemName: "plus")
                                     }
                                     .disabled(images?.count ?? 3 > 2)
-                                    
-                                    
-                                    
                                     EditButton()
                                         .disabled(images?.isEmpty ?? true)
                                     

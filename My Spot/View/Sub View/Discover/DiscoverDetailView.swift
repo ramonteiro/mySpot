@@ -80,14 +80,14 @@ struct DiscoverDetailView: View {
                     }
                     let url2 = cloudViewModel.spots[index].image2URL
                     let url3 = cloudViewModel.spots[index].image3URL
-                    if url3.absoluteString != "none" {
+                    if url3.relativeString != "none" {
                         if let data = try? Data(contentsOf: url2), let image = UIImage(data: data) {
                             self.images.append(image)
                         }
                         if let data = try? Data(contentsOf: url3), let image = UIImage(data: data) {
                             self.images.append(image)
                         }
-                    } else if url2.absoluteString != "none" {
+                    } else if url2.relativeString != "none" {
                         if let data = try? Data(contentsOf: url2), let image = UIImage(data: data) {
                             self.images.append(image)
                         }
@@ -117,7 +117,10 @@ struct DiscoverDetailView: View {
             }
         }
         .navigationBarHidden(true)
-        .edgesIgnoringSafeArea(.top)
+        .ignoresSafeArea(.all, edges: .top)
+        .if(!canShare) { view in
+            view.ignoresSafeArea(.all, edges: [.top, .bottom])
+        }
         .onAppear {
             noType = cloudViewModel.spots[index].type.isEmpty
             spotInCD = isSpotInCoreData()
