@@ -185,13 +185,15 @@ struct DiscoverDetailView: View {
                 if (!images.isEmpty) {
                     Image(uiImage: images[0])
                         .resizable()
-                        .frame(width: UIScreen.screenWidth)
+                        .frame(width: UIScreen.screenWidth, height: UIScreen.screenWidth)
                         .scaledToFit()
+                        .ignoresSafeArea()
                 } else {
                     Image(uiImage: defaultImages.errorImage!)
                         .resizable()
-                        .frame(width: UIScreen.screenWidth)
+                        .frame(width: UIScreen.screenWidth, height: UIScreen.screenWidth)
                         .scaledToFit()
+                        .ignoresSafeArea()
                 }
             }
             detailSheet
@@ -202,9 +204,9 @@ struct DiscoverDetailView: View {
         TabView(selection: $selection) {
             ForEach(images.indices, id: \.self) { index in
                 Image(uiImage: images[index]).resizable()
-                    .ignoresSafeArea()
                     .frame(width: UIScreen.screenWidth, height: UIScreen.screenWidth)
                     .scaledToFit()
+                    .ignoresSafeArea()
                     .tag(index)
             }
         }
