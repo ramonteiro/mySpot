@@ -41,11 +41,11 @@ struct ViewMapSpots: View {
     }
     
     private var displayRouteButon: some View {
-        Button(action: {
+        Button {
             let routeMeTo = MKMapItem(placemark: MKPlacemark(coordinate: CLLocationCoordinate2D(latitude: spots[selection].x, longitude: spots[selection].y)))
             routeMeTo.name = spots[selection].name ?? "Spot"
             routeMeTo.openInMaps(launchOptions: nil)
-        }) {
+        } label: {
             Image(systemName: "point.topleft.down.curvedto.point.bottomright.up").imageScale(.large)
         }
         .shadow(color: Color.black.opacity(0.3), radius: 10)
@@ -53,11 +53,11 @@ struct ViewMapSpots: View {
     }
     
     private var displayMyLocationButton: some View {
-        Button(action: {
+        Button {
             withAnimation {
                 spotRegion = mapViewModel.region
             }
-        }) {
+        } label: {
             Image(systemName: "location").imageScale(.large)
         }
         .disabled(!mapViewModel.isAuthorized)

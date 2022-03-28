@@ -44,11 +44,11 @@ struct ViewSingleSpotOnMap: View {
     }
     
     private var displayLocationButton: some View {
-        Button(action: {
+        Button {
             withAnimation {
                 spotRegion = MKCoordinateRegion(center: singlePin[0].coordinate, span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01))
             }
-        }) {
+        } label: {
             Image(systemName: "mappin").imageScale(.large)
         }
         .padding([.top, .trailing])

@@ -87,7 +87,9 @@ final class MapViewModel: NSObject, ObservableObject, CLLocationManagerDelegate 
         geo.reverseGeocodeLocation(location) { (placemarker, error) in
             if error == nil {
                 let place = placemarker?[0]
-                if let local = place?.locality {
+                if let sublocal = place?.subLocality {
+                    completionHandler(sublocal)
+                } else if let local = place?.locality {
                     completionHandler(local)
                 } else if let state = place?.administrativeArea {
                     completionHandler(state)

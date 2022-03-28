@@ -37,11 +37,15 @@ struct AddPlaylistSheet: View {
     var body: some View {
         NavigationView {
             Form {
-                Section(header: Text("Playlist Name*")) {
+                Section {
                     playlistNamePrompt
+                } header: {
+                    Text("Playlist Name*")
                 }
-                Section(header: Text("Emoji ID*")) {
+                Section {
                     emojiPrompt
+                } header: {
+                    Text("Emoji ID*")
                 }
             }
             .onSubmit {

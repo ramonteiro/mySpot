@@ -13,6 +13,9 @@
 		C502D4F927E1A02C0057A65C /* PlaylistEditSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = C502D4F827E1A02C0057A65C /* PlaylistEditSheet.swift */; };
 		C502D4FB27E1A6310057A65C /* SpotEditSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = C502D4FA27E1A6310057A65C /* SpotEditSheet.swift */; };
 		C502D4FD27E1B63D0057A65C /* DiscoverSheetShared.swift in Sources */ = {isa = PBXBuildFile; fileRef = C502D4FC27E1B63D0057A65C /* DiscoverSheetShared.swift */; };
+		C50CF4A627F122DB001A9698 /* Mantis in Frameworks */ = {isa = PBXBuildFile; productRef = C50CF4A527F122DB001A9698 /* Mantis */; };
+		C50CF4A827F12328001A9698 /* MantisPhotoCropper.swift in Sources */ = {isa = PBXBuildFile; fileRef = C50CF4A727F12328001A9698 /* MantisPhotoCropper.swift */; };
+		C50CF4AA27F13915001A9698 /* ChoosePhoto.swift in Sources */ = {isa = PBXBuildFile; fileRef = C50CF4A927F13915001A9698 /* ChoosePhoto.swift */; };
 		C51503AE27D7C347009F0DCD /* My_SpotApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = C51503AD27D7C347009F0DCD /* My_SpotApp.swift */; };
 		C51503B027D7C347009F0DCD /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C51503AF27D7C347009F0DCD /* ContentView.swift */; };
 		C51503B227D7C349009F0DCD /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C51503B127D7C349009F0DCD /* Assets.xcassets */; };
@@ -68,6 +71,8 @@
 		C502D4F827E1A02C0057A65C /* PlaylistEditSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistEditSheet.swift; sourceTree = "<group>"; };
 		C502D4FA27E1A6310057A65C /* SpotEditSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpotEditSheet.swift; sourceTree = "<group>"; };
 		C502D4FC27E1B63D0057A65C /* DiscoverSheetShared.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiscoverSheetShared.swift; sourceTree = "<group>"; };
+		C50CF4A727F12328001A9698 /* MantisPhotoCropper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MantisPhotoCropper.swift; sourceTree = "<group>"; };
+		C50CF4A927F13915001A9698 /* ChoosePhoto.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChoosePhoto.swift; sourceTree = "<group>"; };
 		C51503AA27D7C347009F0DCD /* My Spot.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "My Spot.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		C51503AD27D7C347009F0DCD /* My_SpotApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = My_SpotApp.swift; sourceTree = "<group>"; };
 		C51503AF27D7C347009F0DCD /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -124,6 +129,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C50CF4A627F122DB001A9698 /* Mantis in Frameworks */,
 				C51503C027D7C531009F0DCD /* CloudKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -131,6 +137,26 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		C50CF4AB27F13949001A9698 /* ImageControl */ = {
+			isa = PBXGroup;
+			children = (
+				C515042127D7CAC6009F0DCD /* TakePhoto.swift */,
+				C50CF4A727F12328001A9698 /* MantisPhotoCropper.swift */,
+				C50CF4A927F13915001A9698 /* ChoosePhoto.swift */,
+			);
+			path = ImageControl;
+			sourceTree = "<group>";
+		};
+		C50CF4AC27F13971001A9698 /* ViewModels */ = {
+			isa = PBXGroup;
+			children = (
+				C56F49A027E05FDF00BCBB8F /* NetworkMonitor.swift */,
+				C51503F127D7CA1D009F0DCD /* MapViewModel.swift */,
+				C51503E627D7C87D009F0DCD /* CloudKitViewModel.swift */,
+			);
+			path = ViewModels;
+			sourceTree = "<group>";
+		};
 		C51503A127D7C347009F0DCD = {
 			isa = PBXGroup;
 			children = (
@@ -152,16 +178,17 @@
 			isa = PBXGroup;
 			children = (
 				C515042A27D95154009F0DCD /* My-Spot-Info.plist */,
+				C515042B27D95225009F0DCD /* LaunchScreen.storyboard */,
+				C51503BD27D7C52C009F0DCD /* My Spot.entitlements */,
+				C51503B127D7C349009F0DCD /* Assets.xcassets */,
+				C50CF4AC27F13971001A9698 /* ViewModels */,
+				C50CF4AB27F13949001A9698 /* ImageControl */,
 				C515041F27D7CABD009F0DCD /* Helper */,
 				C51503E827D7C9B1009F0DCD /* View */,
-				C51503E527D7C871009F0DCD /* Cloud */,
 				C51503D327D7C848009F0DCD /* Model */,
-				C51503BD27D7C52C009F0DCD /* My Spot.entitlements */,
+				C51503B327D7C349009F0DCD /* Preview Content */,
 				C51503AD27D7C347009F0DCD /* My_SpotApp.swift */,
 				C51503AF27D7C347009F0DCD /* ContentView.swift */,
-				C51503B127D7C349009F0DCD /* Assets.xcassets */,
-				C51503B327D7C349009F0DCD /* Preview Content */,
-				C515042B27D95225009F0DCD /* LaunchScreen.storyboard */,
 			);
 			path = "My Spot";
 			sourceTree = "<group>";
@@ -199,14 +226,6 @@
 			path = Model;
 			sourceTree = "<group>";
 		};
-		C51503E527D7C871009F0DCD /* Cloud */ = {
-			isa = PBXGroup;
-			children = (
-				C51503E627D7C87D009F0DCD /* CloudKitViewModel.swift */,
-			);
-			path = Cloud;
-			sourceTree = "<group>";
-		};
 		C51503E827D7C9B1009F0DCD /* View */ = {
 			isa = PBXGroup;
 			children = (
@@ -220,7 +239,6 @@
 		C51503E927D7C9CE009F0DCD /* Map */ = {
 			isa = PBXGroup;
 			children = (
-				C51503F127D7CA1D009F0DCD /* MapViewModel.swift */,
 				C51503F227D7CA1D009F0DCD /* ViewOnlyUserOnMap.swift */,
 				C51503F027D7CA1D009F0DCD /* ViewSingleSpotOnMap.swift */,
 				C51503EF27D7CA10009F0DCD /* Discover */,
@@ -315,11 +333,9 @@
 			isa = PBXGroup;
 			children = (
 				C515042027D7CAC6009F0DCD /* Constants.swift */,
-				C515042127D7CAC6009F0DCD /* TakePhoto.swift */,
 				C515042227D7CAC6009F0DCD /* UIEmojiTextField.swift */,
 				C515042827D8540A009F0DCD /* TabController.swift */,
 				C56F499E27E05CE300BCBB8F /* Extensions.swift */,
-				C56F49A027E05FDF00BCBB8F /* NetworkMonitor.swift */,
 				C587027327E27F1900DFB6C4 /* MailViewCallback.swift */,
 				C501FC1727E3FAB7008FEFA1 /* ZoomableScrollView.swift */,
 				C501FC1927E41FF1008FEFA1 /* ImagePopUp.swift */,
@@ -344,6 +360,9 @@
 			dependencies = (
 			);
 			name = "My Spot";
+			packageProductDependencies = (
+				C50CF4A527F122DB001A9698 /* Mantis */,
+			);
 			productName = "My Spot";
 			productReference = C51503AA27D7C347009F0DCD /* My Spot.app */;
 			productType = "com.apple.product-type.application";
@@ -372,6 +391,9 @@
 				Base,
 			);
 			mainGroup = C51503A127D7C347009F0DCD;
+			packageReferences = (
+				C50CF4A427F122DB001A9698 /* XCRemoteSwiftPackageReference "Mantis" */,
+			);
 			productRefGroup = C51503AB27D7C347009F0DCD /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -406,6 +428,7 @@
 				C51503E127D7C856009F0DCD /* Spot+CoreDataClass.swift in Sources */,
 				C502D4FB27E1A6310057A65C /* SpotEditSheet.swift in Sources */,
 				C51503E427D7C856009F0DCD /* Spots.xcdatamodeld in Sources */,
+				C50CF4AA27F13915001A9698 /* ChoosePhoto.swift in Sources */,
 				C51503E227D7C856009F0DCD /* Spot+CoreDataProperties.swift in Sources */,
 				C51503B027D7C347009F0DCD /* ContentView.swift in Sources */,
 				C515041C27D7CAAA009F0DCD /* ViewDiscoverSpots.swift in Sources */,
@@ -435,6 +458,7 @@
 				C51503E327D7C856009F0DCD /* CoreDataManager.swift in Sources */,
 				C515041527D7CAA3009F0DCD /* SpotMapPreview.swift in Sources */,
 				C515040327D7CA72009F0DCD /* AddSpotSheet.swift in Sources */,
+				C50CF4A827F12328001A9698 /* MantisPhotoCropper.swift in Sources */,
 				C501FC1C27E4419A008FEFA1 /* BottomPopupView.swift in Sources */,
 				C515041627D7CAA3009F0DCD /* MapAnnotationView.swift in Sources */,
 				C5F44E8D27DD3818001E9E32 /* Likes+CoreDataClass.swift in Sources */,
@@ -661,6 +685,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		C50CF4A427F122DB001A9698 /* XCRemoteSwiftPackageReference "Mantis" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/guoyingtao/Mantis.git";
+			requirement = {
+				branch = master;
+				kind = branch;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		C50CF4A527F122DB001A9698 /* Mantis */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C50CF4A427F122DB001A9698 /* XCRemoteSwiftPackageReference "Mantis" */;
+			productName = Mantis;
+		};
+/* End XCSwiftPackageProductDependency section */
 
 /* Begin XCVersionGroup section */
 		C51503DB27D7C856009F0DCD /* Spots.xcdatamodeld */ = {

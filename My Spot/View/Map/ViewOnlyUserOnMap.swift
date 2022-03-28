@@ -36,11 +36,11 @@ struct ViewOnlyUserOnMap: View {
     }
     
     private var displayMyLocationButton: some View {
-        Button(action: {
+        Button {
             withAnimation {
                 spotRegion = mapViewModel.region
             }
-        }) {
+        } label: {
             Image(systemName: "location").imageScale(.large)
         }
         .padding([.top, .trailing])

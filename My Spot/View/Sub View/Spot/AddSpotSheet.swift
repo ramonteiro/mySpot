@@ -23,21 +23,23 @@ struct AddSpotSheet: View {
     @EnvironmentObject var networkViewModel: NetworkMonitor
     
     @State private var showingAlert = false
+    @State private var showingAddImageAlert = false
+    @State private var didCancel = false
+    
     @State private var name = ""
     @State private var founder = ""
     @State private var descript = ""
     @State private var tags = ""
     @State private var locationName = ""
     @State private var isPublic = false
-    @State private var changeProfileImage = false
-    @State private var openCameraRoll = false
-    @State private var canSubmitPic = false
+    
     @State private var long = 1.0
     @State private var lat = 1.0
-    @State private var imageSelected = UIImage()
+    @State private var imageTemp: UIImage?
+    @State private var images: [UIImage?]?
     
     private var disableSave: Bool {
-        name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || canSubmitPic == false || founder.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || (isPublic && !cloudViewModel.isSignedInToiCloud)
+        name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || images?.isEmpty ?? true || founder.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || (isPublic && !cloudViewModel.isSignedInToiCloud)
     }
     
     private enum Field {
@@ -46,6 +48,23 @@ struct AddSpotSheet: View {
         case founder
     }
     
+    private enum ImageCount {
+        case main
+        case second
+        case third
+    }
+    
+    private enum ActiveSheet: Identifiable {
+        case cameraSheet
+        case cameraRollSheet
+        case cropperSheet
+        var id: Int {
+            hashValue
+        }
+    }
+    
+    @State private var activeSheet: ActiveSheet?
+    @State private var imageCount: ImageCount?
     @FocusState private var focusState: Field?
     
     var body: some View {
@@ -54,18 +73,22 @@ struct AddSpotSheet: View {
                 if (lat != 1.0 && networkViewModel.hasInternet) {
                     NavigationView {
                         Form {
-                            Section(header: Text("Spot Name*")) {
+                            Section {
                                 displayNamePrompt
+                            } header: {
+                                Text("Spot Name*")
                             }
-                            Section(header: Text("Founder's Name*")) {
+                            Section {
                                 displayFounderPrompt
                                     .onAppear {
                                         if (UserDefaults.standard.valueExists(forKey: UserDefaultKeys.founder) && founder.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty) {
                                             founder = UserDefaults.standard.value(forKey: UserDefaultKeys.founder) as! String
                                         }
                                     }
+                            } header: {
+                                Text("Founder's Name*")
                             }
-                            Section(header: Text("Share Spot")) {
+                            Section {
                                 if (networkViewModel.hasInternet) {
                                     displayIsPublicPrompt
                                 } else {
@@ -76,20 +99,64 @@ struct AddSpotSheet: View {
                                             isPublic = false
                                         }
                                 }
+                            } header: {
+                                Text("Share Spot")
+                            } footer: {
+                                Text("Public spots are shown in discover tab to other users.")
+                                    .font(.footnote)
+                                    .foregroundColor(.gray)
                             }
-                            Section(header: Text("Spot Description")) {
+                            Section {
                                 displayDescriptionPrompt
+                            } header: {
+                                Text("Spot Description")
+                            } footer: {
+                                Text("Use # to add tags. Example: #hiking #skating")
+                                    .font(.footnote)
+                                    .foregroundColor(.gray)
                             }
-                            Section(header: Text("Date Found")) {
+                            Section {
                                 Text(getDate())
+                            } header: {
+                                Text("Date Found")
                             }
-                            Section(header: Text("Spot Location \(locationName)")) {
+                            Section {
                                 ViewOnlyUserOnMap()
                                     .aspectRatio(contentMode: .fit)
                                     .cornerRadius(15)
+                            } header: {
+                                Text("Spot Location \(locationName)")
+                            } footer: {
+                                Text("Location is permanent and cannot be changed after creating spot.")
+                                    .font(.footnote)
+                                    .foregroundColor(.gray)
                             }
-                            Section(header: Text("Photo of Spot*")) {
-                                displayPhotoButton
+                            Section {
+                                if (images?.count ?? 0 > 0) {
+                                    List {
+                                        ForEach(images ?? [UIImage(systemName: "exclamationmark.triangle")], id: \.self) { images in
+                                            if let images = images {
+                                                Image(uiImage: images)
+                                                    .resizable()
+                                                    .scaledToFit()
+                                                    .frame(width: UIScreen.screenWidth / 2)
+                                                    .cornerRadius(10)
+                                            }
+                                        }
+                                        .onMove { indexSet, offset in
+                                            images!.move(fromOffsets: indexSet, toOffset: offset)
+                                        }
+                                        .onDelete { indexSet in
+                                            images!.remove(atOffsets: indexSet)
+                                        }
+                                    }
+                                }
+                            } header: {
+                                Text("Photo of Spot")
+                            } footer: {
+                                Text("Only 1 image is required (up to 3).")
+                                    .font(.footnote)
+                                    .foregroundColor(.gray)
                             }
                         }
                         .onSubmit {
@@ -102,13 +169,73 @@ struct AddSpotSheet: View {
                                 focusState = nil
                             }
                         }
-                        .sheet(isPresented: $openCameraRoll) {
-                            TakePhoto(selectedImage: $imageSelected, sourceType: .camera)
-                                .ignoresSafeArea()
+                        .confirmationDialog("Choose Image From Photos or Camera", isPresented: $showingAddImageAlert) {
+                            Button("Camera") {
+                                activeSheet = .cameraSheet
+                            }
+                            Button("Photos") {
+                                activeSheet = .cameraRollSheet
+                            }
+                            Button("Cancel", role: .cancel) { }
+                        }
+                        .fullScreenCover(item: $activeSheet) { item in
+                            switch item {
+                            case .cameraSheet:
+                                TakePhoto(selectedImage: $imageTemp)
+                                    .onDisappear {
+                                        if (imageTemp != nil) {
+                                            activeSheet = .cropperSheet
+                                        } else {
+                                            activeSheet = nil
+                                        }
+                                        didCancel = false
+                                    }
+                                    .ignoresSafeArea()
+                            case .cameraRollSheet:
+                                ChoosePhoto(image: $imageTemp, didCancel: $didCancel)
+                                    .onDisappear {
+                                        if (!didCancel) {
+                                            activeSheet = .cropperSheet
+                                        } else {
+                                            activeSheet = nil
+                                        }
+                                        didCancel = false
+                                    }
+                                    .ignoresSafeArea()
+                            case .cropperSheet:
+                                MantisPhotoCropper(selectedImage: $imageTemp)
+                                    .onDisappear {
+                                        if let _ = imageTemp {
+                                            images?.append(imageTemp)
+                                        }
+                                        imageTemp = nil
+                                    }
+                                    .ignoresSafeArea()
+                            }
                         }
                         .navigationTitle("Create Spot")
                         .navigationViewStyle(.stack)
                         .toolbar {
+                            ToolbarItemGroup(placement: .bottomBar) {
+                                HStack {
+                                    Spacer()
+                                    
+                                    Button {
+                                        showingAddImageAlert = true
+                                        focusState = nil
+                                    } label: {
+                                        Image(systemName: "plus")
+                                    }
+                                    .disabled(images?.count ?? 3 > 2)
+                                    
+                                    
+                                    
+                                    EditButton()
+                                        .disabled(images?.isEmpty ?? true)
+                                    
+                                    Spacer()
+                                }
+                            }
                             ToolbarItemGroup(placement: .keyboard) {
                                 HStack {
                                     Button {
@@ -200,28 +327,8 @@ struct AddSpotSheet: View {
         .onAppear {
             lat = getLatitude()
             long = getLongitude()
+            images = []
         }
-    }
-    
-    private var displayPhotoButton: some View {
-        Button(action: {
-            changeProfileImage = true
-            openCameraRoll = true
-            focusState = nil
-            
-            
-        }, label: {
-            if ((changeProfileImage && imageSelected.cgImage != nil) || (changeProfileImage && imageSelected.ciImage != nil)) {
-                Image(uiImage: imageSelected)
-                    .resizable()
-                    .aspectRatio(contentMode: .fit)
-                    .cornerRadius(15)
-                    .onAppear(perform: {canSubmitPic = true})
-            } else {
-                Text("Add Photo")
-                    .onAppear(perform: {canSubmitPic = false})
-            }
-        })
     }
     
     private var displayDescriptionPrompt: some View {
@@ -287,7 +394,7 @@ struct AddSpotSheet: View {
         let newSpot = Spot(context: moc)
         newSpot.founder = founder
         newSpot.details = descript
-        if let imageData = cloudViewModel.compressImage(image: imageSelected).pngData() {
+        if let imageData = cloudViewModel.compressImage(image: imageTemp ?? defaultImages.errorImage!).pngData() {
             newSpot.image = UIImage(data: imageData)
         } else {
             return
@@ -304,7 +411,7 @@ struct AddSpotSheet: View {
     }
     
     private func savePublic() {
-        if let imageData = cloudViewModel.compressImage(image: imageSelected).pngData() {
+        if let imageData = cloudViewModel.compressImage(image: imageTemp ?? defaultImages.errorImage!).pngData() {
             let id = cloudViewModel.addSpotToPublic(name: name, founder: founder, date: getDate(), locationName: locationName, x: lat, y: long, description: descript, type: tags, image: imageData)
             UserDefaults.standard.set(founder, forKey: UserDefaultKeys.founder)
             let newSpot = Spot(context: moc)

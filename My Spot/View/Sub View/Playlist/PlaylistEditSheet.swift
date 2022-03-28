@@ -29,7 +29,7 @@ struct PlaylistEditSheet: View {
             if (exists) {
                 NavigationView {
                     Form {
-                        Section(header: Text("Playlist Name*")) {
+                        Section {
                             TextField("Enter Playlist Name", text: $name)
                                 .onReceive(Just(name)) { _ in
                                     if (name.count > MaxCharLength.names) {
@@ -41,8 +41,10 @@ struct PlaylistEditSheet: View {
                                 }
                                 .focused($focusState, equals: .name)
                                 .submitLabel(.next)
+                        } header: {
+                            Text("Playlist Name*")
                         }
-                        Section(header: Text("Emoji*")) {
+                        Section {
                             EmojiTextField(text: $emoji, placeholder: "Enter Emoji")
                                 .onReceive(Just(emoji), perform: { _ in
                                     self.emoji = String(self.emoji.onlyEmoji().prefix(MaxCharLength.emojis))
@@ -52,6 +54,8 @@ struct PlaylistEditSheet: View {
                                 }
                                 .focused($focusState, equals: .emoji)
                                 .submitLabel(.done)
+                        } header: {
+                            Text("Emoji*")
                         }
                     }
                     .onSubmit {

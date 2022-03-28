@@ -24,17 +24,17 @@ struct NamePopupView: View {
                 Text("Enter Spot Name")
                     .font(.system(size: 25, weight: .bold, design: .default))
                 Spacer()
-                Button(action: {
+                Button {
                     text = ""
                     isPresented = false
-                }, label: {
+                } label: {
                     Image(systemName: "xmark")
                         .imageScale(.small)
                         .frame(width: 32, height: 32)
                         .background(.gray.opacity(0.5))
                         .cornerRadius(16)
                         .foregroundColor(.white)
-                })
+                }
             }
             TextField("", text: $text)
                 .frame(height: 36)
@@ -57,12 +57,12 @@ struct NamePopupView: View {
                 }
             HStack {
                 Spacer()
-                Button(action: {
+                Button {
                     saved = true
                     isPresented = false
-                }, label: {
+                } label: {
                     Text("Save")
-                })
+                }
                 .frame(width: 80, height: 36)
                 .background(Color.accentColor)
                 .foregroundColor(.white)

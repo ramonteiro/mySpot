@@ -38,13 +38,13 @@ struct ViewDiscoverSpots: View {
     }
     
     private var displayRouteButon: some View {
-        Button(action: {
+        Button {
             if (cloudViewModel.spots.count > 0 && cloudViewModel.spots.count >= selection + 1) {
                 let routeMeTo = MKMapItem(placemark: MKPlacemark(coordinate: cloudViewModel.spots[selection].location.coordinate))
                 routeMeTo.name = cloudViewModel.spots[selection].name
                 routeMeTo.openInMaps(launchOptions: nil)
             }
-        }) {
+        } label: {
             Image(systemName: "point.topleft.down.curvedto.point.bottomright.up").imageScale(.large)
         }
         .shadow(color: Color.black.opacity(0.3), radius: 10)
@@ -52,11 +52,11 @@ struct ViewDiscoverSpots: View {
     }
     
     private var displayMyLocationButton: some View {
-        Button(action: {
+        Button {
             withAnimation {
                 spotRegion = mapViewModel.region
             }
-        }) {
+        } label: {
             Image(systemName: "location").imageScale(.large)
         }
         .disabled(!mapViewModel.isAuthorized)
@@ -140,11 +140,11 @@ struct ViewDiscoverSpots: View {
     }
     
     private var displaySearchButton: some View {
-        Button(action: {
+        Button {
             cloudViewModel.fetchSpotPublic(userLocation: CLLocation(latitude: spotRegion.center.latitude, longitude: spotRegion.center.longitude), type: "none")
             originalRegion = spotRegion
             mapViewModel.searchingHere = spotRegion
-        }) {
+        } label: {
             Text("Search Here")
         }
         .shadow(color: Color.black.opacity(0.3), radius: 10)

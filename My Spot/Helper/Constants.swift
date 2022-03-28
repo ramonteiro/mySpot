@@ -11,6 +11,7 @@
  */
 
 import Foundation
+import SwiftUI
 
 // defines max character length for each field
 enum MaxCharLength {
@@ -25,5 +26,10 @@ enum UserDefaultKeys {
     static let isFilterByLocation = "isFilterByLocation"
     static let lastKnownUserLocationX = "lastKnownUserLocationX"
     static let lastKnownUserLocationY = "lastKnownUserLocationY"
+}
+
+// image protection
+enum defaultImages {
+    static let errorImage = UIImage(systemName: "exclamationmark.triangle")
 }
 
