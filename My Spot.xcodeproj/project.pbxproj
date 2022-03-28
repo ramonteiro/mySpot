@@ -292,7 +292,6 @@
 				C515041727D7CAAA009F0DCD /* DiscoverMapPreview.swift */,
 				C515041827D7CAAA009F0DCD /* MapAnnotationDiscover.swift */,
 				C515041927D7CAAA009F0DCD /* ViewDiscoverSpots.swift */,
-				C502D4FC27E1B63D0057A65C /* DiscoverSheetShared.swift */,
 			);
 			path = Discover;
 			sourceTree = "<group>";
@@ -313,6 +312,7 @@
 			children = (
 				C515040627D7CA7B009F0DCD /* DiscoverDetailView.swift */,
 				C515040527D7CA7B009F0DCD /* DiscoverRow.swift */,
+				C502D4FC27E1B63D0057A65C /* DiscoverSheetShared.swift */,
 			);
 			path = Discover;
 			sourceTree = "<group>";

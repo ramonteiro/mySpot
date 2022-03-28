@@ -1,10 +1,14 @@
 //
-//  DiscoverSheetShared.swift
-//  My Spot
+//  DiscoverDetailView.swift
+//  mySpot
 //
-//  Created by Isaac Paschall on 3/15/22.
+//  Created by Isaac Paschall on 2/28/22.
 //
 
+/*
+ DiscoverDetailView:
+ navigation link for each spot from db item in list in root view
+ */
 
 import SwiftUI
 import Combine
@@ -12,175 +16,44 @@ import MapKit
 import CoreData
 
 struct DiscoverSheetShared: View {
-
-    @Environment(\.presentationMode) var presentationMode
-    @Environment(\.managedObjectContext) var moc
-    @FetchRequest(sortDescriptors: []) var likedIds: FetchedResults<Likes>
+    
     @FetchRequest(sortDescriptors: []) var spots: FetchedResults<Spot>
+    @Environment(\.managedObjectContext) var moc
+    @Environment(\.presentationMode) var presentationMode
+    @FetchRequest(sortDescriptors: []) var likedIds: FetchedResults<Likes>
     @EnvironmentObject var tabController: TabController
     @EnvironmentObject var mapViewModel: MapViewModel
     @EnvironmentObject var cloudViewModel: CloudKitViewModel
     
-    @State private var message = ""
-    @State private var showingMailSheet = false
+    @State private var deletedSpot: [Spot] = []
     @State private var mySpot = false
+    @State private var distance: String = ""
+    @State private var message = ""
+    @State private var deleteAlert = false
+    @State private var showingMailSheet = false
+    @State private var selection = 0
     @State private var isSaving = false
     @State private var likeButton = "heart"
-    @State private var deleteAlert = false
     @State private var newName = ""
     @State private var isSaved: Bool = false
-    @State private var distance: String = ""
     @State private var tags: [String] = []
-    @State private var image: UIImage?
+    @State private var images: [UIImage] = []
     @State private var showingImage = false
     @State private var showingSaveSheet = false
     @State private var didLike = false
+    @State private var noType = false
+    @State private var spotInCD: [Spot] = []
     @FocusState private var nameIsFocused: Bool
-    @State private var landscapeOffset: CGFloat = 0
     
     var body: some View {
         ZStack {
             if(cloudViewModel.shared.count == 1) {
                 ZStack {
-                    VStack {
-                        Image(uiImage: (image ?? UIImage(systemName: "exclamationmark.triangle.fill"))!)
-                            .resizable()
-                            .scaledToFit()
-                        Spacer()
-                    }
-                    detailSheet
-                        .if(landscapeOffset != 0, transform: { view in
-                            view.offset(y: landscapeOffset + 50)
-                        })
-                    HStack {
-                        Button {
-                            withAnimation {
-                                showingImage.toggle()
-                            }
-                        } label: {
-                            Image(systemName: "arrow.up.left.and.arrow.down.right")
-                                .font(.system(size: 15, weight: .regular))
-                                .padding(5)
-                                .foregroundColor(.white)
-                        }
-                        .background(.ultraThinMaterial)
-                        .clipShape(Circle())
-                        .offset(x: 20, y: -80 + landscapeOffset)
-                        Spacer()
-                        Button {
-                            withAnimation {
-                                showingSaveSheet = true
-                            }
-                        } label: {
-                            Image(systemName: "icloud.and.arrow.down")
-                                .font(.system(size: 30, weight: .regular))
-                                .padding(15)
-                                .foregroundColor(.white)
-                        }
-                        .background(
-                            Circle()
-                                .foregroundColor(.accentColor)
-                                .shadow(color: .black, radius: 5)
-                        )
-                        .disabled(isSpotInCoreData().count != 0 || isSaved)
-                        .offset(x: -20, y: -60 + landscapeOffset)
-                    }
-                    HStack {
-                        VStack {
-                            Button {
-                                presentationMode.wrappedValue.dismiss()
-                            } label: {
-                                Image(systemName: "chevron.down")
-                                    .foregroundColor(.white)
-                                    .font(.system(size: 30, weight: .regular))
-                                    .padding(15)
-                                    .shadow(color: .black, radius: 5)
-                            }
-                            .offset(y: 30)
-                            Spacer()
-                        }
-                        Spacer()
-                        VStack {
-                            HStack(spacing: -15) {
-                                Spacer()
-                                if (mySpot) {
-                                    Button {
-                                        deleteAlert.toggle()
-                                    } label: {
-                                        Image(systemName: "trash.fill")
-                                            .foregroundColor(.white)
-                                            .font(.system(size: 30, weight: .regular))
-                                            .padding(15)
-                                            .shadow(color: .black, radius: 5)
-                                    }
-                                    .offset(y: 30)
-                                    .alert("Are you sure you want to delete \(cloudViewModel.shared[0].name)?", isPresented: $deleteAlert) {
-                                        Button("Delete", role: .destructive) {
-                                            spots.forEach { i in
-                                                if i.dbid == cloudViewModel.shared[0].record.recordID.recordName {
-                                                    i.isPublic = false
-                                                    try? moc.save()
-                                                }
-                                            }
-                                            cloudViewModel.deleteSpot(id: cloudViewModel.shared[0].record.recordID)
-                                            presentationMode.wrappedValue.dismiss()
-                                        }
-                                    }
-                                }
-                                Button {
-                                    let spot = cloudViewModel.shared[0]
-                                    if (likeButton == "heart") {
-                                        Task {
-                                            didLike = await cloudViewModel.likeSpot(spot: spot, like: true)
-                                            if (didLike) {
-                                                DispatchQueue.main.async {
-                                                    let newLike = Likes(context: moc)
-                                                    newLike.likedId = String(cloudViewModel.shared[0].location.coordinate.latitude + cloudViewModel.shared[0].location.coordinate.longitude) + cloudViewModel.shared[0].name
-                                                    try? moc.save()
-                                                    likeButton = "heart.fill"
-                                                    cloudViewModel.shared[0].likes += 1
-                                                    didLike = false
-                                                }
-                                            }
-                                        }
-                                    } else {
-                                        Task {
-                                            didLike = await cloudViewModel.likeSpot(spot: spot, like: false)
-                                            if (didLike) {
-                                                DispatchQueue.main.async {
-                                                    for i in likedIds {
-                                                        if (i.likedId == String(cloudViewModel.shared[0].location.coordinate.latitude + cloudViewModel.shared[0].location.coordinate.longitude) + cloudViewModel.shared[0].name) {
-                                                            moc.delete(i)
-                                                            try? moc.save()
-                                                            break
-                                                        }
-                                                    }
-                                                    likeButton = "heart"
-                                                    cloudViewModel.shared[0].likes -= 1
-                                                    didLike = false
-                                                }
-                                            }
-                                        }
-                                    }
-                                } label: {
-                                    if (!didLike) {
-                                        Image(systemName: likeButton)
-                                            .foregroundColor(.white)
-                                            .font(.system(size: 30, weight: .regular))
-                                            .padding(15)
-                                            .shadow(color: .black, radius: 5)
-                                    } else {
-                                        ProgressView()
-                                            .padding(15)
-                                    }
-                                }
-                            .offset(y: 30)
-                            }
-                            Spacer()
-                        }
-                    }
+                    displayImage
+                    topButtonRow
+                    middleButtonRow
                     if (showingImage) {
-                        ImagePopUp(showingImage: $showingImage, image: (image ?? UIImage(systemName: "exclamationmark.triangle.fill"))!)
+                        ImagePopUp(showingImage: $showingImage, image: images[selection])
                             .transition(.scale)
                     }
                 }
@@ -196,13 +69,28 @@ struct DiscoverSheetShared: View {
                 .onAppear {
                     mySpot = cloudViewModel.isMySpot(user: cloudViewModel.shared[0].userID)
                     tags = cloudViewModel.shared[0].type.components(separatedBy: ", ")
+                    
+                    // check for images
                     let url = cloudViewModel.shared[0].imageURL
                     if let data = try? Data(contentsOf: url), let image = UIImage(data: data) {
-                        self.image = image
-                        if (image.size.height < image.size.width) {
-                            landscapeOffset = -(60 * UIScreen.screenWidth)/375 - 50
+                        self.images.append(image)
+                    }
+                    let url2 = cloudViewModel.shared[0].image2URL
+                    let url3 = cloudViewModel.shared[0].image3URL
+                    if url3.absoluteString != "none" {
+                        if let data = try? Data(contentsOf: url2), let image = UIImage(data: data) {
+                            self.images.append(image)
+                        }
+                        if let data = try? Data(contentsOf: url3), let image = UIImage(data: data) {
+                            self.images.append(image)
+                        }
+                    } else if url2.absoluteString != "none" {
+                        if let data = try? Data(contentsOf: url2), let image = UIImage(data: data) {
+                            self.images.append(image)
                         }
                     }
+                    
+                    
                     isSaving = false
                     newName = ""
                     var didlike = false
@@ -217,7 +105,7 @@ struct DiscoverSheetShared: View {
                     }
                     message = "The public spot with id: " + cloudViewModel.shared[0].id + ", has the following issue(s):\n"
                     cloudViewModel.canRefresh = false
-            }
+                }
             }
         }
         .popup(isPresented: $showingSaveSheet) {
@@ -227,6 +115,199 @@ struct DiscoverSheetShared: View {
         }
         .navigationBarHidden(true)
         .edgesIgnoringSafeArea(.top)
+        .onAppear {
+            noType = cloudViewModel.shared[0].type.isEmpty
+            spotInCD = isSpotInCoreData()
+        }
+    }
+    
+    private var middleButtonRow: some View {
+        VStack {
+            Spacer()
+                .ignoresSafeArea()
+                .frame(height: UIScreen.screenWidth)
+            HStack {
+                enlargeImageButton
+                    .padding()
+                    .offset(y: -30)
+                Spacer()
+                downloadButton
+                    .padding()
+            }
+            .offset(y: -60)
+            Spacer()
+        }
+    }
+    
+    private var topButtonRow: some View {
+        VStack(spacing: 0) {
+            HStack(spacing: 0) {
+                backButton
+                Spacer()
+                if (mySpot) {
+                    deleteButton
+                }
+                
+                displayLikeButton
+            }
+            .padding(.top, 30)
+            Spacer()
+        }
+    }
+    
+    private var backButton: some View {
+        Button {
+            presentationMode.wrappedValue.dismiss()
+        } label: {
+            Image(systemName: "chevron.down")
+                .foregroundColor(.white)
+                .font(.system(size: 30, weight: .regular))
+                .padding()
+                .shadow(color: .black, radius: 5)
+        }
+    }
+    
+    private var displayImage: some View {
+        VStack(spacing: 0) {
+            if (images.count > 1) {
+                multipleImages
+            } else {
+                if (!images.isEmpty) {
+                    Image(uiImage: images[0])
+                        .resizable()
+                        .frame(width: UIScreen.screenWidth)
+                        .scaledToFit()
+                } else {
+                    Image(uiImage: defaultImages.errorImage!)
+                        .resizable()
+                        .frame(width: UIScreen.screenWidth)
+                        .scaledToFit()
+                }
+            }
+            detailSheet
+        }
+    }
+    
+    private var multipleImages: some View {
+        TabView(selection: $selection) {
+            ForEach(images.indices, id: \.self) { index in
+                Image(uiImage: images[index]).resizable()
+                    .ignoresSafeArea()
+                    .frame(width: UIScreen.screenWidth, height: UIScreen.screenWidth)
+                    .scaledToFit()
+                    .tag(index)
+            }
+        }
+        .frame(width: UIScreen.screenWidth, height: UIScreen.screenWidth)
+        .tabViewStyle(.page)
+    }
+    
+    private var enlargeImageButton: some View {
+        Button {
+            withAnimation {
+                showingImage.toggle()
+            }
+        } label: {
+            Image(systemName: "arrow.up.left.and.arrow.down.right")
+                .font(.system(size: 15, weight: .regular))
+                .padding(5)
+                .foregroundColor(.white)
+        }
+        .background(.ultraThinMaterial)
+        .clipShape(Circle())
+    }
+    
+    private var deleteButton: some View { // if myspot
+        Button {
+            deleteAlert.toggle()
+        } label: {
+            Image(systemName: "trash.fill")
+                .foregroundColor(.white)
+                .font(.system(size: 30, weight: .regular))
+                .padding(10)
+                .shadow(color: .black, radius: 5)
+        }
+        .alert("Are you sure you want to delete \(cloudViewModel.shared[0].name)?", isPresented: $deleteAlert) {
+            Button("Delete", role: .destructive) {
+                spots.forEach { i in
+                    if i.dbid == cloudViewModel.shared[0].record.recordID.recordName {
+                        i.isPublic = false
+                        try? moc.save()
+                    }
+                }
+                cloudViewModel.deleteSpot(id: cloudViewModel.shared[0].record.recordID)
+                presentationMode.wrappedValue.dismiss()
+            }
+        }
+    }
+    
+    private var downloadButton: some View {
+        Button {
+            withAnimation {
+                showingSaveSheet = true
+            }
+        } label: {
+            Image(systemName: "icloud.and.arrow.down")
+                .font(.system(size: 30, weight: .regular))
+                .padding(15)
+                .foregroundColor(.white)
+        }
+        .background(
+            Circle()
+                .foregroundColor(.accentColor)
+                .shadow(color: .black, radius: 5)
+        )
+        .disabled(spotInCD.count != 0 || isSaved)
+    }
+    
+    private var displayLikeButton: some View {
+        Button {
+            let spot = cloudViewModel.shared[0]
+            if (likeButton == "heart") {
+                Task {
+                    didLike = await cloudViewModel.likeSpot(spot: spot, like: true)
+                    if (didLike) {
+                        DispatchQueue.main.async {
+                            let newLike = Likes(context: moc)
+                            newLike.likedId = String(cloudViewModel.shared[0].location.coordinate.latitude + cloudViewModel.shared[0].location.coordinate.longitude) + cloudViewModel.shared[0].name
+                            try? moc.save()
+                            likeButton = "heart.fill"
+                            cloudViewModel.shared[0].likes += 1
+                            didLike = false
+                        }
+                    }
+                }
+            } else {
+                Task {
+                    didLike = await cloudViewModel.likeSpot(spot: spot, like: false)
+                    if (didLike) {
+                        DispatchQueue.main.async {
+                            for i in likedIds {
+                                if (i.likedId == String(cloudViewModel.shared[0].location.coordinate.latitude + cloudViewModel.shared[0].location.coordinate.longitude) + cloudViewModel.shared[0].name) {
+                                    moc.delete(i)
+                                    try? moc.save()
+                                    break
+                                }
+                            }
+                            likeButton = "heart"
+                            cloudViewModel.shared[0].likes -= 1
+                            didLike = false
+                        }
+                    }
+                }
+            }
+        } label: {
+            if (!didLike) {
+                Image(systemName: likeButton)
+                    .foregroundColor(.white)
+                    .font(.system(size: 30, weight: .regular))
+                    .padding(10)
+                    .shadow(color: .black, radius: 5)
+            } else {
+                ProgressView()
+                    .padding(10)
+            }
+        }
     }
     
     private var detailSheet: some View {
@@ -279,7 +360,7 @@ struct DiscoverSheetShared: View {
             .padding([.leading, .trailing], 30)
             .offset(y: 5)
             
-            if (!cloudViewModel.shared[0].type.isEmpty) {
+            if (!noType) {
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack {
                         ForEach(tags, id: \.self) { tag in
@@ -335,8 +416,7 @@ struct DiscoverSheetShared: View {
                     Image(systemName: "exclamationmark.triangle.fill")
                 }
             }
-            .padding(.top, 20)
-            .padding(.bottom, (100 * UIScreen.screenWidth)/375)
+            .padding([.top, .bottom], 20)
             .sheet(isPresented: $showingMailSheet) {
                 MailView(message: $message) { returnedMail in
                     print(returnedMail)
@@ -349,13 +429,11 @@ struct DiscoverSheetShared: View {
             }
         }
         .frame(maxWidth: .infinity)
-        .frame(height: (500 * UIScreen.screenWidth)/375 - landscapeOffset)
         .background(
-            RoundedRectangle(cornerRadius: 40)
+            Rectangle()
                 .foregroundColor(Color(UIColor.secondarySystemBackground))
                 .shadow(color: .black, radius: 5)
         )
-        .offset(y: (200 * UIScreen.screenWidth)/375)
     }
     
     private func isSpotInCoreData() -> [Spot] {
@@ -373,7 +451,13 @@ struct DiscoverSheetShared: View {
         let newSpot = Spot(context: moc)
         newSpot.founder = cloudViewModel.shared[0].founder
         newSpot.details = cloudViewModel.shared[0].description
-        newSpot.image = image
+        newSpot.image = images[0]
+        if images.count == 3 {
+            newSpot.image2 = images[1]
+            newSpot.image3 = images[2]
+        } else if images.count == 2 {
+            newSpot.image2 = images[1]
+        }
         newSpot.locationName = cloudViewModel.shared[0].locationName
         newSpot.name = newName
         newSpot.x = cloudViewModel.shared[0].location.coordinate.latitude
@@ -399,6 +483,7 @@ struct DiscoverSheetShared: View {
         }
         
     }
+    
     private func isMetric() -> Bool {
         return ((Locale.current as NSLocale).object(forKey: NSLocale.Key.usesMetricSystem) as? Bool) ?? true
     }

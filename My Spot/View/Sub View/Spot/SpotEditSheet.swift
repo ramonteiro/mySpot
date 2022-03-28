@@ -226,13 +226,13 @@ struct SpotEditSheet: View {
     
     private func savePublic() {
         guard let imageData = spot.image?.pngData() else { return }
-        let id = cloudViewModel.addSpotToPublic(name: name, founder: founder, date: spot.date ?? "", locationName: spot.locationName ?? "", x: spot.x, y: spot.y, description: descript, type: tags, image: imageData)
+        //let id = cloudViewModel.addSpotToPublic(name: name, founder: founder, date: spot.date ?? "", locationName: spot.locationName ?? "", x: spot.x, y: spot.y, description: descript, type: tags, image: imageData)
         spot.name = name
         spot.details = descript
         spot.founder = founder
         spot.isPublic = isPublic
         spot.tags = tags
-        spot.dbid = id
+        spot.dbid = "l"
         try? moc.save()
     }
     

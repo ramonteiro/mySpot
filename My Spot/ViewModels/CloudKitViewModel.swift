@@ -42,17 +42,35 @@ class CloudKitViewModel: ObservableObject {
                 guard let record = returnedRecord else {return}
                 guard let name = record["name"] as? String else { return }
                 guard let founder = record["founder"] as? String else { return }
-                guard let description = record["description"] as? String else { return }
                 guard let date = record["date"] as? String else { return }
                 guard let location = record["location"] as? CLLocation else { return }
-                guard let type = record["type"] as? String else { return }
-                guard let image = record["image"] as? CKAsset else { return }
+                var types = ""
+                var description = ""
+                var locationName = ""
+                if let typeCheck = record["type"] as? String {
+                    types = typeCheck
+                }
+                if let descriptionCheck = record["description"] as? String {
+                    description = descriptionCheck
+                }
+                if let locationNameCheck = record["locationName"] as? String {
+                    locationName = locationNameCheck
+                }
                 guard let likes = record["likes"] as? Int else { return }
                 guard let id = record["id"] as? String else { return }
-                guard let locationName = record["locationName"] as? String else { return }
                 guard let user = record["userID"] as? String else { return }
+                guard let image = record["image"] as? CKAsset else { return }
                 let imageURL = image.fileURL
-                self?.shared = [SpotFromCloud(id: id, name: name, founder: founder, description: description, date: date, location: location, type: type, imageURL: imageURL ?? URL(fileURLWithPath: "none"), likes: likes, locationName: locationName, userID: user, record: record)]
+                var image2URL = URL(fileURLWithPath: "none")
+                var image3URL = URL(fileURLWithPath: "none")
+                if let image3 = record["image3"] as? CKAsset {
+                    guard let image2 = record["image2"] as? CKAsset else { return }
+                    image3URL = image3.fileURL ?? URL(fileURLWithPath: "none")
+                    image2URL = image2.fileURL ?? URL(fileURLWithPath: "none")
+                } else if let image2 = record["image2"] as? CKAsset {
+                    image2URL = image2.fileURL ?? URL(fileURLWithPath: "none")
+                }
+                self?.shared = [SpotFromCloud(id: id, name: name, founder: founder, description: description, date: date, location: location, type: types, imageURL: imageURL ?? URL(fileURLWithPath: "none"),  image2URL: image2URL , image3URL: image3URL , likes: likes, locationName: locationName, userID: user, record: record)]
             }
         }
     }
@@ -94,7 +112,7 @@ class CloudKitViewModel: ObservableObject {
             return resizedImage
     }
     
-    func addSpotToPublic(name: String, founder: String, date: String, locationName: String, x: Double, y: Double, description: String, type: String, image: Data) -> String {
+    func addSpotToPublic(name: String, founder: String, date: String, locationName: String, x: Double, y: Double, description: String, type: String, image: Data, image2: Data?, image3: Data?) -> String {
         let newSpot = CKRecord(recordType: "Spots")
         newSpot["name"] = name
         newSpot["founder"] = founder
@@ -106,6 +124,32 @@ class CloudKitViewModel: ObservableObject {
         newSpot["id"] = UUID().uuidString
         newSpot["userID"] = userID
         newSpot["likes"] = 0
+        
+        if let image2 = image2 {
+            do {
+                let path = NSTemporaryDirectory() + "imageTemp\(UUID().uuidString).png"
+                let url = URL(fileURLWithPath: path)
+                try image2.write(to: url)
+                let asset = CKAsset(fileURL: url)
+                newSpot["image2"] = asset
+            } catch {
+                print(error)
+                return ""
+            }
+        }
+        
+        if let image3 = image3 {
+            do {
+                let path = NSTemporaryDirectory() + "imageTemp\(UUID().uuidString).png"
+                let url = URL(fileURLWithPath: path)
+                try image3.write(to: url)
+                let asset = CKAsset(fileURL: url)
+                newSpot["image3"] = asset
+            } catch {
+                print(error)
+                return ""
+            }
+        }
         
         do {
             let path = NSTemporaryDirectory() + "imageTemp\(UUID().uuidString).png"
@@ -156,17 +200,35 @@ class CloudKitViewModel: ObservableObject {
             case .success(let record):
                 guard let name = record["name"] as? String else { return }
                 guard let founder = record["founder"] as? String else { return }
-                guard let description = record["description"] as? String else { return }
                 guard let date = record["date"] as? String else { return }
                 guard let location = record["location"] as? CLLocation else { return }
-                guard let type = record["type"] as? String else { return }
-                guard let image = record["image"] as? CKAsset else { return }
                 guard let likes = record["likes"] as? Int else { return }
                 guard let id = record["id"] as? String else { return }
-                guard let locationName = record["locationName"] as? String else { return }
                 guard let user = record["userID"] as? String else { return }
+                guard let image = record["image"] as? CKAsset else { return }
+                var types = ""
+                var description = ""
+                var locationName = ""
+                if let typeCheck = record["type"] as? String {
+                    types = typeCheck
+                }
+                if let descriptionCheck = record["description"] as? String {
+                    description = descriptionCheck
+                }
+                if let locationNameCheck = record["locationName"] as? String {
+                    locationName = locationNameCheck
+                }
                 let imageURL = image.fileURL
-                returnedSpots.append(SpotFromCloud(id: id, name: name, founder: founder, description: description, date: date, location: location, type: type, imageURL: imageURL ?? URL(fileURLWithPath: "none"), likes: likes, locationName: locationName, userID: user, record: record))
+                var image2URL = URL(fileURLWithPath: "none")
+                var image3URL = URL(fileURLWithPath: "none")
+                if let image3 = record["image3"] as? CKAsset {
+                    guard let image2 = record["image2"] as? CKAsset else { return }
+                    image3URL = image3.fileURL ?? URL(fileURLWithPath: "none")
+                    image2URL = image2.fileURL ?? URL(fileURLWithPath: "none")
+                } else if let image2 = record["image2"] as? CKAsset {
+                    image2URL = image2.fileURL ?? URL(fileURLWithPath: "none")
+                }
+                returnedSpots.append(SpotFromCloud(id: id, name: name, founder: founder, description: description, date: date, location: location, type: types, imageURL: imageURL ?? URL(fileURLWithPath: "none"),  image2URL: image2URL , image3URL: image3URL , likes: likes, locationName: locationName, userID: user, record: record))
             case .failure(let error):
                 print("FETCH ERROR: \(error)")
                 self.isFetching = false
@@ -235,17 +297,35 @@ class CloudKitViewModel: ObservableObject {
             case .success(let record):
                 guard let name = record["name"] as? String else { return }
                 guard let founder = record["founder"] as? String else { return }
-                guard let description = record["description"] as? String else { return }
                 guard let date = record["date"] as? String else { return }
                 guard let location = record["location"] as? CLLocation else { return }
-                guard let type = record["type"] as? String else { return }
-                guard let image = record["image"] as? CKAsset else { return }
                 guard let likes = record["likes"] as? Int else { return }
                 guard let id = record["id"] as? String else { return }
-                guard let locationName = record["locationName"] as? String else { return }
                 guard let user = record["userID"] as? String else { return }
+                guard let image = record["image"] as? CKAsset else { return }
+                var types = ""
+                var description = ""
+                var locationName = ""
+                if let typeCheck = record["type"] as? String {
+                    types = typeCheck
+                }
+                if let descriptionCheck = record["description"] as? String {
+                    description = descriptionCheck
+                }
+                if let locationNameCheck = record["locationName"] as? String {
+                    locationName = locationNameCheck
+                }
                 let imageURL = image.fileURL
-                returnedSpots.append(SpotFromCloud(id: id, name: name, founder: founder, description: description, date: date, location: location, type: type, imageURL: imageURL ?? URL(fileURLWithPath: "none"), likes: likes, locationName: locationName, userID: user, record: record))
+                var image2URL = URL(fileURLWithPath: "none")
+                var image3URL = URL(fileURLWithPath: "none")
+                if let image3 = record["image3"] as? CKAsset {
+                    guard let image2 = record["image2"] as? CKAsset else { return }
+                    image3URL = image3.fileURL ?? URL(fileURLWithPath: "none")
+                    image2URL = image2.fileURL ?? URL(fileURLWithPath: "none")
+                } else if let image2 = record["image2"] as? CKAsset {
+                    image2URL = image2.fileURL ?? URL(fileURLWithPath: "none")
+                }
+                returnedSpots.append(SpotFromCloud(id: id, name: name, founder: founder, description: description, date: date, location: location, type: types, imageURL: imageURL ?? URL(fileURLWithPath: "none"),  image2URL: image2URL , image3URL: image3URL , likes: likes, locationName: locationName, userID: user, record: record))
             case .failure(let error):
                 print("FETCH ERROR: \(error)")
             }

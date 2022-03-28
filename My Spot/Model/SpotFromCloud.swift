@@ -17,6 +17,8 @@ struct SpotFromCloud: Hashable, Identifiable {
     let location: CLLocation
     let type: String
     let imageURL: URL
+    let image2URL: URL
+    let image3URL: URL
     var likes: Int
     let locationName: String
     let userID: String

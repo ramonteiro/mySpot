@@ -139,7 +139,7 @@ struct AddSpotSheet: View {
                                                 Image(uiImage: images)
                                                     .resizable()
                                                     .scaledToFit()
-                                                    .frame(width: UIScreen.screenWidth / 2)
+                                                    .frame(width: UIScreen.screenWidth / 2, alignment: .center)
                                                     .cornerRadius(10)
                                             }
                                         }
@@ -390,15 +390,33 @@ struct AddSpotSheet: View {
     }
     
     private func save() {
-        UserDefaults.standard.set(founder, forKey: UserDefaultKeys.founder)
         let newSpot = Spot(context: moc)
-        newSpot.founder = founder
-        newSpot.details = descript
-        if let imageData = cloudViewModel.compressImage(image: imageTemp ?? defaultImages.errorImage!).pngData() {
+        if let imageData = cloudViewModel.compressImage(image: images?[0] ?? defaultImages.errorImage!).pngData() {
             newSpot.image = UIImage(data: imageData)
         } else {
             return
         }
+        if (images?.count == 3) {
+            if let imageData = cloudViewModel.compressImage(image: images?[1] ?? defaultImages.errorImage!).pngData() {
+                newSpot.image2 = UIImage(data: imageData)
+            } else {
+                return
+            }
+            if let imageData = cloudViewModel.compressImage(image: images?[2] ?? defaultImages.errorImage!).pngData() {
+                newSpot.image3 = UIImage(data: imageData)
+            } else {
+                return
+            }
+        } else if (images?.count == 2) {
+            if let imageData = cloudViewModel.compressImage(image: images?[1] ?? defaultImages.errorImage!).pngData() {
+                newSpot.image2 = UIImage(data: imageData)
+            } else {
+                return
+            }
+        }
+        UserDefaults.standard.set(founder, forKey: UserDefaultKeys.founder)
+        newSpot.founder = founder
+        newSpot.details = descript
         newSpot.name = name
         newSpot.x = lat
         newSpot.y = long
@@ -411,27 +429,47 @@ struct AddSpotSheet: View {
     }
     
     private func savePublic() {
-        if let imageData = cloudViewModel.compressImage(image: imageTemp ?? defaultImages.errorImage!).pngData() {
-            let id = cloudViewModel.addSpotToPublic(name: name, founder: founder, date: getDate(), locationName: locationName, x: lat, y: long, description: descript, type: tags, image: imageData)
-            UserDefaults.standard.set(founder, forKey: UserDefaultKeys.founder)
-            let newSpot = Spot(context: moc)
-            newSpot.founder = founder
-            newSpot.details = descript
+        let newSpot = Spot(context: moc)
+        if let imageData = cloudViewModel.compressImage(image: images?[0] ?? defaultImages.errorImage!).pngData() {
             newSpot.image = UIImage(data: imageData)
-            newSpot.name = name
-            newSpot.x = lat
-            newSpot.y = long
-            newSpot.isPublic = true
-            newSpot.date = getDate()
-            newSpot.tags = tags
-            newSpot.locationName = locationName
-            newSpot.id = UUID()
+            var imageData2: Data? = nil
+            var imageData3: Data? = nil
+            if (images?.count == 3) {
+                if let imageData2Check = cloudViewModel.compressImage(image: images?[1] ?? defaultImages.errorImage!).pngData() {
+                    newSpot.image2 = UIImage(data: imageData2Check)
+                    imageData2 = imageData2Check
+                }
+                if let imageData3Check = cloudViewModel.compressImage(image: images?[2] ?? defaultImages.errorImage!).pngData() {
+                    newSpot.image3 = UIImage(data: imageData3Check)
+                    imageData3 = imageData3Check
+                }
+            } else if (images?.count == 2) {
+                if let imageData2Check = cloudViewModel.compressImage(image: images?[1] ?? defaultImages.errorImage!).pngData() {
+                    newSpot.image2 = UIImage(data: imageData2Check)
+                    imageData2 = imageData2Check
+                }
+            }
+            let id = cloudViewModel.addSpotToPublic(name: name, founder: founder, date: getDate(), locationName: locationName, x: lat, y: long, description: descript, type: tags, image: imageData, image2: imageData2, image3: imageData3)
             newSpot.dbid = id
-            try? moc.save()
-            close()
         } else {
             return
         }
+        if newSpot.dbid == "" {
+            return
+        }
+        UserDefaults.standard.set(founder, forKey: UserDefaultKeys.founder)
+        newSpot.founder = founder
+        newSpot.details = descript
+        newSpot.name = name
+        newSpot.x = lat
+        newSpot.y = long
+        newSpot.isPublic = true
+        newSpot.date = getDate()
+        newSpot.tags = tags
+        newSpot.locationName = locationName
+        newSpot.id = UUID()
+        try? moc.save()
+        close()
     }
     
     private func getLongitude() -> Double {

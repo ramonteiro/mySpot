@@ -34,8 +34,8 @@ struct ImagePopUp: View {
                 showingImage.toggle()
             } label: {
                 Image(systemName: "xmark")
-                    .font(.system(size: 15, weight: .regular))
-                    .padding(5)
+                    .font(.system(size: 20, weight: .regular))
+                    .padding(10)
                     .foregroundColor(.white)
             }
             .background(.ultraThinMaterial)
