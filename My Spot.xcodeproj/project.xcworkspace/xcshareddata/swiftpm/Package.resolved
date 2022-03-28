@@ -1,0 +1,14 @@
+{
+  "pins" : [
+    {
+      "identity" : "mantis",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/guoyingtao/Mantis.git",
+      "state" : {
+        "branch" : "master",
+        "revision" : "bb4b250aed6b001e4a6dad29399aaa3cc3c1f060"
+      }
+    }
+  ],
+  "version" : 2
+}
