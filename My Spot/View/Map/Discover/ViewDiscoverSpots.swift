@@ -98,8 +98,8 @@ struct ViewDiscoverSpots: View {
                     }
                     Spacer()
                     VStack(spacing: 0) {
-                        if ((spotRegion.center.latitude > originalRegion.center.latitude + 0.03 || spotRegion.center.latitude < originalRegion.center.latitude - 0.03) ||
-                            (spotRegion.center.longitude > originalRegion.center.longitude + 0.03 || spotRegion.center.longitude < originalRegion.center.longitude - 0.03)) {
+                        if ((spotRegion.center.latitude > originalRegion.center.latitude + 0.01 || spotRegion.center.latitude < originalRegion.center.latitude - 0.01) ||
+                            (spotRegion.center.longitude > originalRegion.center.longitude + 0.01 || spotRegion.center.longitude < originalRegion.center.longitude - 0.01)) {
                             displaySearchButton
                                 .transition(.opacity.animation(.easeInOut(duration: 0.6)))
                             Spacer()
