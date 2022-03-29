@@ -107,7 +107,7 @@ class CloudKitViewModel: ObservableObject {
     
     func compressImage(image: UIImage) -> UIImage {
             let resizedImage = image.aspectFittedToHeight(300)
-            resizedImage.jpegData(compressionQuality: 0.9)
+        resizedImage.jpegData(compressionQuality: 1.0)
 
             return resizedImage
     }
@@ -247,7 +247,7 @@ class CloudKitViewModel: ObservableObject {
     
     
     
-    func updateSpotPublic(spot: Spot, newName: String, newDescription: String, newFounder: String, newType: String) {
+    func updateSpotPublic(spot: Spot, newName: String, newDescription: String, newFounder: String, newType: String, imageChanged: Bool, image: Data?, image2: Data?, image3: Data?) {
         let recordID = CKRecord.ID(recordName: spot.dbid!)
         CKContainer.default().publicCloudDatabase.fetch(withRecordID: recordID) { [weak self] returnedRecord, returnedError in
             DispatchQueue.main.async {
@@ -255,6 +255,53 @@ class CloudKitViewModel: ObservableObject {
                 returnedRecord["name"] = newName
                 returnedRecord["description"] = newDescription
                 returnedRecord["type"] = newType
+                returnedRecord["founder"] = newFounder
+                
+                if (imageChanged) {
+                    if let image3 = image3 {
+                        do {
+                            let path = NSTemporaryDirectory() + "imageTemp\(UUID().uuidString).png"
+                            let url = URL(fileURLWithPath: path)
+                            try image3.write(to: url)
+                            let asset = CKAsset(fileURL: url)
+                            returnedRecord["image3"] = asset
+                        } catch {
+                            print(error)
+                            return
+                        }
+                    } else {
+                        returnedRecord["image3"] = nil
+                    }
+                    
+                    if let image2 = image2 {
+                        do {
+                            let path = NSTemporaryDirectory() + "imageTemp\(UUID().uuidString).png"
+                            let url = URL(fileURLWithPath: path)
+                            try image2.write(to: url)
+                            let asset = CKAsset(fileURL: url)
+                            returnedRecord["image2"] = asset
+                        } catch {
+                            print(error)
+                            return
+                        }
+                    } else {
+                        returnedRecord["image2"] = nil
+                        returnedRecord["image3"] = nil
+                    }
+                    
+                    if let image = image {
+                        do {
+                            let path = NSTemporaryDirectory() + "imageTemp\(UUID().uuidString).png"
+                            let url = URL(fileURLWithPath: path)
+                            try image.write(to: url)
+                            let asset = CKAsset(fileURL: url)
+                            returnedRecord["image"] = asset
+                        } catch {
+                            print(error)
+                            return
+                        }
+                    }
+                }
                 
                 self?.saveSpotPublic(record: returnedRecord)
             }
