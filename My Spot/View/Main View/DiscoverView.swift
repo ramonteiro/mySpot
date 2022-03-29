@@ -103,7 +103,7 @@ struct DiscoverView: View {
     private var displaySpotsFromDB: some View {
         ZStack {
             listSpots
-            if (cloudViewModel.spots.count == 0) {
+            if (cloudViewModel.spots.count == 0 || cloudViewModel.isFetching) {
                 ZStack {
                     ProgressView("Loading Spots")
                         .padding()
@@ -112,6 +112,10 @@ struct DiscoverView: View {
                                 .fill(Color(UIColor.systemBackground))
                         )
                 }
+            } else if (cloudViewModel.spots.count == 0 && !cloudViewModel.isFetching) {
+                Text("iCloud servers are currently down.")
+                    .foregroundColor(.gray)
+                    .font(.subheadline)
             }
         }
     }

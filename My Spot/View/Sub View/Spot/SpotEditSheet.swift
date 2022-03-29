@@ -78,7 +78,7 @@ struct SpotEditSheet: View {
                             .submitLabel(.next)
                     } header: {
                         Text("Spot Name*")
-                    }
+                    } 
                     if !fromDB || !wasPublic {
                         Section {
                             TextField("Enter Founder's Name", text: $founder)

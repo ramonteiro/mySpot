@@ -33,3 +33,9 @@ enum defaultImages {
     static let errorImage = UIImage(systemName: "exclamationmark.triangle")
 }
 
+// error online messages
+enum cloudkitErrorMsg {
+    static let dpLink = "Unable to find spot."
+    static let create = "Error posting spot."
+    static let delete = "Error deleting spot."
+}

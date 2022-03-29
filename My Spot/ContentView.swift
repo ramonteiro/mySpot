@@ -14,6 +14,7 @@ struct ContentView: View {
     @EnvironmentObject var mapViewModel: MapViewModel
     @StateObject private var tabController = TabController()
     @State private var showSharedSpotSheet = false
+    @State private var errorAlert = false
     
     var body: some View {
         TabView(selection: $tabController.activeTab) {
@@ -80,6 +81,12 @@ struct ContentView: View {
             if newValue == 1 {
                 showSharedSpotSheet = true
             }
+        }
+        .onChange(of: cloudViewModel.isError) { newValue in
+            errorAlert.toggle()
+        }
+        .alert(cloudViewModel.isErrorMessage, isPresented: $errorAlert) {
+            Button("Dismiss", role: .cancel) { }
         }
         .environmentObject(tabController)
     }

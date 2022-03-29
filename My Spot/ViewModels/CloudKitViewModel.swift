@@ -18,6 +18,8 @@ class CloudKitViewModel: ObservableObject {
     @Published var canRefresh = false
     @Published var isFetching = false
     @Published var maxTotalfetches = 10
+    @Published var isError = false
+    @Published var isErrorMessage = ""
     
     init() {
         getiCloudStatus()
@@ -27,8 +29,13 @@ class CloudKitViewModel: ObservableObject {
     }
     
     func deleteSpot(id: CKRecord.ID) {
-        CKContainer.default().publicCloudDatabase.delete(withRecordID: id) { returnedID, returnedError in
-            print(returnedID ?? "None")
+        CKContainer.default().publicCloudDatabase.delete(withRecordID: id) {[weak self] returnedID, returnedError in
+            DispatchQueue.main.async {
+                if (returnedError != nil) {
+                    self?.isErrorMessage = cloudkitErrorMsg.delete
+                    self?.isError.toggle()
+                }
+            }
         }
     }
     
@@ -39,7 +46,11 @@ class CloudKitViewModel: ObservableObject {
         }
         CKContainer.default().publicCloudDatabase.fetch(withRecordID: CKRecord.ID(recordName: host)) { [weak self] returnedRecord, returnedError in
             DispatchQueue.main.async {
-                guard let record = returnedRecord else {return}
+                guard let record = returnedRecord else {
+                    self?.isErrorMessage = cloudkitErrorMsg.dpLink
+                    self?.isError.toggle()
+                    return
+                }
                 guard let name = record["name"] as? String else { return }
                 guard let founder = record["founder"] as? String else { return }
                 guard let date = record["date"] as? String else { return }
@@ -176,7 +187,13 @@ class CloudKitViewModel: ObservableObject {
     }
     
     private func saveSpotPublic(record: CKRecord) {
-        CKContainer.default().publicCloudDatabase.save(record) { returnedRecord, returnedError in
+        CKContainer.default().publicCloudDatabase.save(record) { [weak self] returnedRecord, returnedError in
+            DispatchQueue.main.async {
+                if (returnedError != nil) {
+                    self?.isErrorMessage = cloudkitErrorMsg.create
+                    self?.isError.toggle()
+                }
+            }
         }
     }
     

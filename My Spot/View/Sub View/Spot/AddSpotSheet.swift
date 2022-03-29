@@ -455,7 +455,11 @@ struct AddSpotSheet: View {
             return
         }
         if newSpot.dbid == "" {
-            return
+            newSpot.isPublic = false
+            cloudViewModel.isErrorMessage = cloudkitErrorMsg.create
+            cloudViewModel.isError.toggle()
+        } else {
+            newSpot.isPublic = true
         }
         UserDefaults.standard.set(founder, forKey: UserDefaultKeys.founder)
         newSpot.founder = founder
@@ -463,7 +467,6 @@ struct AddSpotSheet: View {
         newSpot.name = name
         newSpot.x = lat
         newSpot.y = long
-        newSpot.isPublic = true
         newSpot.date = getDate()
         newSpot.tags = tags
         newSpot.locationName = locationName
