@@ -12,6 +12,7 @@
 
 import SwiftUI
 import MapKit
+import StoreKit
 import Combine
 
 struct AddSpotSheet: View {
@@ -384,7 +385,7 @@ struct AddSpotSheet: View {
     private func getDate()->String{
         let time = Date()
         let timeFormatter = DateFormatter()
-        timeFormatter.dateFormat = "MMM d, yyyy"
+        timeFormatter.dateFormat = "MMM d, yyyy; HH:mm:ss"
         let stringDate = timeFormatter.string(from: time)
         return stringDate
     }
@@ -426,6 +427,28 @@ struct AddSpotSheet: View {
         newSpot.locationName = locationName
         newSpot.id = UUID()
         try? moc.save()
+        askForReview()
+    }
+    
+    private func askForReview() {
+        if (!UserDefaults.standard.valueExists(forKey: "askedAlready")) {
+            UserDefaults.standard.set(false, forKey: "askedAlready")
+        }
+        if (UserDefaults.standard.bool(forKey: "askedAlready")) {
+            return
+        }
+        if (UserDefaults.standard.valueExists(forKey: "spotsCount")) {
+            UserDefaults.standard.set(UserDefaults.standard.integer(forKey: "spotsCount") + 1, forKey: "spotsCount")
+        } else {
+            UserDefaults.standard.set(1, forKey: "spotsCount")
+        }
+        
+        if (UserDefaults.standard.integer(forKey: "spotsCount") > 3) {
+            if let scene = UIApplication.shared.connectedScenes.first(where: { $0.activationState == .foregroundActive }) as? UIWindowScene {
+                SKStoreReviewController.requestReview(in: scene)
+                UserDefaults.standard.set(true, forKey: "askedAlready")
+            }
+        }
     }
     
     private func savePublic() {
@@ -465,6 +488,7 @@ struct AddSpotSheet: View {
         newSpot.founder = founder
         newSpot.details = descript
         newSpot.name = name
+        newSpot.likes = 0
         newSpot.x = lat
         newSpot.y = long
         newSpot.date = getDate()
@@ -472,6 +496,7 @@ struct AddSpotSheet: View {
         newSpot.locationName = locationName
         newSpot.id = UUID()
         try? moc.save()
+        askForReview()
         close()
     }
     

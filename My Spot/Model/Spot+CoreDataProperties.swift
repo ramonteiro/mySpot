@@ -22,6 +22,7 @@ extension Spot {
     @NSManaged public var image: UIImage?
     @NSManaged public var image2: UIImage?
     @NSManaged public var image3: UIImage?
+    @NSManaged public var likes: Double
     @NSManaged public var name: String?
     @NSManaged public var x: Double
     @NSManaged public var y: Double

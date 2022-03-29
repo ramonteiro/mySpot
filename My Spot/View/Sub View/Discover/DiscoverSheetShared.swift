@@ -235,6 +235,7 @@ struct DiscoverSheetShared: View {
                     if i.dbid == cloudViewModel.shared[0].record.recordID.recordName {
                         i.isPublic = false
                         try? moc.save()
+                        return
                     }
                 }
                 cloudViewModel.deleteSpot(id: cloudViewModel.shared[0].record.recordID)
@@ -343,7 +344,7 @@ struct DiscoverSheetShared: View {
                     .font(.system(size: 15, weight: .light))
                     .foregroundColor(Color.gray)
                 Spacer()
-                Text("\(cloudViewModel.shared[0].date)")
+                Text("\(cloudViewModel.shared[0].date.components(separatedBy: ";")[0])")
                     .font(.system(size: 15, weight: .light))
                     .foregroundColor(Color.gray)
             }

@@ -248,6 +248,7 @@ struct DiscoverDetailView: View {
                     if i.dbid == cloudViewModel.spots[index].record.recordID.recordName {
                         i.isPublic = false
                         try? moc.save()
+                        return
                     }
                 }
                 cloudViewModel.deleteSpot(id: cloudViewModel.spots[index].record.recordID)
@@ -369,7 +370,7 @@ struct DiscoverDetailView: View {
                     .font(.system(size: 15, weight: .light))
                     .foregroundColor(Color.gray)
                 Spacer()
-                Text("\(cloudViewModel.spots[index].date)")
+                Text("\(cloudViewModel.spots[index].date.components(separatedBy: ";")[0])")
                     .font(.system(size: 15, weight: .light))
                     .foregroundColor(Color.gray)
             }

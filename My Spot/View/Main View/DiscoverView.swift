@@ -280,7 +280,7 @@ struct DiscoverView: View {
     
     private func sortDate() {
         let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "MMM d, yyyy"
+        dateFormatter.dateFormat = "MMM d, yyyy; HH:mm:ss"
         cloudViewModel.spots = cloudViewModel.spots.sorted { (spot1, spot2) -> Bool in
             guard let date1 = dateFormatter.date(from: spot1.date) else { return true }
             guard let date2 = dateFormatter.date(from: spot2.date) else { return true }

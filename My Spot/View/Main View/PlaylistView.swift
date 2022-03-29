@@ -90,6 +90,7 @@ struct PlaylistView: View {
             }
             moc.delete(playlists[i])
             try? moc.save()
+            return
         }
     }
 }

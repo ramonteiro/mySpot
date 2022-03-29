@@ -59,7 +59,7 @@ struct SpotMapPreview: View {
                                 .foregroundColor(.gray)
                                 .font(.subheadline)
                         } else {
-                            Text(spot.date ?? "")
+                            Text(spot.date?.components(separatedBy: ";")[0] ?? "")
                                 .font(.subheadline)
                                 .foregroundColor(.gray)
                         }

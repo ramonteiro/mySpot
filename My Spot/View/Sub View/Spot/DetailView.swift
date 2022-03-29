@@ -265,7 +265,7 @@ struct DetailView: View {
                     .font(.system(size: 15, weight: .light))
                     .foregroundColor(Color.gray)
                 Spacer()
-                Text("\(spot.date ?? "")")
+                Text("\(spot.date?.components(separatedBy: ";")[0] ?? "")")
                     .font(.system(size: 15, weight: .light))
                     .foregroundColor(Color.gray)
             }
@@ -333,6 +333,21 @@ struct DetailView: View {
                             scope = "Private"
                         }
                     }
+                if (spot.isPublic && networkViewModel.hasInternet) {
+                    Image(systemName: "heart.fill")
+                        .font(.system(size: 15, weight: .light))
+                        .foregroundColor(Color.gray)
+                    Text("\(Int(spot.likes))")
+                        .font(.system(size: 15, weight: .light))
+                        .foregroundColor(Color.gray)
+                        .onAppear {
+                            cloudViewModel.getLikes(idString: spot.dbid ?? "")
+                            spot.likes = Double(cloudViewModel.fetchedlikes)
+                        }
+                        .onChange(of: cloudViewModel.fetchedlikes) { newValue in
+                            spot.likes = Double(newValue)
+                        }
+                }
             }
             .padding(.bottom, 20)
         }

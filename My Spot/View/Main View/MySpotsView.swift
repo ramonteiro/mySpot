@@ -93,7 +93,7 @@ struct MySpotsView: View {
     
     private func sortDate() {
         let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "MMM d, yyyy"
+        dateFormatter.dateFormat = "MMM d, yyyy; HH:mm:ss"
         filteredSpots = filteredSpots.sorted { (spot1, spot2) -> Bool in
             guard let dateString1 = spot1.date else { return true }
             guard let dateString2 = spot2.date else { return true }
@@ -182,6 +182,14 @@ struct MySpotsView: View {
                 displayLocationIcon
             }
         }
+        .onChange(of: cloudViewModel.isPostError) { newValue in
+            spots.forEach { spot in
+                if spot.dbid == cloudViewModel.isPostErrorID {
+                    spot.isPublic = false
+                    return
+                }
+            }
+        }
     }
                 
     private func distanceBetween(x1: Double, x2: Double, y1: Double, y2: Double) -> Double {
@@ -203,7 +211,7 @@ struct MySpotsView: View {
                 }
             } else if (sortBy == "Newest") {
                 let dateFormatter = DateFormatter()
-                dateFormatter.dateFormat = "MMM d, yyyy"
+                dateFormatter.dateFormat = "MMM d, yyyy; HH:mm:ss"
                 filteredSpots = spots.sorted { (spot1, spot2) -> Bool in
                     guard let dateString1 = spot1.date else { return true }
                     guard let dateString2 = spot2.date else { return true }
@@ -289,6 +297,7 @@ struct MySpotsView: View {
                     DispatchQueue.main.async {
                         moc.delete(j)
                         try? moc.save()
+                        return
                     }
                 }
             }

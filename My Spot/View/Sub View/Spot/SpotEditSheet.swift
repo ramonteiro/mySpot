@@ -414,7 +414,11 @@ struct SpotEditSheet: View {
             return
         }
         if spot.dbid == "" {
-            return
+            spot.isPublic = false
+            cloudViewModel.isErrorMessage = cloudkitErrorMsg.create
+            cloudViewModel.isError.toggle()
+        } else {
+            spot.isPublic = true
         }
         if images?.count == 1 {
             spot.image2 = nil
@@ -423,9 +427,9 @@ struct SpotEditSheet: View {
             spot.image3 = nil
         }
         spot.name = name
+        spot.likes = 0
         spot.details = descript
         spot.founder = founder
-        spot.isPublic = isPublic
         spot.tags = tags
         try? moc.save()
     }

@@ -20,6 +20,9 @@ class CloudKitViewModel: ObservableObject {
     @Published var maxTotalfetches = 10
     @Published var isError = false
     @Published var isErrorMessage = ""
+    @Published var isPostError = false
+    @Published var isPostErrorID = ""
+    @Published var fetchedlikes = 0
     
     init() {
         getiCloudStatus()
@@ -42,6 +45,8 @@ class CloudKitViewModel: ObservableObject {
     func checkDeepLink(url: URL) {
         
         guard let host = URLComponents(url: url, resolvingAgainstBaseURL: true)?.host else {
+            isErrorMessage = cloudkitErrorMsg.dpLink
+            isError.toggle()
             return
         }
         CKContainer.default().publicCloudDatabase.fetch(withRecordID: CKRecord.ID(recordName: host)) { [weak self] returnedRecord, returnedError in
@@ -83,6 +88,20 @@ class CloudKitViewModel: ObservableObject {
                 }
                 self?.shared = [SpotFromCloud(id: id, name: name, founder: founder, description: description, date: date, location: location, type: types, imageURL: imageURL ?? URL(fileURLWithPath: "none"),  image2URL: image2URL , image3URL: image3URL , likes: likes, locationName: locationName, userID: user, record: record)]
             }
+        }
+    }
+    
+    func getLikes(idString: String) {
+        if idString.isEmpty {
+            return
+        }
+        let id = CKRecord.ID(recordName: idString)
+        CKContainer.default().publicCloudDatabase.fetch(withRecordID: id) {[weak self] returnedRecord, returnedError in
+            guard let returnedRecord = returnedRecord else {
+                return
+            }
+            guard let likes = returnedRecord["likes"] as? Int else { return }
+            self?.fetchedlikes = likes
         }
     }
     
@@ -190,8 +209,10 @@ class CloudKitViewModel: ObservableObject {
         CKContainer.default().publicCloudDatabase.save(record) { [weak self] returnedRecord, returnedError in
             DispatchQueue.main.async {
                 if (returnedError != nil) {
+                    self?.isPostErrorID = record.recordID.recordName
                     self?.isErrorMessage = cloudkitErrorMsg.create
                     self?.isError.toggle()
+                    self?.isPostError.toggle()
                 }
             }
         }

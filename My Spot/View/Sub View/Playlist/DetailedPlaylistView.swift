@@ -56,6 +56,7 @@ struct DetailPlaylistView: View {
                     DispatchQueue.main.async {
                         j.playlist = nil
                         try? moc.save()
+                        return
                     }
                 }
             }
@@ -164,7 +165,7 @@ struct DetailPlaylistView: View {
                     }
                 } else if (sortBy == "Newest") {
                     let dateFormatter = DateFormatter()
-                    dateFormatter.dateFormat = "MMM d, yyyy"
+                    dateFormatter.dateFormat = "MMM d, yyyy; HH:mm:ss"
                     filteredSpots = playlist.spotArr.sorted { (spot1, spot2) -> Bool in
                         guard let dateString1 = spot1.date else { return true }
                         guard let dateString2 = spot2.date else { return true }
@@ -283,7 +284,7 @@ struct DetailPlaylistView: View {
     
     private func sortDate() {
         let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "MMM d, yyyy"
+        dateFormatter.dateFormat = "MMM d, yyyy; HH:mm:ss"
         filteredSpots = filteredSpots.sorted { (spot1, spot2) -> Bool in
             guard let dateString1 = spot1.date else { return true }
             guard let dateString2 = spot2.date else { return true }
