@@ -14,6 +14,7 @@ import Combine
 
 struct NamePopupView: View {
     
+    @EnvironmentObject var cloudViewModel: CloudKitViewModel
     @Binding var isPresented: Bool
     @Binding var text: String
     @Binding var saved: Bool
@@ -64,7 +65,7 @@ struct NamePopupView: View {
                     Text("Save")
                 }
                 .frame(width: 80, height: 36)
-                .background(Color.accentColor)
+                .background(cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex])
                 .foregroundColor(.white)
                 .cornerRadius(10)
                 .disabled(text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)

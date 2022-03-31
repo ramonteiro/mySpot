@@ -21,6 +21,7 @@ struct SinglePin: Identifiable {
 
 struct ViewSingleSpotOnMap: View {
     
+    @EnvironmentObject var cloudViewModel: CloudKitViewModel
     @EnvironmentObject var mapViewModel: MapViewModel
     @State var singlePin: [SinglePin]
     @State private var spotRegion = MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: 33.714712646421, longitude: -112.29072718706581), span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01))
@@ -28,7 +29,7 @@ struct ViewSingleSpotOnMap: View {
     var body: some View {
         ZStack {
             Map(coordinateRegion: $spotRegion, interactionModes: [.pan, .zoom], showsUserLocation: mapViewModel.getIsAuthorized(), annotationItems: singlePin) { location in
-                MapMarker(coordinate: singlePin[0].coordinate, tint: .red)
+                MapMarker(coordinate: singlePin[0].coordinate, tint: cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex])
             }
             HStack {
                 Spacer()

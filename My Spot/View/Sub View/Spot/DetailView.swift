@@ -225,7 +225,7 @@ struct DetailView: View {
         }
         .background(
             Circle()
-                .foregroundColor(.accentColor)
+                .foregroundColor(cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex])
                 .shadow(color: .black, radius: 5)
         )
         .sheet(isPresented: $showingEditSheet) {

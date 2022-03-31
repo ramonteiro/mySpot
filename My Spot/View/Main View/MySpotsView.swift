@@ -26,6 +26,7 @@ struct MySpotsView: View {
     @State private var showingAddSheet = false
     @State private var showingMapSheet = false
     @State private var showingDeleteAlert = false
+    @State private var showingSettings = false
     @State private var toBeDeleted: IndexSet?
     @State private var filteredSpots: [Spot] = []
     @State private var searchText = ""
@@ -159,6 +160,11 @@ struct MySpotsView: View {
         .toolbar {
             ToolbarItemGroup(placement: .navigationBarTrailing) {
                 HStack {
+                    Button {
+                        showingSettings.toggle()
+                    } label: {
+                        Image(systemName: "gearshape")
+                    }
                     Button{
                         showingMapSheet.toggle()
                     } label: {
@@ -181,6 +187,9 @@ struct MySpotsView: View {
             ToolbarItemGroup(placement: .navigationBarLeading) {
                 displayLocationIcon
             }
+        }
+        .fullScreenCover(isPresented: $showingSettings) {
+            SettingsView()
         }
         .onChange(of: cloudViewModel.isPostError) { newValue in
             spots.forEach { spot in

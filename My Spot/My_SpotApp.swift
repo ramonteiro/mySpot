@@ -38,6 +38,15 @@ struct My_SpotApp: App {
                 .onOpenURL { url in
                     cloudViewModel.checkDeepLink(url: url)
                 }
+                .onAppear {
+                    if (UserDefaults.standard.valueExists(forKey: "systemcolor")) {
+                        cloudViewModel.systemColorIndex = UserDefaults.standard.integer(forKey: "systemcolor")
+                    } else {
+                        UserDefaults.standard.set(0, forKey: "systemcolor")
+                    }
+                }
+                .tint(cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex])
+                .accentColor(cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex])
         }
     }
 }

@@ -77,7 +77,7 @@ struct ViewMapSpots: View {
         ZStack {
             Map(coordinateRegion: $spotRegion, interactionModes: [.pan, .zoom], showsUserLocation: mapViewModel.getIsAuthorized(), annotationItems: spots, annotationContent: { location in
                 MapAnnotation(coordinate: CLLocationCoordinate2D(latitude: location.x, longitude: location.y)) {
-                    MapAnnotationView(spot: location, isSelected: spots[selection] == location)
+                    MapAnnotationView(color: cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex], spot: location, isSelected: spots[selection] == location)
                         .scaleEffect(spots[selection] == location ? 1.2 : 0.9)
                         .shadow(radius: 8)
                         .onTapGesture {

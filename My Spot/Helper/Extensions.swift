@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import MapKit
 
 // compresses uiimage
 extension UIImage {
@@ -80,5 +81,16 @@ extension UINavigationController: UIGestureRecognizerDelegate {
 
     public func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
         return viewControllers.count > 1
+    }
+}
+
+
+extension MKCoordinateRegion{
+    ///Identify the length of the span in meters north to south
+    var spanLatitude: Measurement<UnitLength>{
+        let loc1 = CLLocation(latitude: center.latitude, longitude: center.longitude - span.latitudeDelta * 0.5)
+        let loc2 = CLLocation(latitude: center.latitude, longitude: center.longitude + span.latitudeDelta * 0.5)
+        let metersInLatitude = loc1.distance(from: loc2)
+        return Measurement(value: metersInLatitude, unit: UnitLength.meters)
     }
 }

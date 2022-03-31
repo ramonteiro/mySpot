@@ -16,6 +16,7 @@ import MapKit
 struct ViewPlaylistMap: View {
     
     @Environment(\.presentationMode) var presentationMode
+    @EnvironmentObject var cloudViewModel: CloudKitViewModel
     @EnvironmentObject var mapViewModel: MapViewModel
     @ObservedObject var playlist: Playlist
     @State private var selection = 0
@@ -74,7 +75,7 @@ struct ViewPlaylistMap: View {
         ZStack {
             Map(coordinateRegion: $spotRegion, interactionModes: [.pan, .zoom], showsUserLocation: mapViewModel.getIsAuthorized(), annotationItems: playlist.spotArr, annotationContent: { location in
                 MapAnnotation(coordinate: CLLocationCoordinate2D(latitude: location.x, longitude: location.y)) {
-                    MapAnnotationView(spot: location, isSelected: playlist.spotArr[selection] == location)
+                    MapAnnotationView(color: cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex], spot: location, isSelected: playlist.spotArr[selection] == location)
                         .scaleEffect(playlist.spotArr[selection] == location ? 1.2 : 0.9)
                         .shadow(radius: 8)
                         .onTapGesture {

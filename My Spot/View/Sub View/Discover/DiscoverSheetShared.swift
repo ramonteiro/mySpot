@@ -257,7 +257,7 @@ struct DiscoverSheetShared: View {
         }
         .background(
             Circle()
-                .foregroundColor(.accentColor)
+                .foregroundColor(cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex])
                 .shadow(color: .black, radius: 5)
         )
         .disabled(spotInCD.count != 0 || isSaved)

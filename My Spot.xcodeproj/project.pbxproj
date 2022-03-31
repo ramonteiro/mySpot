@@ -16,6 +16,8 @@
 		C50CF4A627F122DB001A9698 /* Mantis in Frameworks */ = {isa = PBXBuildFile; productRef = C50CF4A527F122DB001A9698 /* Mantis */; };
 		C50CF4A827F12328001A9698 /* MantisPhotoCropper.swift in Sources */ = {isa = PBXBuildFile; fileRef = C50CF4A727F12328001A9698 /* MantisPhotoCropper.swift */; };
 		C50CF4AA27F13915001A9698 /* ChoosePhoto.swift in Sources */ = {isa = PBXBuildFile; fileRef = C50CF4A927F13915001A9698 /* ChoosePhoto.swift */; };
+		C50CF4AE27F395E2001A9698 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C50CF4AD27F395E2001A9698 /* SettingsView.swift */; };
+		C50CF4B027F3CD4C001A9698 /* SetUpNewSpotNoti.swift in Sources */ = {isa = PBXBuildFile; fileRef = C50CF4AF27F3CD4C001A9698 /* SetUpNewSpotNoti.swift */; };
 		C51503AE27D7C347009F0DCD /* My_SpotApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = C51503AD27D7C347009F0DCD /* My_SpotApp.swift */; };
 		C51503B027D7C347009F0DCD /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C51503AF27D7C347009F0DCD /* ContentView.swift */; };
 		C51503B227D7C349009F0DCD /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C51503B127D7C349009F0DCD /* Assets.xcassets */; };
@@ -73,6 +75,8 @@
 		C502D4FC27E1B63D0057A65C /* DiscoverSheetShared.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiscoverSheetShared.swift; sourceTree = "<group>"; };
 		C50CF4A727F12328001A9698 /* MantisPhotoCropper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MantisPhotoCropper.swift; sourceTree = "<group>"; };
 		C50CF4A927F13915001A9698 /* ChoosePhoto.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChoosePhoto.swift; sourceTree = "<group>"; };
+		C50CF4AD27F395E2001A9698 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		C50CF4AF27F3CD4C001A9698 /* SetUpNewSpotNoti.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetUpNewSpotNoti.swift; sourceTree = "<group>"; };
 		C51503AA27D7C347009F0DCD /* My Spot.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "My Spot.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		C51503AD27D7C347009F0DCD /* My_SpotApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = My_SpotApp.swift; sourceTree = "<group>"; };
 		C51503AF27D7C347009F0DCD /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -303,6 +307,7 @@
 				C515040127D7CA72009F0DCD /* DetailView.swift */,
 				C51503FF27D7CA72009F0DCD /* SpotRow.swift */,
 				C502D4FA27E1A6310057A65C /* SpotEditSheet.swift */,
+				C50CF4AD27F395E2001A9698 /* SettingsView.swift */,
 			);
 			path = Spot;
 			sourceTree = "<group>";
@@ -340,6 +345,7 @@
 				C501FC1727E3FAB7008FEFA1 /* ZoomableScrollView.swift */,
 				C501FC1927E41FF1008FEFA1 /* ImagePopUp.swift */,
 				C501FC1B27E4419A008FEFA1 /* BottomPopupView.swift */,
+				C50CF4AF27F3CD4C001A9698 /* SetUpNewSpotNoti.swift */,
 			);
 			path = Helper;
 			sourceTree = "<group>";
@@ -453,6 +459,7 @@
 				C515041E27D7CAB1009F0DCD /* ViewPlaylistMap.swift in Sources */,
 				C515040D27D7CA87009F0DCD /* DetailedPlaylistView.swift in Sources */,
 				C51503E727D7C87D009F0DCD /* CloudKitViewModel.swift in Sources */,
+				C50CF4B027F3CD4C001A9698 /* SetUpNewSpotNoti.swift in Sources */,
 				C515040427D7CA72009F0DCD /* DetailView.swift in Sources */,
 				C515041427D7CAA3009F0DCD /* ViewMapSpots.swift in Sources */,
 				C51503E327D7C856009F0DCD /* CoreDataManager.swift in Sources */,
@@ -460,6 +467,7 @@
 				C515040327D7CA72009F0DCD /* AddSpotSheet.swift in Sources */,
 				C50CF4A827F12328001A9698 /* MantisPhotoCropper.swift in Sources */,
 				C501FC1C27E4419A008FEFA1 /* BottomPopupView.swift in Sources */,
+				C50CF4AE27F395E2001A9698 /* SettingsView.swift in Sources */,
 				C515041627D7CAA3009F0DCD /* MapAnnotationView.swift in Sources */,
 				C5F44E8D27DD3818001E9E32 /* Likes+CoreDataClass.swift in Sources */,
 				C5F44E8E27DD3818001E9E32 /* Likes+CoreDataProperties.swift in Sources */,

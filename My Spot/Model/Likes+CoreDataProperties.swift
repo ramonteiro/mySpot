@@ -17,7 +17,6 @@ extension Likes {
     }
 
     @NSManaged public var likedId: String?
-    @NSManaged public var reportId: String?
 
 }
 

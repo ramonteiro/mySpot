@@ -13,6 +13,8 @@
 import SwiftUI
 
 struct MapAnnotationView: View {
+    
+    var color: Color
     @ObservedObject var spot: Spot
     var isSelected: Bool
 
@@ -27,13 +29,13 @@ struct MapAnnotationView: View {
                         .font(.headline)
                         .foregroundColor(Color(UIColor.systemBackground))
                         .padding(6)
-                        .background(.red)
+                        .background(color)
                         .cornerRadius(36)
                     
                     Image(systemName: "triangle.fill")
                         .resizable()
                         .scaledToFit()
-                        .foregroundColor(.red)
+                        .foregroundColor(color)
                         .frame(width: UIScreen.main.bounds.width * (10/375), height: UIScreen.main.bounds.height * (10/812))
                         .rotationEffect(Angle(degrees: 180))
                         .offset(y: -1)
@@ -56,7 +58,7 @@ struct MapAnnotationView: View {
                             .frame(width: UIScreen.main.bounds.width * 9.5/100, height: UIScreen.main.bounds.height * (40/812), alignment: .center)
                             .offset(y: 8)
                         Circle()
-                            .stroke(.red, lineWidth: 2)
+                            .stroke(color, lineWidth: 2)
                             .frame(width: UIScreen.main.bounds.width * 9.5/100, height: UIScreen.main.bounds.height * (40/812), alignment: .center)
                             .padding(6)
                             .offset(y: 8)
@@ -68,7 +70,7 @@ struct MapAnnotationView: View {
                     Image(systemName: "triangle.fill")
                         .resizable()
                         .scaledToFit()
-                        .foregroundColor(.red)
+                        .foregroundColor(color)
                         .frame(width: UIScreen.main.bounds.width * (10/375), height: UIScreen.main.bounds.height * (10/812))
                         .rotationEffect(Angle(degrees: 180))
                         .padding(.bottom , UIScreen.main.bounds.height * (40/812))
