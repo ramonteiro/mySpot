@@ -67,7 +67,7 @@ struct SetUpNewSpotNoti: View {
                         let distanceKm = centerRegion.spanLatitude.converted(to: .meters).value / 2
                         let location = CLLocation(latitude: centerRegion.center.latitude, longitude: centerRegion.center.longitude)
                         var placeName: String = ""
-                        mapViewModel.getPlacmarkOfLocation(location: location) { l in
+                        mapViewModel.getPlacmarkOfLocationLessPrecise(location: location) { l in
                             placeName = l
                             UserDefaults.standard.set(placeName, forKey: "discovernotiname")
                             newPlace.toggle()

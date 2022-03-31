@@ -105,4 +105,25 @@ final class MapViewModel: NSObject, ObservableObject, CLLocationManagerDelegate 
             }
         }
     }
+    func getPlacmarkOfLocationLessPrecise(location: CLLocation, completionHandler: @escaping (String) -> Void) {
+        let geo = CLGeocoder()
+        geo.reverseGeocodeLocation(location) { (placemarker, error) in
+            if error == nil {
+                let place = placemarker?[0]
+                if let local = place?.locality {
+                    completionHandler(local)
+                } else if let state = place?.administrativeArea {
+                    completionHandler(state)
+                } else if let country = place?.country {
+                    completionHandler(country)
+                } else if let ocean = place?.ocean {
+                    completionHandler(ocean)
+                } else {
+                    completionHandler("")
+                }
+            } else {
+                completionHandler("")
+            }
+        }
+    }
 }

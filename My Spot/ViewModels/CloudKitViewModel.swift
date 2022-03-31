@@ -563,11 +563,13 @@ class CloudKitViewModel: ObservableObject {
         notification.title = "My Spot"
         notification.alertBody = "A new spot was added to your area!"
         notification.soundName = "default"
+        notification.shouldBadge = true
         subscription.notificationInfo = notification
         CKContainer.default().publicCloudDatabase.save(subscription) {[weak self] returnedSubscription, returnedError in
             if let returnedError = returnedError {
                 print("\(returnedError)")
                 DispatchQueue.main.async {
+                    self?.notiNewSpotOn = false
                     self?.isErrorMessage = "Unable To Turn On Notifications For New Spots."
                     self?.isError.toggle()
                 }
@@ -577,6 +579,18 @@ class CloudKitViewModel: ObservableObject {
     
     private func subscribeToSharedPlaylist() {
         
+    }
+    
+    func checkIfNotiEnabled() {
+        let center = UNUserNotificationCenter.current()
+        center.getNotificationSettings {[weak self] settings in
+            DispatchQueue.main.async {
+                if settings.authorizationStatus == .denied {
+                    self?.notiPlaylistOn = false
+                    self?.notiNewSpotOn = false
+                }
+            }
+        }
     }
     
     func subscribeToNoti(notiType: Int, fixedLocation: CLLocation?, radiusInKm: CGFloat?) {
