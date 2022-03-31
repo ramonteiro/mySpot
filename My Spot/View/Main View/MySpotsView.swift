@@ -191,14 +191,6 @@ struct MySpotsView: View {
         .fullScreenCover(isPresented: $showingSettings) {
             SettingsView()
         }
-        .onChange(of: cloudViewModel.isPostError) { newValue in
-            spots.forEach { spot in
-                if spot.dbid == cloudViewModel.isPostErrorID {
-                    spot.isPublic = false
-                    return
-                }
-            }
-        }
     }
                 
     private func distanceBetween(x1: Double, x2: Double, y1: Double, y2: Double) -> Double {

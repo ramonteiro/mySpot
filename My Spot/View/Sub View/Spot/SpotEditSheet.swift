@@ -455,37 +455,51 @@ struct SpotEditSheet: View {
         if !spot.isPublic {
             cloudViewModel.isErrorMessage = cloudkitErrorMsg.create
             cloudViewModel.isError.toggle()
-            presentationMode.wrappedValue.dismiss()
         }
+        presentationMode.wrappedValue.dismiss()
     }
     
     private func updatePublic() {
-        var imageData: Data? = nil
-        var imageData2: Data? = nil
-        var imageData3: Data? = nil
-        
-        if let imageDataCheck = cloudViewModel.compressImage(image: images?[0] ?? defaultImages.errorImage!).pngData() {
-            spot.image = UIImage(data: imageDataCheck)
-            imageData = imageDataCheck
-            if (images?.count == 3) {
-                if let imageData2Check = cloudViewModel.compressImage(image: images?[1] ?? defaultImages.errorImage!).pngData() {
-                    spot.image2 = UIImage(data: imageData2Check)
-                    imageData2 = imageData2Check
+        Task {
+            var imageData: Data? = nil
+            var imageData2: Data? = nil
+            var imageData3: Data? = nil
+            
+            if let imageDataCheck = cloudViewModel.compressImage(image: images?[0] ?? defaultImages.errorImage!).pngData() {
+                spot.image = UIImage(data: imageDataCheck)
+                imageData = imageDataCheck
+                if (images?.count == 3) {
+                    if let imageData2Check = cloudViewModel.compressImage(image: images?[1] ?? defaultImages.errorImage!).pngData() {
+                        spot.image2 = UIImage(data: imageData2Check)
+                        imageData2 = imageData2Check
+                    }
+                    if let imageData3Check = cloudViewModel.compressImage(image: images?[2] ?? defaultImages.errorImage!).pngData() {
+                        spot.image3 = UIImage(data: imageData3Check)
+                        imageData3 = imageData3Check
+                    }
+                } else if (images?.count == 2) {
+                    if let imageData2Check = cloudViewModel.compressImage(image: images?[1] ?? defaultImages.errorImage!).pngData() {
+                        spot.image2 = UIImage(data: imageData2Check)
+                        imageData2 = imageData2Check
+                    }
                 }
-                if let imageData3Check = cloudViewModel.compressImage(image: images?[2] ?? defaultImages.errorImage!).pngData() {
-                    spot.image3 = UIImage(data: imageData3Check)
-                    imageData3 = imageData3Check
+                let id = spot.dbid ?? ""
+                do {
+                    let isSuccess = try await cloudViewModel.updateSpotPublic(id: id, newName: name, newDescription: descript, newFounder: founder, newType: tags, imageChanged: imageChanged, image: imageData, image2: imageData2, image3: imageData3, isMultipleImages: (images?.count ?? 1) - 1)
+                    if isSuccess {
+                        spot.isPublic = true
+                    } else {
+                        spot.isPublic = false
+                    }
+                } catch {
+                    spot.isPublic = false
                 }
-            } else if (images?.count == 2) {
-                if let imageData2Check = cloudViewModel.compressImage(image: images?[1] ?? defaultImages.errorImage!).pngData() {
-                    spot.image2 = UIImage(data: imageData2Check)
-                    imageData2 = imageData2Check
-                }
+            } else {
+                cloudViewModel.isErrorMessage = "Error, unable to save spot. Please try again."
+                cloudViewModel.isError.toggle()
+                return
             }
-        } else {
-            return
         }
-        cloudViewModel.updateSpotPublic(spot: spot, newName: name, newDescription: descript, newFounder: founder, newType: tags, imageChanged: imageChanged, image: imageData, image2: imageData2, image3: imageData3, isMultipleImages: (images?.count ?? 1) - 1)
         if images?.count == 1 {
             spot.image2 = nil
             spot.image3 = nil
@@ -495,9 +509,19 @@ struct SpotEditSheet: View {
         spot.name = name
         spot.details = descript
         spot.founder = founder
-        spot.isPublic = isPublic
         spot.tags = tags
-        try? moc.save()
+        do {
+            try moc.save()
+        } catch {
+            cloudViewModel.isErrorMessage = "Error, unable to save spot. Please try again."
+            cloudViewModel.isError.toggle()
+            return
+        }
+        if !spot.isPublic {
+            cloudViewModel.isErrorMessage = cloudkitErrorMsg.create
+            cloudViewModel.isError.toggle()
+        }
+        presentationMode.wrappedValue.dismiss()
     }
     
     private var displayIsPublicPrompt: some View {
