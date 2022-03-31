@@ -232,15 +232,27 @@ struct DiscoverSheetShared: View {
         }
         .alert("Are you sure you want to delete \(cloudViewModel.shared[0].name)?", isPresented: $deleteAlert) {
             Button("Delete", role: .destructive) {
-                spots.forEach { i in
-                    if i.dbid == cloudViewModel.shared[0].record.recordID.recordName {
-                        i.isPublic = false
-                        try? moc.save()
-                        return
+                let spotID = cloudViewModel.shared[0].record.recordID
+                Task {
+                    do {
+                        try await cloudViewModel.deleteSpot(id: spotID)
+                        DispatchQueue.main.async {
+                            spots.forEach { i in
+                                if i.dbid == spotID.recordName {
+                                    i.isPublic = false
+                                    try? moc.save()
+                                    return
+                                }
+                            }
+                            presentationMode.wrappedValue.dismiss()
+                        }
+                    } catch {
+                        DispatchQueue.main.async {
+                            cloudViewModel.isErrorMessage = cloudkitErrorMsg.delete
+                            cloudViewModel.isError.toggle()
+                        }
                     }
                 }
-                cloudViewModel.deleteSpot(id: cloudViewModel.shared[0].record.recordID)
-                presentationMode.wrappedValue.dismiss()
             }
         }
     }

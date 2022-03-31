@@ -267,16 +267,28 @@ struct DiscoverDetailView: View {
         }
         .alert("Are you sure you want to delete \(cloudViewModel.spots[index].name)?", isPresented: $deleteAlert) {
             Button("Delete", role: .destructive) {
-                spots.forEach { i in
-                    if i.dbid == cloudViewModel.spots[index].record.recordID.recordName {
-                        i.isPublic = false
-                        try? moc.save()
-                        return
+                let spotID = cloudViewModel.spots[index].record.recordID
+                Task {
+                    do {
+                        try await cloudViewModel.deleteSpot(id: spotID)
+                        DispatchQueue.main.async {
+                            spots.forEach { i in
+                                if i.dbid == spotID.recordName {
+                                    i.isPublic = false
+                                    try? moc.save()
+                                    return
+                                }
+                            }
+                            cloudViewModel.spots.remove(at: index)
+                            presentationMode.wrappedValue.dismiss()
+                        }
+                    } catch {
+                        DispatchQueue.main.async {
+                            cloudViewModel.isErrorMessage = cloudkitErrorMsg.delete
+                            cloudViewModel.isError.toggle()
+                        }
                     }
                 }
-                cloudViewModel.deleteSpot(id: cloudViewModel.spots[index].record.recordID)
-                cloudViewModel.spots.remove(at: index)
-                presentationMode.wrappedValue.dismiss()
             }
         }
     }

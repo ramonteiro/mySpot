@@ -63,15 +63,8 @@ class CloudKitViewModel: ObservableObject {
         }
     }
     
-    func deleteSpot(id: CKRecord.ID) {
-        CKContainer.default().publicCloudDatabase.delete(withRecordID: id) {[weak self] returnedID, returnedError in
-            DispatchQueue.main.async {
-                if (returnedError != nil) {
-                    self?.isErrorMessage = cloudkitErrorMsg.delete
-                    self?.isError.toggle()
-                }
-            }
-        }
+    func deleteSpot(id: CKRecord.ID) async throws {
+        try await CKContainer.default().publicCloudDatabase.deleteRecord(withID: id)
     }
     
     func checkDeepLink(url: URL) async {
