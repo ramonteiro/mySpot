@@ -26,7 +26,6 @@ class CloudKitViewModel: ObservableObject {
     @Published var isErrorMessage = ""
     @Published var isPostError = false
     @Published var isPostErrorID = ""
-    @Published var fetchedlikes = 0
     
     init() {
         getiCloudStatus()
@@ -143,6 +142,26 @@ class CloudKitViewModel: ObservableObject {
         }
     }
     
+    func getLikes(idString: String) async throws -> Int? {
+        if idString.isEmpty {
+            return nil
+        }
+        let id = CKRecord.ID(recordName: idString)
+        let results = try await CKContainer.default().publicCloudDatabase.records(for: [id], desiredKeys: ["likes"])
+        let record = results[id]
+        switch record {
+        case .success(let record):
+            guard let likes = record["likes"] as? Int else { return nil }
+            return likes
+        case .failure(let error):
+            print("\(error)")
+            return nil
+        case .none:
+            print("error fetching likes, none case")
+            return nil
+        }
+    }
+    /*
     func getLikes(idString: String) {
         if idString.isEmpty {
             return
@@ -158,7 +177,8 @@ class CloudKitViewModel: ObservableObject {
             }
         }
     }
-    
+    */
+     
     func getiCloudStatus() {
         CKContainer.default().accountStatus { [weak self] returnedStatus, returnedError in
             DispatchQueue.main.async {

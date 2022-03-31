@@ -333,23 +333,32 @@ struct DetailView: View {
                             scope = "Private"
                         }
                     }
-                if (spot.isPublic && networkViewModel.hasInternet) {
+                if (spot.isPublic && spot.likes >= 0) {
                     Image(systemName: "heart.fill")
                         .font(.system(size: 15, weight: .light))
                         .foregroundColor(Color.gray)
                     Text("\(Int(spot.likes))")
                         .font(.system(size: 15, weight: .light))
                         .foregroundColor(Color.gray)
-                        .onAppear {
-                            cloudViewModel.getLikes(idString: spot.dbid ?? "")
-                            spot.likes = Double(cloudViewModel.fetchedlikes)
-                        }
-                        .onChange(of: cloudViewModel.fetchedlikes) { newValue in
-                            spot.likes = Double(newValue)
-                        }
                 }
             }
             .padding(.bottom, 20)
+            .onAppear {
+                if spot.isPublic {
+                    Task {
+                        do {
+                            let l = try await cloudViewModel.getLikes(idString: spot.dbid ?? "")
+                            if let l = l {
+                                spot.likes = Double(l)
+                            } else {
+                                spot.likes = -1
+                            }
+                        } catch {
+                            spot.likes = -1
+                        }
+                    }
+                }
+            }
         }
         .frame(maxWidth: .infinity)
         .background(
