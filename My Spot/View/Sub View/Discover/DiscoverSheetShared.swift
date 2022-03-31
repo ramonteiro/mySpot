@@ -90,13 +90,13 @@ struct DiscoverSheetShared: View {
                     newName = ""
                     var didlike = false
                     for i in likedIds {
-                        if i.likedId == cloudViewModel.spots[0].record.recordID.recordName {
+                        if i.likedId == cloudViewModel.shared[0].record.recordID.recordName {
                             didlike = true
                             break
                         }
                     }
                     for i in reportIds {
-                        if i.reportid == cloudViewModel.spots[0].record.recordID.recordName {
+                        if i.reportid == cloudViewModel.shared[0].record.recordID.recordName {
                             hasReported = true
                             break
                         }
@@ -273,7 +273,7 @@ struct DiscoverSheetShared: View {
                     if (didLike) {
                         DispatchQueue.main.async {
                             let newLike = Likes(context: moc)
-                            newLike.likedId = cloudViewModel.spots[0].record.recordID.recordName
+                            newLike.likedId = cloudViewModel.shared[0].record.recordID.recordName
                             try? moc.save()
                             likeButton = "heart.fill"
                             cloudViewModel.shared[0].likes += 1
@@ -287,7 +287,7 @@ struct DiscoverSheetShared: View {
                     if (didLike) {
                         DispatchQueue.main.async {
                             for i in likedIds {
-                                if (i.likedId == cloudViewModel.spots[0].record.recordID.recordName) {
+                                if (i.likedId == cloudViewModel.shared[0].record.recordID.recordName) {
                                     moc.delete(i)
                                     try? moc.save()
                                     break
@@ -432,52 +432,52 @@ struct DiscoverSheetShared: View {
         }
         .confirmationDialog("How should this spot be reported?", isPresented: $showingReportAlert) {
             Button("Offensive") {
-                let spot = cloudViewModel.spots[0]
+                let spot = cloudViewModel.shared[0]
                 Task {
                     hasReported = await cloudViewModel.report(spot: spot, report: "offensive")
                     if hasReported {
                         DispatchQueue.main.async {
                             let newReport = Report(context: moc)
-                            newReport.reportid = cloudViewModel.spots[0].record.recordID.recordName
+                            newReport.reportid = cloudViewModel.shared[0].record.recordID.recordName
                             try? moc.save()
                         }
                     }
                 }
             }
             Button("Inappropriate") {
-                let spot = cloudViewModel.spots[0]
+                let spot = cloudViewModel.shared[0]
                 Task {
                     hasReported = await cloudViewModel.report(spot: spot, report: "inappropriate")
                     if hasReported {
                         DispatchQueue.main.async {
                             let newReport = Report(context: moc)
-                            newReport.reportid = cloudViewModel.spots[0].record.recordID.recordName
+                            newReport.reportid = cloudViewModel.shared[0].record.recordID.recordName
                             try? moc.save()
                         }
                     }
                 }
             }
             Button("Spam") {
-                let spot = cloudViewModel.spots[0]
+                let spot = cloudViewModel.shared[0]
                 Task {
                     hasReported = await cloudViewModel.report(spot: spot, report: "spam")
                     if hasReported {
                         DispatchQueue.main.async {
                             let newReport = Report(context: moc)
-                            newReport.reportid = cloudViewModel.spots[0].record.recordID.recordName
+                            newReport.reportid = cloudViewModel.shared[0].record.recordID.recordName
                             try? moc.save()
                         }
                     }
                 }
             }
             Button("Dangerous") {
-                let spot = cloudViewModel.spots[0]
+                let spot = cloudViewModel.shared[0]
                 Task {
                     hasReported = await cloudViewModel.report(spot: spot, report: "dangerous")
                     if hasReported {
                         DispatchQueue.main.async {
                             let newReport = Report(context: moc)
-                            newReport.reportid = cloudViewModel.spots[0].record.recordID.recordName
+                            newReport.reportid = cloudViewModel.shared[0].record.recordID.recordName
                             try? moc.save()
                         }
                     }

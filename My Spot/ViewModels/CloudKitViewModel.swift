@@ -82,84 +82,7 @@ class CloudKitViewModel: ObservableObject {
         }
         do {
             let record = try await CKContainer.default().publicCloudDatabase.record(for: CKRecord.ID(recordName: host))
-            guard let name = record["name"] as? String else { return }
-            guard let founder = record["founder"] as? String else { return }
-            guard let date = record["date"] as? String else { return }
-            guard let location = record["location"] as? CLLocation else { return }
-            var types = ""
-            var description = ""
-            var locationName = ""
-            if let typeCheck = record["type"] as? String {
-                types = typeCheck
-            }
-            if let descriptionCheck = record["description"] as? String {
-                description = descriptionCheck
-            }
-            if let locationNameCheck = record["locationName"] as? String {
-                locationName = locationNameCheck
-            }
-            guard let likes = record["likes"] as? Int else { return }
-            guard let id = record["id"] as? String else { return }
-            guard let user = record["userID"] as? String else { return }
-            guard let image = record["image"] as? CKAsset else { return }
-            var isMultipleImages = 0
-            if let m = record["isMultipleImages"] as? Int {
-                isMultipleImages = m
-            }
-            var inappropriate = 0
-            var offensive = 0
-            var spam = 0
-            var dangerous = 0
-            if let inna = record["inappropriate"] as? Int {
-                inappropriate = inna
-            }
-            if let offen = record["offensive"] as? Int {
-                offensive = offen
-            }
-            if let sp = record["spam"] as? Int {
-                spam = sp
-            }
-            if let dan = record["dangerous"] as? Int {
-                dangerous = dan
-            }
-            let imageURL = image.fileURL
-            if let image3Check = record["image3"] as? CKAsset {
-                guard let image2Check = record["image2"] as? CKAsset else { return }
-                let image3URL = image3Check.fileURL ?? URL(fileURLWithPath: "none")
-                let image2URL = image2Check.fileURL ?? URL(fileURLWithPath: "none")
-                guard let data2 = try? Data(contentsOf: image2URL) else { return }
-                guard let data3 = try? Data(contentsOf: image3URL) else { return }
-                let image2 = UIImage(data: data2)
-                let image3 = UIImage(data: data3)
-                self.shared = [SpotFromCloud(id: id, name: name, founder: founder, description: description, date: date, location: location, type: types, imageURL: imageURL ?? URL(fileURLWithPath: "none"),  image2URL: image2 , image3URL: image3, isMultipleImages: isMultipleImages , likes: likes, offensive: offensive, spam: spam, inappropriate: inappropriate, dangerous: dangerous, locationName: locationName, userID: user, record: record)]
-            } else if let image2Check = record["image2"] as? CKAsset {
-                let image2URL = image2Check.fileURL ?? URL(fileURLWithPath: "none")
-                guard let data2 = try? Data(contentsOf: image2URL) else { return }
-                let image2 = UIImage(data: data2)
-                self.shared = [SpotFromCloud(id: id, name: name, founder: founder, description: description, date: date, location: location, type: types, imageURL: imageURL ?? URL(fileURLWithPath: "none"),  image2URL: image2 , image3URL: nil, isMultipleImages: isMultipleImages , likes: likes, offensive: offensive, spam: spam, inappropriate: inappropriate, dangerous: dangerous, locationName: locationName, userID: user, record: record)]
-            } else {
-                self.shared = [SpotFromCloud(id: id, name: name, founder: founder, description: description, date: date, location: location, type: types, imageURL: imageURL ?? URL(fileURLWithPath: "none"),  image2URL: nil , image3URL: nil, isMultipleImages: isMultipleImages , likes: likes, offensive: offensive, spam: spam, inappropriate: inappropriate, dangerous: dangerous, locationName: locationName, userID: user, record: record)]
-            }
-        } catch {
-            self.isErrorMessage = cloudkitErrorMsg.dpLink
-            self.isError.toggle()
-        }
-    }
-    /*
-    func checkDeepLink(url: URL) {
-        
-        guard let host = URLComponents(url: url, resolvingAgainstBaseURL: true)?.host else {
-            isErrorMessage = cloudkitErrorMsg.dpLink
-            isError.toggle()
-            return
-        }
-        CKContainer.default().publicCloudDatabase.fetch(withRecordID: CKRecord.ID(recordName: host)) { [weak self] returnedRecord, returnedError in
             DispatchQueue.main.async {
-                guard let record = returnedRecord else {
-                    self?.isErrorMessage = cloudkitErrorMsg.dpLink
-                    self?.isError.toggle()
-                    return
-                }
                 guard let name = record["name"] as? String else { return }
                 guard let founder = record["founder"] as? String else { return }
                 guard let date = record["date"] as? String else { return }
@@ -209,19 +132,23 @@ class CloudKitViewModel: ObservableObject {
                     guard let data3 = try? Data(contentsOf: image3URL) else { return }
                     let image2 = UIImage(data: data2)
                     let image3 = UIImage(data: data3)
-                    self?.shared = [SpotFromCloud(id: id, name: name, founder: founder, description: description, date: date, location: location, type: types, imageURL: imageURL ?? URL(fileURLWithPath: "none"),  image2URL: image2 , image3URL: image3, isMultipleImages: isMultipleImages , likes: likes, offensive: offensive, spam: spam, inappropriate: inappropriate, dangerous: dangerous, locationName: locationName, userID: user, record: record)]
+                    self.shared = [SpotFromCloud(id: id, name: name, founder: founder, description: description, date: date, location: location, type: types, imageURL: imageURL ?? URL(fileURLWithPath: "none"),  image2URL: image2 , image3URL: image3, isMultipleImages: isMultipleImages , likes: likes, offensive: offensive, spam: spam, inappropriate: inappropriate, dangerous: dangerous, locationName: locationName, userID: user, record: record)]
                 } else if let image2Check = record["image2"] as? CKAsset {
                     let image2URL = image2Check.fileURL ?? URL(fileURLWithPath: "none")
                     guard let data2 = try? Data(contentsOf: image2URL) else { return }
                     let image2 = UIImage(data: data2)
-                    self?.shared = [SpotFromCloud(id: id, name: name, founder: founder, description: description, date: date, location: location, type: types, imageURL: imageURL ?? URL(fileURLWithPath: "none"),  image2URL: image2 , image3URL: nil, isMultipleImages: isMultipleImages , likes: likes, offensive: offensive, spam: spam, inappropriate: inappropriate, dangerous: dangerous, locationName: locationName, userID: user, record: record)]
+                    self.shared = [SpotFromCloud(id: id, name: name, founder: founder, description: description, date: date, location: location, type: types, imageURL: imageURL ?? URL(fileURLWithPath: "none"),  image2URL: image2 , image3URL: nil, isMultipleImages: isMultipleImages , likes: likes, offensive: offensive, spam: spam, inappropriate: inappropriate, dangerous: dangerous, locationName: locationName, userID: user, record: record)]
                 } else {
-                    self?.shared = [SpotFromCloud(id: id, name: name, founder: founder, description: description, date: date, location: location, type: types, imageURL: imageURL ?? URL(fileURLWithPath: "none"),  image2URL: nil , image3URL: nil, isMultipleImages: isMultipleImages , likes: likes, offensive: offensive, spam: spam, inappropriate: inappropriate, dangerous: dangerous, locationName: locationName, userID: user, record: record)]
+                    self.shared = [SpotFromCloud(id: id, name: name, founder: founder, description: description, date: date, location: location, type: types, imageURL: imageURL ?? URL(fileURLWithPath: "none"),  image2URL: nil , image3URL: nil, isMultipleImages: isMultipleImages , likes: likes, offensive: offensive, spam: spam, inappropriate: inappropriate, dangerous: dangerous, locationName: locationName, userID: user, record: record)]
                 }
+            }
+        } catch {
+            DispatchQueue.main.async {
+                self.isErrorMessage = cloudkitErrorMsg.dpLink
+                self.isError.toggle()
             }
         }
     }
-     */
     
     func getLikes(idString: String) {
         if idString.isEmpty {
