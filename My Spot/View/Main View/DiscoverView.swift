@@ -198,6 +198,14 @@ struct DiscoverView: View {
                     } label: {
                         Text("Load 50 Spots")
                     }
+                    Button {
+                        cloudViewModel.maxTotalfetches = 100
+                        UserDefaults.standard.set(100, forKey: "maxTotalFetches")
+                        mapViewModel.checkLocationAuthorization()
+                        loadSpotsFromDB(location: CLLocation(latitude: mapViewModel.searchingHere.center.latitude, longitude: mapViewModel.searchingHere.center.longitude))
+                    } label: {
+                        Text("Load 100 Spots")
+                    }
                 } label: {
                     HStack {
                         Image(systemName: "line.3.horizontal.decrease")

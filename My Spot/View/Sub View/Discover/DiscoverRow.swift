@@ -34,7 +34,7 @@ struct DiscoverRow: View {
                         .frame(width: 100, height: 120, alignment: .center)
                         .cornerRadius(20)
                 }
-                if (spot.image2URL.relativeString != "none") {
+                if (spot.isMultipleImages != 0) {
                     Image(systemName: "square.on.square")
                         .font(.subheadline)
                         .offset(x: -35, y: -45)

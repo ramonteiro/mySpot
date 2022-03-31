@@ -472,7 +472,7 @@ struct AddSpotSheet: View {
                     imageData2 = imageData2Check
                 }
             }
-            let id = cloudViewModel.addSpotToPublic(name: name, founder: founder, date: getDate(), locationName: locationName, x: lat, y: long, description: descript, type: tags, image: imageData, image2: imageData2, image3: imageData3)
+            let id = cloudViewModel.addSpotToPublic(name: name, founder: founder, date: getDate(), locationName: locationName, x: lat, y: long, description: descript, type: tags, image: imageData, image2: imageData2, image3: imageData3, isMultipleImages: (images?.count ?? 1) - 1)
             newSpot.dbid = id
         } else {
             return

@@ -75,19 +75,13 @@ struct DiscoverSheetShared: View {
                     if let data = try? Data(contentsOf: url), let image = UIImage(data: data) {
                         self.images.append(image)
                     }
-                    let url2 = cloudViewModel.shared[0].image2URL
-                    let url3 = cloudViewModel.shared[0].image3URL
-                    if url3.relativeString != "none" {
-                        if let data = try? Data(contentsOf: url2), let image = UIImage(data: data) {
-                            self.images.append(image)
-                        }
-                        if let data = try? Data(contentsOf: url3), let image = UIImage(data: data) {
-                            self.images.append(image)
-                        }
-                    } else if url2.relativeString != "none" {
-                        if let data = try? Data(contentsOf: url2), let image = UIImage(data: data) {
-                            self.images.append(image)
-                        }
+                    
+                    if let image2 = cloudViewModel.shared[0].image2URL {
+                        self.images.append(image2)
+                    }
+                    
+                    if let image3 = cloudViewModel.shared[0].image3URL {
+                        self.images.append(image3)
                     }
                     
                     

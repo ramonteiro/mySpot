@@ -78,18 +78,15 @@ struct DiscoverDetailView: View {
                     if let data = try? Data(contentsOf: url), let image = UIImage(data: data) {
                         self.images.append(image)
                     }
-                    let url2 = cloudViewModel.spots[index].image2URL
-                    let url3 = cloudViewModel.spots[index].image3URL
-                    if url3.relativeString != "none" {
-                        if let data = try? Data(contentsOf: url2), let image = UIImage(data: data) {
-                            self.images.append(image)
-                        }
-                        if let data = try? Data(contentsOf: url3), let image = UIImage(data: data) {
-                            self.images.append(image)
-                        }
-                    } else if url2.relativeString != "none" {
-                        if let data = try? Data(contentsOf: url2), let image = UIImage(data: data) {
-                            self.images.append(image)
+                    Task {
+                        let id = cloudViewModel.spots[index].record.recordID.recordName
+                        let fetchedImages: [UIImage?] = await cloudViewModel.fetchImages(id: id)
+                        if !fetchedImages.isEmpty {
+                            fetchedImages.forEach { image in
+                                if let image = image {
+                                    self.images.append(image)
+                                }
+                            }
                         }
                     }
                     
@@ -186,11 +183,30 @@ struct DiscoverDetailView: View {
                 multipleImages
             } else {
                 if (!images.isEmpty) {
-                    Image(uiImage: images[0])
-                        .resizable()
-                        .frame(width: UIScreen.screenWidth, height: UIScreen.screenWidth)
-                        .scaledToFit()
-                        .ignoresSafeArea()
+                    if (cloudViewModel.spots[index].isMultipleImages != 0) {
+                        ZStack {
+                            Image(uiImage: images[0])
+                                .resizable()
+                                .frame(width: UIScreen.screenWidth, height: UIScreen.screenWidth)
+                                .scaledToFit()
+                                .ignoresSafeArea()
+                            VStack {
+                                Spacer()
+                                HStack {
+                                    Spacer()
+                                    ProgressView()
+                                        .frame(width: 30, height: 30)
+                                    Spacer()
+                                }
+                            }
+                        }
+                    } else {
+                        Image(uiImage: images[0])
+                            .resizable()
+                            .frame(width: UIScreen.screenWidth, height: UIScreen.screenWidth)
+                            .scaledToFit()
+                            .ignoresSafeArea()
+                    }
                 } else {
                     Image(uiImage: defaultImages.errorImage!)
                         .resizable()

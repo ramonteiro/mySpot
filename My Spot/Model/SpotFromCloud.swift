@@ -7,6 +7,7 @@
 
 import Foundation
 import CloudKit
+import UIKit
 
 struct SpotFromCloud: Hashable, Identifiable {
     let id: String
@@ -17,8 +18,9 @@ struct SpotFromCloud: Hashable, Identifiable {
     let location: CLLocation
     let type: String
     let imageURL: URL
-    let image2URL: URL
-    let image3URL: URL
+    var image2URL: UIImage?
+    var image3URL: UIImage?
+    let isMultipleImages: Int
     var likes: Int
     let locationName: String
     let userID: String
