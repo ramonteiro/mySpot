@@ -36,7 +36,9 @@ struct My_SpotApp: App {
                 .environmentObject(cloudViewModel)
                 .environmentObject(networkViewModel)
                 .onOpenURL { url in
-                    cloudViewModel.checkDeepLink(url: url)
+                    Task {
+                        await cloudViewModel.checkDeepLink(url: url)
+                    }
                 }
                 .onAppear {
                     if (UserDefaults.standard.valueExists(forKey: "systemcolor")) {
