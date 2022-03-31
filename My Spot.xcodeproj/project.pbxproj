@@ -62,6 +62,8 @@
 		C56F499F27E05CE300BCBB8F /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = C56F499E27E05CE300BCBB8F /* Extensions.swift */; };
 		C56F49A127E05FDF00BCBB8F /* NetworkMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = C56F49A027E05FDF00BCBB8F /* NetworkMonitor.swift */; };
 		C587027427E27F1900DFB6C4 /* MailViewCallback.swift in Sources */ = {isa = PBXBuildFile; fileRef = C587027327E27F1900DFB6C4 /* MailViewCallback.swift */; };
+		C5886FAC27F5FC48000E574A /* Report+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5886FAA27F5FC48000E574A /* Report+CoreDataClass.swift */; };
+		C5886FAD27F5FC48000E574A /* Report+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5886FAB27F5FC48000E574A /* Report+CoreDataProperties.swift */; };
 		C5F44E8D27DD3818001E9E32 /* Likes+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5F44E8B27DD3818001E9E32 /* Likes+CoreDataClass.swift */; };
 		C5F44E8E27DD3818001E9E32 /* Likes+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5F44E8C27DD3818001E9E32 /* Likes+CoreDataProperties.swift */; };
 /* End PBXBuildFile section */
@@ -124,6 +126,8 @@
 		C56F499E27E05CE300BCBB8F /* Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
 		C56F49A027E05FDF00BCBB8F /* NetworkMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkMonitor.swift; sourceTree = "<group>"; };
 		C587027327E27F1900DFB6C4 /* MailViewCallback.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MailViewCallback.swift; sourceTree = "<group>"; };
+		C5886FAA27F5FC48000E574A /* Report+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Report+CoreDataClass.swift"; sourceTree = SOURCE_ROOT; };
+		C5886FAB27F5FC48000E574A /* Report+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Report+CoreDataProperties.swift"; sourceTree = SOURCE_ROOT; };
 		C5F44E8B27DD3818001E9E32 /* Likes+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Likes+CoreDataClass.swift"; sourceTree = "<group>"; };
 		C5F44E8C27DD3818001E9E32 /* Likes+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Likes+CoreDataProperties.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -216,6 +220,8 @@
 		C51503D327D7C848009F0DCD /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				C5886FAA27F5FC48000E574A /* Report+CoreDataClass.swift */,
+				C5886FAB27F5FC48000E574A /* Report+CoreDataProperties.swift */,
 				C5F44E8B27DD3818001E9E32 /* Likes+CoreDataClass.swift */,
 				C5F44E8C27DD3818001E9E32 /* Likes+CoreDataProperties.swift */,
 				C51503DA27D7C856009F0DCD /* CoreDataManager.swift */,
@@ -434,6 +440,7 @@
 				C51503E127D7C856009F0DCD /* Spot+CoreDataClass.swift in Sources */,
 				C502D4FB27E1A6310057A65C /* SpotEditSheet.swift in Sources */,
 				C51503E427D7C856009F0DCD /* Spots.xcdatamodeld in Sources */,
+				C5886FAD27F5FC48000E574A /* Report+CoreDataProperties.swift in Sources */,
 				C50CF4AA27F13915001A9698 /* ChoosePhoto.swift in Sources */,
 				C51503E227D7C856009F0DCD /* Spot+CoreDataProperties.swift in Sources */,
 				C51503B027D7C347009F0DCD /* ContentView.swift in Sources */,
@@ -455,6 +462,7 @@
 				C587027427E27F1900DFB6C4 /* MailViewCallback.swift in Sources */,
 				C515040727D7CA7B009F0DCD /* DiscoverRow.swift in Sources */,
 				C515042527D7CAC6009F0DCD /* UIEmojiTextField.swift in Sources */,
+				C5886FAC27F5FC48000E574A /* Report+CoreDataClass.swift in Sources */,
 				C515040E27D7CA87009F0DCD /* PlaylistRow.swift in Sources */,
 				C515041E27D7CAB1009F0DCD /* ViewPlaylistMap.swift in Sources */,
 				C515040D27D7CA87009F0DCD /* DetailedPlaylistView.swift in Sources */,

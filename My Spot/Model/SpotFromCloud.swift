@@ -22,6 +22,10 @@ struct SpotFromCloud: Hashable, Identifiable {
     var image3URL: UIImage?
     let isMultipleImages: Int
     var likes: Int
+    var offensive: Int
+    var spam: Int
+    var inappropriate: Int
+    var dangerous: Int
     let locationName: String
     let userID: String
     let record: CKRecord

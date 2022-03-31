@@ -45,8 +45,8 @@ struct TakePhoto: UIViewControllerRepresentable {
      
             if let image = info[UIImagePickerController.InfoKey.originalImage] as? UIImage {
                 parent.selectedImage = image
+                parent.presentationMode.wrappedValue.dismiss()
             }
-            parent.presentationMode.wrappedValue.dismiss()
         }
     }
     

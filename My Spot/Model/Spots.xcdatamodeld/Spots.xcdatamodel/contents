@@ -9,6 +9,9 @@
         <attribute name="name" optional="YES" attributeType="String"/>
         <relationship name="spot" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Spot" inverseName="playlist" inverseEntity="Spot"/>
     </entity>
+    <entity name="Report" representedClassName="Report" syncable="YES">
+        <attribute name="reportid" optional="YES" attributeType="String"/>
+    </entity>
     <entity name="Spot" representedClassName="Spot" syncable="YES">
         <attribute name="date" optional="YES" attributeType="String"/>
         <attribute name="dbid" optional="YES" attributeType="String"/>
@@ -31,5 +34,6 @@
         <element name="Likes" positionX="-54" positionY="90" width="128" height="44"/>
         <element name="Playlist" positionX="-63" positionY="54" width="128" height="14"/>
         <element name="Spot" positionX="-63" positionY="-18" width="128" height="269"/>
+        <element name="Report" positionX="-54" positionY="108" width="128" height="44"/>
     </elements>
 </model>

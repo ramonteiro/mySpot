@@ -44,6 +44,7 @@ struct My_SpotApp: App {
                     } else {
                         UserDefaults.standard.set(0, forKey: "systemcolor")
                     }
+                    UIApplication.shared.applicationIconBadgeNumber = 0
                 }
                 .tint(cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex])
                 .accentColor(cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex])

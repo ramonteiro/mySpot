@@ -22,6 +22,7 @@ struct DiscoverDetailView: View {
     @Environment(\.managedObjectContext) var moc
     @Environment(\.presentationMode) var presentationMode
     @FetchRequest(sortDescriptors: []) var likedIds: FetchedResults<Likes>
+    @FetchRequest(sortDescriptors: []) var reportIds: FetchedResults<Report>
     @EnvironmentObject var tabController: TabController
     @EnvironmentObject var mapViewModel: MapViewModel
     @EnvironmentObject var cloudViewModel: CloudKitViewModel
@@ -31,9 +32,8 @@ struct DiscoverDetailView: View {
     @State private var backImage = "chevron.left"
     @State private var mySpot = false
     @State private var distance: String = ""
-    @State private var message = ""
     @State private var deleteAlert = false
-    @State private var showingMailSheet = false
+    @State private var showingReportAlert = false
     @State private var selection = 0
     @State private var isSaving = false
     @State private var likeButton = "heart"
@@ -47,6 +47,7 @@ struct DiscoverDetailView: View {
     @State private var noType = false
     @State private var spotInCD: [Spot] = []
     @FocusState private var nameIsFocused: Bool
+    @State private var hasReported: Bool = false
     
     var body: some View {
         ZStack {
@@ -95,15 +96,21 @@ struct DiscoverDetailView: View {
                     newName = ""
                     var didlike = false
                     for i in likedIds {
-                        if i.likedId == String(cloudViewModel.spots[index].location.coordinate.latitude + cloudViewModel.spots[index].location.coordinate.longitude) + cloudViewModel.spots[index].name {
+                        if i.likedId == cloudViewModel.spots[index].record.recordID.recordName {
                             didlike = true
+                            break
+                        }
+                    }
+                    for i in reportIds {
+                        if i.reportid == cloudViewModel.spots[index].record.recordID.recordName {
+                            hasReported = true
                             break
                         }
                     }
                     if (didlike) {
                         likeButton = "heart.fill"
                     }
-                    message = "The public spot with id: " + cloudViewModel.spots[index].id + ", has the following issue(s):\n"
+                    // add hasreport
                     cloudViewModel.canRefresh = false
                 }
             }
@@ -314,7 +321,7 @@ struct DiscoverDetailView: View {
                     if (didLike) {
                         DispatchQueue.main.async {
                             let newLike = Likes(context: moc)
-                            newLike.likedId = String(cloudViewModel.spots[index].location.coordinate.latitude + cloudViewModel.spots[index].location.coordinate.longitude) + cloudViewModel.spots[index].name
+                            newLike.likedId = cloudViewModel.spots[index].record.recordID.recordName
                             try? moc.save()
                             likeButton = "heart.fill"
                             cloudViewModel.spots[index].likes += 1
@@ -328,7 +335,7 @@ struct DiscoverDetailView: View {
                     if (didLike) {
                         DispatchQueue.main.async {
                             for i in likedIds {
-                                if (i.likedId == String(cloudViewModel.spots[index].location.coordinate.latitude + cloudViewModel.spots[index].location.coordinate.longitude) + cloudViewModel.spots[index].name) {
+                                if (i.likedId == cloudViewModel.spots[index].record.recordID.recordName) {
                                     moc.delete(i)
                                     try? moc.save()
                                     break
@@ -450,23 +457,81 @@ struct DiscoverDetailView: View {
                 Text("\(distance) away")
                     .foregroundColor(.gray)
                     .font(.system(size: 15, weight: .light))
-                    .padding(.bottom, 1)
+                    .padding([.top, .bottom], 10)
             }
             
-            Button {
-                showingMailSheet = true
-            } label: {
+            if !hasReported {
+                Button {
+                    showingReportAlert = true
+                } label: {
+                    HStack {
+                        Text("Report Spot")
+                        Image(systemName: "exclamationmark.triangle.fill")
+                    }
+                }
+                .padding([.top, .bottom], 10)
+            } else {
                 HStack {
-                    Text("Report Spot")
-                    Image(systemName: "exclamationmark.triangle.fill")
+                    Text("Report Received")
+                    Image(systemName: "checkmark.square.fill")
+                }
+                .padding([.top, .bottom], 10)
+            }
+        }
+        .confirmationDialog("How should this spot be reported?", isPresented: $showingReportAlert) {
+            Button("Offensive") {
+                let spot = cloudViewModel.spots[index]
+                Task {
+                    hasReported = await cloudViewModel.report(spot: spot, report: "offensive")
+                    if hasReported {
+                        DispatchQueue.main.async {
+                            let newReport = Report(context: moc)
+                            newReport.reportid = cloudViewModel.spots[index].record.recordID.recordName
+                            try? moc.save()
+                        }
+                    }
                 }
             }
-            .padding([.top, .bottom], 20)
-            .sheet(isPresented: $showingMailSheet) {
-                MailView(message: $message) { returnedMail in
-                    print(returnedMail)
+            Button("Inappropriate") {
+                let spot = cloudViewModel.spots[index]
+                Task {
+                    hasReported = await cloudViewModel.report(spot: spot, report: "inappropriate")
+                    if hasReported {
+                        DispatchQueue.main.async {
+                            let newReport = Report(context: moc)
+                            newReport.reportid = cloudViewModel.spots[index].record.recordID.recordName
+                            try? moc.save()
+                        }
+                    }
                 }
             }
+            Button("Spam") {
+                let spot = cloudViewModel.spots[index]
+                Task {
+                    hasReported = await cloudViewModel.report(spot: spot, report: "spam")
+                    if hasReported {
+                        DispatchQueue.main.async {
+                            let newReport = Report(context: moc)
+                            newReport.reportid = cloudViewModel.spots[index].record.recordID.recordName
+                            try? moc.save()
+                        }
+                    }
+                }
+            }
+            Button("Dangerous") {
+                let spot = cloudViewModel.spots[index]
+                Task {
+                    hasReported = await cloudViewModel.report(spot: spot, report: "dangerous")
+                    if hasReported {
+                        DispatchQueue.main.async {
+                            let newReport = Report(context: moc)
+                            newReport.reportid = cloudViewModel.spots[index].record.recordID.recordName
+                            try? moc.save()
+                        }
+                    }
+                }
+            }
+            Button("Cancel", role: .cancel) { }
         }
         .onAppear {
             if (mapViewModel.isAuthorized) {

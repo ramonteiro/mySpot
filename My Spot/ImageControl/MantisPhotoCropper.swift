@@ -12,6 +12,7 @@ struct MantisPhotoCropper: UIViewControllerRepresentable {
     
     typealias Coordinator = MantisPhotoCropperCoordinator
     @Environment(\.presentationMode) var presentationMode
+    @EnvironmentObject var cloudViewModel: CloudKitViewModel
     @Binding var selectedImage: UIImage?
     
     func makeCoordinator() -> MantisPhotoCropperCoordinator {
@@ -26,9 +27,17 @@ struct MantisPhotoCropper: UIViewControllerRepresentable {
         var config = Mantis.Config()
         config.presetFixedRatioType = .alwaysUsingOnePresetFixedRatio(ratio: 1.0)
         config.showRotationDial = false
-        let editor = Mantis.cropViewController(image: selectedImage ?? defaultImages.errorImage!, config: config)
-        editor.delegate = context.coordinator
-        return editor
+        if let image = selectedImage {
+            let editor = Mantis.cropViewController(image: image, config: config)
+            editor.delegate = context.coordinator
+            return editor
+        } else {
+            cloudViewModel.isErrorMessage = "Unable to load image, please try again."
+            cloudViewModel.isError.toggle()
+            let editor = Mantis.cropViewController(image: defaultImages.errorImage!, config: config)
+            editor.delegate = context.coordinator
+            return editor
+        }
     }
 }
 
