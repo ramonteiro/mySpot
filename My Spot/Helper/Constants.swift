@@ -36,6 +36,6 @@ enum defaultImages {
 // error online messages
 enum cloudkitErrorMsg {
     static let dpLink = "Unable to find spot."
-    static let create = "Error posting spot."
-    static let delete = "Error deleting spot."
+    static let create = "Error posting spot. Spot is saved in My Spots but it's status has changed to private."
+    static let delete = "Error deleting spot. Please try again. This may be due to poor connection."
 }

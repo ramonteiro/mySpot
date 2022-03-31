@@ -161,23 +161,6 @@ class CloudKitViewModel: ObservableObject {
             return nil
         }
     }
-    /*
-    func getLikes(idString: String) {
-        if idString.isEmpty {
-            return
-        }
-        let id = CKRecord.ID(recordName: idString)
-        CKContainer.default().publicCloudDatabase.fetch(withRecordID: id) {[weak self] returnedRecord, returnedError in
-            DispatchQueue.main.async {
-                guard let returnedRecord = returnedRecord else {
-                    return
-                }
-                guard let likes = returnedRecord["likes"] as? Int else { return }
-                self?.fetchedlikes = likes
-            }
-        }
-    }
-    */
      
     func getiCloudStatus() {
         CKContainer.default().accountStatus { [weak self] returnedStatus, returnedError in
@@ -216,6 +199,66 @@ class CloudKitViewModel: ObservableObject {
         return resizedImage
     }
     
+    func addSpotToPublic(name: String, founder: String, date: String, locationName: String, x: Double, y: Double, description: String, type: String, image: Data, image2: Data?, image3: Data?, isMultipleImages: Int) async throws -> String {
+        
+        let newSpot = CKRecord(recordType: "Spots")
+        newSpot["name"] = name
+        newSpot["founder"] = founder
+        newSpot["description"] = description
+        newSpot["date"] = date
+        newSpot["locationName"] = locationName
+        newSpot["location"] = CLLocation(latitude: x, longitude: y)
+        newSpot["type"] = type
+        newSpot["id"] = UUID().uuidString
+        newSpot["userID"] = userID
+        newSpot["likes"] = 0
+        newSpot["isMultipleImages"] = isMultipleImages
+        newSpot["offensive"] = 0
+        newSpot["inappropriate"] = 0
+        newSpot["spam"] = 0
+        newSpot["dangerous"] = 0
+        
+        if let image2 = image2 {
+            do {
+                let path = NSTemporaryDirectory() + "imageTemp\(UUID().uuidString).png"
+                let url = URL(fileURLWithPath: path)
+                try image2.write(to: url)
+                let asset = CKAsset(fileURL: url)
+                newSpot["image2"] = asset
+            } catch {
+                print(error)
+                return ""
+            }
+        }
+        
+        if let image3 = image3 {
+            do {
+                let path = NSTemporaryDirectory() + "imageTemp\(UUID().uuidString).png"
+                let url = URL(fileURLWithPath: path)
+                try image3.write(to: url)
+                let asset = CKAsset(fileURL: url)
+                newSpot["image3"] = asset
+            } catch {
+                print(error)
+                return ""
+            }
+        }
+        
+        do {
+            let path = NSTemporaryDirectory() + "imageTemp\(UUID().uuidString).png"
+            let url = URL(fileURLWithPath: path)
+            try image.write(to: url)
+            let asset = CKAsset(fileURL: url)
+            newSpot["image"] = asset
+            try await CKContainer.default().publicCloudDatabase.save(newSpot)
+            return newSpot.recordID.recordName
+        } catch {
+            print(error)
+            return ""
+        }
+    }
+    
+    /*
     func addSpotToPublic(name: String, founder: String, date: String, locationName: String, x: Double, y: Double, description: String, type: String, image: Data, image2: Data?, image3: Data?, isMultipleImages: Int) -> String {
         let newSpot = CKRecord(recordType: "Spots")
         newSpot["name"] = name
@@ -273,6 +316,7 @@ class CloudKitViewModel: ObservableObject {
             return ""
         }
     }
+     */
     
     private func fetchUserID() {
         CKContainer.default().fetchUserRecordID { [weak self] returnedID, returnedError in

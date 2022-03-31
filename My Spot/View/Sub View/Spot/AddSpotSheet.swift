@@ -426,8 +426,14 @@ struct AddSpotSheet: View {
         newSpot.tags = tags
         newSpot.locationName = locationName
         newSpot.id = UUID()
-        try? moc.save()
-        askForReview()
+        do {
+            try moc.save()
+            askForReview()
+        } catch {
+            cloudViewModel.isErrorMessage = "Error, unable to save spot. Please try again."
+            cloudViewModel.isError.toggle()
+            return
+        }
     }
     
     private func askForReview() {
@@ -454,35 +460,43 @@ struct AddSpotSheet: View {
     private func savePublic() {
         let newSpot = Spot(context: moc)
         if let imageData = cloudViewModel.compressImage(image: images?[0] ?? defaultImages.errorImage!).pngData() {
-            newSpot.image = UIImage(data: imageData)
-            var imageData2: Data? = nil
-            var imageData3: Data? = nil
-            if (images?.count == 3) {
-                if let imageData2Check = cloudViewModel.compressImage(image: images?[1] ?? defaultImages.errorImage!).pngData() {
-                    newSpot.image2 = UIImage(data: imageData2Check)
-                    imageData2 = imageData2Check
+            Task {
+                newSpot.image = UIImage(data: imageData)
+                var imageData2: Data? = nil
+                var imageData3: Data? = nil
+                if (images?.count == 3) {
+                    if let imageData2Check = cloudViewModel.compressImage(image: images?[1] ?? defaultImages.errorImage!).pngData() {
+                        newSpot.image2 = UIImage(data: imageData2Check)
+                        imageData2 = imageData2Check
+                    }
+                    if let imageData3Check = cloudViewModel.compressImage(image: images?[2] ?? defaultImages.errorImage!).pngData() {
+                        newSpot.image3 = UIImage(data: imageData3Check)
+                        imageData3 = imageData3Check
+                    }
+                } else if (images?.count == 2) {
+                    if let imageData2Check = cloudViewModel.compressImage(image: images?[1] ?? defaultImages.errorImage!).pngData() {
+                        newSpot.image2 = UIImage(data: imageData2Check)
+                        imageData2 = imageData2Check
+                    }
                 }
-                if let imageData3Check = cloudViewModel.compressImage(image: images?[2] ?? defaultImages.errorImage!).pngData() {
-                    newSpot.image3 = UIImage(data: imageData3Check)
-                    imageData3 = imageData3Check
-                }
-            } else if (images?.count == 2) {
-                if let imageData2Check = cloudViewModel.compressImage(image: images?[1] ?? defaultImages.errorImage!).pngData() {
-                    newSpot.image2 = UIImage(data: imageData2Check)
-                    imageData2 = imageData2Check
+                do {
+                    let id = try await cloudViewModel.addSpotToPublic(name: name, founder: founder, date: getDate(), locationName: locationName, x: lat, y: long, description: descript, type: tags, image: imageData, image2: imageData2, image3: imageData3, isMultipleImages: (images?.count ?? 1) - 1)
+                    if !id.isEmpty {
+                        newSpot.dbid = id
+                        newSpot.isPublic = true
+                    } else {
+                        newSpot.dbid = ""
+                        newSpot.isPublic = false
+                    }
+                } catch {
+                    newSpot.dbid = ""
+                    newSpot.isPublic = false
                 }
             }
-            let id = cloudViewModel.addSpotToPublic(name: name, founder: founder, date: getDate(), locationName: locationName, x: lat, y: long, description: descript, type: tags, image: imageData, image2: imageData2, image3: imageData3, isMultipleImages: (images?.count ?? 1) - 1)
-            newSpot.dbid = id
         } else {
-            return
-        }
-        if newSpot.dbid == "" {
-            newSpot.isPublic = false
-            cloudViewModel.isErrorMessage = cloudkitErrorMsg.create
+            cloudViewModel.isErrorMessage = "Error, unable to save spot. Please try again."
             cloudViewModel.isError.toggle()
-        } else {
-            newSpot.isPublic = true
+            return
         }
         UserDefaults.standard.set(founder, forKey: UserDefaultKeys.founder)
         newSpot.founder = founder
@@ -495,8 +509,19 @@ struct AddSpotSheet: View {
         newSpot.tags = tags
         newSpot.locationName = locationName
         newSpot.id = UUID()
-        try? moc.save()
-        askForReview()
+        do {
+            try moc.save()
+        } catch {
+            cloudViewModel.isErrorMessage = "Error, unable to save spot. Please try again."
+            cloudViewModel.isError.toggle()
+            return
+        }
+        if newSpot.isPublic {
+            askForReview()
+        } else {
+            cloudViewModel.isErrorMessage = cloudkitErrorMsg.create
+            cloudViewModel.isError.toggle()
+        }
         close()
     }
     
