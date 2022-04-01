@@ -26,6 +26,9 @@ class CloudKitViewModel: ObservableObject {
     @Published var isErrorMessage = ""
     @Published var isPostError = false
     @Published var radiusInMeters: Double = 0
+    @Published var notiDenied = false
+    @Published var doNotAlert = false
+    @Published var askForPermission = false
     
     init() {
         getiCloudStatus()
@@ -40,26 +43,12 @@ class CloudKitViewModel: ObservableObject {
             maxTotalfetches = UserDefaults.standard.integer(forKey: "maxTotalFetches")
         }
         if (UserDefaults.standard.valueExists(forKey: "discovernot")) {
-            let center = UNUserNotificationCenter.current()
-            center.getNotificationSettings {[weak self] settings in
-                DispatchQueue.main.async {
-                    if settings.authorizationStatus == .authorized {
-                        self?.notiNewSpotOn = true
-                    }
-                }
-            }
+            notiNewSpotOn = UserDefaults.standard.bool(forKey: "discovernot")
         } else {
             UserDefaults.standard.set(false, forKey: "discovernot")
         }
         if (UserDefaults.standard.valueExists(forKey: "playlistnot")) {
-            let center = UNUserNotificationCenter.current()
-            center.getNotificationSettings {[weak self] settings in
-                DispatchQueue.main.async {
-                    if settings.authorizationStatus == .authorized {
-                        self?.notiNewSpotOn = true
-                    }
-                }
-            }
+            notiPlaylistOn = UserDefaults.standard.bool(forKey: "playlistnot")
         } else {
             UserDefaults.standard.set(false, forKey: "playlistnot")
         }
@@ -582,9 +571,6 @@ class CloudKitViewModel: ObservableObject {
         }
     }
     
-    private func addOperation(operation: CKDatabaseOperation) {
-        CKContainer.default().publicCloudDatabase.add(operation)
-    }
     
     func shareSheet(index i: Int) {
         let activityView = UIActivityViewController(activityItems: ["Check out, \"\(spots[i].name)\" on My Spot! ", URL(string: "myspot://" + (spots[i].record.recordID.recordName)) ?? "", "\n\nIf you don't have My Spot, get it on the Appstore here: ", URL(string: "https://apps.apple.com/us/app/my-spot-exploration/id1613618373")!], applicationActivities: nil)
@@ -611,36 +597,42 @@ class CloudKitViewModel: ObservableObject {
         return false
     }
     
-    private func requestPermissionNoti(notiType: Int, fixedLocation: CLLocation?, radiusInKm: CGFloat?) {
+    
+    private func requestPermissionNoti(notiType: Int, fixedLocation: CLLocation?, radiusInKm: CGFloat?) async {
         let options: UNAuthorizationOptions = [.alert, .sound, .badge]
-        UNUserNotificationCenter.current().requestAuthorization(options: options) {[weak self] success, error in
-            if !success {
-                DispatchQueue.main.async {
-                    self?.notiPlaylistOn = false
-                    self?.notiNewSpotOn = false
+        do {
+            let success = try await UNUserNotificationCenter.current().requestAuthorization(options: options)
+            if success {
+                await UIApplication.shared.registerForRemoteNotifications()
+                if notiType == 1 {
+                    subscribeToSharedPlaylist()
+                } else if notiType == 2 {
+                    await subscribeToNewSpot(fixedLocation: fixedLocation!, radiusInKm: radiusInKm!)
                 }
+
             } else {
                 DispatchQueue.main.async {
-                    UIApplication.shared.registerForRemoteNotifications()
-                    if notiType == 1 {
-                        self?.subscribeToSharedPlaylist()
-                    } else if notiType == 2 {
-                        self?.subscribeToNewSpot(fixedLocation: fixedLocation!, radiusInKm: radiusInKm!)
-                    }
+                    self.doNotAlert = true
+                    self.askForPermission = true
+                    self.notiPlaylistOn = false
+                    self.notiNewSpotOn = false
                 }
             }
-        }
-    }
-    
-    func unsubscribe(id: CKSubscription.ID) {
-        CKContainer.default().publicCloudDatabase.delete(withSubscriptionID: id) { returnedId, returnedError in
-            if let returnedError = returnedError {
-                print("\(returnedError)")
+        } catch {
+            DispatchQueue.main.async {
+                self.doNotAlert = true
+                self.notiPlaylistOn = false
+                self.notiNewSpotOn = false
+                self.notiDenied = true
             }
         }
     }
     
-    func subscribeToNewSpot(fixedLocation: CLLocation, radiusInKm: CGFloat) {
+    func unsubscribe(id: CKSubscription.ID) async throws {
+        _ = try await CKContainer.default().publicCloudDatabase.deleteSubscription(withID: id)
+    }
+    
+    func subscribeToNewSpot(fixedLocation: CLLocation, radiusInKm: CGFloat) async {
         let predicate = NSPredicate(format: "distanceToLocation:fromLocation:(location, %@) < %f", fixedLocation, radiusInKm)
         let subscription = CKQuerySubscription(recordType: "Spots", predicate: predicate, subscriptionID: "NewSpotDiscover", options: .firesOnRecordCreation)
         let notification = CKSubscription.NotificationInfo()
@@ -649,14 +641,11 @@ class CloudKitViewModel: ObservableObject {
         notification.soundName = "default"
         notification.shouldBadge = true
         subscription.notificationInfo = notification
-        CKContainer.default().publicCloudDatabase.save(subscription) {[weak self] returnedSubscription, returnedError in
-            if let returnedError = returnedError {
-                print("\(returnedError)")
-                DispatchQueue.main.async {
-                    self?.notiNewSpotOn = false
-                    self?.isErrorMessage = "Unable To Turn On Notifications For New Spots."
-                    self?.isError.toggle()
-                }
+        do {
+            try await CKContainer.default().publicCloudDatabase.save(subscription)
+        } catch {
+            DispatchQueue.main.async {
+                self.notiDenied = true
             }
         }
     }
@@ -665,41 +654,34 @@ class CloudKitViewModel: ObservableObject {
         
     }
     
-    func checkIfNotiEnabled() {
-        let center = UNUserNotificationCenter.current()
-        center.getNotificationSettings {[weak self] settings in
-            DispatchQueue.main.async {
-                if settings.authorizationStatus == .denied {
-                    self?.notiPlaylistOn = false
-                    self?.notiNewSpotOn = false
-                }
-            }
-        }
-    }
     
-    func subscribeToNoti(notiType: Int, fixedLocation: CLLocation?, radiusInKm: CGFloat?) {
+    func subscribeToNoti(notiType: Int, fixedLocation: CLLocation?, radiusInKm: CGFloat?) async {
         let center = UNUserNotificationCenter.current()
-        center.getNotificationSettings {[weak self] settings in
-            DispatchQueue.main.async {
-                if settings.authorizationStatus == .notDetermined {
-                    if notiType == 1 {
-                        self?.requestPermissionNoti(notiType: notiType, fixedLocation: nil, radiusInKm: nil)
-                    } else if notiType == 2 {
-                        self?.requestPermissionNoti(notiType: notiType, fixedLocation: fixedLocation, radiusInKm: radiusInKm)
-                    }
-                } else if settings.authorizationStatus == .denied {
-                    self?.notiPlaylistOn = false
-                    self?.notiNewSpotOn = false
-                    self?.isErrorMessage = "Please enable notifications in settings for My Spot."
-                    self?.isError.toggle()
-                } else if settings.authorizationStatus == .authorized {
-                    if notiType == 1 {
-                        self?.subscribeToSharedPlaylist()
-                    } else if notiType == 2 {
-                        self?.subscribeToNewSpot(fixedLocation: fixedLocation!, radiusInKm: radiusInKm!)
-                    }
-                }
+        let settings = await center.notificationSettings()
+        switch settings.authorizationStatus {
+        case .notDetermined:
+            if notiType == 1 {
+                await requestPermissionNoti(notiType: notiType, fixedLocation: nil, radiusInKm: nil)
+            } else if notiType == 2 {
+                await requestPermissionNoti(notiType: notiType, fixedLocation: fixedLocation, radiusInKm: radiusInKm)
             }
+        case .denied:
+            self.doNotAlert = true
+            self.askForPermission = true
+            self.notiPlaylistOn = false
+            self.notiNewSpotOn = false
+        case .authorized:
+            if notiType == 1 {
+                subscribeToSharedPlaylist()
+            } else if notiType == 2 {
+                await subscribeToNewSpot(fixedLocation: fixedLocation!, radiusInKm: radiusInKm!)
+            }
+        case .provisional:
+            print("error")
+        case .ephemeral:
+            print("error")
+        @unknown default:
+            print("unknown")
         }
     }
 }

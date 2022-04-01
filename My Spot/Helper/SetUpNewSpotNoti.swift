@@ -19,6 +19,7 @@ struct SetUpNewSpotNoti: View {
     @State private var distance: String = "Diameter: "
     @State private var isMetric = false
     @Binding var newPlace: Bool
+    @Binding var unableToAddSpot: Bool
     
     var body: some View {
         NavigationView {
@@ -66,18 +67,32 @@ struct SetUpNewSpotNoti: View {
                     Button("Save") {
                         let distanceKm = centerRegion.spanLatitude.converted(to: .meters).value / 2
                         let location = CLLocation(latitude: centerRegion.center.latitude, longitude: centerRegion.center.longitude)
-                        var placeName: String = ""
-                        mapViewModel.getPlacmarkOfLocationLessPrecise(location: location) { l in
-                            placeName = l
-                            UserDefaults.standard.set(placeName, forKey: "discovernotiname")
-                            newPlace.toggle()
+                        Task {
+                            var placeName: String = ""
+                            mapViewModel.getPlacmarkOfLocationLessPrecise(location: location) { l in
+                                placeName = l
+                            }
+                            var proceed = true
+                            do {
+                                try await cloudViewModel.unsubscribe(id: "NewSpotDiscover")
+                            } catch {
+                                unableToAddSpot = true
+                                proceed = false
+                            }
+                            if proceed {
+                                await cloudViewModel.subscribeToNewSpot(fixedLocation: location, radiusInKm: distanceKm)
+                                if cloudViewModel.notiDenied {
+                                    cloudViewModel.notiDenied = false
+                                    unableToAddSpot = true
+                                } else {
+                                    UserDefaults.standard.set(placeName, forKey: "discovernotiname")
+                                    newPlace.toggle()
+                                    UserDefaults.standard.set(Double(centerRegion.center.latitude), forKey: "discovernotix")
+                                    UserDefaults.standard.set(Double(centerRegion.center.longitude), forKey: "discovernotiy")
+                                    UserDefaults.standard.set(Double(distanceKm), forKey: "discovernotikm")
+                                }
+                            }
                         }
-                        UserDefaults.standard.set(Double(centerRegion.center.latitude), forKey: "discovernotix")
-                        UserDefaults.standard.set(Double(centerRegion.center.longitude), forKey: "discovernotiy")
-                        UserDefaults.standard.set(Double(distanceKm), forKey: "discovernotikm")
-                        
-                        cloudViewModel.unsubscribe(id: "NewSpotDiscover")
-                        cloudViewModel.subscribeToNewSpot(fixedLocation: location, radiusInKm: distanceKm)
                         presentationMode.wrappedValue.dismiss()
                     }
                     .buttonStyle(.borderedProminent)

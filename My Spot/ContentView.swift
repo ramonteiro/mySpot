@@ -41,7 +41,6 @@ struct ContentView: View {
             if newValue == .active {
                 cloudViewModel.getiCloudStatus()
                 mapViewModel.checkLocationAuthorization()
-                cloudViewModel.checkIfNotiEnabled()
             }
         })
         .onReceive(tabController.$activeTab) { selection in
