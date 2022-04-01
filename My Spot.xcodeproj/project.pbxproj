@@ -60,7 +60,6 @@
 		C515042927D8540A009F0DCD /* TabController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C515042827D8540A009F0DCD /* TabController.swift */; };
 		C515042C27D95225009F0DCD /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C515042B27D95225009F0DCD /* LaunchScreen.storyboard */; };
 		C56F499F27E05CE300BCBB8F /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = C56F499E27E05CE300BCBB8F /* Extensions.swift */; };
-		C56F49A127E05FDF00BCBB8F /* NetworkMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = C56F49A027E05FDF00BCBB8F /* NetworkMonitor.swift */; };
 		C587027427E27F1900DFB6C4 /* MailViewCallback.swift in Sources */ = {isa = PBXBuildFile; fileRef = C587027327E27F1900DFB6C4 /* MailViewCallback.swift */; };
 		C5886FAC27F5FC48000E574A /* Report+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5886FAA27F5FC48000E574A /* Report+CoreDataClass.swift */; };
 		C5886FAD27F5FC48000E574A /* Report+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5886FAB27F5FC48000E574A /* Report+CoreDataProperties.swift */; };
@@ -124,7 +123,6 @@
 		C515042A27D95154009F0DCD /* My-Spot-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "My-Spot-Info.plist"; sourceTree = SOURCE_ROOT; };
 		C515042B27D95225009F0DCD /* LaunchScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
 		C56F499E27E05CE300BCBB8F /* Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
-		C56F49A027E05FDF00BCBB8F /* NetworkMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkMonitor.swift; sourceTree = "<group>"; };
 		C587027327E27F1900DFB6C4 /* MailViewCallback.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MailViewCallback.swift; sourceTree = "<group>"; };
 		C5886FAA27F5FC48000E574A /* Report+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Report+CoreDataClass.swift"; sourceTree = SOURCE_ROOT; };
 		C5886FAB27F5FC48000E574A /* Report+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Report+CoreDataProperties.swift"; sourceTree = SOURCE_ROOT; };
@@ -158,7 +156,6 @@
 		C50CF4AC27F13971001A9698 /* ViewModels */ = {
 			isa = PBXGroup;
 			children = (
-				C56F49A027E05FDF00BCBB8F /* NetworkMonitor.swift */,
 				C51503F127D7CA1D009F0DCD /* MapViewModel.swift */,
 				C51503E627D7C87D009F0DCD /* CloudKitViewModel.swift */,
 			);
@@ -447,7 +444,6 @@
 				C515041C27D7CAAA009F0DCD /* ViewDiscoverSpots.swift in Sources */,
 				C51503F427D7CA1D009F0DCD /* MapViewModel.swift in Sources */,
 				C51503FC27D7CA60009F0DCD /* MySpotsView.swift in Sources */,
-				C56F49A127E05FDF00BCBB8F /* NetworkMonitor.swift in Sources */,
 				C515041B27D7CAAA009F0DCD /* MapAnnotationDiscover.swift in Sources */,
 				C51503AE27D7C347009F0DCD /* My_SpotApp.swift in Sources */,
 				C501FC1827E3FAB7008FEFA1 /* ZoomableScrollView.swift in Sources */,

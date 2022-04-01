@@ -11,7 +11,6 @@ import Combine
 struct SpotEditSheet: View {
     
     @EnvironmentObject var cloudViewModel: CloudKitViewModel
-    @EnvironmentObject var networkViewModel: NetworkMonitor
     @ObservedObject var spot:Spot
     @Environment(\.managedObjectContext) var moc
     @Environment(\.presentationMode) var presentationMode
@@ -29,6 +28,8 @@ struct SpotEditSheet: View {
     @State private var didCancel = false
     @State private var imageTemp: UIImage?
     @State private var images: [UIImage]?
+    @Binding var showingCannotSavePublicAlert: Bool
+    @State private var showingCannotSavePrivateAlert: Bool = false
     
     
     private enum Field {
@@ -62,274 +63,261 @@ struct SpotEditSheet: View {
     
     var body: some View {
         NavigationView {
-            if ((wasPublic && networkViewModel.hasInternet) || (!wasPublic)) {
-                Form {
+            Form {
+                Section {
+                    TextField("Enter Spot Name", text: $name)
+                        .onReceive(Just(name)) { _ in
+                            if (name.count > MaxCharLength.names) {
+                                name = String(name.prefix(MaxCharLength.names))
+                            }
+                        }
+                        .onAppear {
+                            name = spot.name ?? ""
+                        }
+                        .focused($focusState, equals: .name)
+                        .submitLabel(.next)
+                } header: {
+                    Text("Spot Name*")
+                }
+                if !fromDB || !wasPublic {
                     Section {
-                        TextField("Enter Spot Name", text: $name)
-                            .onReceive(Just(name)) { _ in
-                                if (name.count > MaxCharLength.names) {
-                                    name = String(name.prefix(MaxCharLength.names))
-                                }
-                            }
-                            .onAppear {
-                                name = spot.name ?? ""
-                            }
-                            .focused($focusState, equals: .name)
+                        TextField("Enter Founder's Name", text: $founder)
+                            .focused($focusState, equals: .founder)
                             .submitLabel(.next)
+                            .textContentType(.givenName)
+                            .onAppear {
+                                founder = spot.founder ?? ""
+                            }
+                            .onReceive(Just(founder)) { _ in
+                                if (founder.count > MaxCharLength.names) {
+                                    founder = String(founder.prefix(MaxCharLength.names))
+                                }
+                            }
                     } header: {
-                        Text("Spot Name*")
-                    } 
-                    if !fromDB || !wasPublic {
+                        Text("Founder's Name*")
+                    }
+                    if (!wasPublic) {
                         Section {
-                            TextField("Enter Founder's Name", text: $founder)
-                                .focused($focusState, equals: .founder)
-                                .submitLabel(.next)
-                                .textContentType(.givenName)
-                                .onAppear {
-                                    founder = spot.founder ?? ""
-                                }
-                                .onReceive(Just(founder)) { _ in
-                                    if (founder.count > MaxCharLength.names) {
-                                        founder = String(founder.prefix(MaxCharLength.names))
-                                    }
-                                }
+                            displayIsPublicPrompt
                         } header: {
-                            Text("Founder's Name*")
-                        }
-                        if (!wasPublic) {
-                            Section {
-                                if (networkViewModel.hasInternet) {
-                                    displayIsPublicPrompt
-                                } else if (!networkViewModel.hasInternet) {
-                                    Text("Internet Is Required To Share Spot.")
-                                        .font(.subheadline)
-                                        .foregroundColor(.gray)
-                                        .onAppear {
-                                            isPublic = false
-                                        }
-                                }
-                            } header: {
-                                Text("Share Spot")
-                            } footer: {
-                                Text("Public spots are shown in discover tab to other users.")
-                                    .font(.footnote)
-                                    .foregroundColor(.gray)
-                            }
-                        }
-                    }
-                    Section {
-                        ZStack {
-                            TextEditor(text: $descript)
-                            Text(descript).opacity(0).padding(.all, 8)
-                        }
-                        .focused($focusState, equals: .descript)
-                        .onReceive(Just(descript)) { _ in
-                            if (descript.count > MaxCharLength.description) {
-                                descript = String(descript.prefix(MaxCharLength.description))
-                            }
-                        }
-                    } header: {
-                        Text("Spot Description")
-                    } footer: {
-                        Text("Use # to add tags. Example: #hiking #skating")
-                            .font(.footnote)
-                            .foregroundColor(.gray)
-                    }
-                    .onAppear {
-                        descript = spot.details ?? ""
-                    }
-                    Section {
-                        if (images?.count ?? 0 > 0) {
-                            List {
-                                ForEach(images ?? [defaultImages.errorImage!], id: \.self) { images in
-                                    if let images = images {
-                                        HStack {
-                                            Spacer()
-                                            Image(uiImage: images)
-                                                .resizable()
-                                                .scaledToFit()
-                                                .frame(width: UIScreen.screenWidth / 2, alignment: .center)
-                                                .cornerRadius(10)
-                                            Spacer()
-                                        }
-                                    }
-                                }
-                                .onMove { indexSet, offset in
-                                    images!.move(fromOffsets: indexSet, toOffset: offset)
-                                    imageChanged = true
-                                }
-                                .onDelete { indexSet in
-                                    images!.remove(atOffsets: indexSet)
-                                    imageChanged = true
-                                }
-                            }
-                        }
-                    } header: {
-                        Text("Photo of Spot")
-                    } footer: {
-                        Text("Only 1 image is required (up to 3).")
-                            .font(.footnote)
-                            .foregroundColor(.gray)
-                    }
-                }
-                .onSubmit {
-                    switch focusState {
-                    case .name:
-                        if (fromDB && wasPublic) {
-                            focusState = .descript
-                        } else {
-                            focusState = .founder
-                        }
-                    case .founder:
-                        focusState = .descript
-                    default:
-                        focusState = nil
-                    }
-                }
-                .confirmationDialog("Choose Image From Photos or Camera", isPresented: $showingAddImageAlert) {
-                    Button("Camera") {
-                        activeSheet = .cameraSheet
-                    }
-                    Button("Photos") {
-                        activeSheet = .cameraRollSheet
-                    }
-                    Button("Cancel", role: .cancel) { }
-                }
-                .fullScreenCover(item: $activeSheet) { item in
-                    switch item {
-                    case .cameraSheet:
-                        TakePhoto(selectedImage: $imageTemp)
-                            .onDisappear {
-                                if (imageTemp != nil) {
-                                    activeSheet = .cropperSheet
-                                } else {
-                                    activeSheet = nil
-                                }
-                                didCancel = false
-                            }
-                            .ignoresSafeArea()
-                    case .cameraRollSheet:
-                        ChoosePhoto(image: $imageTemp, didCancel: $didCancel)
-                            .onDisappear {
-                                if (!didCancel) {
-                                    activeSheet = .cropperSheet
-                                } else {
-                                    activeSheet = nil
-                                }
-                                didCancel = false
-                            }
-                            .ignoresSafeArea()
-                    case .cropperSheet:
-                        MantisPhotoCropper(selectedImage: $imageTemp)
-                            .onDisappear {
-                                if let _ = imageTemp {
-                                    images?.append(imageTemp ?? defaultImages.errorImage!)
-                                    imageChanged = true
-                                }
-                                imageTemp = nil
-                            }
-                            .ignoresSafeArea()
-                    }
-                }
-                .navigationTitle(name)
-                .navigationViewStyle(.stack)
-                .toolbar {
-                    ToolbarItemGroup(placement: .bottomBar) {
-                        HStack {
-                            Spacer()
-                            Button {
-                                showingAddImageAlert = true
-                                focusState = nil
-                            } label: {
-                                Image(systemName: "plus")
-                            }
-                            .disabled(images?.count ?? 3 > 2)
-                            EditButton()
-                                .disabled(images?.isEmpty ?? true)
-                            
-                            Spacer()
-                        }
-                    }
-                    ToolbarItemGroup(placement: .navigationBarTrailing) {
-                        Button("Save") {
-                            if (wasPublic) {
-                                isPublic = true
-                            }
-                            tags = descript.findTags()
-                            if (isPublic && wasPublic) {
-                                updatePublic()
-                            } else if (!wasPublic && isPublic) {
-                                savePublic()
-                            } else {
-                                saveChanges()
-                            }
-                        }
-                        .padding(.trailing)
-                        .tint(.blue)
-                        .disabled(keepDisabled)
-                    }
-                    ToolbarItemGroup(placement: .navigationBarLeading) {
-                        Button("Cancel") {
-                            name = ""
-                            founder = ""
-                            descript = ""
-                            tags = ""
-                            presentationMode.wrappedValue.dismiss()
-                        }
-                        .padding(.leading)
-                    }
-                    ToolbarItemGroup(placement: .keyboard) {
-                        HStack {
-                            Button {
-                                switch focusState {
-                                case .descript:
-                                    if (fromDB && wasPublic) {
-                                        focusState = .name
-                                    } else {
-                                        focusState = .founder
-                                    }
-                                case .founder:
-                                    focusState = .name
-                                default:
-                                    focusState = nil
-                                }
-                            } label: {
-                                Image(systemName: "chevron.up")
-                            }
-                            .disabled(focusState == .name)
-                            Button {
-                                switch focusState {
-                                case .name:
-                                    if (fromDB && wasPublic) {
-                                        focusState = .descript
-                                    } else {
-                                        focusState = .founder
-                                    }
-                                case .founder:
-                                    focusState = .descript
-                                default:
-                                    focusState = nil
-                                }
-                            } label: {
-                                Image(systemName: "chevron.down")
-                            }
-                            .disabled(focusState == .descript)
-                            Spacer()
-                            Button("Done") {
-                                focusState = nil
-                            }
+                            Text("Share Spot")
+                        } footer: {
+                            Text("Public spots are shown in discover tab to other users.")
+                                .font(.footnote)
+                                .foregroundColor(.gray)
                         }
                     }
                 }
-            } else {
-                VStack {
-                    Spacer()
-                    Text("Internet Is Required To Update Public Spots.")
-                        .font(.subheadline)
+                Section {
+                    ZStack {
+                        TextEditor(text: $descript)
+                        Text(descript).opacity(0).padding(.all, 8)
+                    }
+                    .focused($focusState, equals: .descript)
+                    .onReceive(Just(descript)) { _ in
+                        if (descript.count > MaxCharLength.description) {
+                            descript = String(descript.prefix(MaxCharLength.description))
+                        }
+                    }
+                } header: {
+                    Text("Spot Description")
+                } footer: {
+                    Text("Use # to add tags. Example: #hiking #skating")
+                        .font(.footnote)
                         .foregroundColor(.gray)
-                    Spacer()
+                }
+                .onAppear {
+                    descript = spot.details ?? ""
+                }
+                Section {
+                    if (images?.count ?? 0 > 0) {
+                        List {
+                            ForEach(images ?? [defaultImages.errorImage!], id: \.self) { images in
+                                if let images = images {
+                                    HStack {
+                                        Spacer()
+                                        Image(uiImage: images)
+                                            .resizable()
+                                            .scaledToFit()
+                                            .frame(width: UIScreen.screenWidth / 2, alignment: .center)
+                                            .cornerRadius(10)
+                                        Spacer()
+                                    }
+                                }
+                            }
+                            .onMove { indexSet, offset in
+                                images!.move(fromOffsets: indexSet, toOffset: offset)
+                                imageChanged = true
+                            }
+                            .onDelete { indexSet in
+                                images!.remove(atOffsets: indexSet)
+                                imageChanged = true
+                            }
+                        }
+                    }
+                } header: {
+                    Text("Photo of Spot")
+                } footer: {
+                    Text("Only 1 image is required (up to 3).")
+                        .font(.footnote)
+                        .foregroundColor(.gray)
                 }
             }
+            .onSubmit {
+                switch focusState {
+                case .name:
+                    if (fromDB && wasPublic) {
+                        focusState = .descript
+                    } else {
+                        focusState = .founder
+                    }
+                case .founder:
+                    focusState = .descript
+                default:
+                    focusState = nil
+                }
+            }
+            .alert("Unable to save spot. Please try again.", isPresented: $showingCannotSavePrivateAlert) {
+                Button("OK", role: .cancel) { }
+            }
+            .confirmationDialog("Choose Image From Photos or Camera", isPresented: $showingAddImageAlert) {
+                Button("Camera") {
+                    activeSheet = .cameraSheet
+                }
+                Button("Photos") {
+                    activeSheet = .cameraRollSheet
+                }
+                Button("Cancel", role: .cancel) { }
+            }
+            .fullScreenCover(item: $activeSheet) { item in
+                switch item {
+                case .cameraSheet:
+                    TakePhoto(selectedImage: $imageTemp)
+                        .onDisappear {
+                            if (imageTemp != nil) {
+                                activeSheet = .cropperSheet
+                            } else {
+                                activeSheet = nil
+                            }
+                            didCancel = false
+                        }
+                        .ignoresSafeArea()
+                case .cameraRollSheet:
+                    ChoosePhoto(image: $imageTemp, didCancel: $didCancel)
+                        .onDisappear {
+                            if (!didCancel) {
+                                activeSheet = .cropperSheet
+                            } else {
+                                activeSheet = nil
+                            }
+                            didCancel = false
+                        }
+                        .ignoresSafeArea()
+                case .cropperSheet:
+                    MantisPhotoCropper(selectedImage: $imageTemp)
+                        .onDisappear {
+                            if let _ = imageTemp {
+                                images?.append(imageTemp ?? defaultImages.errorImage!)
+                                imageChanged = true
+                            }
+                            imageTemp = nil
+                        }
+                        .ignoresSafeArea()
+                }
+            }
+            .navigationTitle(name)
+            .navigationViewStyle(.stack)
+            .toolbar {
+                ToolbarItemGroup(placement: .bottomBar) {
+                    HStack {
+                        Spacer()
+                        Button {
+                            showingAddImageAlert = true
+                            focusState = nil
+                        } label: {
+                            Image(systemName: "plus")
+                        }
+                        .disabled(images?.count ?? 3 > 2)
+                        EditButton()
+                            .disabled(images?.isEmpty ?? true)
+                        
+                        Spacer()
+                    }
+                }
+                ToolbarItemGroup(placement: .navigationBarTrailing) {
+                    Button("Save") {
+                        if (wasPublic) {
+                            isPublic = true
+                        }
+                        tags = descript.findTags()
+                        if (isPublic && wasPublic) {
+                            updatePublic()
+                        } else if (!wasPublic && isPublic) {
+                            savePublic()
+                        } else {
+                            saveChanges()
+                        }
+                    }
+                    .padding(.trailing)
+                    .tint(.blue)
+                    .disabled(keepDisabled)
+                }
+                ToolbarItemGroup(placement: .navigationBarLeading) {
+                    Button("Cancel") {
+                        name = ""
+                        founder = ""
+                        descript = ""
+                        tags = ""
+                        presentationMode.wrappedValue.dismiss()
+                    }
+                    .padding(.leading)
+                }
+                ToolbarItemGroup(placement: .keyboard) {
+                    HStack {
+                        Button {
+                            switch focusState {
+                            case .descript:
+                                if (fromDB && wasPublic) {
+                                    focusState = .name
+                                } else {
+                                    focusState = .founder
+                                }
+                            case .founder:
+                                focusState = .name
+                            default:
+                                focusState = nil
+                            }
+                        } label: {
+                            Image(systemName: "chevron.up")
+                        }
+                        .disabled(focusState == .name)
+                        Button {
+                            switch focusState {
+                            case .name:
+                                if (fromDB && wasPublic) {
+                                    focusState = .descript
+                                } else {
+                                    focusState = .founder
+                                }
+                            case .founder:
+                                focusState = .descript
+                            default:
+                                focusState = nil
+                            }
+                        } label: {
+                            Image(systemName: "chevron.down")
+                        }
+                        .disabled(focusState == .descript)
+                        Spacer()
+                        Button("Done") {
+                            focusState = nil
+                        }
+                    }
+                }
+            }
+            
+            
+            
         }
         .onAppear {
             wasPublic = spot.isPublic
@@ -387,8 +375,9 @@ struct SpotEditSheet: View {
         do {
             try moc.save()
         } catch {
-            cloudViewModel.isErrorMessage = "Error, unable to save spot. Please try again."
-            cloudViewModel.isError.toggle()
+            showingCannotSavePrivateAlert = true
+            let generator = UINotificationFeedbackGenerator()
+            generator.notificationOccurred(.warning)
             return
         }
         presentationMode.wrappedValue.dismiss()
@@ -430,8 +419,9 @@ struct SpotEditSheet: View {
                 }
             }
         } else {
-            cloudViewModel.isErrorMessage = "Error, unable to save spot. Please try again."
-            cloudViewModel.isError.toggle()
+            showingCannotSavePrivateAlert = true
+            let generator = UINotificationFeedbackGenerator()
+            generator.notificationOccurred(.warning)
             return
         }
         if images?.count == 1 {
@@ -448,13 +438,13 @@ struct SpotEditSheet: View {
         do {
             try moc.save()
         } catch {
-            cloudViewModel.isErrorMessage = "Error, unable to save spot. Please try again."
-            cloudViewModel.isError.toggle()
+            showingCannotSavePrivateAlert = true
+            let generator = UINotificationFeedbackGenerator()
+            generator.notificationOccurred(.warning)
             return
         }
         if !spot.isPublic {
-            cloudViewModel.isErrorMessage = cloudkitErrorMsg.create
-            cloudViewModel.isError.toggle()
+            showingCannotSavePublicAlert = true
         }
         presentationMode.wrappedValue.dismiss()
     }
@@ -495,8 +485,9 @@ struct SpotEditSheet: View {
                     spot.isPublic = false
                 }
             } else {
-                cloudViewModel.isErrorMessage = "Error, unable to save spot. Please try again."
-                cloudViewModel.isError.toggle()
+                showingCannotSavePrivateAlert = true
+                let generator = UINotificationFeedbackGenerator()
+                generator.notificationOccurred(.warning)
                 return
             }
         }
@@ -513,13 +504,13 @@ struct SpotEditSheet: View {
         do {
             try moc.save()
         } catch {
-            cloudViewModel.isErrorMessage = "Error, unable to save spot. Please try again."
-            cloudViewModel.isError.toggle()
+            showingCannotSavePrivateAlert = true
+            let generator = UINotificationFeedbackGenerator()
+            generator.notificationOccurred(.warning)
             return
         }
         if !spot.isPublic {
-            cloudViewModel.isErrorMessage = cloudkitErrorMsg.create
-            cloudViewModel.isError.toggle()
+            showingCannotSavePublicAlert = true
         }
         presentationMode.wrappedValue.dismiss()
     }

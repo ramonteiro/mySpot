@@ -50,6 +50,8 @@ struct DetailPlaylistView: View {
     }
     
     private func deleteFiltered(at offsets: IndexSet) {
+        let generator = UINotificationFeedbackGenerator()
+        generator.notificationOccurred(.warning)
         offsets.forEach { i in
             playlist.spotArr.forEach { j in
                 if (filteredSpots[i] == j) {

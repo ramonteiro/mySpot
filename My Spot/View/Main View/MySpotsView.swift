@@ -31,6 +31,8 @@ struct MySpotsView: View {
     @State private var filteredSpots: [Spot] = []
     @State private var searchText = ""
     @State private var sortBy = "Name"
+    @State private var showingCannotSavePublicAlert = false
+    @State private var pu = false
     
     private var searchResults: [Spot] {
             if searchText.isEmpty {
@@ -51,6 +53,9 @@ struct MySpotsView: View {
                     } else if (sortType == "Closest") {
                         sortClosest()
                     }
+                }
+                .alert("Unable to upload spot. Spot is now private, please try again later and check internet connection.", isPresented: $pu) {
+                    Button("OK", role: .cancel) { }
                 }
         }
         .navigationViewStyle(.stack)
@@ -179,8 +184,16 @@ struct MySpotsView: View {
                     } label: {
                         Image(systemName: "plus").imageScale(.large)
                     }
-                    .sheet(isPresented: $showingAddSheet, onDismiss: setFilteringType) {
-                        AddSpotSheet()
+                    .sheet(isPresented: $showingAddSheet, onDismiss: {
+                        setFilteringType()
+                        if showingCannotSavePublicAlert {
+                            let generator = UINotificationFeedbackGenerator()
+                            generator.notificationOccurred(.warning)
+                            pu.toggle()
+                            showingCannotSavePublicAlert = false
+                        }
+                    }) {
+                        AddSpotSheet(showingCannotSavePublicAlert: $showingCannotSavePublicAlert)
                     }
                 }
             }
@@ -200,7 +213,22 @@ struct MySpotsView: View {
     private func setFilteringType() {
         if (UserDefaults.standard.valueExists(forKey: "savedSort")) {
             sortBy = UserDefaults.standard.string(forKey: "savedSort") ?? "Name"
-            if (sortBy == "Name") {
+            if sortBy == "Likes" {
+                sortBy = "Newest"
+                let dateFormatter = DateFormatter()
+                dateFormatter.dateFormat = "MMM d, yyyy; HH:mm:ss"
+                filteredSpots = spots.sorted { (spot1, spot2) -> Bool in
+                    guard let dateString1 = spot1.date else { return true }
+                    guard let dateString2 = spot2.date else { return true }
+                    guard let date1 = dateFormatter.date(from: dateString1) else { return true }
+                    guard let date2 = dateFormatter.date(from: dateString2) else { return true }
+                    if (date1 > date2) {
+                        return true
+                    } else {
+                        return false
+                    }
+                }
+            } else if (sortBy == "Name") {
                 filteredSpots = spots.sorted { (spot1, spot2) -> Bool in
                     guard let name1 = spot1.name else { return true }
                     guard let name2 = spot2.name else { return true }
@@ -289,6 +317,8 @@ struct MySpotsView: View {
     private func deleteRow(at indexSet: IndexSet) {
         self.toBeDeleted = indexSet
         self.showingDeleteAlert = true
+        let generator = UINotificationFeedbackGenerator()
+        generator.notificationOccurred(.warning)
     }
     
     private func deleteFiltered(at offsets: IndexSet) {

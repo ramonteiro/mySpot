@@ -82,6 +82,8 @@ struct PlaylistView: View {
     }
     
     private func delete(at offsets: IndexSet) {
+        let generator = UINotificationFeedbackGenerator()
+        generator.notificationOccurred(.warning)
         offsets.forEach { i in
             if (playlists[i].spotArr.count > 0) {
                 for place in playlists[i].spotArr {

@@ -18,12 +18,14 @@ struct DiscoverView: View {
     @EnvironmentObject var mapViewModel: MapViewModel
     @EnvironmentObject var cloudViewModel: CloudKitViewModel
     @EnvironmentObject var tabController: TabController
-    @EnvironmentObject var networkViewModel: NetworkMonitor
     
     @State private var showingMapSheet = false
     @State private var searchText = ""
     @State private var searchLocationName = ""
     @State private var sortBy = "Closest"
+    @State private var distance = 0
+    @State private var isMetric = false
+    @State private var hasError = false
 
     // find spot names from db that contain searchtext
     private var searchResults: [SpotFromCloud] {
@@ -37,32 +39,34 @@ struct DiscoverView: View {
     var body: some View {
         NavigationView {
             // check if user is signed in to icloud/has internet
-            if (networkViewModel.hasInternet && cloudViewModel.isSignedInToiCloud) {
+            if (cloudViewModel.isSignedInToiCloud) {
                 displaySpotsFromDB
             } else {
-                displayError
+                displaySignInToIcloudPrompt
             }
         }
         .navigationViewStyle(.stack)
         .onAppear {
             mapViewModel.searchingHere = mapViewModel.region
+            if (UserDefaults.standard.valueExists(forKey: "savedSort")) {
+                sortBy = UserDefaults.standard.string(forKey: "savedSort") ?? "Closest"
+            }
+            if (UserDefaults.standard.valueExists(forKey: "savedDistance")) {
+                distance = UserDefaults.standard.integer(forKey: "savedDistance")
+            }
             if (cloudViewModel.spots.count == 0) {
-                loadSpotsFromDB(location: CLLocation(latitude: mapViewModel.searchingHere.center.latitude, longitude: mapViewModel.searchingHere.center.longitude))
+                let dis = CGFloat(cloudViewModel.radiusInMeters)
+                loadSpotsFromDB(location: CLLocation(latitude: mapViewModel.searchingHere.center.latitude, longitude: mapViewModel.searchingHere.center.longitude), radiusInMeters: dis, filteringBy: sortBy)
             }
             mapViewModel.getPlacmarkOfLocation(location: CLLocation(latitude: mapViewModel.searchingHere.center.latitude, longitude: mapViewModel.searchingHere.center.longitude)) { location in
                 searchLocationName = location
             }
+            isMetric = getIsMetric()
         }
     }
     
-    private var displayError: some View {
-        ZStack {
-            if (!networkViewModel.hasInternet) {
-                Text("No Internet Connection Found")
-            } else if (!cloudViewModel.isSignedInToiCloud) {
-                displaySignInToIcloudPrompt
-            }
-        }
+    private func getIsMetric() -> Bool {
+        return ((Locale.current as NSLocale).object(forKey: NSLocale.Key.usesMetricSystem) as? Bool) ?? true
     }
     
     private var displaySignInToIcloudPrompt: some View {
@@ -93,17 +97,30 @@ struct DiscoverView: View {
         }
     }
     
-    private func loadSpotsFromDB(location: CLLocation) {
-        DispatchQueue.main.async {
-            cloudViewModel.fetchSpotPublic(userLocation: location, type: "none")
-            sortBy = "Closest"
+    private func loadSpotsFromDB(location: CLLocation, radiusInMeters: CGFloat, filteringBy: String) {
+        if isMetric {
+            let radiusUnit = Measurement(value: radiusInMeters, unit: UnitLength.kilometers)
+            let unitMeters = radiusUnit.converted(to: .meters)
+            cloudViewModel.radiusInMeters = unitMeters.value
+        } else {
+            let radiusUnit = Measurement(value: radiusInMeters, unit: UnitLength.miles)
+            let unitMeters = radiusUnit.converted(to: .meters)
+            cloudViewModel.radiusInMeters = unitMeters.value
+        }
+        Task {
+            do {
+                try await cloudViewModel.fetchSpotPublic(userLocation: location, filteringBy: filteringBy)
+            } catch {
+                cloudViewModel.isFetching = false
+                hasError = true
+            }
         }
     }
     
     private var displaySpotsFromDB: some View {
         ZStack {
             listSpots
-            if (cloudViewModel.spots.count == 0 || cloudViewModel.isFetching) {
+            if (cloudViewModel.isFetching) {
                 ZStack {
                     ProgressView("Loading Spots")
                         .padding()
@@ -112,10 +129,38 @@ struct DiscoverView: View {
                                 .fill(Color(UIColor.systemBackground))
                         )
                 }
-            } else if (cloudViewModel.spots.count == 0 && !cloudViewModel.isFetching) {
-                Text("iCloud servers are currently down.")
-                    .foregroundColor(.gray)
-                    .font(.subheadline)
+            }
+            if hasError {
+                VStack {
+                    HStack {
+                        Spacer()
+                        Text("Unable to load spots")
+                            .foregroundColor(.gray)
+                            .font(.subheadline)
+                        Spacer()
+                    }
+                    HStack {
+                        Spacer()
+                        Text("Try refreshing or checking your internet connection")
+                            .foregroundColor(.gray)
+                            .font(.subheadline)
+                            .multilineTextAlignment(.center)
+                        Spacer()
+                    }
+                }
+                .padding(.vertical)
+                .padding(.horizontal, 2)
+                .background(
+                    RoundedRectangle(cornerRadius: 10)
+                        .fill(Color(UIColor.systemBackground))
+                )
+                .onAppear {
+                    if cloudViewModel.spots.count != 0 {
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                            hasError.toggle()
+                        }
+                    }
+                }
             }
         }
     }
@@ -133,10 +178,10 @@ struct DiscoverView: View {
             .onAppear {
                 cloudViewModel.canRefresh = true
             }
-            .if(cloudViewModel.canRefresh && cloudViewModel.spots.count != 0) { view in
+            .if(cloudViewModel.canRefresh) { view in
                 view.refreshable {
                     mapViewModel.checkLocationAuthorization()
-                    loadSpotsFromDB(location: CLLocation(latitude: mapViewModel.searchingHere.center.latitude, longitude: mapViewModel.searchingHere.center.longitude))
+                    loadSpotsFromDB(location: CLLocation(latitude: mapViewModel.searchingHere.center.latitude, longitude: mapViewModel.searchingHere.center.longitude), radiusInMeters: CGFloat(distance), filteringBy: sortBy)
                 }
             }
             .onChange(of: tabController.discoverPopToRoot) { _ in
@@ -159,57 +204,89 @@ struct DiscoverView: View {
             ToolbarItemGroup(placement: .navigationBarTrailing) {
                 Menu {
                     Button {
-                        cloudViewModel.maxTotalfetches = 10
-                        UserDefaults.standard.set(10, forKey: "maxTotalFetches")
+                        distance = 5
+                        UserDefaults.standard.set(5, forKey: "savedDistance")
                         mapViewModel.checkLocationAuthorization()
-                        loadSpotsFromDB(location: CLLocation(latitude: mapViewModel.searchingHere.center.latitude, longitude: mapViewModel.searchingHere.center.longitude))
+                        loadSpotsFromDB(location: CLLocation(latitude: mapViewModel.searchingHere.center.latitude, longitude: mapViewModel.searchingHere.center.longitude), radiusInMeters: CGFloat(distance), filteringBy: sortBy)
                     } label: {
-                        Text("Load 10 Spots")
+                        if isMetric {
+                            Text("Max Range Of 5 Km")
+                        } else {
+                            Text("Max Range Of 5 Mi")
+                        }
                     }
                     Button {
-                        cloudViewModel.maxTotalfetches = 20
-                        UserDefaults.standard.set(20, forKey: "maxTotalFetches")
+                        distance = 10
+                        UserDefaults.standard.set(10, forKey: "savedDistance")
                         mapViewModel.checkLocationAuthorization()
-                        loadSpotsFromDB(location: CLLocation(latitude: mapViewModel.searchingHere.center.latitude, longitude: mapViewModel.searchingHere.center.longitude))
+                        loadSpotsFromDB(location: CLLocation(latitude: mapViewModel.searchingHere.center.latitude, longitude: mapViewModel.searchingHere.center.longitude), radiusInMeters: CGFloat(distance), filteringBy: sortBy)
                     } label: {
-                        Text("Load 20 Spots")
+                        if isMetric {
+                            Text("Max Range Of 10 Km")
+                        } else {
+                            Text("Max Range Of 10 Mi")
+                        }
                     }
                     Button {
-                        cloudViewModel.maxTotalfetches = 30
-                        UserDefaults.standard.set(30, forKey: "maxTotalFetches")
+                        distance = 25
+                        UserDefaults.standard.set(25, forKey: "savedDistance")
                         mapViewModel.checkLocationAuthorization()
-                        loadSpotsFromDB(location: CLLocation(latitude: mapViewModel.searchingHere.center.latitude, longitude: mapViewModel.searchingHere.center.longitude))
+                        loadSpotsFromDB(location: CLLocation(latitude: mapViewModel.searchingHere.center.latitude, longitude: mapViewModel.searchingHere.center.longitude), radiusInMeters: CGFloat(distance), filteringBy: sortBy)
                     } label: {
-                        Text("Load 30 Spots")
+                        if isMetric {
+                            Text("Max Range Of 25 Km")
+                        } else {
+                            Text("Max Range Of 25 Mi")
+                        }
                     }
                     Button {
-                        cloudViewModel.maxTotalfetches = 40
-                        UserDefaults.standard.set(40, forKey: "maxTotalFetches")
+                        distance = 50
+                        UserDefaults.standard.set(50, forKey: "savedDistance")
                         mapViewModel.checkLocationAuthorization()
-                        loadSpotsFromDB(location: CLLocation(latitude: mapViewModel.searchingHere.center.latitude, longitude: mapViewModel.searchingHere.center.longitude))
+                        loadSpotsFromDB(location: CLLocation(latitude: mapViewModel.searchingHere.center.latitude, longitude: mapViewModel.searchingHere.center.longitude), radiusInMeters: CGFloat(distance), filteringBy: sortBy)
                     } label: {
-                        Text("Load 40 Spots")
+                        if isMetric {
+                            Text("Max Range Of 50 Km")
+                        } else {
+                            Text("Max Range Of 50 Mi")
+                        }
                     }
                     Button {
-                        cloudViewModel.maxTotalfetches = 50
-                        UserDefaults.standard.set(50, forKey: "maxTotalFetches")
+                        distance = 100
+                        UserDefaults.standard.set(100, forKey: "savedDistance")
                         mapViewModel.checkLocationAuthorization()
-                        loadSpotsFromDB(location: CLLocation(latitude: mapViewModel.searchingHere.center.latitude, longitude: mapViewModel.searchingHere.center.longitude))
+                        loadSpotsFromDB(location: CLLocation(latitude: mapViewModel.searchingHere.center.latitude, longitude: mapViewModel.searchingHere.center.longitude), radiusInMeters: CGFloat(distance), filteringBy: sortBy)
                     } label: {
-                        Text("Load 50 Spots")
+                        if isMetric {
+                            Text("Max Range Of 100 Km")
+                        } else {
+                            Text("Max Range Of 100 Mi")
+                        }
                     }
                     Button {
-                        cloudViewModel.maxTotalfetches = 100
-                        UserDefaults.standard.set(100, forKey: "maxTotalFetches")
+                        distance = 0
+                        UserDefaults.standard.set(0, forKey: "savedDistance")
                         mapViewModel.checkLocationAuthorization()
-                        loadSpotsFromDB(location: CLLocation(latitude: mapViewModel.searchingHere.center.latitude, longitude: mapViewModel.searchingHere.center.longitude))
+                        loadSpotsFromDB(location: CLLocation(latitude: mapViewModel.searchingHere.center.latitude, longitude: mapViewModel.searchingHere.center.longitude), radiusInMeters: CGFloat(distance), filteringBy: sortBy)
                     } label: {
-                        Text("Load 100 Spots")
+                        Text("Anywhere In The World")
                     }
                 } label: {
                     HStack {
                         Image(systemName: "line.3.horizontal.decrease")
-                        Text("\(cloudViewModel.maxTotalfetches)")
+                        if isMetric {
+                            if distance == 0 {
+                                Text("Any")
+                            } else {
+                                Text("\(distance) Km")
+                            }
+                        } else {
+                            if distance == 0 {
+                                Text("Any")
+                            } else {
+                                Text("\(distance) Mi")
+                            }
+                        }
                     }
                 }
 
@@ -219,15 +296,11 @@ struct DiscoverView: View {
                     Image(systemName: "map").imageScale(.large)
                 }
                 .fullScreenCover(isPresented: $showingMapSheet) {
-                    ViewDiscoverSpots()
+                    ViewDiscoverSpots(sortBy: sortBy)
                 }
             }
             ToolbarItemGroup(placement: .navigationBarLeading) {
-                if (!cloudViewModel.isFetching) {
-                    displayLocationIcon
-                } else {
-                    ProgressView()
-                }
+                displayLocationIcon
             }
         }
     }
@@ -262,53 +335,27 @@ struct DiscoverView: View {
         }
     }
     
-    private func distanceBetween(x1: Double, x2: Double, y1: Double, y2: Double) -> Double {
-        return (((x2 - x1) * (x2 - x1))+((y2 - y1) * (y2 - y1))).squareRoot()
-    }
-    
     private func sortClosest() {
-        cloudViewModel.spots = cloudViewModel.spots.sorted { (spot1, spot2) -> Bool in
-            let distanceFromSpot1 = distanceBetween(x1: mapViewModel.searchingHere.center.latitude, x2: spot1.location.coordinate.latitude, y1: mapViewModel.searchingHere.center.longitude, y2: spot1.location.coordinate.longitude)
-            let distanceFromSpot2 = distanceBetween(x1: mapViewModel.searchingHere.center.latitude, x2: spot2.location.coordinate.latitude, y1: mapViewModel.searchingHere.center.longitude, y2: spot2.location.coordinate.longitude)
-            return distanceFromSpot1 < distanceFromSpot2
-        }
         sortBy = "Closest"
+        UserDefaults.standard.set(sortBy, forKey: "savedSort")
+        loadSpotsFromDB(location: CLLocation(latitude: mapViewModel.searchingHere.center.latitude, longitude: mapViewModel.searchingHere.center.longitude), radiusInMeters: CGFloat(distance), filteringBy: sortBy)
     }
     
     private func sortName() {
-        cloudViewModel.spots = cloudViewModel.spots.sorted { (spot1, spot2) -> Bool in
-            if (spot1.name < spot2.name) {
-                return true
-            } else {
-                return false
-            }
-        }
         sortBy = "Name"
+        UserDefaults.standard.set(sortBy, forKey: "savedSort")
+        loadSpotsFromDB(location: CLLocation(latitude: mapViewModel.searchingHere.center.latitude, longitude: mapViewModel.searchingHere.center.longitude), radiusInMeters: CGFloat(distance), filteringBy: sortBy)
     }
     
     private func sortDate() {
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "MMM d, yyyy; HH:mm:ss"
-        cloudViewModel.spots = cloudViewModel.spots.sorted { (spot1, spot2) -> Bool in
-            guard let date1 = dateFormatter.date(from: spot1.date) else { return true }
-            guard let date2 = dateFormatter.date(from: spot2.date) else { return true }
-            if (date1 > date2) {
-                return true
-            } else {
-                return false
-            }
-        }
         sortBy = "Newest"
+        UserDefaults.standard.set(sortBy, forKey: "savedSort")
+        loadSpotsFromDB(location: CLLocation(latitude: mapViewModel.searchingHere.center.latitude, longitude: mapViewModel.searchingHere.center.longitude), radiusInMeters: CGFloat(distance), filteringBy: sortBy)
     }
     
     private func sortLikes() {
-        cloudViewModel.spots = cloudViewModel.spots.sorted { (spot1, spot2) -> Bool in
-            if (spot1.likes > spot2.likes) {
-                return true
-            } else {
-                return false
-            }
-        }
         sortBy = "Likes"
+        UserDefaults.standard.set(sortBy, forKey: "savedSort")
+        loadSpotsFromDB(location: CLLocation(latitude: mapViewModel.searchingHere.center.latitude, longitude: mapViewModel.searchingHere.center.longitude), radiusInMeters: CGFloat(distance), filteringBy: sortBy)
     }
 }

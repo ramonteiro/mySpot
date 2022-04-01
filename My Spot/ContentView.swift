@@ -84,6 +84,8 @@ struct ContentView: View {
             }
         }
         .onChange(of: cloudViewModel.isError) { newValue in
+            let generator = UINotificationFeedbackGenerator()
+            generator.notificationOccurred(.warning)
             errorAlert.toggle()
         }
         .alert(cloudViewModel.isErrorMessage, isPresented: $errorAlert) {

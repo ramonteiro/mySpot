@@ -21,9 +21,6 @@ struct My_SpotApp: App {
     // initialize iCloudViewModel
     @StateObject private var cloudViewModel = CloudKitViewModel()
     
-    // initialize Network Monitor
-    @StateObject private var networkViewModel = NetworkMonitor()
-    
     init() {
         UIView.appearance(whenContainedInInstancesOf: [UIAlertController.self]).tintColor = .systemBlue
     }
@@ -34,7 +31,6 @@ struct My_SpotApp: App {
                 .environment(\.managedObjectContext, dataController.container.viewContext)
                 .environmentObject(mapViewModel)
                 .environmentObject(cloudViewModel)
-                .environmentObject(networkViewModel)
                 .onOpenURL { url in
                     Task {
                         await cloudViewModel.checkDeepLink(url: url)

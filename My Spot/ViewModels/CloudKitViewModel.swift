@@ -25,6 +25,7 @@ class CloudKitViewModel: ObservableObject {
     @Published var isError = false
     @Published var isErrorMessage = ""
     @Published var isPostError = false
+    @Published var radiusInMeters: Double = 0
     
     init() {
         getiCloudStatus()
@@ -32,8 +33,11 @@ class CloudKitViewModel: ObservableObject {
     }
     
     private func setUserDefaults() {
+        if (UserDefaults.standard.valueExists(forKey: "savedDistance")) {
+            radiusInMeters = Double(UserDefaults.standard.integer(forKey: "savedDistance"))
+        }
         if (UserDefaults.standard.valueExists(forKey: "maxTotalFetches")) {
-            maxTotalfetches = UserDefaults.standard.value(forKey: "maxTotalFetches") as! Int
+            maxTotalfetches = UserDefaults.standard.integer(forKey: "maxTotalFetches")
         }
         if (UserDefaults.standard.valueExists(forKey: "discovernot")) {
             let center = UNUserNotificationCenter.current()
@@ -301,81 +305,109 @@ class CloudKitViewModel: ObservableObject {
         }
     }
     
-    func fetchSpotPublic(userLocation: CLLocation, type: String) {
+    func fetchSpotPublic(userLocation: CLLocation, filteringBy: String) async throws {
         isFetching = true
-        var pred = NSPredicate(value: true)
-        if (type != "none") {
-            pred = NSPredicate(format: "name CONTAINS[c] %@", type)
+        var predicate = NSPredicate()
+        if radiusInMeters == 0 {
+            predicate = NSPredicate(value: true)
+        } else {
+            predicate = NSPredicate(format: "distanceToLocation:fromLocation:(location, %@) < %f", userLocation, CGFloat(radiusInMeters))
         }
-        let query = CKQuery(recordType: "Spots", predicate: pred)
-        let distance = CKLocationSortDescriptor(key: "location", relativeLocation: userLocation)
-        let creation = NSSortDescriptor(key: "creationDate", ascending: false)
-        query.sortDescriptors = [distance, creation]
+        let query = CKQuery(recordType: "Spots", predicate: predicate)
+        if filteringBy == "Closest" {
+            let distance = CKLocationSortDescriptor(key: "location", relativeLocation: userLocation)
+            let creation = NSSortDescriptor(key: "creationDate", ascending: false)
+            query.sortDescriptors = [distance, creation]
+        } else if filteringBy == "Likes" {
+            let likes = NSSortDescriptor(key: "likes", ascending: false)
+            let distance = CKLocationSortDescriptor(key: "location", relativeLocation: userLocation)
+            let creation = NSSortDescriptor(key: "creationDate", ascending: false)
+            query.sortDescriptors = [likes, distance, creation]
+        } else if filteringBy == "Name" {
+            let name = NSSortDescriptor(key: "name", ascending: true)
+            let distance = CKLocationSortDescriptor(key: "location", relativeLocation: userLocation)
+            let creation = NSSortDescriptor(key: "creationDate", ascending: false)
+            query.sortDescriptors = [name, distance, creation]
+        } else if filteringBy == "Newest" {
+            let distance = CKLocationSortDescriptor(key: "location", relativeLocation: userLocation)
+            let creation = NSSortDescriptor(key: "creationDate", ascending: false)
+            query.sortDescriptors = [creation, distance]
+        }
+        let desiredKeys = ["name", "founder", "date", "location", "likes", "inappropriate", "offensive", "dangerous", "spam", "id", "userID", "image", "type", "isMultipleImages", "locationName"]
         
-        let operation = CKQueryOperation(query: query)
-        operation.resultsLimit = 10
-        operation.desiredKeys = ["name", "founder", "date", "location", "likes", "inappropriate", "offensive", "dangerous", "spam", "id", "userID", "image", "type", "isMultipleImages"]
-        var returnedSpots: [SpotFromCloud] = []
-        
-        operation.recordMatchedBlock = { (returnedRecordID, returnedResult) in
-            switch returnedResult {
+        let results = try await CKContainer.default().publicCloudDatabase.records(matching: query, desiredKeys: desiredKeys, resultsLimit: 10)
+        DispatchQueue.main.async {
+            self.spots.removeAll()
+        }
+        results.matchResults.forEach { (_,result) in
+            switch result {
             case .success(let record):
-                guard let name = record["name"] as? String else { return }
-                guard let founder = record["founder"] as? String else { return }
-                guard let date = record["date"] as? String else { return }
-                guard let location = record["location"] as? CLLocation else { return }
-                guard let likes = record["likes"] as? Int else { return }
-                guard let id = record["id"] as? String else { return }
-                guard let user = record["userID"] as? String else { return }
-                guard let image = record["image"] as? CKAsset else { return }
-                var isMultipleImages = 0
-                if let m = record["isMultipleImages"] as? Int {
-                    isMultipleImages = m
+                DispatchQueue.main.async {
+                    guard let name = record["name"] as? String else { return }
+                    guard let founder = record["founder"] as? String else { return }
+                    guard let date = record["date"] as? String else { return }
+                    guard let location = record["location"] as? CLLocation else { return }
+                    guard let likes = record["likes"] as? Int else { return }
+                    guard let id = record["id"] as? String else { return }
+                    guard let user = record["userID"] as? String else { return }
+                    guard let image = record["image"] as? CKAsset else { return }
+                    var isMultipleImages = 0
+                    if let m = record["isMultipleImages"] as? Int {
+                        isMultipleImages = m
+                    }
+                    var inappropriate = 0
+                    var offensive = 0
+                    var spam = 0
+                    var dangerous = 0
+                    if let inna = record["inappropriate"] as? Int {
+                        inappropriate = inna
+                    }
+                    if let offen = record["offensive"] as? Int {
+                        offensive = offen
+                    }
+                    if let sp = record["spam"] as? Int {
+                        spam = sp
+                    }
+                    if let dan = record["dangerous"] as? Int {
+                        dangerous = dan
+                    }
+                    var types = ""
+                    var description = ""
+                    var locationName = ""
+                    if let typeCheck = record["type"] as? String {
+                        types = typeCheck
+                    }
+                    if let descriptionCheck = record["description"] as? String {
+                        description = descriptionCheck
+                    }
+                    if let locationNameCheck = record["locationName"] as? String {
+                        locationName = locationNameCheck
+                    }
+                    let imageURL = image.fileURL
+                    self.spots.append(SpotFromCloud(id: id, name: name, founder: founder, description: description, date: date, location: location, type: types, imageURL: imageURL ?? URL(fileURLWithPath: "none"),  image2URL: nil , image3URL: nil, isMultipleImages: isMultipleImages , likes: likes, offensive: offensive, spam: spam, inappropriate: inappropriate, dangerous: dangerous, locationName: locationName, userID: user, record: record))
                 }
-                var inappropriate = 0
-                var offensive = 0
-                var spam = 0
-                var dangerous = 0
-                if let inna = record["inappropriate"] as? Int {
-                    inappropriate = inna
-                }
-                if let offen = record["offensive"] as? Int {
-                    offensive = offen
-                }
-                if let sp = record["spam"] as? Int {
-                    spam = sp
-                }
-                if let dan = record["dangerous"] as? Int {
-                    dangerous = dan
-                }
-                var types = ""
-                var description = ""
-                var locationName = ""
-                if let typeCheck = record["type"] as? String {
-                    types = typeCheck
-                }
-                if let descriptionCheck = record["description"] as? String {
-                    description = descriptionCheck
-                }
-                if let locationNameCheck = record["locationName"] as? String {
-                    locationName = locationNameCheck
-                }
-                let imageURL = image.fileURL
-                returnedSpots.append(SpotFromCloud(id: id, name: name, founder: founder, description: description, date: date, location: location, type: types, imageURL: imageURL ?? URL(fileURLWithPath: "none"),  image2URL: nil , image3URL: nil, isMultipleImages: isMultipleImages , likes: likes, offensive: offensive, spam: spam, inappropriate: inappropriate, dangerous: dangerous, locationName: locationName, userID: user, record: record))
             case .failure(let error):
-                print("FETCH ERROR: \(error)")
+                print("\(error)")
+                DispatchQueue.main.async {
+                    self.isFetching = false
+                }
+                return
+            }
+        }
+        
+        if let cursor = results.queryCursor {
+            if spots.count > maxTotalfetches - 1 {
+                DispatchQueue.main.async {
+                    self.isFetching = false
+                }
+            } else {
+                await fetchMoreSpotsPublic(cursor: cursor, desiredKeys: desiredKeys, resultLimit: 10)
+            }
+        } else {
+            DispatchQueue.main.async {
                 self.isFetching = false
             }
         }
-        
-        operation.queryResultBlock = { [weak self] cur in
-            print("RETURNED RESULT: \(cur)")
-            DispatchQueue.main.async {
-                self?.spots = returnedSpots
-                self?.fetchMoreSpotsPublic(cursor: try? cur.get())
-            }
-        }
-        addOperation(operation: operation)
     }
     
     func updateSpotPublic(id: String, newName: String, newDescription: String, newFounder: String, newType: String, imageChanged: Bool, image: Data?, image2: Data?, image3: Data?, isMultipleImages: Int) async throws -> Bool {
@@ -437,69 +469,6 @@ class CloudKitViewModel: ObservableObject {
         try await CKContainer.default().publicCloudDatabase.save(record)
         return true
     }
-    /*
-    func updateSpotPublic(spot: Spot, newName: String, newDescription: String, newFounder: String, newType: String, imageChanged: Bool, image: Data?, image2: Data?, image3: Data?, isMultipleImages: Int) {
-        let recordID = CKRecord.ID(recordName: spot.dbid!)
-        CKContainer.default().publicCloudDatabase.fetch(withRecordID: recordID) { [weak self] returnedRecord, returnedError in
-            DispatchQueue.main.async {
-                guard let returnedRecord = returnedRecord else {return}
-                returnedRecord["name"] = newName
-                returnedRecord["description"] = newDescription
-                returnedRecord["type"] = newType
-                returnedRecord["founder"] = newFounder
-                returnedRecord["isMultipleImages"] = isMultipleImages
-                
-                if (imageChanged) {
-                    if let image3 = image3 {
-                        do {
-                            let path = NSTemporaryDirectory() + "imageTemp\(UUID().uuidString).png"
-                            let url = URL(fileURLWithPath: path)
-                            try image3.write(to: url)
-                            let asset = CKAsset(fileURL: url)
-                            returnedRecord["image3"] = asset
-                        } catch {
-                            print(error)
-                            return
-                        }
-                    } else {
-                        returnedRecord["image3"] = nil
-                    }
-                    
-                    if let image2 = image2 {
-                        do {
-                            let path = NSTemporaryDirectory() + "imageTemp\(UUID().uuidString).png"
-                            let url = URL(fileURLWithPath: path)
-                            try image2.write(to: url)
-                            let asset = CKAsset(fileURL: url)
-                            returnedRecord["image2"] = asset
-                        } catch {
-                            print(error)
-                            return
-                        }
-                    } else {
-                        returnedRecord["image2"] = nil
-                        returnedRecord["image3"] = nil
-                    }
-                    
-                    if let image = image {
-                        do {
-                            let path = NSTemporaryDirectory() + "imageTemp\(UUID().uuidString).png"
-                            let url = URL(fileURLWithPath: path)
-                            try image.write(to: url)
-                            let asset = CKAsset(fileURL: url)
-                            returnedRecord["image"] = asset
-                        } catch {
-                            print(error)
-                            return
-                        }
-                    }
-                }
-                
-                self?.saveSpotPublic(record: returnedRecord)
-            }
-        }
-    }
-     */
     
     func likeSpot(spot: SpotFromCloud, like: Bool) async -> Bool {
         guard let _ = spot.record["likes"] else { return false }
@@ -532,77 +501,85 @@ class CloudKitViewModel: ObservableObject {
         }
     }
     
-    func fetchMoreSpotsPublic(cursor:CKQueryOperation.Cursor?)  {
-        
-        guard let cursorChecked = cursor else {
-            isFetching = false
-            return
-        }
-        if spots.count > maxTotalfetches - 1 {
-            isFetching = false
-            return
-        }
-        let queryoperation = CKQueryOperation(cursor: cursorChecked)
-        queryoperation.resultsLimit = 10
-        queryoperation.desiredKeys = ["name", "founder", "date", "location", "likes", "inappropriate", "offensive", "dangerous", "spam", "id", "userID", "image", "type", "isMultipleImages"]
-        var returnedSpots: [SpotFromCloud] = []
-        queryoperation.recordMatchedBlock = { (returnedRecordID, returnedResult) in
-            switch returnedResult {
-            case .success(let record):
-                guard let name = record["name"] as? String else { return }
-                guard let founder = record["founder"] as? String else { return }
-                guard let date = record["date"] as? String else { return }
-                guard let location = record["location"] as? CLLocation else { return }
-                guard let likes = record["likes"] as? Int else { return }
-                guard let id = record["id"] as? String else { return }
-                guard let user = record["userID"] as? String else { return }
-                guard let image = record["image"] as? CKAsset else { return }
-                var isMultipleImages = 0
-                if let m = record["isMultipleImages"] as? Int {
-                    isMultipleImages = m
+    func fetchMoreSpotsPublic(cursor: CKQueryOperation.Cursor, desiredKeys: [String], resultLimit: Int) async {
+        do {
+            let results = try await CKContainer.default().publicCloudDatabase.records(continuingMatchFrom: cursor, desiredKeys: desiredKeys, resultsLimit: resultLimit)
+            results.matchResults.forEach { (_,result) in
+                switch result {
+                case .success(let record):
+                    DispatchQueue.main.async {
+                        guard let name = record["name"] as? String else { return }
+                        guard let founder = record["founder"] as? String else { return }
+                        guard let date = record["date"] as? String else { return }
+                        guard let location = record["location"] as? CLLocation else { return }
+                        guard let likes = record["likes"] as? Int else { return }
+                        guard let id = record["id"] as? String else { return }
+                        guard let user = record["userID"] as? String else { return }
+                        guard let image = record["image"] as? CKAsset else { return }
+                        var isMultipleImages = 0
+                        if let m = record["isMultipleImages"] as? Int {
+                            isMultipleImages = m
+                        }
+                        var inappropriate = 0
+                        var offensive = 0
+                        var spam = 0
+                        var dangerous = 0
+                        if let inna = record["inappropriate"] as? Int {
+                            inappropriate = inna
+                        }
+                        if let offen = record["offensive"] as? Int {
+                            offensive = offen
+                        }
+                        if let sp = record["spam"] as? Int {
+                            spam = sp
+                        }
+                        if let dan = record["dangerous"] as? Int {
+                            dangerous = dan
+                        }
+                        var types = ""
+                        var description = ""
+                        var locationName = ""
+                        if let typeCheck = record["type"] as? String {
+                            types = typeCheck
+                        }
+                        if let descriptionCheck = record["description"] as? String {
+                            description = descriptionCheck
+                        }
+                        if let locationNameCheck = record["locationName"] as? String {
+                            locationName = locationNameCheck
+                        }
+                        let imageURL = image.fileURL
+                        self.spots.append(SpotFromCloud(id: id, name: name, founder: founder, description: description, date: date, location: location, type: types, imageURL: imageURL ?? URL(fileURLWithPath: "none"),  image2URL: nil , image3URL: nil, isMultipleImages: isMultipleImages , likes: likes, offensive: offensive, spam: spam, inappropriate: inappropriate, dangerous: dangerous, locationName: locationName, userID: user, record: record))
+                    }
+                case .failure(let error):
+                    print("\(error)")
+                    DispatchQueue.main.async {
+                        self.isFetching = false
+                    }
+                    return
                 }
-                var inappropriate = 0
-                var offensive = 0
-                var spam = 0
-                var dangerous = 0
-                if let inna = record["inappropriate"] as? Int {
-                    inappropriate = inna
-                }
-                if let offen = record["offensive"] as? Int {
-                    offensive = offen
-                }
-                if let sp = record["spam"] as? Int {
-                    spam = sp
-                }
-                if let dan = record["dangerous"] as? Int {
-                    dangerous = dan
-                }
-                var types = ""
-                var description = ""
-                var locationName = ""
-                if let typeCheck = record["type"] as? String {
-                    types = typeCheck
-                }
-                if let descriptionCheck = record["description"] as? String {
-                    description = descriptionCheck
-                }
-                if let locationNameCheck = record["locationName"] as? String {
-                    locationName = locationNameCheck
-                }
-                let imageURL = image.fileURL
-                returnedSpots.append(SpotFromCloud(id: id, name: name, founder: founder, description: description, date: date, location: location, type: types, imageURL: imageURL ?? URL(fileURLWithPath: "none"),  image2URL: nil , image3URL: nil, isMultipleImages: isMultipleImages , likes: likes, offensive: offensive, spam: spam, inappropriate: inappropriate, dangerous: dangerous, locationName: locationName, userID: user, record: record))
-            case .failure(let error):
-                print("FETCH ERROR: \(error)")
             }
-        }
-        queryoperation.queryResultBlock = { [weak self] returnedResult in
-            print("RETURNED RESULT: \(returnedResult)")
+            
+            if let cursor = results.queryCursor {
+                if spots.count > maxTotalfetches - 1 {
+                    DispatchQueue.main.async {
+                        self.isFetching = false
+                    }
+                } else {
+                    await fetchMoreSpotsPublic(cursor: cursor, desiredKeys: desiredKeys, resultLimit: 10)
+                }
+            } else {
+                DispatchQueue.main.async {
+                    self.isFetching = false
+                }
+            }
+        } catch {
             DispatchQueue.main.async {
-                self?.spots += returnedSpots
-                self?.fetchMoreSpotsPublic(cursor: try? returnedResult.get())
+                self.isErrorMessage = "Unable to load more spots"
+                self.isError.toggle()
             }
+            return
         }
-        addOperation(operation: queryoperation)
     }
     
     private func addOperation(operation: CKDatabaseOperation) {

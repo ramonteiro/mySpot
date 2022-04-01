@@ -19,7 +19,6 @@ struct DetailView: View {
     var fromPlaylist: Bool
     @EnvironmentObject var cloudViewModel: CloudKitViewModel
     @EnvironmentObject var mapViewModel: MapViewModel
-    @EnvironmentObject var networkViewModel: NetworkMonitor
     @ObservedObject var spot:Spot
     @Environment(\.presentationMode) var presentationMode
     @EnvironmentObject var tabController: TabController
@@ -33,11 +32,16 @@ struct DetailView: View {
     @State private var fromDB = false
     @State private var selection = 0
     @State private var images: [UIImage] = []
+    @State private var showingCannotSavePublicAlert = false
+    @State private var pu = false
     
     var body: some View {
         ZStack {
             if (exists) {
                 displaySpot
+                    .alert("Unable to upload spot. Spot is now private, please try again later and check internet connection.", isPresented: $pu) {
+                        Button("OK", role: .cancel) { }
+                    }
                     .onChange(of: tabController.playlistPopToRoot) { _ in
                         if (fromPlaylist) {
                             presentationMode.wrappedValue.dismiss()
@@ -228,10 +232,17 @@ struct DetailView: View {
                 .foregroundColor(cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex])
                 .shadow(color: .black, radius: 5)
         )
-        .sheet(isPresented: $showingEditSheet) {
-            SpotEditSheet(spot: spot)
+        .sheet(isPresented: $showingEditSheet, onDismiss: {
+            if showingCannotSavePublicAlert {
+                let generator = UINotificationFeedbackGenerator()
+                generator.notificationOccurred(.warning)
+                pu.toggle()
+                showingCannotSavePublicAlert = false
+            }
+        }) {
+            SpotEditSheet(spot: spot, showingCannotSavePublicAlert: $showingCannotSavePublicAlert)
         }
-        .disabled(!networkViewModel.hasInternet && spot.isPublic && !cloudViewModel.isSignedInToiCloud)
+        .disabled(spot.isPublic && !cloudViewModel.isSignedInToiCloud)
     }
     
     private var detailSheet: some View {

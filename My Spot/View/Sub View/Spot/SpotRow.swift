@@ -51,6 +51,7 @@ struct SpotRow: View {
                     .shadow(color: .black, radius: 5)
                 if let _ = spot.image2 {
                     Image(systemName: "square.on.square")
+                        .foregroundColor(.white)
                         .font(.subheadline)
                         .offset(x: -35, y: -45)
                 }

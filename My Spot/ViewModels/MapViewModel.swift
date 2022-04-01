@@ -105,6 +105,7 @@ final class MapViewModel: NSObject, ObservableObject, CLLocationManagerDelegate 
             }
         }
     }
+    
     func getPlacmarkOfLocationLessPrecise(location: CLLocation, completionHandler: @escaping (String) -> Void) {
         let geo = CLGeocoder()
         geo.reverseGeocodeLocation(location) { (placemarker, error) in

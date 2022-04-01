@@ -24,6 +24,7 @@ struct ViewDiscoverSpots: View {
     @State private var originalRegion = MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: 33.714712646421, longitude: -112.29072718706581), span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01))
     @State private var showingDetailsSheet = false
     @State private var spotRegion: MKCoordinateRegion = MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: 33.714712646421, longitude: -112.29072718706581), span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01))
+    @State var sortBy: String
     
     var body: some View {
         displayMap
@@ -141,9 +142,16 @@ struct ViewDiscoverSpots: View {
     
     private var displaySearchButton: some View {
         Button {
-            cloudViewModel.fetchSpotPublic(userLocation: CLLocation(latitude: spotRegion.center.latitude, longitude: spotRegion.center.longitude), type: "none")
-            originalRegion = spotRegion
-            mapViewModel.searchingHere = spotRegion
+            Task {
+                do {
+                    try await cloudViewModel.fetchSpotPublic(userLocation: CLLocation(latitude: spotRegion.center.latitude, longitude: spotRegion.center.longitude), filteringBy: sortBy)
+                    originalRegion = spotRegion
+                    mapViewModel.searchingHere = spotRegion
+                } catch {
+                    cloudViewModel.isErrorMessage = "Error searching here"
+                    cloudViewModel.isError.toggle()
+                }
+            }
         } label: {
             Text("Search Here")
         }

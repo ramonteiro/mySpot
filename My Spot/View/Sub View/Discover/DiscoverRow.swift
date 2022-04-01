@@ -36,6 +36,7 @@ struct DiscoverRow: View {
                 }
                 if (spot.isMultipleImages != 0) {
                     Image(systemName: "square.on.square")
+                        .foregroundColor(.white)
                         .font(.subheadline)
                         .offset(x: -35, y: -45)
                 }

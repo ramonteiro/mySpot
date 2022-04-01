@@ -21,7 +21,6 @@ struct AddSpotSheet: View {
     @Environment(\.managedObjectContext) var moc
     @EnvironmentObject var mapViewModel: MapViewModel
     @EnvironmentObject var cloudViewModel: CloudKitViewModel
-    @EnvironmentObject var networkViewModel: NetworkMonitor
     
     @State private var showingAlert = false
     @State private var showingAddImageAlert = false
@@ -38,6 +37,9 @@ struct AddSpotSheet: View {
     @State private var lat = 1.0
     @State private var imageTemp: UIImage?
     @State private var images: [UIImage?]?
+    @Binding var showingCannotSavePublicAlert: Bool
+    @State private var showingCannotSavePrivateAlert: Bool = false
+    
     
     private var disableSave: Bool {
         name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || images?.isEmpty ?? true || founder.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || (isPublic && !cloudViewModel.isSignedInToiCloud)
@@ -71,7 +73,7 @@ struct AddSpotSheet: View {
     var body: some View {
         ZStack {
             if (mapViewModel.isAuthorized) {
-                if (lat != 1.0 && networkViewModel.hasInternet) {
+                if (lat != 1.0) {
                     NavigationView {
                         Form {
                             Section {
@@ -90,16 +92,7 @@ struct AddSpotSheet: View {
                                 Text("Founder's Name*")
                             }
                             Section {
-                                if (networkViewModel.hasInternet) {
-                                    displayIsPublicPrompt
-                                } else {
-                                    Text("Internet Is Required To Share Spot.")
-                                        .font(.subheadline)
-                                        .foregroundColor(.gray)
-                                        .onAppear {
-                                            isPublic = false
-                                        }
-                                }
+                                displayIsPublicPrompt
                             } header: {
                                 Text("Share Spot")
                             } footer: {
@@ -173,6 +166,9 @@ struct AddSpotSheet: View {
                             default:
                                 focusState = nil
                             }
+                        }
+                        .alert("Unable to save spot. Please try again.", isPresented: $showingCannotSavePrivateAlert) {
+                            Button("OK", role: .cancel) { }
                         }
                         .confirmationDialog("Choose Image From Photos or Camera", isPresented: $showingAddImageAlert) {
                             Button("Camera") {
@@ -273,9 +269,6 @@ struct AddSpotSheet: View {
                             }
                             ToolbarItemGroup(placement: .navigationBarTrailing) {
                                 Button("Save") {
-                                    if (!networkViewModel.hasInternet) {
-                                        isPublic = false
-                                    }
                                     tags = descript.findTags()
                                     if (isPublic) {
                                         savePublic()
@@ -430,8 +423,9 @@ struct AddSpotSheet: View {
             try moc.save()
             askForReview()
         } catch {
-            cloudViewModel.isErrorMessage = "Error, unable to save spot. Please try again."
-            cloudViewModel.isError.toggle()
+            showingCannotSavePrivateAlert = true
+            let generator = UINotificationFeedbackGenerator()
+            generator.notificationOccurred(.warning)
             return
         }
     }
@@ -494,8 +488,9 @@ struct AddSpotSheet: View {
                 }
             }
         } else {
-            cloudViewModel.isErrorMessage = "Error, unable to save spot. Please try again."
-            cloudViewModel.isError.toggle()
+            showingCannotSavePrivateAlert = true
+            let generator = UINotificationFeedbackGenerator()
+            generator.notificationOccurred(.warning)
             return
         }
         UserDefaults.standard.set(founder, forKey: UserDefaultKeys.founder)
@@ -512,15 +507,15 @@ struct AddSpotSheet: View {
         do {
             try moc.save()
         } catch {
-            cloudViewModel.isErrorMessage = "Error, unable to save spot. Please try again."
-            cloudViewModel.isError.toggle()
+            showingCannotSavePrivateAlert = true
+            let generator = UINotificationFeedbackGenerator()
+            generator.notificationOccurred(.warning)
             return
         }
         if newSpot.isPublic {
             askForReview()
         } else {
-            cloudViewModel.isErrorMessage = cloudkitErrorMsg.create
-            cloudViewModel.isError.toggle()
+            showingCannotSavePublicAlert = true
         }
         close()
     }

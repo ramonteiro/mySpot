@@ -18,22 +18,15 @@ struct ViewMapSpots: View {
     @FetchRequest(sortDescriptors: []) var spots: FetchedResults<Spot>
     @EnvironmentObject var mapViewModel: MapViewModel
     @EnvironmentObject var cloudViewModel: CloudKitViewModel
-    @EnvironmentObject var networkViewModel: NetworkMonitor
     @State private var selection = 0
     @State private var showingDetailsSheet = false
     @State private var spotRegion: MKCoordinateRegion = MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: 33.714712646421, longitude: -112.29072718706581), span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01))
 
     var body: some View {
-        ZStack {
-            if (networkViewModel.hasInternet) {
-                displayMap
-                    .onAppear {
-                        spotRegion = mapViewModel.region
-                    }
-            } else {
-                Text("No Internet Connection Found")
+        displayMap
+            .onAppear {
+                spotRegion = mapViewModel.region
             }
-        }
     }
 
     func close() {
