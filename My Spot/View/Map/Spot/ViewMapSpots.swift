@@ -41,7 +41,7 @@ struct ViewMapSpots: View {
         } label: {
             Image(systemName: "point.topleft.down.curvedto.point.bottomright.up").imageScale(.large)
         }
-        .shadow(color: Color.black.opacity(0.3), radius: 10)
+        .shadow(color: Color.black.opacity(0.3), radius: 5)
         .buttonStyle(.borderedProminent)
     }
     
@@ -54,7 +54,7 @@ struct ViewMapSpots: View {
             Image(systemName: "location").imageScale(.large)
         }
         .disabled(!mapViewModel.isAuthorized)
-        .shadow(color: Color.black.opacity(0.3), radius: 10)
+        .shadow(color: Color.black.opacity(0.3), radius: 5)
         .buttonStyle(.borderedProminent)
     }
     
@@ -62,7 +62,7 @@ struct ViewMapSpots: View {
         Button(action: close ) {
             Image(systemName: "arrowshape.turn.up.backward").imageScale(.large)
         }
-        .shadow(color: Color.black.opacity(0.3), radius: 10)
+        .shadow(color: Color.black.opacity(0.3), radius: 5)
         .buttonStyle(.borderedProminent)
     }
     
@@ -72,7 +72,7 @@ struct ViewMapSpots: View {
                 MapAnnotation(coordinate: CLLocationCoordinate2D(latitude: location.x, longitude: location.y)) {
                     MapAnnotationView(color: cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex], spot: location, isSelected: spots[selection] == location)
                         .scaleEffect(spots[selection] == location ? 1.2 : 0.9)
-                        .shadow(radius: 8)
+                        .shadow(color: Color.black.opacity(0.3), radius: 5)
                         .onTapGesture {
                             selection = spots.firstIndex(of: location) ?? 0
                             withAnimation {
@@ -103,7 +103,6 @@ struct ViewMapSpots: View {
                         ForEach(spots.indices, id: \.self) { index in
                             SpotMapPreview(spot: spots[index])
                                 .tag(index)
-                                .shadow(color: Color.black.opacity(0.3), radius: 10)
                                 .onTapGesture {
                                     showingDetailsSheet.toggle()
                                 }

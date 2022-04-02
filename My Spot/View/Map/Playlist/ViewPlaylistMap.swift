@@ -46,7 +46,7 @@ struct ViewPlaylistMap: View {
         } label: {
             Image(systemName: "point.topleft.down.curvedto.point.bottomright.up").imageScale(.large)
         }
-        .shadow(color: Color.black.opacity(0.3), radius: 10)
+        .shadow(color: Color.black.opacity(0.3), radius: 5)
         .buttonStyle(.borderedProminent)
     }
     
@@ -59,7 +59,7 @@ struct ViewPlaylistMap: View {
             Image(systemName: "location").imageScale(.large)
         }
         .disabled(!mapViewModel.isAuthorized)
-        .shadow(color: Color.black.opacity(0.3), radius: 10)
+        .shadow(color: Color.black.opacity(0.3), radius: 5)
         .buttonStyle(.borderedProminent)
     }
     
@@ -67,7 +67,7 @@ struct ViewPlaylistMap: View {
         Button(action: close ) {
             Image(systemName: "arrowshape.turn.up.backward").imageScale(.large)
         }
-        .shadow(color: Color.black.opacity(0.3), radius: 10)
+        .shadow(color: Color.black.opacity(0.3), radius: 5)
         .buttonStyle(.borderedProminent)
     }
     
@@ -77,7 +77,7 @@ struct ViewPlaylistMap: View {
                 MapAnnotation(coordinate: CLLocationCoordinate2D(latitude: location.x, longitude: location.y)) {
                     MapAnnotationView(color: cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex], spot: location, isSelected: playlist.spotArr[selection] == location)
                         .scaleEffect(playlist.spotArr[selection] == location ? 1.2 : 0.9)
-                        .shadow(radius: 8)
+                        .shadow(color: Color.black.opacity(0.3), radius: 5)
                         .onTapGesture {
                             selection = playlist.spotArr.firstIndex(of: location) ?? 0
                             withAnimation {
@@ -108,7 +108,6 @@ struct ViewPlaylistMap: View {
                         ForEach(playlist.spotArr.indices, id: \.self) { index in
                             SpotMapPreview(spot: playlist.spotArr[index])
                                 .tag(index)
-                                .shadow(color: Color.black.opacity(0.3), radius: 10)
                                 .onTapGesture {
                                     showingDetailsSheet.toggle()
                                 }

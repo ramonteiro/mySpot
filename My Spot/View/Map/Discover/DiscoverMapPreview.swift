@@ -26,18 +26,18 @@ struct DiscoverMapPreview: View {
                         if (!spot.locationName.isEmpty) {
                             Image(systemName: "mappin")
                                 .font(.subheadline)
-                                .foregroundColor(.gray)
+                                .foregroundColor(.white)
                             Text(spot.locationName)
                                 .font(.subheadline)
-                                .foregroundColor(.gray)
+                                .foregroundColor(.white)
                         }
                         Spacer()
                         Image(systemName: "heart.fill")
                             .font(.subheadline)
-                            .foregroundColor(.gray)
+                            .foregroundColor(.white)
                         Text("\(spot.likes)")
                             .font(.subheadline)
-                            .foregroundColor(.gray)
+                            .foregroundColor(.white)
                     }
                     .padding(.top)
                     Spacer()
@@ -51,16 +51,16 @@ struct DiscoverMapPreview: View {
                     HStack {
                         Text("By: \(spot.founder)")
                             .font(.subheadline)
-                            .foregroundColor(.gray)
+                            .foregroundColor(.white)
                         Spacer()
                         if (!distance.isEmpty) {
                             Text("\(distance) away")
-                                .foregroundColor(.gray)
+                                .foregroundColor(.white)
                                 .font(.subheadline)
                         } else {
                             Text(spot.date.components(separatedBy: ";")[0])
                                 .font(.subheadline)
-                                .foregroundColor(.gray)
+                                .foregroundColor(.white)
                         }
                     }
                     .padding(.bottom, pad)
@@ -110,7 +110,7 @@ struct DiscoverMapPreview: View {
                     .frame(width: UIScreen.screenWidth - 20, height: UIScreen.screenHeight * 0.25)
                     .clipShape(RoundedRectangle(cornerRadius: 40))
             }
-            Color.black.opacity(0.5)
+            Color.black.opacity(0.4)
                 .frame(width: UIScreen.screenWidth - 20, height: UIScreen.screenHeight * 0.25)
                 .cornerRadius(40)
         }

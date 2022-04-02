@@ -27,18 +27,18 @@ struct SpotMapPreview: View {
                         if (!(spot.locationName?.isEmpty ?? true)) {
                             Image(systemName: "mappin")
                                 .font(.subheadline)
-                                .foregroundColor(.gray)
+                                .foregroundColor(.white)
                             Text(spot.locationName ?? "")
                                 .font(.subheadline)
-                                .foregroundColor(.gray)
+                                .foregroundColor(.white)
                         }
                         Spacer()
                         Image(systemName: "globe")
                             .font(.subheadline)
-                            .foregroundColor(.gray)
+                            .foregroundColor(.white)
                         Text(scope)
                             .font(.subheadline)
-                            .foregroundColor(.gray)
+                            .foregroundColor(.white)
                     }
                     .padding(.top)
                     Spacer()
@@ -52,16 +52,16 @@ struct SpotMapPreview: View {
                     HStack {
                         Text("By: \(spot.founder ?? "")")
                             .font(.subheadline)
-                            .foregroundColor(.gray)
+                            .foregroundColor(.white)
                         Spacer()
                         if (!distance.isEmpty) {
                             Text("\(distance) away")
-                                .foregroundColor(.gray)
+                                .foregroundColor(.white)
                                 .font(.subheadline)
                         } else {
                             Text(spot.date?.components(separatedBy: ";")[0] ?? "")
                                 .font(.subheadline)
-                                .foregroundColor(.gray)
+                                .foregroundColor(.white)
                         }
                     }
                     .padding(.bottom, pad)
@@ -108,7 +108,7 @@ struct SpotMapPreview: View {
                 .scaledToFill()
                 .frame(width: UIScreen.screenWidth - 20, height: UIScreen.screenHeight * 0.25)
                 .clipShape(RoundedRectangle(cornerRadius: 40))
-            Color.black.opacity(0.5)
+            Color.black.opacity(0.4)
                 .frame(width: UIScreen.screenWidth - 20, height: UIScreen.screenHeight * 0.25)
                 .cornerRadius(40)
         }

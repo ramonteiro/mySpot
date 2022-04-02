@@ -28,7 +28,7 @@ struct DiscoverRow: View {
                         .scaledToFill()
                         .frame(width: 100, height: 120)
                         .cornerRadius(10)
-                        .shadow(color: .black, radius: 5)
+                        .shadow(color: Color.black.opacity(0.3), radius: 5)
                 } else {
                     ProgressView("Loading Image")
                         .frame(width: 100, height: 120, alignment: .center)

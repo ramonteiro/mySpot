@@ -45,7 +45,7 @@ struct ViewOnlyUserOnMap: View {
         }
         .padding([.top, .trailing])
         .disabled(!mapViewModel.isAuthorized)
-        .shadow(color: Color.black.opacity(0.3), radius: 10)
+        .shadow(color: Color.black.opacity(0.3), radius: 5)
         .buttonStyle(.borderedProminent)
     }
 }

@@ -22,7 +22,7 @@ struct PlaylistRow: View {
                 HStack {
                     Text(playlist.emoji ?? "❓")
                         .font(.system(size: 50))
-                        .shadow(color: .black, radius: 5)
+                        .shadow(color: Color.black.opacity(0.3), radius: 5)
                     
                     VStack(alignment: .leading) {
                         Text("\(playlist.name ?? "")")

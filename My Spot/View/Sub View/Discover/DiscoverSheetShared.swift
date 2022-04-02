@@ -44,6 +44,7 @@ struct DiscoverSheetShared: View {
     @State private var didLike = false
     @State private var noType = false
     @State private var spotInCD: [Spot] = []
+    private var idiom : UIUserInterfaceIdiom { UIDevice.current.userInterfaceIdiom }
     
     var body: some View {
         ZStack {
@@ -126,6 +127,9 @@ struct DiscoverSheetShared: View {
             Spacer()
                 .ignoresSafeArea()
                 .frame(height: UIScreen.screenWidth)
+                .if(idiom == .pad) { view in
+                    view.frame(maxWidth: UIScreen.screenHeight/2, maxHeight: UIScreen.screenHeight/2)
+                }
             HStack {
                 enlargeImageButton
                     .padding()
@@ -163,7 +167,7 @@ struct DiscoverSheetShared: View {
                 .foregroundColor(.white)
                 .font(.system(size: 30, weight: .regular))
                 .padding()
-                .shadow(color: .black, radius: 5)
+                .shadow(color: Color.black.opacity(0.5), radius: 5)
         }
     }
     
@@ -175,13 +179,23 @@ struct DiscoverSheetShared: View {
                 if (!images.isEmpty) {
                     Image(uiImage: images[0])
                         .resizable()
-                        .frame(width: UIScreen.screenWidth, height: UIScreen.screenWidth)
+                        .if(idiom == .pad) { view in
+                            view.frame(width: UIScreen.screenHeight/2, height: UIScreen.screenHeight/2)
+                        }
+                        .if(idiom != .pad) { view in
+                            view.frame(width: UIScreen.screenWidth, height: UIScreen.screenWidth)
+                        }
                         .scaledToFit()
                         .ignoresSafeArea()
                 } else {
                     Image(uiImage: defaultImages.errorImage!)
                         .resizable()
-                        .frame(width: UIScreen.screenWidth, height: UIScreen.screenWidth)
+                        .if(idiom == .pad) { view in
+                            view.frame(width: UIScreen.screenHeight/2, height: UIScreen.screenHeight/2)
+                        }
+                        .if(idiom != .pad) { view in
+                            view.frame(width: UIScreen.screenWidth, height: UIScreen.screenWidth)
+                        }
                         .scaledToFit()
                         .ignoresSafeArea()
                 }
@@ -194,13 +208,23 @@ struct DiscoverSheetShared: View {
         TabView(selection: $selection) {
             ForEach(images.indices, id: \.self) { index in
                 Image(uiImage: images[index]).resizable()
-                    .frame(width: UIScreen.screenWidth, height: UIScreen.screenWidth)
+                    .if(idiom == .pad) { view in
+                        view.frame(width: UIScreen.screenHeight/2, height: UIScreen.screenHeight/2)
+                    }
+                    .if(idiom != .pad) { view in
+                        view.frame(width: UIScreen.screenWidth, height: UIScreen.screenWidth)
+                    }
                     .scaledToFit()
                     .ignoresSafeArea()
                     .tag(index)
             }
         }
-        .frame(width: UIScreen.screenWidth, height: UIScreen.screenWidth)
+        .if(idiom == .pad) { view in
+            view.frame(width: UIScreen.screenHeight/2, height: UIScreen.screenHeight/2)
+        }
+        .if(idiom != .pad) { view in
+            view.frame(width: UIScreen.screenWidth, height: UIScreen.screenWidth)
+        }
         .tabViewStyle(.page)
     }
     
@@ -227,7 +251,7 @@ struct DiscoverSheetShared: View {
                 .foregroundColor(.white)
                 .font(.system(size: 30, weight: .regular))
                 .padding(10)
-                .shadow(color: .black, radius: 5)
+                .shadow(color: Color.black.opacity(0.5), radius: 5)
         }
         .alert("Are You Sure You Want To Delete \(cloudViewModel.shared[0].name)?", isPresented: $deleteAlert) {
             Button("Delete", role: .destructive) {
@@ -273,7 +297,7 @@ struct DiscoverSheetShared: View {
         .background(
             Circle()
                 .foregroundColor(cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex])
-                .shadow(color: .black, radius: 5)
+                .shadow(color: Color.black.opacity(0.3), radius: 5)
         )
         .disabled(spotInCD.count != 0 || isSaved)
     }
@@ -320,7 +344,7 @@ struct DiscoverSheetShared: View {
                     .foregroundColor(.white)
                     .font(.system(size: 30, weight: .regular))
                     .padding(10)
-                    .shadow(color: .black, radius: 5)
+                    .shadow(color: Color.black.opacity(0.5), radius: 5)
             } else {
                 ProgressView()
                     .padding(10)
@@ -508,7 +532,7 @@ struct DiscoverSheetShared: View {
         .background(
             Rectangle()
                 .foregroundColor(Color(UIColor.secondarySystemBackground))
-                .shadow(color: .black, radius: 5)
+                .shadow(color: Color.black.opacity(0.3), radius: 5)
         )
     }
     

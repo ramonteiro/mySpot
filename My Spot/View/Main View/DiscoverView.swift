@@ -314,7 +314,7 @@ struct DiscoverView: View {
                     Image(systemName: "map").imageScale(.large)
                 }
                 .fullScreenCover(isPresented: $showingMapSheet) {
-                    ViewDiscoverSpots(sortBy: sortBy, searchText: $searchText)
+                    ViewDiscoverSpots(sortBy: $sortBy, searchText: $searchText)
                 }
             }
             ToolbarItemGroup(placement: .navigationBarLeading) {

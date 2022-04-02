@@ -53,7 +53,7 @@ struct ViewSingleSpotOnMap: View {
             Image(systemName: "mappin").imageScale(.large)
         }
         .padding([.top, .trailing])
-        .shadow(color: Color.black.opacity(0.3), radius: 10)
+        .shadow(color: Color.black.opacity(0.3), radius: 5)
         .buttonStyle(.borderedProminent)
     }
 }

@@ -48,7 +48,7 @@ struct SpotRow: View {
                     .scaledToFill()
                     .frame(width: 100, height: 120)
                     .cornerRadius(10)
-                    .shadow(color: .black, radius: 5)
+                    .shadow(color: Color.black.opacity(0.3), radius: 5)
                 if let _ = spot.image2 {
                     Image(systemName: "square.on.square")
                         .foregroundColor(.white)

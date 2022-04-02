@@ -24,7 +24,7 @@ struct ViewDiscoverSpots: View {
     @State private var originalRegion = MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: 33.714712646421, longitude: -112.29072718706581), span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01))
     @State private var showingDetailsSheet = false
     @State private var spotRegion: MKCoordinateRegion = MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: 33.714712646421, longitude: -112.29072718706581), span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01))
-    @State var sortBy: String
+    @Binding var sortBy: String
     @Binding var searchText: String
     @State private var showingErrorConnection = false
     
@@ -55,7 +55,7 @@ struct ViewDiscoverSpots: View {
         } label: {
             Image(systemName: "point.topleft.down.curvedto.point.bottomright.up").imageScale(.large)
         }
-        .shadow(color: Color.black.opacity(0.3), radius: 10)
+        .shadow(color: Color.black.opacity(0.3), radius: 5)
         .buttonStyle(.borderedProminent)
     }
     
@@ -68,7 +68,7 @@ struct ViewDiscoverSpots: View {
             Image(systemName: "location").imageScale(.large)
         }
         .disabled(!mapViewModel.isAuthorized)
-        .shadow(color: Color.black.opacity(0.3), radius: 10)
+        .shadow(color: Color.black.opacity(0.3), radius: 5)
         .buttonStyle(.borderedProminent)
     }
     
@@ -76,7 +76,7 @@ struct ViewDiscoverSpots: View {
         Button(action: close ) {
             Image(systemName: "arrowshape.turn.up.backward").imageScale(.large)
         }
-        .shadow(color: Color.black.opacity(0.3), radius: 10)
+        .shadow(color: Color.black.opacity(0.3), radius: 5)
         .buttonStyle(.borderedProminent)
     }
     
@@ -87,7 +87,7 @@ struct ViewDiscoverSpots: View {
                     if (cloudViewModel.spots.count > 0 && cloudViewModel.spots.count >= selection + 1) {
                         MapAnnotationDiscover(spot: location, isSelected: cloudViewModel.spots[selection] == location, color: cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex])
                             .scaleEffect(cloudViewModel.spots[selection] == location ? 1.2 : 0.9)
-                            .shadow(radius: 8)
+                            .shadow(color: Color.black.opacity(0.3), radius: 5)
                             .onTapGesture {
                                 selection = cloudViewModel.spots.firstIndex(of: location) ?? 0
                                 withAnimation {
@@ -127,7 +127,6 @@ struct ViewDiscoverSpots: View {
                     ForEach(cloudViewModel.spots.indices, id: \.self) { index in
                         DiscoverMapPreview(spot: cloudViewModel.spots[index])
                             .tag(index)
-                            .shadow(color: Color.black.opacity(0.3), radius: 10)
                             .onTapGesture {
                                 showingDetailsSheet.toggle()
                             }
@@ -151,6 +150,8 @@ struct ViewDiscoverSpots: View {
         Button {
             Task {
                 do {
+                    sortBy = "Closest"
+                    UserDefaults.standard.set(sortBy, forKey: "savedSort")
                     try await cloudViewModel.fetchSpotPublic(userLocation: CLLocation(latitude: spotRegion.center.latitude, longitude: spotRegion.center.longitude), filteringBy: sortBy, search: searchText)
                     originalRegion = spotRegion
                     mapViewModel.searchingHere = spotRegion
@@ -161,7 +162,7 @@ struct ViewDiscoverSpots: View {
         } label: {
             Text("Search Here")
         }
-        .shadow(color: Color.black.opacity(0.3), radius: 10)
+        .shadow(color: Color.black.opacity(0.3), radius: 5)
         .buttonStyle(.borderedProminent)
     }
 }
