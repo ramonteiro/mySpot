@@ -28,6 +28,8 @@ struct DiscoverView: View {
     @State private var hasError = false
     @State private var searching = false
     @State private var canLoad = false
+    @State private var index: Int?
+    @State private var showPlaceDetail = false
     
     var body: some View {
         NavigationView {
@@ -159,61 +161,53 @@ struct DiscoverView: View {
     }
     
     private var listSpots: some View {
-        ScrollViewReader { prox in
-            VStack(spacing: 10) {
-                SearchBar(searchText: $searchText, searching: $searching, searchName: $searchLocationName)
-                List {
-                    ForEach(cloudViewModel.spots.indices, id: \.self) { index in
-                        NavigationLink(destination: DiscoverDetailView(index: index, canShare: true)) {
-                            DiscoverRow(spot: cloudViewModel.spots[index])
-                                .id(cloudViewModel.spots[index])
-                        }
+        VStack(spacing: 10) {
+            SearchBar(searchText: $searchText, searching: $searching, searchName: $searchLocationName)
+            List {
+                ForEach(cloudViewModel.spots.indices, id: \.self) { i in
+                    Button(action: {
+                        index = i
+                        showPlaceDetail = true
+                    }, label: { DiscoverRow(spot: cloudViewModel.spots[i]) })
+                }
+                if (canLoad) {
+                    loadMoreSpots
+                        .listRowBackground(Color.clear)
+                }
+            }
+            NavigationLink(destination: DiscoverDetailView(index: index ?? 0, canShare: true), isActive: $showPlaceDetail) { EmptyView() }.isDetailLink(false)
+            .gesture(DragGesture()
+                .onChanged { _ in
+                    UIApplication.shared.dismissKeyboard()
+                }
+            )
+            .onChange(of: cloudViewModel.isFetching) { fetching in
+                if fetching {
+                    withAnimation {
+                        canLoad = false
                     }
-                    if (canLoad) {
-                        loadMoreSpots
-                            .listRowBackground(Color.clear)
+                } else if let _ = cloudViewModel.cursorMain {
+                    withAnimation {
+                        canLoad = true
                     }
                 }
-                .gesture(DragGesture()
-                    .onChanged { _ in
-                        UIApplication.shared.dismissKeyboard()
-                    }
-                )
-                .onChange(of: cloudViewModel.isFetching) { fetching in
-                    if fetching {
-                        withAnimation {
-                            canLoad = false
-                        }
-                    } else if let _ = cloudViewModel.cursorMain {
-                        withAnimation {
-                            canLoad = true
-                        }
-                    }
-                }
-                .onAppear {
-                    cloudViewModel.canRefresh = true
-                }
-                .onChange(of: searching) { _ in
+            }
+            .onAppear {
+                cloudViewModel.canRefresh = true
+            }
+            .onChange(of: searching) { _ in
+                loadSpotsFromDB(location: CLLocation(latitude: mapViewModel.searchingHere.center.latitude, longitude: mapViewModel.searchingHere.center.longitude), radiusInMeters: CGFloat(distance), filteringBy: sortBy)
+            }
+            .if(cloudViewModel.canRefresh) { view in
+                view.refreshable {
+                    mapViewModel.checkLocationAuthorization()
                     loadSpotsFromDB(location: CLLocation(latitude: mapViewModel.searchingHere.center.latitude, longitude: mapViewModel.searchingHere.center.longitude), radiusInMeters: CGFloat(distance), filteringBy: sortBy)
                 }
-                .if(cloudViewModel.canRefresh) { view in
-                    view.refreshable {
-                        mapViewModel.checkLocationAuthorization()
-                        loadSpotsFromDB(location: CLLocation(latitude: mapViewModel.searchingHere.center.latitude, longitude: mapViewModel.searchingHere.center.longitude), radiusInMeters: CGFloat(distance), filteringBy: sortBy)
-                    }
-                }
-                .onChange(of: tabController.discoverPopToRoot) { _ in
-                    if (cloudViewModel.spots.count > 0) {
-                        withAnimation(.easeInOut) {
-                            prox.scrollTo(cloudViewModel.spots[0])
-                        }
-                    }
-                }
-                .animation(.default, value: cloudViewModel.spots)
-                .onChange(of: mapViewModel.searchingHere.center.longitude) { _ in
-                    mapViewModel.getPlacmarkOfLocation(location: CLLocation(latitude: mapViewModel.searchingHere.center.latitude, longitude: mapViewModel.searchingHere.center.longitude)) { location in
-                        searchLocationName = location
-                    }
+            }
+            .animation(.default, value: cloudViewModel.spots)
+            .onChange(of: mapViewModel.searchingHere.center.longitude) { _ in
+                mapViewModel.getPlacmarkOfLocation(location: CLLocation(latitude: mapViewModel.searchingHere.center.latitude, longitude: mapViewModel.searchingHere.center.longitude)) { location in
+                    searchLocationName = location
                 }
             }
         }

@@ -25,6 +25,7 @@ struct DiscoverSheetShared: View {
     @EnvironmentObject var tabController: TabController
     @EnvironmentObject var mapViewModel: MapViewModel
     @EnvironmentObject var cloudViewModel: CloudKitViewModel
+    @Environment(\.colorScheme) var colorScheme
     
     @State private var deletedSpot: [Spot] = []
     @State private var mySpot = false
@@ -35,6 +36,8 @@ struct DiscoverSheetShared: View {
     @State private var selection = 0
     @State private var isSaving = false
     @State private var likeButton = "heart"
+    @State private var showSaveAlert = false
+    @State private var showingCannotSavePrivateAlert = false
     @State private var newName = ""
     @State private var isSaved: Bool = false
     @State private var tags: [String] = []
@@ -43,7 +46,7 @@ struct DiscoverSheetShared: View {
     @State private var showingSaveSheet = false
     @State private var didLike = false
     @State private var noType = false
-    @State private var spotInCD: [Spot] = []
+    @State private var spotInCD = false
     private var idiom : UIUserInterfaceIdiom { UIDevice.current.userInterfaceIdiom }
     
     var body: some View {
@@ -64,7 +67,11 @@ struct DiscoverSheetShared: View {
                 }
                 .onChange(of: isSaving) { newValue in
                     if newValue {
-                        save()
+                        Task {
+                            showSaveAlert = true
+                            await save()
+                            showSaveAlert = false
+                        }
                     }
                 }
                 .onAppear {
@@ -113,6 +120,11 @@ struct DiscoverSheetShared: View {
             BottomPopupView {
                 NamePopupView(isPresented: $showingSaveSheet, text: $newName, saved: $isSaving)
             }
+        }
+        .alert("Unable To Save Spot", isPresented: $showingCannotSavePrivateAlert) {
+            Button("OK", role: .cancel) { }
+        } message: {
+            Text("Failed to save spot. Please try again.")
         }
         .navigationBarHidden(true)
         .ignoresSafeArea(.all, edges: [.top, .bottom])
@@ -237,7 +249,7 @@ struct DiscoverSheetShared: View {
             Image(systemName: "arrow.up.left.and.arrow.down.right")
                 .font(.system(size: 15, weight: .regular))
                 .padding(5)
-                .foregroundColor(.white)
+                .foregroundColor(colorScheme == .dark ? .white : .black)
         }
         .background(.ultraThinMaterial)
         .clipShape(Circle())
@@ -289,17 +301,21 @@ struct DiscoverSheetShared: View {
                 showingSaveSheet = true
             }
         } label: {
-            Image(systemName: "icloud.and.arrow.down")
-                .font(.system(size: 30, weight: .regular))
-                .padding(15)
-                .foregroundColor(.white)
+            if !showSaveAlert {
+                Image(systemName: "icloud.and.arrow.down")
+                    .font(.system(size: 30, weight: .regular))
+                    .padding(15)
+                    .foregroundColor(.white)
+            } else {
+                ProgressView().progressViewStyle(.circular)
+            }
         }
         .background(
             Circle()
-                .foregroundColor(cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex])
+                .foregroundColor((spotInCD || isSaved) == true ? .gray : cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex])
                 .shadow(color: Color.black.opacity(0.3), radius: 5)
         )
-        .disabled(spotInCD.count != 0 || isSaved)
+        .disabled(spotInCD || isSaved)
     }
     
     private var displayLikeButton: some View {
@@ -536,18 +552,18 @@ struct DiscoverSheetShared: View {
         )
     }
     
-    private func isSpotInCoreData() -> [Spot] {
-        let fetchRequest: NSFetchRequest<Spot> = Spot.fetchRequest()
-        fetchRequest.predicate = NSPredicate(format: "dbid == %@", cloudViewModel.shared[0].record.recordID.recordName as CVarArg)
-        do {
-            let spotsFound: [Spot] = try moc.fetch(fetchRequest)
-            return spotsFound
-        } catch {
-            return []
+    private func isSpotInCoreData() -> Bool {
+        var isInSpots = false
+        spots.forEach { spot in
+            if spot.dbid == cloudViewModel.shared[0].record.recordID.recordName {
+                isInSpots = true
+                return
+            }
         }
+        return isInSpots
     }
     
-    private func save() {
+    private func save() async {
         let newSpot = Spot(context: moc)
         newSpot.founder = cloudViewModel.shared[0].founder
         newSpot.details = cloudViewModel.shared[0].description
@@ -567,8 +583,16 @@ struct DiscoverSheetShared: View {
         newSpot.date = cloudViewModel.shared[0].date
         newSpot.id = UUID()
         newSpot.dbid = cloudViewModel.shared[0].record.recordID.recordName
-        try? moc.save()
-        isSaved = true
+        do {
+            try moc.save()
+            isSaved = true
+        } catch {
+            isSaved = false
+            let generator = UINotificationFeedbackGenerator()
+            generator.notificationOccurred(.warning)
+            showingCannotSavePrivateAlert = true
+            return
+        }
     }
     
     private func calculateDistance() {

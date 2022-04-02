@@ -25,6 +25,7 @@ struct AddSpotSheet: View {
     @State private var showingAlert = false
     @State private var showingAddImageAlert = false
     @State private var didCancel = false
+    @State private var isSaving = false
     
     @State private var name = ""
     @State private var founder = ""
@@ -273,10 +274,17 @@ struct AddSpotSheet: View {
                                 Button("Save") {
                                     tags = descript.findTags()
                                     if (isPublic) {
-                                        savePublic()
+                                        Task {
+                                            isSaving = true
+                                            await savePublic()
+                                            isSaving = false
+                                        }
                                     } else {
-                                        save()
-                                        close()
+                                        Task {
+                                            isSaving = true
+                                            await save()
+                                            isSaving = false
+                                        }
                                     }
                                 }
                                 .tint(.blue)
@@ -303,6 +311,14 @@ struct AddSpotSheet: View {
                         })
                     }
                     .interactiveDismissDisabled()
+                    if isSaving {
+                        ProgressView("Saving")
+                            .padding()
+                            .background(
+                                RoundedRectangle(cornerRadius: 10)
+                                    .fill(Color(UIColor.systemBackground))
+                            )
+                    }
                 } else {
                     VStack {
                         Text("No Internet Connection Found.")
@@ -325,6 +341,7 @@ struct AddSpotSheet: View {
             long = getLongitude()
             images = []
         }
+        .disabled(isSaving)
     }
     
     private var displayDescriptionPrompt: some View {
@@ -385,28 +402,40 @@ struct AddSpotSheet: View {
         return stringDate
     }
     
-    private func save() {
+    private func save() async {
         let newSpot = Spot(context: moc)
         if let imageData = cloudViewModel.compressImage(image: images?[0] ?? defaultImages.errorImage!).pngData() {
             newSpot.image = UIImage(data: imageData)
         } else {
+            showingCannotSavePrivateAlert = true
+            let generator = UINotificationFeedbackGenerator()
+            generator.notificationOccurred(.warning)
             return
         }
         if (images?.count == 3) {
             if let imageData = cloudViewModel.compressImage(image: images?[1] ?? defaultImages.errorImage!).pngData() {
                 newSpot.image2 = UIImage(data: imageData)
             } else {
+                showingCannotSavePrivateAlert = true
+                let generator = UINotificationFeedbackGenerator()
+                generator.notificationOccurred(.warning)
                 return
             }
             if let imageData = cloudViewModel.compressImage(image: images?[2] ?? defaultImages.errorImage!).pngData() {
                 newSpot.image3 = UIImage(data: imageData)
             } else {
+                showingCannotSavePrivateAlert = true
+                let generator = UINotificationFeedbackGenerator()
+                generator.notificationOccurred(.warning)
                 return
             }
         } else if (images?.count == 2) {
             if let imageData = cloudViewModel.compressImage(image: images?[1] ?? defaultImages.errorImage!).pngData() {
                 newSpot.image2 = UIImage(data: imageData)
             } else {
+                showingCannotSavePrivateAlert = true
+                let generator = UINotificationFeedbackGenerator()
+                generator.notificationOccurred(.warning)
                 return
             }
         }
@@ -430,6 +459,7 @@ struct AddSpotSheet: View {
             generator.notificationOccurred(.warning)
             return
         }
+        close()
     }
     
     private func askForReview() {
@@ -453,73 +483,71 @@ struct AddSpotSheet: View {
         }
     }
     
-    private func savePublic() {
+    private func savePublic() async {
         let newSpot = Spot(context: moc)
         if let imageData = cloudViewModel.compressImage(image: images?[0] ?? defaultImages.errorImage!).pngData() {
-            Task {
-                newSpot.image = UIImage(data: imageData)
-                var imageData2: Data? = nil
-                var imageData3: Data? = nil
-                if (images?.count == 3) {
-                    if let imageData2Check = cloudViewModel.compressImage(image: images?[1] ?? defaultImages.errorImage!).pngData() {
-                        newSpot.image2 = UIImage(data: imageData2Check)
-                        imageData2 = imageData2Check
-                    }
-                    if let imageData3Check = cloudViewModel.compressImage(image: images?[2] ?? defaultImages.errorImage!).pngData() {
-                        newSpot.image3 = UIImage(data: imageData3Check)
-                        imageData3 = imageData3Check
-                    }
-                } else if (images?.count == 2) {
-                    if let imageData2Check = cloudViewModel.compressImage(image: images?[1] ?? defaultImages.errorImage!).pngData() {
-                        newSpot.image2 = UIImage(data: imageData2Check)
-                        imageData2 = imageData2Check
-                    }
+            newSpot.image = UIImage(data: imageData)
+            var imageData2: Data? = nil
+            var imageData3: Data? = nil
+            if (images?.count == 3) {
+                if let imageData2Check = cloudViewModel.compressImage(image: images?[1] ?? defaultImages.errorImage!).pngData() {
+                    newSpot.image2 = UIImage(data: imageData2Check)
+                    imageData2 = imageData2Check
                 }
-                do {
-                    let id = try await cloudViewModel.addSpotToPublic(name: name, founder: founder, date: getDate(), locationName: locationName, x: lat, y: long, description: descript, type: tags, image: imageData, image2: imageData2, image3: imageData3, isMultipleImages: (images?.count ?? 1) - 1)
-                    if !id.isEmpty {
-                        newSpot.dbid = id
-                        newSpot.isPublic = true
-                    } else {
-                        newSpot.dbid = ""
-                        newSpot.isPublic = false
-                    }
-                } catch {
+                if let imageData3Check = cloudViewModel.compressImage(image: images?[2] ?? defaultImages.errorImage!).pngData() {
+                    newSpot.image3 = UIImage(data: imageData3Check)
+                    imageData3 = imageData3Check
+                }
+            } else if (images?.count == 2) {
+                if let imageData2Check = cloudViewModel.compressImage(image: images?[1] ?? defaultImages.errorImage!).pngData() {
+                    newSpot.image2 = UIImage(data: imageData2Check)
+                    imageData2 = imageData2Check
+                }
+            }
+            do {
+                let id = try await cloudViewModel.addSpotToPublic(name: name, founder: founder, date: getDate(), locationName: locationName, x: lat, y: long, description: descript, type: tags, image: imageData, image2: imageData2, image3: imageData3, isMultipleImages: (images?.count ?? 1) - 1)
+                if !id.isEmpty {
+                    newSpot.dbid = id
+                    newSpot.isPublic = true
+                } else {
                     newSpot.dbid = ""
                     newSpot.isPublic = false
                 }
+            } catch {
+                newSpot.dbid = ""
+                newSpot.isPublic = false
             }
+            UserDefaults.standard.set(founder, forKey: UserDefaultKeys.founder)
+            newSpot.founder = founder
+            newSpot.details = descript
+            newSpot.name = name
+            newSpot.likes = 0
+            newSpot.x = lat
+            newSpot.y = long
+            newSpot.date = getDate()
+            newSpot.tags = tags
+            newSpot.locationName = locationName
+            newSpot.id = UUID()
+            do {
+                try moc.save()
+            } catch {
+                showingCannotSavePrivateAlert = true
+                let generator = UINotificationFeedbackGenerator()
+                generator.notificationOccurred(.warning)
+                return
+            }
+            if newSpot.isPublic {
+                askForReview()
+            } else {
+                showingCannotSavePublicAlert = true
+            }
+            close()
         } else {
             showingCannotSavePrivateAlert = true
             let generator = UINotificationFeedbackGenerator()
             generator.notificationOccurred(.warning)
             return
         }
-        UserDefaults.standard.set(founder, forKey: UserDefaultKeys.founder)
-        newSpot.founder = founder
-        newSpot.details = descript
-        newSpot.name = name
-        newSpot.likes = 0
-        newSpot.x = lat
-        newSpot.y = long
-        newSpot.date = getDate()
-        newSpot.tags = tags
-        newSpot.locationName = locationName
-        newSpot.id = UUID()
-        do {
-            try moc.save()
-        } catch {
-            showingCannotSavePrivateAlert = true
-            let generator = UINotificationFeedbackGenerator()
-            generator.notificationOccurred(.warning)
-            return
-        }
-        if newSpot.isPublic {
-            askForReview()
-        } else {
-            showingCannotSavePublicAlert = true
-        }
-        close()
     }
     
     private func getLongitude() -> Double {

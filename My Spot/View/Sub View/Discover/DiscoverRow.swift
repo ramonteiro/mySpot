@@ -18,6 +18,7 @@ struct DiscoverRow: View {
     @State private var tags: [String] = []
     @State private var distance: String = ""
     @EnvironmentObject var mapViewModel: MapViewModel
+    @Environment(\.colorScheme) var colorScheme
 
     var body: some View {
         HStack {
@@ -44,6 +45,7 @@ struct DiscoverRow: View {
             
             VStack(alignment: .leading) {
                 Text("\(spot.name)")
+                    .foregroundColor(colorScheme == .dark ? .white : .black)
                     .font(.headline)
                     .fontWeight(.bold)
                     .lineLimit(1)

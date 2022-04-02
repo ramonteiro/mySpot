@@ -21,6 +21,7 @@ struct DetailView: View {
     @EnvironmentObject var mapViewModel: MapViewModel
     @ObservedObject var spot:Spot
     @Environment(\.presentationMode) var presentationMode
+    @Environment(\.colorScheme) var colorScheme
     @EnvironmentObject var tabController: TabController
     @State private var showingEditSheet = false
     @State private var backImage = "chevron.left"
@@ -214,7 +215,7 @@ struct DetailView: View {
             Image(systemName: "arrow.up.left.and.arrow.down.right")
                 .font(.system(size: 15, weight: .regular))
                 .padding(5)
-                .foregroundColor(.white)
+                .foregroundColor(colorScheme == .dark ? .white : .black)
         }
         .background(.ultraThinMaterial)
         .clipShape(Circle())
