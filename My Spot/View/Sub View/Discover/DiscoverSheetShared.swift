@@ -44,7 +44,6 @@ struct DiscoverSheetShared: View {
     @State private var didLike = false
     @State private var noType = false
     @State private var spotInCD: [Spot] = []
-    @FocusState private var nameIsFocused: Bool
     
     var body: some View {
         ZStack {

@@ -144,7 +144,7 @@ struct ViewDiscoverSpots: View {
         Button {
             Task {
                 do {
-                    try await cloudViewModel.fetchSpotPublic(userLocation: CLLocation(latitude: spotRegion.center.latitude, longitude: spotRegion.center.longitude), filteringBy: sortBy)
+                    try await cloudViewModel.fetchSpotPublic(userLocation: CLLocation(latitude: spotRegion.center.latitude, longitude: spotRegion.center.longitude), filteringBy: sortBy, search: "")
                     originalRegion = spotRegion
                     mapViewModel.searchingHere = spotRegion
                 } catch {

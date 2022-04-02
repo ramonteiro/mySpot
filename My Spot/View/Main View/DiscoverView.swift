@@ -26,15 +26,8 @@ struct DiscoverView: View {
     @State private var distance = 0
     @State private var isMetric = false
     @State private var hasError = false
-
-    // find spot names from db that contain searchtext
-    private var searchResults: [SpotFromCloud] {
-        if searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-            return cloudViewModel.spots
-        } else {
-            return cloudViewModel.spots.filter { $0.name.lowercased().contains(searchText.lowercased()) || $0.type.lowercased().contains(searchText.lowercased()) || $0.founder.lowercased().contains(searchText.lowercased())}
-        }
-    }
+    @State private var searching = false
+    @State private var canLoad = false
     
     var body: some View {
         NavigationView {
@@ -109,7 +102,7 @@ struct DiscoverView: View {
         }
         Task {
             do {
-                try await cloudViewModel.fetchSpotPublic(userLocation: location, filteringBy: filteringBy)
+                try await cloudViewModel.fetchSpotPublic(userLocation: location, filteringBy: filteringBy, search: searchText)
             } catch {
                 cloudViewModel.isFetching = false
                 hasError = true
@@ -136,7 +129,7 @@ struct DiscoverView: View {
                         Spacer()
                         Text("Unable to load spots")
                             .foregroundColor(.gray)
-                            .font(.subheadline)
+                            .font(.headline)
                         Spacer()
                     }
                     HStack {
@@ -167,35 +160,60 @@ struct DiscoverView: View {
     
     private var listSpots: some View {
         ScrollViewReader { prox in
-            List {
-                ForEach(searchResults.indices, id: \.self) { index in
-                    NavigationLink(destination: DiscoverDetailView(index: index, canShare: true)) {
-                        DiscoverRow(spot: searchResults[index])
-                            .id(searchResults[index])
+            VStack(spacing: 10) {
+                SearchBar(searchText: $searchText, searching: $searching, searchName: $searchLocationName)
+                List {
+                    ForEach(cloudViewModel.spots.indices, id: \.self) { index in
+                        NavigationLink(destination: DiscoverDetailView(index: index, canShare: true)) {
+                            DiscoverRow(spot: cloudViewModel.spots[index])
+                                .id(cloudViewModel.spots[index])
+                        }
+                    }
+                    if (canLoad) {
+                        loadMoreSpots
+                            .listRowBackground(Color.clear)
                     }
                 }
-            }
-            .onAppear {
-                cloudViewModel.canRefresh = true
-            }
-            .if(cloudViewModel.canRefresh) { view in
-                view.refreshable {
-                    mapViewModel.checkLocationAuthorization()
+                .gesture(DragGesture()
+                    .onChanged { _ in
+                        UIApplication.shared.dismissKeyboard()
+                    }
+                )
+                .onChange(of: cloudViewModel.isFetching) { fetching in
+                    if fetching {
+                        withAnimation {
+                            canLoad = false
+                        }
+                    } else if let _ = cloudViewModel.cursorMain {
+                        withAnimation {
+                            canLoad = true
+                        }
+                    }
+                }
+                .onAppear {
+                    cloudViewModel.canRefresh = true
+                }
+                .onChange(of: searching) { _ in
                     loadSpotsFromDB(location: CLLocation(latitude: mapViewModel.searchingHere.center.latitude, longitude: mapViewModel.searchingHere.center.longitude), radiusInMeters: CGFloat(distance), filteringBy: sortBy)
                 }
-            }
-            .onChange(of: tabController.discoverPopToRoot) { _ in
-                if (cloudViewModel.spots.count > 0) {
-                    withAnimation(.easeInOut) {
-                        prox.scrollTo(searchResults[0])
+                .if(cloudViewModel.canRefresh) { view in
+                    view.refreshable {
+                        mapViewModel.checkLocationAuthorization()
+                        loadSpotsFromDB(location: CLLocation(latitude: mapViewModel.searchingHere.center.latitude, longitude: mapViewModel.searchingHere.center.longitude), radiusInMeters: CGFloat(distance), filteringBy: sortBy)
                     }
                 }
-            }
-            .animation(.default, value: searchResults)
-            .searchable(text: $searchText, prompt: "Search \(searchLocationName)")
-            .onChange(of: mapViewModel.searchingHere.center.longitude) { _ in
-                mapViewModel.getPlacmarkOfLocation(location: CLLocation(latitude: mapViewModel.searchingHere.center.latitude, longitude: mapViewModel.searchingHere.center.longitude)) { location in
-                    searchLocationName = location
+                .onChange(of: tabController.discoverPopToRoot) { _ in
+                    if (cloudViewModel.spots.count > 0) {
+                        withAnimation(.easeInOut) {
+                            prox.scrollTo(cloudViewModel.spots[0])
+                        }
+                    }
+                }
+                .animation(.default, value: cloudViewModel.spots)
+                .onChange(of: mapViewModel.searchingHere.center.longitude) { _ in
+                    mapViewModel.getPlacmarkOfLocation(location: CLLocation(latitude: mapViewModel.searchingHere.center.latitude, longitude: mapViewModel.searchingHere.center.longitude)) { location in
+                        searchLocationName = location
+                    }
                 }
             }
         }
@@ -305,6 +323,22 @@ struct DiscoverView: View {
         }
     }
     
+    private var loadMoreSpots: some View {
+        HStack {
+            Spacer()
+            Text("Load More Spots")
+                .foregroundColor(cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex])
+            Spacer()
+        }
+        .onTapGesture {
+            if let cursor = cloudViewModel.cursorMain {
+                Task {
+                    await cloudViewModel.fetchMoreSpotsPublic(cursor: cursor, desiredKeys: cloudViewModel.desiredKeys, resultLimit: 20)
+                }
+            }
+        }
+    }
+    
     private var displayLocationIcon: some View {
         Menu {
             Button {
@@ -357,5 +391,61 @@ struct DiscoverView: View {
         sortBy = "Likes"
         UserDefaults.standard.set(sortBy, forKey: "savedSort")
         loadSpotsFromDB(location: CLLocation(latitude: mapViewModel.searchingHere.center.latitude, longitude: mapViewModel.searchingHere.center.longitude), radiusInMeters: CGFloat(distance), filteringBy: sortBy)
+    }
+}
+
+
+struct SearchBar: View {
+    
+    @Binding var searchText: String
+    @Binding var searching: Bool
+    @Binding var searchName: String
+    @State private var canCancel: Bool = false
+    @Environment(\.colorScheme) var colorScheme
+    
+    var body: some View {
+        ZStack {
+            Rectangle()
+                .foregroundColor(Color(UIColor.secondarySystemBackground))
+            HStack {
+                Image(systemName: "magnifyingglass")
+                TextField("Search \(searchName)", text: $searchText)
+                    .submitLabel(.search)
+                    .onSubmit {
+                        if !searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                            searching.toggle()
+                        }
+                    }
+                if (canCancel) {
+                    Spacer()
+                    Image(systemName: "xmark")
+                        .padding(5)
+                        .background(.ultraThinMaterial)
+                        .clipShape(Circle())
+                        .onTapGesture {
+                            UIApplication.shared.dismissKeyboard()
+                            searchText = ""
+                            searching.toggle()
+                        }
+                        .padding(.trailing, 13)
+                }
+            }
+            .foregroundColor(.gray)
+            .padding(.leading, 13)
+        }
+        .frame(height: 40)
+        .cornerRadius(13)
+        .padding(.horizontal)
+        .onChange(of: searchText) { newValue in
+            if !newValue.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                withAnimation {
+                    canCancel = true
+                }
+            } else {
+                withAnimation {
+                    canCancel = false
+                }
+            }
+        }
     }
 }

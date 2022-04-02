@@ -29,6 +29,8 @@ class CloudKitViewModel: ObservableObject {
     @Published var notiDenied = false
     @Published var doNotAlert = false
     @Published var askForPermission = false
+    @Published var cursorMain: CKQueryOperation.Cursor?
+    @Published var desiredKeys = ["name", "founder", "date", "location", "likes", "inappropriate", "offensive", "dangerous", "spam", "id", "userID", "image", "type", "isMultipleImages", "locationName", "description"]
     
     init() {
         getiCloudStatus()
@@ -294,15 +296,20 @@ class CloudKitViewModel: ObservableObject {
         }
     }
     
-    func fetchSpotPublic(userLocation: CLLocation, filteringBy: String) async throws {
-        isFetching = true
+    func fetchSpotPublic(userLocation: CLLocation, filteringBy: String, search: String) async throws {
+        self.isFetching = true
         var predicate = NSPredicate()
         if radiusInMeters == 0 {
             predicate = NSPredicate(value: true)
         } else {
             predicate = NSPredicate(format: "distanceToLocation:fromLocation:(location, %@) < %f", userLocation, CGFloat(radiusInMeters))
         }
-        let query = CKQuery(recordType: "Spots", predicate: predicate)
+        var query = CKQuery(recordType: "Spots", predicate: predicate)
+        if !search.isEmpty {
+            let predicate2 = NSPredicate(format: "self contains %@", search)
+            let compoundPredicate = NSCompoundPredicate(andPredicateWithSubpredicates: [predicate, predicate2])
+            query = CKQuery(recordType: "Spots", predicate: compoundPredicate)
+        }
         if filteringBy == "Closest" {
             let distance = CKLocationSortDescriptor(key: "location", relativeLocation: userLocation)
             let creation = NSSortDescriptor(key: "creationDate", ascending: false)
@@ -322,11 +329,11 @@ class CloudKitViewModel: ObservableObject {
             let creation = NSSortDescriptor(key: "creationDate", ascending: false)
             query.sortDescriptors = [creation, distance]
         }
-        let desiredKeys = ["name", "founder", "date", "location", "likes", "inappropriate", "offensive", "dangerous", "spam", "id", "userID", "image", "type", "isMultipleImages", "locationName"]
         
-        let results = try await CKContainer.default().publicCloudDatabase.records(matching: query, desiredKeys: desiredKeys, resultsLimit: 10)
+        let results = try await CKContainer.default().publicCloudDatabase.records(matching: query, desiredKeys: desiredKeys, resultsLimit: 20)
         DispatchQueue.main.async {
             self.spots.removeAll()
+            self.cursorMain = nil
         }
         results.matchResults.forEach { (_,result) in
             switch result {
@@ -384,17 +391,13 @@ class CloudKitViewModel: ObservableObject {
             }
         }
         
+        DispatchQueue.main.async {
+            self.isFetching = false
+        }
+        
         if let cursor = results.queryCursor {
-            if spots.count > maxTotalfetches - 1 {
-                DispatchQueue.main.async {
-                    self.isFetching = false
-                }
-            } else {
-                await fetchMoreSpotsPublic(cursor: cursor, desiredKeys: desiredKeys, resultLimit: 10)
-            }
-        } else {
             DispatchQueue.main.async {
-                self.isFetching = false
+                self.cursorMain = cursor
             }
         }
     }
@@ -455,6 +458,7 @@ class CloudKitViewModel: ObservableObject {
                 }
             }
         }
+        
         try await CKContainer.default().publicCloudDatabase.save(record)
         return true
     }
@@ -491,6 +495,8 @@ class CloudKitViewModel: ObservableObject {
     }
     
     func fetchMoreSpotsPublic(cursor: CKQueryOperation.Cursor, desiredKeys: [String], resultLimit: Int) async {
+        self.isFetching = true
+        self.cursorMain = nil
         do {
             let results = try await CKContainer.default().publicCloudDatabase.records(continuingMatchFrom: cursor, desiredKeys: desiredKeys, resultsLimit: resultLimit)
             results.matchResults.forEach { (_,result) in
@@ -549,25 +555,22 @@ class CloudKitViewModel: ObservableObject {
                 }
             }
             
+            DispatchQueue.main.async {
+                self.isFetching = false
+            }
+            
             if let cursor = results.queryCursor {
-                if spots.count > maxTotalfetches - 1 {
-                    DispatchQueue.main.async {
-                        self.isFetching = false
-                    }
-                } else {
-                    await fetchMoreSpotsPublic(cursor: cursor, desiredKeys: desiredKeys, resultLimit: 10)
-                }
-            } else {
                 DispatchQueue.main.async {
-                    self.isFetching = false
+                    self.cursorMain = cursor
                 }
             }
         } catch {
             DispatchQueue.main.async {
+                self.isFetching = false
+                self.cursorMain = nil
                 self.isErrorMessage = "Unable to load more spots"
                 self.isError.toggle()
             }
-            return
         }
     }
     
@@ -666,10 +669,7 @@ class CloudKitViewModel: ObservableObject {
                 await requestPermissionNoti(notiType: notiType, fixedLocation: fixedLocation, radiusInKm: radiusInKm)
             }
         case .denied:
-            self.doNotAlert = true
-            self.askForPermission = true
-            self.notiPlaylistOn = false
-            self.notiNewSpotOn = false
+            print("hi")
         case .authorized:
             if notiType == 1 {
                 subscribeToSharedPlaylist()
