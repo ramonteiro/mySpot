@@ -82,13 +82,15 @@ struct ContentView: View {
                 showSharedSpotSheet = true
             }
         }
-        .onChange(of: cloudViewModel.isError) { newValue in
+        .onChange(of: cloudViewModel.isError) { _ in
             let generator = UINotificationFeedbackGenerator()
             generator.notificationOccurred(.warning)
             errorAlert.toggle()
         }
         .alert(cloudViewModel.isErrorMessage, isPresented: $errorAlert) {
-            Button("Dismiss", role: .cancel) { }
+            Button("OK", role: .cancel) { }
+        } message: {
+            Text(cloudViewModel.isErrorMessageDetails)
         }
         .environmentObject(tabController)
     }

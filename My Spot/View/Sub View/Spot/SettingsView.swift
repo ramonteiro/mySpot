@@ -19,9 +19,12 @@ struct SettingsView: View {
     @State private var placeName = ""
     @State private var newPlace = false
     @State private var message = "Message to My Spot developer: "
-    @State private var showingCannotTurnOffNoti = false
-    @State private var showingCannotTurnOnNoti = false
-    @State private var unableToAddSpot = false
+    @State private var discoverNoti = false
+    @State private var playlistNoti = false
+    @State private var unableToAddSpot = 0 // 0: ok, 1: no connection, 2: no permission
+    @State private var showingErrorNoPermission = false
+    @State private var showingErrorNoConnection = false
+    @State private var preventDoubleTrigger = false // stops onchange from triggering itself
     
     var body: some View {
         NavigationView {
@@ -46,7 +49,7 @@ struct SettingsView: View {
                         .font(.headline)
                 }
                 Section {
-                    Toggle(isOn: $cloudViewModel.notiPlaylistOn) {
+                    Toggle(isOn: $playlistNoti) {
                         Text("Shared Playlists")
                     }
                     .tint(cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex])
@@ -57,7 +60,7 @@ struct SettingsView: View {
                     Text("Alerts when new spots are added to shared playlists.")
                 }
                 Section {
-                    Toggle(isOn: $cloudViewModel.notiNewSpotOn) {
+                    Toggle(isOn: $discoverNoti) {
                         Text("New Spots")
                     }
                     .tint(cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex])
@@ -108,10 +111,110 @@ struct SettingsView: View {
                     Text("Youtube video with timestamps to demonstrate how to use My Spot.")
                 }
             }
+            .onChange(of: discoverNoti) { newValue in
+                if newValue && !preventDoubleTrigger {
+                    Task {
+                        await cloudViewModel.checkNotificationPermission()
+                        if cloudViewModel.notiPermission == 0 { // not determined
+                            // ask
+                            await cloudViewModel.requestPermissionNoti()
+                        }
+                        if cloudViewModel.notiPermission == 2 ||  cloudViewModel.notiPermission == 3 { // allowed/provisional
+                            // subscribe
+                            var location = CLLocation(latitude: mapViewModel.region.center.latitude, longitude: mapViewModel.region.center.longitude)
+                            var radius: CGFloat = 1000
+                            if (UserDefaults.standard.valueExists(forKey: "discovernotix")) {
+                                location = CLLocation(latitude: UserDefaults.standard.double(forKey: "discovernotix"), longitude: UserDefaults.standard.double(forKey: "discovernotiy"))
+                                radius = UserDefaults.standard.double(forKey: "discovernotikm")
+                            } else {
+                                UserDefaults.standard.set(Double(mapViewModel.region.center.latitude), forKey: "discovernotix")
+                                UserDefaults.standard.set(Double(mapViewModel.region.center.longitude), forKey: "discovernotiy")
+                                UserDefaults.standard.set(Double(1000), forKey: "discovernotikm")
+                            }
+                            try? await cloudViewModel.unsubscribe(id: "NewSpotDiscover")
+                            do {
+                                try await cloudViewModel.subscribeToNewSpot(fixedLocation: location, radiusInKm: radius)
+                                cloudViewModel.notiNewSpotOn = true
+                                UserDefaults.standard.set(true, forKey: "discovernot")
+                            } catch {
+                                // alert error connecting
+                                cloudViewModel.notiNewSpotOn = false
+                                UserDefaults.standard.set(false, forKey: "discovernot")
+                                preventDoubleTrigger = true
+                                discoverNoti = false
+                                let generator = UINotificationFeedbackGenerator()
+                                generator.notificationOccurred(.warning)
+                                showingErrorNoConnection = true
+                            }
+                        } else { // denied/unknown
+                            // alert, notifications do not have permission
+                            cloudViewModel.notiNewSpotOn = false
+                            UserDefaults.standard.set(false, forKey: "discovernot")
+                            preventDoubleTrigger = true
+                            discoverNoti = false
+                            let generator = UINotificationFeedbackGenerator()
+                            generator.notificationOccurred(.warning)
+                            showingErrorNoPermission = true
+                        }
+                    }
+                }
+                if !newValue && !preventDoubleTrigger {
+                    // unsubscribe
+                    Task {
+                        do {
+                            try await cloudViewModel.unsubscribe(id: "NewSpotDiscover")
+                            cloudViewModel.notiNewSpotOn = false
+                            UserDefaults.standard.set(false, forKey: "discovernot")
+                        } catch {
+                            // alert no connection
+                            preventDoubleTrigger = true
+                            discoverNoti = true
+                            cloudViewModel.notiNewSpotOn = true
+                            UserDefaults.standard.set(true, forKey: "discovernot")
+                            let generator = UINotificationFeedbackGenerator()
+                            generator.notificationOccurred(.warning)
+                            showingErrorNoConnection = true
+                        }
+                    }
+                }
+                if preventDoubleTrigger {
+                    preventDoubleTrigger = false
+                }
+            }
+            .alert("Notification Permissions Denied", isPresented: $showingErrorNoPermission) {
+                Button("Settings") {
+                    guard let url = URL(string: UIApplication.openSettingsURLString) else { return }
+                    UIApplication.shared.open(url)
+                }
+                Button("Cancel", role: .cancel) { }
+            } message: {
+                Text("Please check settings and make sure notifications are on for My Spot.")
+            }
+            .alert("Connection Error", isPresented: $showingErrorNoConnection) {
+                Button("OK", role: .cancel) { }
+            } message: {
+                Text("Please check internet connection and try again.")
+            }
+            .onAppear {
+                if UserDefaults.standard.valueExists(forKey: "discovernotiname") {
+                    placeName = UserDefaults.standard.string(forKey: "discovernotiname") ?? ""
+                }
+            }
             .fullScreenCover(isPresented: $showingConfigure, onDismiss: {
-                if unableToAddSpot {
-                    unableToAddSpot = false
-                    showingCannotTurnOnNoti = true
+                if unableToAddSpot == 2 {
+                    unableToAddSpot = 0
+                    cloudViewModel.notiNewSpotOn = false
+                    UserDefaults.standard.set(false, forKey: "discovernot")
+                    preventDoubleTrigger = true
+                    discoverNoti = false
+                    let generator = UINotificationFeedbackGenerator()
+                    generator.notificationOccurred(.warning)
+                    showingErrorNoPermission = true
+                } else if unableToAddSpot == 1 {
+                    unableToAddSpot = 0
+                    let generator = UINotificationFeedbackGenerator()
+                    generator.notificationOccurred(.warning)
+                    showingErrorNoConnection = true
                 }
             }) {
                 SetUpNewSpotNoti(newPlace: $newPlace, unableToAddSpot: $unableToAddSpot)
@@ -122,70 +225,6 @@ struct SettingsView: View {
                     print(returnedMail)
                 }
                 .accentColor(cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex])
-            }
-            .alert("Unable to save notification. Please check internet and try again.", isPresented: $showingCannotTurnOnNoti) {
-                Button("OK", role: .cancel) { }
-            }
-            .alert("Unable to turn off notification at the moment. Please check internet and try again.", isPresented: $showingCannotTurnOffNoti) {
-                Button("OK", role: .cancel) { }
-            }
-            .alert("Please Enable Notifications In Settings.", isPresented: $cloudViewModel.askForPermission) {
-                Button("OK", role: .cancel) { }
-            }
-            .onChange(of: cloudViewModel.notiNewSpotOn) { newValue in
-                if cloudViewModel.doNotAlert {
-                    cloudViewModel.doNotAlert = false
-                } else {
-                    if newValue {
-                        if (UserDefaults.standard.valueExists(forKey: "discovernotix")) {
-                            Task {
-                                await cloudViewModel.subscribeToNoti(notiType: 2, fixedLocation: CLLocation(latitude: UserDefaults.standard.double(forKey: "discovernotix"), longitude: UserDefaults.standard.double(forKey: "discovernotiy")), radiusInKm: UserDefaults.standard.double(forKey: "discovernotikm"))
-                                if (cloudViewModel.notiDenied) {
-                                    cloudViewModel.notiDenied = false
-                                    cloudViewModel.notiNewSpotOn = false
-                                    showingCannotTurnOnNoti = true
-                                }
-                            }
-                        } else {
-                            Task {
-                                await cloudViewModel.subscribeToNoti(notiType: 2, fixedLocation: CLLocation(latitude: mapViewModel.region.center.latitude, longitude: mapViewModel.region.center.longitude), radiusInKm: 1000)
-                                if (cloudViewModel.notiDenied) {
-                                    cloudViewModel.notiDenied = false
-                                    cloudViewModel.notiNewSpotOn = false
-                                    showingCannotTurnOnNoti = true
-                                } else {
-                                    UserDefaults.standard.set(Double(mapViewModel.region.center.latitude), forKey: "discovernotix")
-                                    UserDefaults.standard.set(Double(mapViewModel.region.center.longitude), forKey: "discovernotiy")
-                                    UserDefaults.standard.set(Double(1000), forKey: "discovernotikm")
-                                }
-                            }
-                        }
-                    } else {
-                        Task {
-                            do {
-                                try await cloudViewModel.unsubscribe(id: "NewSpotDiscover")
-                            } catch {
-                                cloudViewModel.doNotAlert = true
-                                cloudViewModel.notiNewSpotOn = true
-                                showingCannotTurnOffNoti = true
-                            }
-                        }
-                    }
-                }
-            }
-            .onChange(of: cloudViewModel.notiPlaylistOn) { newValue in
-                
-            }
-            .onChange(of: cloudViewModel.notiNewSpotOn) { newValue in
-                UserDefaults.standard.set(newValue, forKey: "discovernot")
-            }
-            .onChange(of: cloudViewModel.notiPlaylistOn) { newValue in
-                UserDefaults.standard.set(newValue, forKey: "playlistnot")
-            }
-            .onAppear {
-                if UserDefaults.standard.valueExists(forKey: "discovernotiname") {
-                    placeName = UserDefaults.standard.string(forKey: "discovernotiname") ?? ""
-                }
             }
             .onChange(of: newPlace) { newValue in
                 placeName = UserDefaults.standard.string(forKey: "discovernotiname") ?? ""
@@ -203,6 +242,10 @@ struct SettingsView: View {
                     }
                 }
             }
+        }
+        .onAppear {
+            discoverNoti = cloudViewModel.notiNewSpotOn
+            playlistNoti = cloudViewModel.notiPlaylistOn
         }
     }
 }

@@ -39,8 +39,10 @@ struct DetailView: View {
         ZStack {
             if (exists) {
                 displaySpot
-                    .alert("Unable to upload spot. Spot is now private, please try again later and check internet connection.", isPresented: $pu) {
+                    .alert("Unable To Save Spot", isPresented: $pu) {
                         Button("OK", role: .cancel) { }
+                    } message: {
+                        Text("Failed to upload spot. Spot is now set to private, please try again later and check internet connection.")
                     }
                     .onChange(of: tabController.playlistPopToRoot) { _ in
                         if (fromPlaylist) {

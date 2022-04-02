@@ -19,7 +19,7 @@ struct SetUpNewSpotNoti: View {
     @State private var distance: String = "Diameter: "
     @State private var isMetric = false
     @Binding var newPlace: Bool
-    @Binding var unableToAddSpot: Bool
+    @Binding var unableToAddSpot: Int
     
     var body: some View {
         NavigationView {
@@ -72,25 +72,26 @@ struct SetUpNewSpotNoti: View {
                             mapViewModel.getPlacmarkOfLocationLessPrecise(location: location) { l in
                                 placeName = l
                             }
-                            var proceed = true
-                            do {
-                                try await cloudViewModel.unsubscribe(id: "NewSpotDiscover")
-                            } catch {
-                                unableToAddSpot = true
-                                proceed = false
-                            }
-                            if proceed {
-                                await cloudViewModel.subscribeToNewSpot(fixedLocation: location, radiusInKm: distanceKm)
-                                if cloudViewModel.notiDenied {
-                                    cloudViewModel.notiDenied = false
-                                    unableToAddSpot = true
-                                } else {
+                            
+                            // check permissions
+                            await cloudViewModel.checkNotificationPermission()
+                            if cloudViewModel.notiPermission == 2 ||  cloudViewModel.notiPermission == 3 { // allowed
+                                // unsub from old noti
+                                try? await cloudViewModel.unsubscribe(id: "NewSpotDiscover")
+                                
+                                // sub
+                                do {
+                                    try await cloudViewModel.subscribeToNewSpot(fixedLocation: location, radiusInKm: distanceKm)
                                     UserDefaults.standard.set(placeName, forKey: "discovernotiname")
                                     newPlace.toggle()
                                     UserDefaults.standard.set(Double(centerRegion.center.latitude), forKey: "discovernotix")
                                     UserDefaults.standard.set(Double(centerRegion.center.longitude), forKey: "discovernotiy")
                                     UserDefaults.standard.set(Double(distanceKm), forKey: "discovernotikm")
+                                } catch { // no connection
+                                    unableToAddSpot = 1
                                 }
+                            } else { // not allowed
+                                unableToAddSpot = 2
                             }
                         }
                         presentationMode.wrappedValue.dismiss()

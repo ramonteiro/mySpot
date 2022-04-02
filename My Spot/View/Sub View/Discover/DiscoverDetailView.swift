@@ -265,7 +265,7 @@ struct DiscoverDetailView: View {
                 .padding(10)
                 .shadow(color: .black, radius: 5)
         }
-        .alert("Are you sure you want to delete \(cloudViewModel.spots[index].name)?", isPresented: $deleteAlert) {
+        .alert("Are You Sure You Want To Delete \(cloudViewModel.spots[index].name)?", isPresented: $deleteAlert) {
             Button("Delete", role: .destructive) {
                 let spotID = cloudViewModel.spots[index].record.recordID
                 Task {
@@ -284,12 +284,15 @@ struct DiscoverDetailView: View {
                         }
                     } catch {
                         DispatchQueue.main.async {
-                            cloudViewModel.isErrorMessage = cloudkitErrorMsg.delete
+                            cloudViewModel.isErrorMessage = "Error Deleting Spot"
+                            cloudViewModel.isErrorMessageDetails = "Please check internet connection and try again."
                             cloudViewModel.isError.toggle()
                         }
                     }
                 }
             }
+        } message: {
+            Text("Spot will be removed from discover tab and no longer sharable. If this spot is still in 'My Spots' tab, it will not be deleted there.")
         }
     }
     

@@ -54,8 +54,10 @@ struct MySpotsView: View {
                         sortClosest()
                     }
                 }
-                .alert("Unable to upload spot. Spot is now private, please try again later and check internet connection.", isPresented: $pu) {
+                .alert("Unable To Upload Spot", isPresented: $pu) {
                     Button("OK", role: .cancel) { }
+                } message: {
+                    Text("Please check internet connection and try again.")
                 }
         }
         .navigationViewStyle(.stack)

@@ -25,12 +25,19 @@ struct ViewDiscoverSpots: View {
     @State private var showingDetailsSheet = false
     @State private var spotRegion: MKCoordinateRegion = MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: 33.714712646421, longitude: -112.29072718706581), span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01))
     @State var sortBy: String
+    @Binding var searchText: String
+    @State private var showingErrorConnection = false
     
     var body: some View {
         displayMap
             .onAppear {
                 spotRegion = mapViewModel.searchingHere
                 originalRegion = spotRegion
+            }
+            .alert("Unable To Find New Spots", isPresented: $showingErrorConnection) {
+                Button("OK", role: .cancel) { }
+            } message: {
+                Text("Connection Error. Please check internet connection and try again.")
             }
     }
 
@@ -144,12 +151,11 @@ struct ViewDiscoverSpots: View {
         Button {
             Task {
                 do {
-                    try await cloudViewModel.fetchSpotPublic(userLocation: CLLocation(latitude: spotRegion.center.latitude, longitude: spotRegion.center.longitude), filteringBy: sortBy, search: "")
+                    try await cloudViewModel.fetchSpotPublic(userLocation: CLLocation(latitude: spotRegion.center.latitude, longitude: spotRegion.center.longitude), filteringBy: sortBy, search: searchText)
                     originalRegion = spotRegion
                     mapViewModel.searchingHere = spotRegion
                 } catch {
-                    cloudViewModel.isErrorMessage = "Error searching here"
-                    cloudViewModel.isError.toggle()
+                    showingErrorConnection = true
                 }
             }
         } label: {

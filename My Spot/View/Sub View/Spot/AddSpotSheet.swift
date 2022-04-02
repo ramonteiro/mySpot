@@ -167,8 +167,10 @@ struct AddSpotSheet: View {
                                 focusState = nil
                             }
                         }
-                        .alert("Unable to save spot. Please try again.", isPresented: $showingCannotSavePrivateAlert) {
+                        .alert("Unable To Save Spot", isPresented: $showingCannotSavePrivateAlert) {
                             Button("OK", role: .cancel) { }
+                        } message: {
+                            Text("Failed to save spot. Please try again.")
                         }
                         .confirmationDialog("Choose Image From Photos or Camera", isPresented: $showingAddImageAlert) {
                             Button("Camera") {

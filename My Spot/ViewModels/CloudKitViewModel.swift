@@ -21,14 +21,12 @@ class CloudKitViewModel: ObservableObject {
     @Published var userID: String = ""
     @Published var canRefresh = false
     @Published var isFetching = false
-    @Published var maxTotalfetches = 10
     @Published var isError = false
     @Published var isErrorMessage = ""
+    @Published var isErrorMessageDetails = ""
     @Published var isPostError = false
     @Published var radiusInMeters: Double = 0
-    @Published var notiDenied = false
-    @Published var doNotAlert = false
-    @Published var askForPermission = false
+    @Published var notiPermission = 0 // 0: not determined, 1: denied, 2: allowed, 3: provisional, 4: ephemeral, 5: unknown
     @Published var cursorMain: CKQueryOperation.Cursor?
     @Published var desiredKeys = ["name", "founder", "date", "location", "likes", "inappropriate", "offensive", "dangerous", "spam", "id", "userID", "image", "type", "isMultipleImages", "locationName", "description"]
     
@@ -40,9 +38,6 @@ class CloudKitViewModel: ObservableObject {
     private func setUserDefaults() {
         if (UserDefaults.standard.valueExists(forKey: "savedDistance")) {
             radiusInMeters = Double(UserDefaults.standard.integer(forKey: "savedDistance"))
-        }
-        if (UserDefaults.standard.valueExists(forKey: "maxTotalFetches")) {
-            maxTotalfetches = UserDefaults.standard.integer(forKey: "maxTotalFetches")
         }
         if (UserDefaults.standard.valueExists(forKey: "discovernot")) {
             notiNewSpotOn = UserDefaults.standard.bool(forKey: "discovernot")
@@ -62,7 +57,8 @@ class CloudKitViewModel: ObservableObject {
     
     func checkDeepLink(url: URL) async {
         guard let host = URLComponents(url: url, resolvingAgainstBaseURL: true)?.host else {
-            isErrorMessage = cloudkitErrorMsg.dpLink
+            isErrorMessage = "Invalid Link"
+            isErrorMessageDetails = "Check that the link was not modified and try again."
             isError.toggle()
             return
         }
@@ -130,7 +126,8 @@ class CloudKitViewModel: ObservableObject {
             }
         } catch {
             DispatchQueue.main.async {
-                self.isErrorMessage = cloudkitErrorMsg.dpLink
+                self.isErrorMessage = "Unable To Find Spot"
+                self.isErrorMessageDetails = "This is due to poor internet connection or the spot you are looking for has been deleted by the founder."
                 self.isError.toggle()
             }
         }
@@ -568,7 +565,8 @@ class CloudKitViewModel: ObservableObject {
             DispatchQueue.main.async {
                 self.isFetching = false
                 self.cursorMain = nil
-                self.isErrorMessage = "Unable to load more spots"
+                self.isErrorMessage = "Unable To Load More Spots"
+                self.isErrorMessageDetails = "Check internet conection and try again."
                 self.isError.toggle()
             }
         }
@@ -600,33 +598,54 @@ class CloudKitViewModel: ObservableObject {
         return false
     }
     
+    func checkNotificationPermission() async {
+        let center = UNUserNotificationCenter.current()
+        let settings = await center.notificationSettings()
+        switch settings.authorizationStatus {
+        case .notDetermined:
+            DispatchQueue.main.async {
+                self.notiPermission = 0
+            }
+        case .denied:
+            DispatchQueue.main.async {
+                self.notiPermission = 1
+            }
+        case .authorized:
+            DispatchQueue.main.async {
+                self.notiPermission = 2
+            }
+        case .provisional:
+            DispatchQueue.main.async {
+                self.notiPermission = 3
+            }
+        case .ephemeral:
+            DispatchQueue.main.async {
+                self.notiPermission = 4
+            }
+        @unknown default:
+            DispatchQueue.main.async {
+                self.notiPermission = 5
+            }
+        }
+    }
     
-    private func requestPermissionNoti(notiType: Int, fixedLocation: CLLocation?, radiusInKm: CGFloat?) async {
+    func requestPermissionNoti() async {
         let options: UNAuthorizationOptions = [.alert, .sound, .badge]
         do {
             let success = try await UNUserNotificationCenter.current().requestAuthorization(options: options)
             if success {
                 await UIApplication.shared.registerForRemoteNotifications()
-                if notiType == 1 {
-                    subscribeToSharedPlaylist()
-                } else if notiType == 2 {
-                    await subscribeToNewSpot(fixedLocation: fixedLocation!, radiusInKm: radiusInKm!)
+                DispatchQueue.main.async {
+                    self.notiPermission = 2
                 }
-
             } else {
                 DispatchQueue.main.async {
-                    self.doNotAlert = true
-                    self.askForPermission = true
-                    self.notiPlaylistOn = false
-                    self.notiNewSpotOn = false
+                    self.notiPermission = 1
                 }
             }
         } catch {
             DispatchQueue.main.async {
-                self.doNotAlert = true
-                self.notiPlaylistOn = false
-                self.notiNewSpotOn = false
-                self.notiDenied = true
+                self.notiPermission = 1
             }
         }
     }
@@ -635,7 +654,7 @@ class CloudKitViewModel: ObservableObject {
         _ = try await CKContainer.default().publicCloudDatabase.deleteSubscription(withID: id)
     }
     
-    func subscribeToNewSpot(fixedLocation: CLLocation, radiusInKm: CGFloat) async {
+    func subscribeToNewSpot(fixedLocation: CLLocation, radiusInKm: CGFloat) async throws {
         let predicate = NSPredicate(format: "distanceToLocation:fromLocation:(location, %@) < %f", fixedLocation, radiusInKm)
         let subscription = CKQuerySubscription(recordType: "Spots", predicate: predicate, subscriptionID: "NewSpotDiscover", options: .firesOnRecordCreation)
         let notification = CKSubscription.NotificationInfo()
@@ -643,45 +662,12 @@ class CloudKitViewModel: ObservableObject {
         notification.alertBody = "A new spot was added to your area!"
         notification.soundName = "default"
         notification.shouldBadge = true
+        notification.desiredKeys = ["id"]
         subscription.notificationInfo = notification
-        do {
-            try await CKContainer.default().publicCloudDatabase.save(subscription)
-        } catch {
-            DispatchQueue.main.async {
-                self.notiDenied = true
-            }
-        }
+        try await CKContainer.default().publicCloudDatabase.save(subscription)
     }
     
     private func subscribeToSharedPlaylist() {
         
-    }
-    
-    
-    func subscribeToNoti(notiType: Int, fixedLocation: CLLocation?, radiusInKm: CGFloat?) async {
-        let center = UNUserNotificationCenter.current()
-        let settings = await center.notificationSettings()
-        switch settings.authorizationStatus {
-        case .notDetermined:
-            if notiType == 1 {
-                await requestPermissionNoti(notiType: notiType, fixedLocation: nil, radiusInKm: nil)
-            } else if notiType == 2 {
-                await requestPermissionNoti(notiType: notiType, fixedLocation: fixedLocation, radiusInKm: radiusInKm)
-            }
-        case .denied:
-            print("hi")
-        case .authorized:
-            if notiType == 1 {
-                subscribeToSharedPlaylist()
-            } else if notiType == 2 {
-                await subscribeToNewSpot(fixedLocation: fixedLocation!, radiusInKm: radiusInKm!)
-            }
-        case .provisional:
-            print("error")
-        case .ephemeral:
-            print("error")
-        @unknown default:
-            print("unknown")
-        }
     }
 }
