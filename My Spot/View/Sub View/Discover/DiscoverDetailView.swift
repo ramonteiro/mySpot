@@ -49,6 +49,7 @@ struct DiscoverDetailView: View {
     @State private var didLike = false
     @State private var noType = false
     @State private var spotInCD = false
+    @State private var attemptToReport = false
     @FocusState private var nameIsFocused: Bool
     @State private var hasReported: Bool = false
     private var idiom : UIUserInterfaceIdiom { UIDevice.current.userInterfaceIdiom }
@@ -519,29 +520,34 @@ struct DiscoverDetailView: View {
                     .font(.system(size: 15, weight: .light))
                     .padding([.top, .bottom], 10)
             }
-            
-            if !hasReported {
-                Button {
-                    showingReportAlert = true
-                } label: {
-                    HStack {
-                        Text("Report Spot")
-                        Image(systemName: "exclamationmark.triangle.fill")
+            if !attemptToReport {
+                if !hasReported {
+                    Button {
+                        showingReportAlert = true
+                    } label: {
+                        HStack {
+                            Text("Report Spot")
+                            Image(systemName: "exclamationmark.triangle.fill")
+                        }
                     }
+                    .padding([.top, .bottom], 10)
+                } else {
+                    HStack {
+                        Text("Report Received")
+                        Image(systemName: "checkmark.square.fill")
+                    }
+                    .padding([.top, .bottom], 10)
                 }
-                .padding([.top, .bottom], 10)
             } else {
-                HStack {
-                    Text("Report Received")
-                    Image(systemName: "checkmark.square.fill")
-                }
-                .padding([.top, .bottom], 10)
+                ProgressView().progressViewStyle(.circular)
+                    .padding([.top, .bottom], 10)
             }
         }
         .confirmationDialog("How should this spot be reported?", isPresented: $showingReportAlert) {
             Button("Offensive") {
                 let spot = cloudViewModel.spots[index]
                 Task {
+                    attemptToReport = true
                     hasReported = await cloudViewModel.report(spot: spot, report: "offensive")
                     if hasReported {
                         DispatchQueue.main.async {
@@ -550,11 +556,13 @@ struct DiscoverDetailView: View {
                             try? moc.save()
                         }
                     }
+                    attemptToReport = false
                 }
             }
             Button("Inappropriate") {
                 let spot = cloudViewModel.spots[index]
                 Task {
+                    attemptToReport = true
                     hasReported = await cloudViewModel.report(spot: spot, report: "inappropriate")
                     if hasReported {
                         DispatchQueue.main.async {
@@ -563,11 +571,13 @@ struct DiscoverDetailView: View {
                             try? moc.save()
                         }
                     }
+                    attemptToReport = false
                 }
             }
             Button("Spam") {
                 let spot = cloudViewModel.spots[index]
                 Task {
+                    attemptToReport = true
                     hasReported = await cloudViewModel.report(spot: spot, report: "spam")
                     if hasReported {
                         DispatchQueue.main.async {
@@ -576,11 +586,13 @@ struct DiscoverDetailView: View {
                             try? moc.save()
                         }
                     }
+                    attemptToReport = false
                 }
             }
             Button("Dangerous") {
                 let spot = cloudViewModel.spots[index]
                 Task {
+                    attemptToReport = true
                     hasReported = await cloudViewModel.report(spot: spot, report: "dangerous")
                     if hasReported {
                         DispatchQueue.main.async {
@@ -589,6 +601,7 @@ struct DiscoverDetailView: View {
                             try? moc.save()
                         }
                     }
+                    attemptToReport = false
                 }
             }
             Button("Cancel", role: .cancel) { }

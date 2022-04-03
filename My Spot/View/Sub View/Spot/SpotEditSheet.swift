@@ -334,6 +334,8 @@ struct SpotEditSheet: View {
             }
             .interactiveDismissDisabled()
             if isSaving {
+                Color.black.opacity(0.5)
+                    .ignoresSafeArea()
                 ProgressView("Saving")
                     .padding()
                     .background(

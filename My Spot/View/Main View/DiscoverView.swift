@@ -24,6 +24,7 @@ struct DiscoverView: View {
     @State private var searchLocationName = ""
     @State private var sortBy = "Closest"
     @State private var distance = 0
+    @State private var hasSearched = false
     @State private var isMetric = false
     @State private var hasError = false
     @State private var searching = false
@@ -102,6 +103,11 @@ struct DiscoverView: View {
             let unitMeters = radiusUnit.converted(to: .meters)
             cloudViewModel.radiusInMeters = unitMeters.value
         }
+        if !searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            hasSearched = true
+        } else {
+            hasSearched = false
+        }
         Task {
             do {
                 try await cloudViewModel.fetchSpotPublic(userLocation: location, filteringBy: filteringBy, search: searchText)
@@ -162,7 +168,7 @@ struct DiscoverView: View {
     
     private var listSpots: some View {
         VStack(spacing: 10) {
-            SearchBar(searchText: $searchText, searching: $searching, searchName: $searchLocationName)
+            SearchBar(searchText: $searchText, searching: $searching, searchName: $searchLocationName, hasSearched: $hasSearched)
             List {
                 ForEach(cloudViewModel.spots.indices, id: \.self) { i in
                     Button(action: {
@@ -394,6 +400,7 @@ struct SearchBar: View {
     @Binding var searchText: String
     @Binding var searching: Bool
     @Binding var searchName: String
+    @Binding var hasSearched: Bool
     @State private var canCancel: Bool = false
     @Environment(\.colorScheme) var colorScheme
     
@@ -419,7 +426,9 @@ struct SearchBar: View {
                         .onTapGesture {
                             UIApplication.shared.dismissKeyboard()
                             searchText = ""
-                            searching.toggle()
+                            if hasSearched {
+                                searching.toggle()
+                            }
                         }
                         .padding(.trailing, 13)
                 }

@@ -30,6 +30,7 @@ struct DiscoverSheetShared: View {
     @State private var deletedSpot: [Spot] = []
     @State private var mySpot = false
     @State private var distance: String = ""
+    @State private var attemptToReport = false
     @State private var deleteAlert = false
     @State private var showingReportAlert = false
     @State private var hasReported = false
@@ -466,28 +467,34 @@ struct DiscoverSheetShared: View {
                     .padding([.top, .bottom], 10)
             }
             
-            if !hasReported {
-                Button {
-                    showingReportAlert = true
-                } label: {
-                    HStack {
-                        Text("Report Spot")
-                        Image(systemName: "exclamationmark.triangle.fill")
+            if !attemptToReport {
+                if !hasReported {
+                    Button {
+                        showingReportAlert = true
+                    } label: {
+                        HStack {
+                            Text("Report Spot")
+                            Image(systemName: "exclamationmark.triangle.fill")
+                        }
                     }
+                    .padding([.top, .bottom], 10)
+                } else {
+                    HStack {
+                        Text("Report Received")
+                        Image(systemName: "checkmark.square.fill")
+                    }
+                    .padding([.top, .bottom], 10)
                 }
-                .padding([.top, .bottom], 10)
             } else {
-                HStack {
-                    Text("Report Received")
-                    Image(systemName: "checkmark.square.fill")
-                }
-                .padding([.top, .bottom], 10)
+                ProgressView().progressViewStyle(.circular)
+                    .padding([.top, .bottom], 10)
             }
         }
         .confirmationDialog("How should this spot be reported?", isPresented: $showingReportAlert) {
             Button("Offensive") {
                 let spot = cloudViewModel.shared[0]
                 Task {
+                    attemptToReport = true
                     hasReported = await cloudViewModel.report(spot: spot, report: "offensive")
                     if hasReported {
                         DispatchQueue.main.async {
@@ -496,11 +503,13 @@ struct DiscoverSheetShared: View {
                             try? moc.save()
                         }
                     }
+                    attemptToReport = false
                 }
             }
             Button("Inappropriate") {
                 let spot = cloudViewModel.shared[0]
                 Task {
+                    attemptToReport = true
                     hasReported = await cloudViewModel.report(spot: spot, report: "inappropriate")
                     if hasReported {
                         DispatchQueue.main.async {
@@ -509,11 +518,13 @@ struct DiscoverSheetShared: View {
                             try? moc.save()
                         }
                     }
+                    attemptToReport = false
                 }
             }
             Button("Spam") {
                 let spot = cloudViewModel.shared[0]
                 Task {
+                    attemptToReport = true
                     hasReported = await cloudViewModel.report(spot: spot, report: "spam")
                     if hasReported {
                         DispatchQueue.main.async {
@@ -523,10 +534,12 @@ struct DiscoverSheetShared: View {
                         }
                     }
                 }
+                attemptToReport = false
             }
             Button("Dangerous") {
                 let spot = cloudViewModel.shared[0]
                 Task {
+                    attemptToReport = true
                     hasReported = await cloudViewModel.report(spot: spot, report: "dangerous")
                     if hasReported {
                         DispatchQueue.main.async {
@@ -535,6 +548,7 @@ struct DiscoverSheetShared: View {
                             try? moc.save()
                         }
                     }
+                    attemptToReport = false
                 }
             }
             Button("Cancel", role: .cancel) { }
