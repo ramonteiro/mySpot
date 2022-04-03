@@ -13,7 +13,6 @@ struct DiscoverMapPreview: View {
     let spot: SpotFromCloud
     @State private var tags: [String] = []
     @State private var pad:CGFloat = 20
-    @State private var distance: String = ""
     @EnvironmentObject var mapViewModel: MapViewModel
     
     var body: some View {
@@ -53,21 +52,15 @@ struct DiscoverMapPreview: View {
                             .font(.subheadline)
                             .foregroundColor(.white)
                         Spacer()
-                        if (!distance.isEmpty) {
-                            Text("\(distance) away")
-                                .foregroundColor(.white)
-                                .font(.subheadline)
-                        } else {
-                            Text(spot.date.components(separatedBy: ";")[0])
-                                .font(.subheadline)
-                                .foregroundColor(.white)
-                        }
+                        Text("\(calculateDistance())")
+                            .foregroundColor(.white)
+                            .font(.subheadline)
                     }
                     .padding(.bottom, pad)
                     if (!(spot.type.isEmpty)) {
                         ScrollView(.horizontal, showsIndicators: false) {
                             HStack {
-                                ForEach(tags, id: \.self) { tag in
+                                ForEach(spot.type.components(separatedBy: ", "), id: \.self) { tag in
                                     Text(tag)
                                         .font(.system(size: 12, weight: .regular))
                                         .lineLimit(2)
@@ -85,12 +78,6 @@ struct DiscoverMapPreview: View {
                     }
                 }
                 .padding(.horizontal)
-            }
-        }
-        .onAppear {
-            tags = spot.type.components(separatedBy: ", ")
-            if (mapViewModel.isAuthorized) {
-                calculateDistance()
             }
         }
     }
@@ -116,17 +103,21 @@ struct DiscoverMapPreview: View {
         }
     }
     
-    private func calculateDistance() {
+    private func calculateDistance() -> String {
+        if !mapViewModel.isAuthorized {
+            return spot.date.components(separatedBy: ";")[0]
+        }
+        var distance = ""
         let userLocation = CLLocation(latitude: mapViewModel.region.center.latitude, longitude: mapViewModel.region.center.longitude)
         let distanceInMeters = userLocation.distance(from: spot.location)
         if isMetric() {
             let distanceDouble = distanceInMeters / 1000
-            distance = String(format: "%.1f", distanceDouble) + " km"
+            distance = String(format: "%.1f", distanceDouble) + " km away"
         } else {
             let distanceDouble = distanceInMeters / 1609.344
-            distance = String(format: "%.1f", distanceDouble) + " mi"
+            distance = String(format: "%.1f", distanceDouble) + " mi away"
         }
-        
+        return distance
     }
     private func isMetric() -> Bool {
         return ((Locale.current as NSLocale).object(forKey: NSLocale.Key.usesMetricSystem) as? Bool) ?? true

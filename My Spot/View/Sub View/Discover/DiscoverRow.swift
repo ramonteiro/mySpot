@@ -15,8 +15,6 @@ import CoreLocation
 
 struct DiscoverRow: View {
     var spot: SpotFromCloud
-    @State private var tags: [String] = []
-    @State private var distance: String = ""
     @EnvironmentObject var mapViewModel: MapViewModel
     @Environment(\.colorScheme) var colorScheme
 
@@ -73,16 +71,14 @@ struct DiscoverRow: View {
                             .font(.subheadline)
                     }
                 }
-                if (!distance.isEmpty) {
-                    Text("\(distance) away")
-                        .foregroundColor(Color.gray)
-                        .font(.subheadline)
-                }
+                Text("\(calculateDistance())")
+                    .foregroundColor(Color.gray)
+                    .font(.subheadline)
                 
                 if (!(spot.type.isEmpty)) {
                     ScrollView(.horizontal, showsIndicators: false) {
                         HStack {
-                            ForEach(tags, id: \.self) { tag in
+                            ForEach(spot.type.components(separatedBy: ", "), id: \.self) { tag in
                                 Text(tag)
                                     .font(.system(size: 12, weight: .regular))
                                     .lineLimit(2)
@@ -99,24 +95,23 @@ struct DiscoverRow: View {
             }
             .padding(.leading, 5)
         }
-        .onAppear {
-            tags = spot.type.components(separatedBy: ", ")
-            if (mapViewModel.isAuthorized) {
-                calculateDistance()
-            }
-        }
     }
     
-    private func calculateDistance() {
+    private func calculateDistance() -> String {
+        if !mapViewModel.isAuthorized {
+            return "Cannot Find Location"
+        }
+        var distance = ""
         let userLocation = CLLocation(latitude: mapViewModel.region.center.latitude, longitude: mapViewModel.region.center.longitude)
         let distanceInMeters = userLocation.distance(from: spot.location)
         if isMetric() {
             let distanceDouble = distanceInMeters / 1000
-            distance = String(format: "%.1f", distanceDouble) + " km"
+            distance = String(format: "%.1f", distanceDouble) + " km away"
         } else {
             let distanceDouble = distanceInMeters / 1609.344
-            distance = String(format: "%.1f", distanceDouble) + " mi"
+            distance = String(format: "%.1f", distanceDouble) + " mi away"
         }
+        return distance
         
     }
     private func isMetric() -> Bool {

@@ -171,10 +171,12 @@ struct DiscoverView: View {
             SearchBar(searchText: $searchText, searching: $searching, searchName: $searchLocationName, hasSearched: $hasSearched)
             List {
                 ForEach(cloudViewModel.spots.indices, id: \.self) { i in
-                    Button(action: {
+                    Button {
                         index = i
                         showPlaceDetail = true
-                    }, label: { DiscoverRow(spot: cloudViewModel.spots[i]) })
+                    } label: {
+                        DiscoverRow(spot: cloudViewModel.spots[i])
+                    }
                 }
                 if (canLoad) {
                     loadMoreSpots
