@@ -16,9 +16,7 @@ import CoreData
 
 struct MySpotsView: View {
     
-    @FetchRequest(sortDescriptors: [
-        NSSortDescriptor( keyPath: \Spot.name, ascending: true)
-    ], animation: .default) var spots: FetchedResults<Spot>
+    @FetchRequest(sortDescriptors: [], animation: .default) var spots: FetchedResults<Spot>
     @Environment(\.managedObjectContext) var moc
     @EnvironmentObject var mapViewModel: MapViewModel
     @EnvironmentObject var cloudViewModel: CloudKitViewModel
@@ -33,6 +31,7 @@ struct MySpotsView: View {
     @State private var sortBy = "Name"
     @State private var showingCannotSavePublicAlert = false
     @State private var pu = false
+    @State private var isSaving = false
     
     private var searchResults: [Spot] {
             if searchText.isEmpty {
@@ -69,6 +68,14 @@ struct MySpotsView: View {
             if (newValue > 0 && filteredSpots.count == 0) {
                 mapViewModel.checkLocationAuthorization()
                 setFilteringType()
+            } else if filteredSpots.count > newValue {
+                filteredSpots.forEach { spot in
+                    if !spots.contains(spot) {
+                        if let i = filteredSpots.firstIndex(of: spot) {
+                            filteredSpots.remove(at: i)
+                        }
+                    }
+                }
             }
         }
     }
@@ -181,21 +188,25 @@ struct MySpotsView: View {
                         ViewMapSpots()
                     }
                     .disabled(spots.isEmpty)
-                    Button {
-                        showingAddSheet.toggle()
-                    } label: {
-                        Image(systemName: "plus").imageScale(.large)
-                    }
-                    .sheet(isPresented: $showingAddSheet, onDismiss: {
-                        setFilteringType()
-                        if showingCannotSavePublicAlert {
-                            let generator = UINotificationFeedbackGenerator()
-                            generator.notificationOccurred(.warning)
-                            pu.toggle()
-                            showingCannotSavePublicAlert = false
+                    if !isSaving {
+                        Button {
+                            showingAddSheet.toggle()
+                        } label: {
+                            Image(systemName: "plus").imageScale(.large)
                         }
-                    }) {
-                        AddSpotSheet(showingCannotSavePublicAlert: $showingCannotSavePublicAlert)
+                        .sheet(isPresented: $showingAddSheet, onDismiss: {
+                            setFilteringType()
+                            if showingCannotSavePublicAlert {
+                                let generator = UINotificationFeedbackGenerator()
+                                generator.notificationOccurred(.warning)
+                                pu.toggle()
+                                showingCannotSavePublicAlert = false
+                            }
+                        }) {
+                            AddSpotSheet(isSaving: $isSaving, showingCannotSavePublicAlert: $showingCannotSavePublicAlert)
+                        }
+                    } else {
+                        ProgressView().progressViewStyle(.circular)
                     }
                 }
             }

@@ -7,6 +7,7 @@
 
 import SwiftUI
 import Combine
+import CloudKit
 
 struct SpotEditSheet: View {
     
@@ -25,8 +26,10 @@ struct SpotEditSheet: View {
     @State private var nameInTitle = ""
     @State private var fromDB = false
     @State private var imageChanged = false
+    @State private var showingCannotSaveAlert = false
     @State private var showingAddImageAlert = false
     @State private var didCancel = false
+    @State private var showingCannotDeleteAlert = false
     @State private var imageTemp: UIImage?
     @State private var images: [UIImage]?
     @Binding var showingCannotSavePublicAlert: Bool
@@ -59,7 +62,9 @@ struct SpotEditSheet: View {
     @FocusState private var focusState: Field?
     
     private var keepDisabled: Bool {
-        (fromDB && name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty) || (!fromDB && (name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || founder.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)) || (fromDB && !wasPublic && (name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || founder.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)) || images?.isEmpty ?? true
+        name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ||
+        (!fromDB && founder.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty) ||
+        images?.isEmpty ?? true
     }
     
     var body: some View {
@@ -81,7 +86,7 @@ struct SpotEditSheet: View {
                     } header: {
                         Text("Spot Name*")
                     }
-                    if !fromDB || !wasPublic {
+                    if !fromDB {
                         Section {
                             TextField("Enter Founder's Name", text: $founder)
                                 .focused($focusState, equals: .founder)
@@ -98,12 +103,21 @@ struct SpotEditSheet: View {
                         } header: {
                             Text("Founder's Name*")
                         }
-                        if (!wasPublic) {
-                            Section {
-                                displayIsPublicPrompt
-                            } header: {
-                                Text("Share Spot")
-                            } footer: {
+                    }
+                    if (!fromDB) {
+                        Section {
+                            displayIsPublicPrompt
+                                .onAppear {
+                                    isPublic = wasPublic
+                                }
+                        } header: {
+                            Text("Share Spot")
+                        } footer: {
+                            if wasPublic {
+                                Text("Setting a public spot to private will remove it from discvoer tab.")
+                                    .font(.footnote)
+                                    .foregroundColor(.gray)
+                            } else {
                                 Text("Public spots are shown in discover tab to other users.")
                                     .font(.footnote)
                                     .foregroundColor(.gray)
@@ -184,6 +198,16 @@ struct SpotEditSheet: View {
                 } message: {
                     Text("Failed to save spot. Please try again.")
                 }
+                .alert("Unable To Remove Public Spot", isPresented: $showingCannotDeleteAlert) {
+                    Button("OK", role: .cancel) { }
+                } message: {
+                    Text("Failed to remove spot from discover tab. Please check connection and try again.")
+                }
+                .alert("Unable To Save Public Spot", isPresented: $showingCannotSavePrivateAlert) {
+                    Button("OK", role: .cancel) { }
+                } message: {
+                    Text("Failed to save public spot. Please check connection and try again.")
+                }
                 .confirmationDialog("Choose Image From Photos or Camera", isPresented: $showingAddImageAlert) {
                     Button("Camera") {
                         activeSheet = .cameraSheet
@@ -250,9 +274,6 @@ struct SpotEditSheet: View {
                     }
                     ToolbarItemGroup(placement: .navigationBarTrailing) {
                         Button("Save") {
-                            if (wasPublic) {
-                                isPublic = true
-                            }
                             tags = descript.findTags()
                             if (isPublic && wasPublic) {
                                 Task {
@@ -264,6 +285,12 @@ struct SpotEditSheet: View {
                                 Task {
                                     isSaving = true
                                     await savePublic()
+                                    isSaving = false
+                                }
+                            } else if (wasPublic && !isPublic) {
+                                Task {
+                                    isSaving = true
+                                    await removePublic()
                                     isSaving = false
                                 }
                             } else {
@@ -363,7 +390,7 @@ struct SpotEditSheet: View {
     }
     
     private func isFromDB() -> Bool {
-        if let _ = spot.dbid {
+        if spot.fromDB {
             return true
         } else {
             return false
@@ -473,6 +500,55 @@ struct SpotEditSheet: View {
         presentationMode.wrappedValue.dismiss()
     }
     
+    private func removePublic() async {
+        do {
+            try await cloudViewModel.deleteSpot(id: CKRecord.ID(recordName: spot.dbid ?? ""))
+            spot.isPublic = false
+            if (imageChanged) {
+                if let imageData = cloudViewModel.compressImage(image: images?[0] ?? defaultImages.errorImage!).pngData() {
+                    spot.image = UIImage(data: imageData)
+                }
+                if images?.count == 2 {
+                    if let imageData = cloudViewModel.compressImage(image: images?[1] ?? defaultImages.errorImage!).pngData() {
+                        spot.image2 = UIImage(data: imageData)
+                    }
+                    spot.image3 = nil
+                } else if images?.count == 3 {
+                    if let imageData = cloudViewModel.compressImage(image: images?[1] ?? defaultImages.errorImage!).pngData() {
+                        spot.image2 = UIImage(data: imageData)
+                    }
+                    if let imageData = cloudViewModel.compressImage(image: images?[2] ?? defaultImages.errorImage!).pngData() {
+                        spot.image3 = UIImage(data: imageData)
+                    }
+                }
+                if images?.count == 1 {
+                    spot.image2 = nil
+                    spot.image3 = nil
+                }
+            }
+            spot.name = name
+            spot.details = descript
+            spot.founder = founder
+            spot.tags = tags
+            do {
+                try moc.save()
+            } catch {
+                showingCannotSavePrivateAlert = true
+                let generator = UINotificationFeedbackGenerator()
+                generator.notificationOccurred(.warning)
+                return
+            }
+            presentationMode.wrappedValue.dismiss()
+        } catch {
+            spot.isPublic = true
+            isPublic = true
+            showingCannotDeleteAlert = true
+            let generator = UINotificationFeedbackGenerator()
+            generator.notificationOccurred(.warning)
+            return
+        }
+    }
+    
     private func updatePublic() async {
         var imageData: Data? = nil
         var imageData2: Data? = nil
@@ -502,10 +578,16 @@ struct SpotEditSheet: View {
                 if isSuccess {
                     spot.isPublic = true
                 } else {
-                    spot.isPublic = false
+                    showingCannotSaveAlert = true
+                    let generator = UINotificationFeedbackGenerator()
+                    generator.notificationOccurred(.warning)
+                    return
                 }
             } catch {
-                spot.isPublic = false
+                showingCannotSaveAlert = true
+                let generator = UINotificationFeedbackGenerator()
+                generator.notificationOccurred(.warning)
+                return
             }
         } else {
             showingCannotSavePrivateAlert = true
@@ -530,9 +612,6 @@ struct SpotEditSheet: View {
             let generator = UINotificationFeedbackGenerator()
             generator.notificationOccurred(.warning)
             return
-        }
-        if !spot.isPublic {
-            showingCannotSavePublicAlert = true
         }
         presentationMode.wrappedValue.dismiss()
     }

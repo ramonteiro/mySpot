@@ -27,6 +27,7 @@ extension Spot {
     @NSManaged public var x: Double
     @NSManaged public var y: Double
     @NSManaged public var isPublic: Bool
+    @NSManaged public var fromDB: Bool
     @NSManaged public var date: String?
     @NSManaged public var founder: String?
     @NSManaged public var tags: String?

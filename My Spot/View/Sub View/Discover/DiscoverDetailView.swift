@@ -646,6 +646,11 @@ struct DiscoverDetailView: View {
         newSpot.x = cloudViewModel.spots[index].location.coordinate.latitude
         newSpot.y = cloudViewModel.spots[index].location.coordinate.longitude
         newSpot.isPublic = false
+        if cloudViewModel.spots[index].userID != cloudViewModel.userID {
+            newSpot.fromDB = true
+        } else {
+            newSpot.fromDB = false
+        }
         newSpot.tags = cloudViewModel.spots[index].type
         newSpot.date = cloudViewModel.spots[index].date
         newSpot.id = UUID()

@@ -181,7 +181,12 @@ struct DiscoverView: View {
                         .listRowBackground(Color.clear)
                 }
             }
-            NavigationLink(destination: DiscoverDetailView(index: index ?? 0, canShare: true), isActive: $showPlaceDetail) { EmptyView() }.isDetailLink(false)
+            .if(cloudViewModel.canRefresh) { view in
+                view.refreshable {
+                    mapViewModel.checkLocationAuthorization()
+                    loadSpotsFromDB(location: CLLocation(latitude: mapViewModel.searchingHere.center.latitude, longitude: mapViewModel.searchingHere.center.longitude), radiusInMeters: CGFloat(distance), filteringBy: sortBy)
+                }
+            }
             .gesture(DragGesture()
                 .onChanged { _ in
                     UIApplication.shared.dismissKeyboard()
@@ -204,18 +209,13 @@ struct DiscoverView: View {
             .onChange(of: searching) { _ in
                 loadSpotsFromDB(location: CLLocation(latitude: mapViewModel.searchingHere.center.latitude, longitude: mapViewModel.searchingHere.center.longitude), radiusInMeters: CGFloat(distance), filteringBy: sortBy)
             }
-            .if(cloudViewModel.canRefresh) { view in
-                view.refreshable {
-                    mapViewModel.checkLocationAuthorization()
-                    loadSpotsFromDB(location: CLLocation(latitude: mapViewModel.searchingHere.center.latitude, longitude: mapViewModel.searchingHere.center.longitude), radiusInMeters: CGFloat(distance), filteringBy: sortBy)
-                }
-            }
             .animation(.default, value: cloudViewModel.spots)
             .onChange(of: mapViewModel.searchingHere.center.longitude) { _ in
                 mapViewModel.getPlacmarkOfLocation(location: CLLocation(latitude: mapViewModel.searchingHere.center.latitude, longitude: mapViewModel.searchingHere.center.longitude)) { location in
                     searchLocationName = location
                 }
             }
+            NavigationLink(destination: DiscoverDetailView(index: index ?? 0, canShare: true), isActive: $showPlaceDetail) { EmptyView() }.isDetailLink(false)
         }
         .navigationTitle("Discover")
         .toolbar {

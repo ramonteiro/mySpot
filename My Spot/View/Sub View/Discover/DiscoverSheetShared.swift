@@ -593,6 +593,11 @@ struct DiscoverSheetShared: View {
         newSpot.x = cloudViewModel.shared[0].location.coordinate.latitude
         newSpot.y = cloudViewModel.shared[0].location.coordinate.longitude
         newSpot.isPublic = false
+        if cloudViewModel.shared[0].userID != cloudViewModel.userID {
+            newSpot.fromDB = true
+        } else {
+            newSpot.fromDB = false
+        }
         newSpot.tags = cloudViewModel.shared[0].type
         newSpot.date = cloudViewModel.shared[0].date
         newSpot.id = UUID()

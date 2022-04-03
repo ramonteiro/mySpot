@@ -7,6 +7,7 @@
 
 import SwiftUI
 import MapKit
+import Combine
 
 struct SetUpNewSpotNoti: View {
     
@@ -18,6 +19,8 @@ struct SetUpNewSpotNoti: View {
     @State private var locations = [MKPointAnnotation]()
     @State private var distance: String = "Diameter: "
     @State private var isMetric = false
+    @State private var showingFilters = false
+    @State private var filters: [String] = []
     @Binding var newPlace: Bool
     @Binding var unableToAddSpot: Int
     
@@ -35,8 +38,8 @@ struct SetUpNewSpotNoti: View {
                     let y = UserDefaults.standard.double(forKey: "discovernotiy")
                     let x = UserDefaults.standard.double(forKey: "discovernotix")
                     let location = CLLocationCoordinate2D(latitude: x, longitude: y)
-                    print(location)
                     let newRegion = MKCoordinateRegion(center: location, span: mapViewModel.region.span)
+                    filters = UserDefaults.standard.stringArray(forKey: "filters") ?? []
                     centerRegion = newRegion
                 } else {
                     centerRegion = mapViewModel.region
@@ -81,12 +84,13 @@ struct SetUpNewSpotNoti: View {
                                 
                                 // sub
                                 do {
-                                    try await cloudViewModel.subscribeToNewSpot(fixedLocation: location, radiusInKm: distanceKm)
+                                    try await cloudViewModel.subscribeToNewSpot(fixedLocation: location, radiusInKm: distanceKm, filters: filters)
                                     UserDefaults.standard.set(placeName, forKey: "discovernotiname")
                                     newPlace.toggle()
                                     UserDefaults.standard.set(Double(centerRegion.center.latitude), forKey: "discovernotix")
                                     UserDefaults.standard.set(Double(centerRegion.center.longitude), forKey: "discovernotiy")
                                     UserDefaults.standard.set(Double(distanceKm), forKey: "discovernotikm")
+                                    UserDefaults.standard.set(filters, forKey: "filters")
                                 } catch { // no connection
                                     unableToAddSpot = 1
                                 }
@@ -99,15 +103,24 @@ struct SetUpNewSpotNoti: View {
                     .buttonStyle(.borderedProminent)
                 }
                 ToolbarItemGroup(placement: .bottomBar) {
-                    Text("\(distance)")
-                        .foregroundColor(.white)
-                        .padding([.leading,.trailing])
-                        .padding(.vertical, 2)
-                        .background(
-                            RoundedRectangle(cornerRadius: 10)
-                                .foregroundColor(.gray)
-                                .opacity(0.5)
-                        )
+                    VStack {
+                        Text("\(distance)")
+                            .foregroundColor(.white)
+                            .padding([.leading,.trailing])
+                            .padding(.vertical, 2)
+                            .background(
+                                RoundedRectangle(cornerRadius: 10)
+                                    .foregroundColor(.gray)
+                                    .opacity(0.5)
+                            )
+                        Button("Add Filters") {
+                            showingFilters.toggle()
+                        }
+                        .buttonStyle(.borderedProminent)
+                        .sheet(isPresented: $showingFilters) {
+                            addFiltersSheet(filters: $filters)
+                        }
+                    }
                 }
                 ToolbarItemGroup(placement: .navigationBarLeading) {
                     Button("Cancel", role: .destructive) {
@@ -186,3 +199,64 @@ struct MapView: UIViewRepresentable {
 }
 
 
+struct addFiltersSheet: View {
+    
+    @Binding var filters: [String]
+    @Environment(\.presentationMode) var presentationMode
+    @State private var text = ""
+    
+    var body: some View {
+        NavigationView {
+            Form {
+                Section {
+                    TextField("Enter Filter", text: $text)
+                        .submitLabel(.done)
+                        .onSubmit {
+                            if filters.count < 4 && !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                                filters.append(String(text.filter { !" \n\t\r".contains($0) }))
+                                text = ""
+                            }
+                        }
+                        .onReceive(Just(text)) { _ in
+                            if (text.count > MaxCharLength.names) {
+                                text = String(text.prefix(MaxCharLength.names))
+                            }
+                        }
+                } footer: {
+                    Text("Filters must have no spaces. Up to 3 filters are allowed. Example: 'Skate' 'Hiking'")
+                }
+                Section {
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        HStack {
+                            ForEach(filters.indices, id: \.self) { i in
+                                Text(filters[i])
+                                    .font(.system(size: 12, weight: .regular))
+                                    .lineLimit(2)
+                                    .foregroundColor(.white)
+                                    .padding(5)
+                                    .background(.tint)
+                                    .cornerRadius(5)
+                                    .onTapGesture {
+                                        filters.remove(at: i)
+                                    }
+                            }
+                        }
+                    }
+                } header: {
+                    Text("Filters")
+                } footer: {
+                    Text("Tap to remove filter.")
+                }
+            }
+            .navigationTitle("Add Filters")
+            .navigationViewStyle(.stack)
+            .toolbar {
+                ToolbarItemGroup(placement: .navigationBarTrailing) {
+                    Button("Done") {
+                        presentationMode.wrappedValue.dismiss()
+                    }
+                }
+            }
+        }
+    }
+}

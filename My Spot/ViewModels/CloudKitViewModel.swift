@@ -10,10 +10,11 @@ import CloudKit
 
 class CloudKitViewModel: ObservableObject {
     
+    @Published var totalMapSize = 2
     @Published var notiPlaylistOn = false
     @Published var notiNewSpotOn = false
     @Published var systemColorIndex = 0
-    @Published var systemColorArray: [Color] = [.red,.green,.pink,.blue,.indigo,.mint,.orange,.purple,.teal,.yellow]
+    @Published var systemColorArray: [Color] = [.red,.green,.pink,.blue,.indigo,.mint,.orange,.purple,.teal,.yellow, .gray]
     @Published var isSignedInToiCloud: Bool = false
     @Published var error: String = ""
     @Published var spots: [SpotFromCloud] = []
@@ -48,6 +49,9 @@ class CloudKitViewModel: ObservableObject {
             notiPlaylistOn = UserDefaults.standard.bool(forKey: "playlistnot")
         } else {
             UserDefaults.standard.set(false, forKey: "playlistnot")
+        }
+        if UserDefaults.standard.valueExists(forKey: "customColorA") {
+            systemColorArray[systemColorArray.count - 1] = Color(uiColor: UIColor(red: UserDefaults.standard.double(forKey: "customColorR"), green: UserDefaults.standard.double(forKey: "customColorG"), blue: UserDefaults.standard.double(forKey: "customColorB"), alpha: UserDefaults.standard.double(forKey: "customColorA")))
         }
     }
     
@@ -654,9 +658,28 @@ class CloudKitViewModel: ObservableObject {
         _ = try await CKContainer.default().publicCloudDatabase.deleteSubscription(withID: id)
     }
     
-    func subscribeToNewSpot(fixedLocation: CLLocation, radiusInKm: CGFloat) async throws {
+    func subscribeToNewSpot(fixedLocation: CLLocation, radiusInKm: CGFloat, filters: [String]) async throws {
         let predicate = NSPredicate(format: "distanceToLocation:fromLocation:(location, %@) < %f", fixedLocation, radiusInKm)
-        let subscription = CKQuerySubscription(recordType: "Spots", predicate: predicate, subscriptionID: "NewSpotDiscover", options: .firesOnRecordCreation)
+        var subscription = CKQuerySubscription(recordType: "Spots", predicate: predicate, subscriptionID: "NewSpotDiscover", options: .firesOnRecordCreation)
+        if !filters.isEmpty {
+            var compoundPredicate = NSCompoundPredicate()
+            if filters.count == 1 {
+                let predicate2 = NSPredicate(format: "self contains %@", filters[0])
+                compoundPredicate = NSCompoundPredicate(type: .and, subpredicates: [predicate, predicate2])
+            } else if filters.count == 2 {
+                let predicate2 = NSPredicate(format: "self contains %@", filters[0])
+                let predicate3 = NSPredicate(format: "self contains %@", filters[1])
+                let compundOr = NSCompoundPredicate(type: .or, subpredicates: [predicate2, predicate3])
+                compoundPredicate = NSCompoundPredicate(type: .and, subpredicates: [predicate, compundOr])
+            } else if filters.count == 3 {
+                let predicate2 = NSPredicate(format: "self contains %@", filters[0])
+                let predicate3 = NSPredicate(format: "self contains %@", filters[1])
+                let predicate4 = NSPredicate(format: "self contains %@", filters[2])
+                let compundOr = NSCompoundPredicate(type: .or, subpredicates: [predicate2, predicate3, predicate4])
+                compoundPredicate = NSCompoundPredicate(type: .and, subpredicates: [predicate, compundOr])
+            }
+            subscription = CKQuerySubscription(recordType: "Spots", predicate: compoundPredicate, subscriptionID: "NewSpotDiscover", options: .firesOnRecordCreation)
+        }
         let notification = CKSubscription.NotificationInfo()
         notification.title = "My Spot"
         notification.alertBody = "A new spot was added to your area!"

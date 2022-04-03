@@ -19,6 +19,8 @@ struct DetailView: View {
     var fromPlaylist: Bool
     @EnvironmentObject var cloudViewModel: CloudKitViewModel
     @EnvironmentObject var mapViewModel: MapViewModel
+    @FetchRequest(sortDescriptors: [], animation: .default) var spots: FetchedResults<Spot>
+    @Environment(\.managedObjectContext) var moc
     @ObservedObject var spot:Spot
     @Environment(\.presentationMode) var presentationMode
     @Environment(\.colorScheme) var colorScheme
@@ -28,9 +30,9 @@ struct DetailView: View {
     @State private var scope:String = "Private"
     @State private var tags: [String] = []
     @State private var showingImage = false
+    @State private var deleteAlert = false
     @State private var distance: String = ""
     @State private var exists = true
-    @State private var fromDB = false
     @State private var selection = 0
     @State private var images: [UIImage] = []
     @State private var showingCannotSavePublicAlert = false
@@ -102,9 +104,6 @@ struct DetailView: View {
             } else {
                 scope = "Private"
             }
-            if let _ = spot.dbid {
-                fromDB = true
-            }
             if (canShare) {
                 backImage = "chevron.left"
             } else {
@@ -152,7 +151,8 @@ struct DetailView: View {
             HStack(spacing: 0) {
                 backButtonView
                 Spacer()
-                if (canShare && fromDB && spot.isPublic) {
+                deleteButton
+                if (canShare && spot.isPublic) {
                     shareButton
                 }
             }
@@ -231,6 +231,36 @@ struct DetailView: View {
                 .padding(15)
                 .shadow(color: Color.black.opacity(0.5), radius: 5)
         }
+    }
+    
+    private var deleteButton: some View {
+        Button {
+            deleteAlert.toggle()
+        } label: {
+            Image(systemName: "trash.fill")
+                .foregroundColor(.white)
+                .font(.system(size: 30, weight: .regular))
+                .padding(10)
+                .shadow(color: Color.black.opacity(0.5), radius: 5)
+        }
+        .alert("Are you sure you want to delete \(spot.name ?? "").", isPresented: $deleteAlert) {
+            Button("Delete", role: .destructive) {
+                if let i = spots.firstIndex(of: spot) {
+                    moc.delete(spots[i])
+                    do {
+                        try moc.save()
+                        
+                        presentationMode.wrappedValue.dismiss()
+                    } catch {
+                        print("couldnt save")
+                    }
+                    
+                }
+            }
+        } message: {
+            Text("Spot will be removed from 'My Spots' tab. If this spot is still in 'Discover' tab, it will not be deleted there.")
+        }
+
     }
     
     private var backButtonView: some View {

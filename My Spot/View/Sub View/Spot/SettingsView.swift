@@ -20,7 +20,9 @@ struct SettingsView: View {
     @State private var newPlace = false
     @State private var message = "Message to My Spot developer: "
     @State private var discoverNoti = false
+    @State private var filters: [String] = []
     @State private var playlistNoti = false
+    @State private var discoverProcess = false
     @State private var unableToAddSpot = 0 // 0: ok, 1: no connection, 2: no permission
     @State private var showingErrorNoPermission = false
     @State private var showingErrorNoConnection = false
@@ -33,21 +35,42 @@ struct SettingsView: View {
                     ScrollView(.horizontal, showsIndicators: false) {
                         HStack {
                             ForEach(cloudViewModel.systemColorArray.indices, id: \.self) { i in
-                                Circle()
-                                    .strokeBorder(cloudViewModel.systemColorIndex == i ? (colorScheme == .dark ? .white : .black) : .clear, lineWidth: 5)
-                                    .frame(width: 40, height: 40)
-                                    .background(Circle().foregroundColor(cloudViewModel.systemColorArray[i]))
-                                    .onTapGesture {
-                                        cloudViewModel.systemColorIndex = i
-                                        UserDefaults.standard.set(i, forKey: "systemcolor")
+                                if i != cloudViewModel.systemColorArray.count - 1 {
+                                    Circle()
+                                        .strokeBorder(cloudViewModel.systemColorIndex == i ? (colorScheme == .dark ? .white : .black) : .clear, lineWidth: 5)
+                                        .frame(width: 40, height: 40)
+                                        .background(Circle().foregroundColor(cloudViewModel.systemColorArray[i]))
+                                        .onTapGesture {
+                                            cloudViewModel.systemColorIndex = i
+                                            UserDefaults.standard.set(i, forKey: "systemcolor")
+                                        }
+                                } else {
+                                    ZStack {
+                                        Circle()
+                                            .strokeBorder(cloudViewModel.systemColorIndex == i ? (colorScheme == .dark ? .white : .black) : .clear, lineWidth: 5)
+                                            .frame(width: 40, height: 40)
+                                            .background(Circle().foregroundColor(cloudViewModel.systemColorArray[i]))
+                                            .onTapGesture {
+                                                cloudViewModel.systemColorIndex = i
+                                                UserDefaults.standard.set(i, forKey: "systemcolor")
+                                            }
+                                        Image(systemName: "pencil")
+                                            .frame(width: 40, height: 40)
                                     }
+                                }
                             }
+                        }
+                    }
+                    if (cloudViewModel.systemColorIndex == cloudViewModel.systemColorArray.count - 1) {
+                        ColorPicker(selection: $cloudViewModel.systemColorArray[cloudViewModel.systemColorArray.count - 1], supportsOpacity: false) {
+                            Text("Edit Custom Color")
                         }
                     }
                 } header: {
                     Text("Color Scheme")
                         .font(.headline)
                 }
+
                 Section {
                     Toggle(isOn: $playlistNoti) {
                         Text("Shared Playlists")
@@ -63,6 +86,7 @@ struct SettingsView: View {
                     Toggle(isOn: $discoverNoti) {
                         Text("New Spots")
                     }
+                    .disabled(discoverProcess)
                     .tint(cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex])
                     if (cloudViewModel.notiNewSpotOn) {
                         Button {
@@ -70,6 +94,7 @@ struct SettingsView: View {
                         } label: {
                             Text("Configure")
                                 .foregroundColor(cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex])
+                                .disabled(discoverProcess)
                         }
                     }
                     
@@ -114,6 +139,7 @@ struct SettingsView: View {
             .onChange(of: discoverNoti) { newValue in
                 if newValue && !preventDoubleTrigger {
                     Task {
+                        discoverProcess = true
                         await cloudViewModel.checkNotificationPermission()
                         if cloudViewModel.notiPermission == 0 { // not determined
                             // ask
@@ -126,14 +152,16 @@ struct SettingsView: View {
                             if (UserDefaults.standard.valueExists(forKey: "discovernotix")) {
                                 location = CLLocation(latitude: UserDefaults.standard.double(forKey: "discovernotix"), longitude: UserDefaults.standard.double(forKey: "discovernotiy"))
                                 radius = UserDefaults.standard.double(forKey: "discovernotikm")
+                                filters = UserDefaults.standard.stringArray(forKey: "filters") ?? []
                             } else {
                                 UserDefaults.standard.set(Double(mapViewModel.region.center.latitude), forKey: "discovernotix")
                                 UserDefaults.standard.set(Double(mapViewModel.region.center.longitude), forKey: "discovernotiy")
                                 UserDefaults.standard.set(Double(1000), forKey: "discovernotikm")
+                                UserDefaults.standard.set(filters, forKey: "filters")
                             }
                             try? await cloudViewModel.unsubscribe(id: "NewSpotDiscover")
                             do {
-                                try await cloudViewModel.subscribeToNewSpot(fixedLocation: location, radiusInKm: radius)
+                                try await cloudViewModel.subscribeToNewSpot(fixedLocation: location, radiusInKm: radius, filters: filters)
                                 cloudViewModel.notiNewSpotOn = true
                                 UserDefaults.standard.set(true, forKey: "discovernot")
                             } catch {
@@ -156,11 +184,13 @@ struct SettingsView: View {
                             generator.notificationOccurred(.warning)
                             showingErrorNoPermission = true
                         }
+                        discoverProcess = false
                     }
                 }
                 if !newValue && !preventDoubleTrigger {
                     // unsubscribe
                     Task {
+                        discoverProcess = true
                         do {
                             try await cloudViewModel.unsubscribe(id: "NewSpotDiscover")
                             cloudViewModel.notiNewSpotOn = false
@@ -175,6 +205,7 @@ struct SettingsView: View {
                             generator.notificationOccurred(.warning)
                             showingErrorNoConnection = true
                         }
+                        discoverProcess = false
                     }
                 }
                 if preventDoubleTrigger {
@@ -228,6 +259,19 @@ struct SettingsView: View {
             }
             .onChange(of: newPlace) { newValue in
                 placeName = UserDefaults.standard.string(forKey: "discovernotiname") ?? ""
+            }
+            .onChange(of: cloudViewModel.systemColorArray[cloudViewModel.systemColorArray.count - 1]) { newColor in
+                let color = UIColor(newColor)
+                var red: CGFloat = 0
+                var green: CGFloat = 0
+                var blue: CGFloat = 0
+                var alpha: CGFloat = 0
+
+                color.getRed(&red, green: &green, blue: &blue, alpha: &alpha)
+                UserDefaults.standard.set(Double(red), forKey: "customColorR")
+                UserDefaults.standard.set(Double(green), forKey: "customColorG")
+                UserDefaults.standard.set(Double(blue), forKey: "customColorB")
+                UserDefaults.standard.set(Double(alpha), forKey: "customColorA")
             }
             .navigationTitle("Settings")
             .navigationViewStyle(.stack)

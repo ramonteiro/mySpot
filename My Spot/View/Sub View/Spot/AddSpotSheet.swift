@@ -25,7 +25,7 @@ struct AddSpotSheet: View {
     @State private var showingAlert = false
     @State private var showingAddImageAlert = false
     @State private var didCancel = false
-    @State private var isSaving = false
+    @Binding var isSaving: Bool
     
     @State private var name = ""
     @State private var founder = ""
@@ -279,6 +279,7 @@ struct AddSpotSheet: View {
                                             await savePublic()
                                             isSaving = false
                                         }
+                                        close()
                                     } else {
                                         Task {
                                             isSaving = true
@@ -311,16 +312,6 @@ struct AddSpotSheet: View {
                         })
                     }
                     .interactiveDismissDisabled()
-                    if isSaving {
-                        Color.black.opacity(0.5)
-                            .ignoresSafeArea()
-                        ProgressView("Saving")
-                            .padding()
-                            .background(
-                                RoundedRectangle(cornerRadius: 10)
-                                    .fill(Color(UIColor.systemBackground))
-                            )
-                    }
                 } else {
                     VStack {
                         Text("No Internet Connection Found.")
@@ -445,6 +436,7 @@ struct AddSpotSheet: View {
         newSpot.founder = founder
         newSpot.details = descript
         newSpot.name = name
+        newSpot.fromDB = false
         newSpot.x = lat
         newSpot.y = long
         newSpot.isPublic = false
@@ -524,6 +516,7 @@ struct AddSpotSheet: View {
             newSpot.details = descript
             newSpot.name = name
             newSpot.likes = 0
+            newSpot.fromDB = false
             newSpot.x = lat
             newSpot.y = long
             newSpot.date = getDate()
@@ -543,7 +536,6 @@ struct AddSpotSheet: View {
             } else {
                 showingCannotSavePublicAlert = true
             }
-            close()
         } else {
             showingCannotSavePrivateAlert = true
             let generator = UINotificationFeedbackGenerator()
