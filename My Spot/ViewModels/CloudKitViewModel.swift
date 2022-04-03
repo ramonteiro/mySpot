@@ -685,6 +685,7 @@ class CloudKitViewModel: ObservableObject {
         notification.alertBody = "A new spot was added to your area!"
         notification.soundName = "default"
         notification.shouldBadge = true
+        notification.shouldSendContentAvailable = true
         notification.desiredKeys = ["id"]
         subscription.notificationInfo = notification
         try await CKContainer.default().publicCloudDatabase.save(subscription)
