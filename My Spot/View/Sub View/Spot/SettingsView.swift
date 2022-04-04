@@ -107,7 +107,7 @@ struct SettingsView: View {
                 }
                 Section {
                     Button {
-                        let youtubeId = "f-sQsR2YS4U"
+                        let youtubeId = "Q0FO_jjDHzA"
                         var youtubeUrl = URL(string:"youtube://\(youtubeId)")!
                         if UIApplication.shared.canOpenURL(youtubeUrl){
                             UIApplication.shared.open(youtubeUrl)
@@ -121,6 +121,18 @@ struct SettingsView: View {
                     }
                 } footer: {
                     Text("Youtube video with timestamps to demonstrate how to use My Spot.")
+                }
+                Section {
+                    Button {
+                        if let url = URL(string:"https://wp.me/PdMUcQ-7") {
+                            UIApplication.shared.open(url)
+                        }
+                    } label: {
+                        Text("About Me")
+                            .foregroundColor(colorScheme == .dark ? .white : .black)
+                    }
+                } footer: {
+                    Text("A link to my wordpress site with short detail about me and the current privacy policy in My Spot.")
                 }
             }
             .onChange(of: discoverNoti) { newValue in
