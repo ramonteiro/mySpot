@@ -21,6 +21,7 @@ struct SetUpNewSpotNoti: View {
     @State private var isMetric = false
     @State private var showingFilters = false
     @State private var filters: [String] = []
+    @State private var saving: Bool = false
     @Binding var newPlace: Bool
     @Binding var unableToAddSpot: Int
     
@@ -31,6 +32,16 @@ struct SetUpNewSpotNoti: View {
                 Cross(radius: $radius)
                     .stroke(cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex])
                     .frame(width: radius*2, height: radius*2)
+                if (saving) {
+                    Color.black.opacity(0.5)
+                        .ignoresSafeArea()
+                    ProgressView("Saving")
+                        .padding()
+                        .background(
+                            RoundedRectangle(cornerRadius: 10)
+                                .fill(Color(UIColor.systemBackground))
+                        )
+                }
             }
             .onAppear {
                 isMetric = getIsMetric()
@@ -71,6 +82,7 @@ struct SetUpNewSpotNoti: View {
                         let distanceKm = centerRegion.spanLatitude.converted(to: .meters).value / 2
                         let location = CLLocation(latitude: centerRegion.center.latitude, longitude: centerRegion.center.longitude)
                         Task {
+                            saving = true
                             var placeName: String = ""
                             mapViewModel.getPlacmarkOfLocationLessPrecise(location: location) { l in
                                 placeName = l
@@ -83,25 +95,23 @@ struct SetUpNewSpotNoti: View {
                                 try? await cloudViewModel.unsubscribeAll()
                                 
                                 // sub
-                                do {
-                                    try await cloudViewModel.subscribeToNewSpot(fixedLocation: location, radiusInKm: distanceKm, filters: filters)
-                                    print("SUCCess")
-                                    UserDefaults.standard.set(placeName, forKey: "discovernotiname")
-                                    newPlace.toggle()
-                                    UserDefaults.standard.set(Double(centerRegion.center.latitude), forKey: "discovernotix")
-                                    UserDefaults.standard.set(Double(centerRegion.center.longitude), forKey: "discovernotiy")
-                                    UserDefaults.standard.set(Double(distanceKm), forKey: "discovernotikm")
-                                    UserDefaults.standard.set(filters, forKey: "filters")
-                                } catch { // no connection
-                                    unableToAddSpot = 1
-                                }
+                                cloudViewModel.subscribeToNewSpotC(fixedLocation: location, radiusInKm: distanceKm, filters: filters)
+                                print("SUCCess")
+                                UserDefaults.standard.set(placeName, forKey: "discovernotiname")
+                                newPlace.toggle()
+                                UserDefaults.standard.set(Double(centerRegion.center.latitude), forKey: "discovernotix")
+                                UserDefaults.standard.set(Double(centerRegion.center.longitude), forKey: "discovernotiy")
+                                UserDefaults.standard.set(Double(distanceKm), forKey: "discovernotikm")
+                                UserDefaults.standard.set(filters, forKey: "filters")
                             } else { // not allowed
                                 unableToAddSpot = 2
                             }
+                            saving = false
+                            presentationMode.wrappedValue.dismiss()
                         }
-                        presentationMode.wrappedValue.dismiss()
                     }
                     .buttonStyle(.borderedProminent)
+                    .disabled(saving)
                 }
                 ToolbarItemGroup(placement: .bottomBar) {
                     VStack {
@@ -114,13 +124,14 @@ struct SetUpNewSpotNoti: View {
                                     .foregroundColor(.gray)
                                     .opacity(0.5)
                             )
-                        Button("Add Filters") {
+                        Button("Add Filter") {
                             showingFilters.toggle()
                         }
                         .buttonStyle(.borderedProminent)
                         .sheet(isPresented: $showingFilters) {
                             addFiltersSheet(filters: $filters)
                         }
+                        .disabled(saving)
                     }
                 }
                 ToolbarItemGroup(placement: .navigationBarLeading) {
@@ -128,6 +139,7 @@ struct SetUpNewSpotNoti: View {
                         presentationMode.wrappedValue.dismiss()
                     }
                     .buttonStyle(.borderedProminent)
+                    .disabled(saving)
                 }
             }
         }
@@ -213,7 +225,7 @@ struct addFiltersSheet: View {
                     TextField("Enter Filter", text: $text)
                         .submitLabel(.done)
                         .onSubmit {
-                            if filters.count < 4 && !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                            if filters.count < 2 && !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
                                 filters.append(String(text.filter { !" \n\t\r".contains($0) }))
                                 text = ""
                             }
@@ -224,7 +236,7 @@ struct addFiltersSheet: View {
                             }
                         }
                 } footer: {
-                    Text("Filters must have no spaces. Up to 3 filters are allowed. Example: 'Skate' 'Hiking'")
+                    Text("Filter must have no spaces. Only one filter is allowed. Example: 'Skate' or 'Hiking'")
                 }
                 Section {
                     ScrollView(.horizontal, showsIndicators: false) {
@@ -244,12 +256,12 @@ struct addFiltersSheet: View {
                         }
                     }
                 } header: {
-                    Text("Filters")
+                    Text("Filter")
                 } footer: {
                     Text("Tap to remove filter.")
                 }
             }
-            .navigationTitle("Add Filters")
+            .navigationTitle("Add Filter")
             .navigationViewStyle(.stack)
             .toolbar {
                 ToolbarItemGroup(placement: .navigationBarTrailing) {
