@@ -91,18 +91,20 @@ struct SetUpNewSpotNoti: View {
                             // check permissions
                             await cloudViewModel.checkNotificationPermission()
                             if cloudViewModel.notiPermission == 2 ||  cloudViewModel.notiPermission == 3 { // allowed
-                                // unsub from old noti
-                                try? await cloudViewModel.unsubscribeAll()
                                 
                                 // sub
-                                cloudViewModel.subscribeToNewSpotC(fixedLocation: location, radiusInKm: distanceKm, filters: filters)
-                                print("SUCCess")
-                                UserDefaults.standard.set(placeName, forKey: "discovernotiname")
-                                newPlace.toggle()
-                                UserDefaults.standard.set(Double(centerRegion.center.latitude), forKey: "discovernotix")
-                                UserDefaults.standard.set(Double(centerRegion.center.longitude), forKey: "discovernotiy")
-                                UserDefaults.standard.set(Double(distanceKm), forKey: "discovernotikm")
-                                UserDefaults.standard.set(filters, forKey: "filters")
+                                do {
+                                    try await cloudViewModel.subscribeToNewSpotModify(fixedLocation: location, radiusInKm: distanceKm, filters: filters)
+                                    print("SUCCess")
+                                    UserDefaults.standard.set(placeName, forKey: "discovernotiname")
+                                    newPlace.toggle()
+                                    UserDefaults.standard.set(Double(centerRegion.center.latitude), forKey: "discovernotix")
+                                    UserDefaults.standard.set(Double(centerRegion.center.longitude), forKey: "discovernotiy")
+                                    UserDefaults.standard.set(Double(distanceKm), forKey: "discovernotikm")
+                                    UserDefaults.standard.set(filters, forKey: "filters")
+                                } catch { // no connection
+                                    unableToAddSpot = 1
+                                }
                             } else { // not allowed
                                 unableToAddSpot = 2
                             }

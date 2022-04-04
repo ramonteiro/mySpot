@@ -21,6 +21,7 @@ class CloudKitViewModel: ObservableObject {
     @Published var canRefresh = false
     @Published var isFetching = false
     @Published var isError = false
+    @Published var subID: CKSubscription.ID?
     @Published var isErrorMessage = ""
     @Published var isErrorMessageDetails = ""
     @Published var isPostError = false
@@ -35,6 +36,9 @@ class CloudKitViewModel: ObservableObject {
     }
     
     private func setUserDefaults() {
+        if UserDefaults.standard.valueExists(forKey: "subID") {
+            subID = CKSubscription.ID(UserDefaults.standard.string(forKey: "subID") ?? "")
+        }
         if (UserDefaults.standard.valueExists(forKey: "savedDistance")) {
             radiusInMeters = Double(UserDefaults.standard.integer(forKey: "savedDistance"))
         }
@@ -670,48 +674,46 @@ class CloudKitViewModel: ObservableObject {
         notification.shouldBadge = true
         notification.desiredKeys = ["id"]
         subscription.notificationInfo = notification
-        try await CKContainer.default().publicCloudDatabase.save(subscription)
-    }
-    
-    func subscribeToNewSpotC(fixedLocation: CLLocation, radiusInKm: CGFloat, filters: [String]) {
-        let predicate = NSPredicate(format: "distanceToLocation:fromLocation:(location, %@) < %f", fixedLocation, radiusInKm)
-        var subscription = CKQuerySubscription(recordType: "Spots", predicate: predicate, options: .firesOnRecordCreation)
-//        if !filters.isEmpty {
-//            let predicate2 = NSPredicate(format: "self contains %@", filters[0])
-//            let compoundPredicate = NSCompoundPredicate(type: .and, subpredicates: [predicate, predicate2])
-//            subscription = CKQuerySubscription(recordType: "Spots", predicate: compoundPredicate, options: .firesOnRecordCreation)
-//        }
-        let notification = CKSubscription.NotificationInfo()
-        notification.title = "My Spot"
-        notification.alertBody = "A new spot was added to your area!"
-        notification.soundName = "default"
-        notification.shouldBadge = true
-        notification.shouldSendContentAvailable = true
-        notification.desiredKeys = ["id"]
-        subscription.notificationInfo = notification
-        CKContainer.default().publicCloudDatabase.save(subscription) { sub, err in
-            if let err = err {
-                print(err)
-            }
+        let sub = try await CKContainer.default().publicCloudDatabase.save(subscription)
+        DispatchQueue.main.async {
+            self.subID = sub.subscriptionID
+            UserDefaults.standard.set(String(sub.subscriptionID), forKey: "subID")
         }
     }
     
-    func subscribeToNewSpotM(fixedLocation: CLLocation, radiusInKm: CGFloat, filters: [String]) {
+    func subscribeToNewSpotModify(fixedLocation: CLLocation, radiusInKm: CGFloat, filters: [String]) async throws {
         let predicate = NSPredicate(format: "distanceToLocation:fromLocation:(location, %@) < %f", fixedLocation, radiusInKm)
         var subscription = CKQuerySubscription(recordType: "Spots", predicate: predicate, options: .firesOnRecordCreation)
-//        if !filters.isEmpty {
-//            let predicate2 = NSPredicate(format: "self contains %@", filters[0])
-//            let compoundPredicate = NSCompoundPredicate(type: .and, subpredicates: [predicate, predicate2])
-//            subscription = CKQuerySubscription(recordType: "Spots", predicate: compoundPredicate, options: .firesOnRecordCreation)
-//        }
+        if !filters.isEmpty {
+            let predicate2 = NSPredicate(format: "self contains %@", filters[0])
+            let compoundPredicate = NSCompoundPredicate(type: .and, subpredicates: [predicate, predicate2])
+            subscription = CKQuerySubscription(recordType: "Spots", predicate: compoundPredicate, options: .firesOnRecordCreation)
+        }
         let notification = CKSubscription.NotificationInfo()
         notification.title = "My Spot"
         notification.alertBody = "A new spot was added to your area!"
         notification.soundName = "default"
         notification.shouldBadge = true
-        notification.shouldSendContentAvailable = true
         notification.desiredKeys = ["id"]
         subscription.notificationInfo = notification
-        CKContainer.default().privateCloudDatabase.modifySubscriptions(saving: [subscription], deleting: <#T##[CKSubscription.ID]#>, completionHandler: <#T##(Result<(saveResults: [CKSubscription.ID : Result<CKSubscription, Error>], deleteResults: [CKSubscription.ID : Result<Void, Error>]), Error>) -> Void#>)
+        let _ = try await CKContainer.default().publicCloudDatabase.modifySubscriptions(saving: [subscription], deleting: [subID!])
+    }
+    
+    func subscribeToNewSpotModifyC(fixedLocation: CLLocation, radiusInKm: CGFloat, filters: [String]) {
+        let predicate = NSPredicate(format: "distanceToLocation:fromLocation:(location, %@) < %f", fixedLocation, radiusInKm)
+        var subscription = CKQuerySubscription(recordType: "Spots", predicate: predicate, options: .firesOnRecordCreation)
+        if !filters.isEmpty {
+            let predicate2 = NSPredicate(format: "self contains %@", filters[0])
+            let compoundPredicate = NSCompoundPredicate(type: .and, subpredicates: [predicate, predicate2])
+            subscription = CKQuerySubscription(recordType: "Spots", predicate: compoundPredicate, options: .firesOnRecordCreation)
+        }
+        let notification = CKSubscription.NotificationInfo()
+        notification.title = "My Spot"
+        notification.alertBody = "A new spot was added to your area!"
+        notification.soundName = "default"
+        notification.shouldBadge = true
+        notification.desiredKeys = ["id"]
+        subscription.notificationInfo = notification
+        let _ = try await CKContainer.default().publicCloudDatabase.modifySubscriptions(saving: [subscription], deleting: [subID!])
     }
 }
