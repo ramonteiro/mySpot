@@ -24,7 +24,6 @@ struct AddSpotSheet: View {
     
     @State private var showingAlert = false
     @State private var showingAddImageAlert = false
-    @State private var didCancel = false
     @Binding var isSaving: Bool
     
     @State private var name = ""
@@ -192,22 +191,14 @@ struct AddSpotSheet: View {
                                         } else {
                                             activeSheet = nil
                                         }
-                                        didCancel = false
                                     }
                                     .ignoresSafeArea()
                             case .cameraRollSheet:
-                                ChoosePhoto(image: $imageTemp, didCancel: $didCancel)
-                                    .onDisappear {
-                                        if (!didCancel) {
-                                            DispatchQueue.main.asyncAfter(deadline: .now()+1) {
-                                                activeSheet = .cropperSheet
-                                            }
-                                        } else {
-                                            activeSheet = nil
-                                        }
-                                        didCancel = false
-                                    }
-                                    .ignoresSafeArea()
+                                ChoosePhoto() { image in
+                                    imageTemp = image
+                                    activeSheet = .cropperSheet
+                                }
+                                .ignoresSafeArea()
                             case .cropperSheet:
                                 MantisPhotoCropper(selectedImage: $imageTemp)
                                     .onDisappear {

@@ -9,8 +9,8 @@ import PhotosUI
 import SwiftUI
 
 struct ChoosePhoto: UIViewControllerRepresentable {
-    @Binding var image: UIImage?
-    @Binding var didCancel: Bool
+    let completion: (_ selectedImage: UIImage) -> Void
+    @Environment(\.presentationMode) var presentationMode
 
     func makeUIViewController(context: Context) -> PHPickerViewController {
         var config = PHPickerConfiguration()
@@ -21,34 +21,37 @@ struct ChoosePhoto: UIViewControllerRepresentable {
     }
 
     func updateUIViewController(_ uiViewController: PHPickerViewController, context: Context) {
-
+        
     }
-
+    
     func makeCoordinator() -> Coordinator {
         Coordinator(self)
     }
-
+    
     class Coordinator: NSObject, PHPickerViewControllerDelegate {
         let parent: ChoosePhoto
-
+        
         init(_ parent: ChoosePhoto) {
             self.parent = parent
         }
         
-        func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
-            picker.dismiss(animated: true, completion: nil)
-
-            if let provider = results.first?.itemProvider {
-                if provider.canLoadObject(ofClass: UIImage.self) {
-                    provider.loadObject(ofClass: UIImage.self) { image, _ in
-                        self.parent.image = image as? UIImage
+        func picker(_: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
+            for image in results {
+                image.itemProvider.loadObject(ofClass: UIImage.self) { selectedImage, error in
+                    if let error = error {
+                        print(error.localizedDescription)
+                        return
                     }
-                } else {
-                    parent.didCancel = true
+                    
+                    guard let uiImage = selectedImage as? UIImage else {
+                        return
+                    }
+                    
+                    self.parent.completion(uiImage)
                 }
-            } else {
-                parent.didCancel = true
             }
+            
+            parent.presentationMode.wrappedValue.dismiss()
         }
     }
 }

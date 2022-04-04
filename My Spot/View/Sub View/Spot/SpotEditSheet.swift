@@ -28,7 +28,6 @@ struct SpotEditSheet: View {
     @State private var imageChanged = false
     @State private var showingCannotSaveAlert = false
     @State private var showingAddImageAlert = false
-    @State private var didCancel = false
     @State private var showingCannotDeleteAlert = false
     @State private var imageTemp: UIImage?
     @State private var images: [UIImage]?
@@ -227,20 +226,14 @@ struct SpotEditSheet: View {
                                 } else {
                                     activeSheet = nil
                                 }
-                                didCancel = false
                             }
                             .ignoresSafeArea()
                     case .cameraRollSheet:
-                        ChoosePhoto(image: $imageTemp, didCancel: $didCancel)
-                            .onDisappear {
-                                if (!didCancel) {
-                                    activeSheet = .cropperSheet
-                                } else {
-                                    activeSheet = nil
-                                }
-                                didCancel = false
-                            }
-                            .ignoresSafeArea()
+                        ChoosePhoto() { image in
+                            imageTemp = image
+                            activeSheet = .cropperSheet
+                        }
+                        .ignoresSafeArea()
                     case .cropperSheet:
                         MantisPhotoCropper(selectedImage: $imageTemp)
                             .onDisappear {
