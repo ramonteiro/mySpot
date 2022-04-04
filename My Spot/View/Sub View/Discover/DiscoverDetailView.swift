@@ -42,6 +42,7 @@ struct DiscoverDetailView: View {
     @State private var likeButton = "heart"
     @State private var newName = ""
     @State private var isSaved: Bool = false
+    @State private var imageOffset: CGFloat = -50
     @State private var tags: [String] = []
     @State private var images: [UIImage] = []
     @State private var showingImage = false
@@ -59,14 +60,21 @@ struct DiscoverDetailView: View {
             if(cloudViewModel.spots.count > 0 && cloudViewModel.spots.count >= index + 1) {
                 ZStack {
                     displayImage
+                        .offset(y: imageOffset)
+                    VStack {
+                        Spacer()
+                            .frame(height: (idiom == .pad ? UIScreen.screenHeight/2 - 65 : UIScreen.screenWidth - 65))
+                        detailSheet
+                    }
                     topButtonRow
                     middleButtonRow
+                        .offset(y: -50)
                     if (showingImage) {
                         ImagePopUp(showingImage: $showingImage, image: images[selection])
                             .transition(.scale)
                     }
                 }
-                .ignoresSafeArea(.all, edges: .top)
+                .ignoresSafeArea(.all, edges: (canShare ? .top : [.top, .bottom]))
                 .onChange(of: tabController.discoverPopToRoot) { _ in
                     presentationMode.wrappedValue.dismiss()
                 }
@@ -135,10 +143,7 @@ struct DiscoverDetailView: View {
             Text("Failed to save spot. Please try again.")
         }
         .navigationBarHidden(true)
-        .ignoresSafeArea(.all, edges: .top)
-        .if(!canShare) { view in
-            view.ignoresSafeArea(.all, edges: [.top, .bottom])
-        }
+        .ignoresSafeArea(.all, edges: (canShare ? .top : [.top, .bottom]))
         .onAppear {
             noType = cloudViewModel.spots[index].type.isEmpty
             spotInCD = isSpotInCoreData()
@@ -191,6 +196,9 @@ struct DiscoverDetailView: View {
     
     private var backButton: some View {
         Button {
+            if !canShare {
+                imageOffset = 0
+            }
             presentationMode.wrappedValue.dismiss()
         } label: {
             Image(systemName: backImage)
@@ -254,7 +262,7 @@ struct DiscoverDetailView: View {
                         .ignoresSafeArea()
                 }
             }
-            detailSheet
+            Spacer()
         }
     }
     
@@ -320,6 +328,9 @@ struct DiscoverDetailView: View {
                                     try? moc.save()
                                     return
                                 }
+                            }
+                            if !canShare {
+                                imageOffset = 0
                             }
                             cloudViewModel.spots.remove(at: index)
                             presentationMode.wrappedValue.dismiss()
@@ -615,7 +626,9 @@ struct DiscoverDetailView: View {
         .background(
             Rectangle()
                 .foregroundColor(Color(UIColor.secondarySystemBackground))
-                .shadow(color: Color.black.opacity(0.3), radius: 5)
+                .cornerRadius(radius: 20, corners: [.topLeft, .topRight])
+                .shadow(color: Color.black.opacity(0.8), radius: 5)
+                .mask(Rectangle().padding(.top, -20))
         )
     }
     

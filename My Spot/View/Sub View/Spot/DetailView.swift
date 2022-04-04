@@ -33,6 +33,7 @@ struct DetailView: View {
     @State private var deleteAlert = false
     @State private var distance: String = ""
     @State private var exists = true
+    @State private var imageOffset: CGFloat = -50
     @State private var selection = 0
     @State private var images: [UIImage] = []
     @State private var showingCannotSavePublicAlert = false
@@ -77,17 +78,21 @@ struct DetailView: View {
     private var displaySpot: some View {
         ZStack {
             displayImage
+                .offset(y: imageOffset)
+            VStack {
+                Spacer()
+                    .frame(height: (idiom == .pad ? UIScreen.screenHeight/2 - 65 : UIScreen.screenWidth - 65))
+                detailSheet
+            }
             topButtonRow
             middleButtonRow
+                .offset(y: -50)
             if (showingImage) {
                 ImagePopUp(showingImage: $showingImage, image: images[selection])
                     .transition(.scale)
             }
         }
-        .ignoresSafeArea(.all, edges: .top)
-        .if(!canShare) { view in
-            view.ignoresSafeArea(.all, edges: [.top, .bottom])
-        }
+        .ignoresSafeArea(.all, edges: (canShare ? .top : [.top, .bottom]))
         .onAppear {
             // check for images
             images.append(spot.image ?? defaultImages.errorImage!)
@@ -121,28 +126,18 @@ struct DetailView: View {
                 if (!images.isEmpty) {
                     Image(uiImage: images[0])
                         .resizable()
-                        .if(idiom == .pad) { view in
-                            view.frame(width: UIScreen.screenHeight/2, height: UIScreen.screenHeight/2)
-                        }
-                        .if(idiom != .pad) { view in
-                            view.frame(width: UIScreen.screenWidth, height: UIScreen.screenWidth)
-                        }
+                        .frame(width: (idiom == .pad ? UIScreen.screenHeight/2 : UIScreen.screenWidth), height: (idiom == .pad ? UIScreen.screenHeight/2 : UIScreen.screenWidth))
                         .scaledToFit()
                         .ignoresSafeArea()
                 } else {
                     Image(uiImage: defaultImages.errorImage!)
                         .resizable()
-                        .if(idiom == .pad) { view in
-                            view.frame(width: UIScreen.screenHeight/2, height: UIScreen.screenHeight/2)
-                        }
-                        .if(idiom != .pad) { view in
-                            view.frame(width: UIScreen.screenWidth, height: UIScreen.screenWidth)
-                        }
+                        .frame(width: (idiom == .pad ? UIScreen.screenHeight/2 : UIScreen.screenWidth), height: (idiom == .pad ? UIScreen.screenHeight/2 : UIScreen.screenWidth))
                         .scaledToFit()
                         .ignoresSafeArea()
                 }
             }
-            detailSheet
+            Spacer()
         }
     }
     
@@ -186,23 +181,13 @@ struct DetailView: View {
         TabView(selection: $selection) {
             ForEach(images.indices, id: \.self) { index in
                 Image(uiImage: images[index]).resizable()
-                    .if(idiom == .pad) { view in
-                        view.frame(width: UIScreen.screenHeight/2, height: UIScreen.screenHeight/2)
-                    }
-                    .if(idiom != .pad) { view in
-                        view.frame(width: UIScreen.screenWidth, height: UIScreen.screenWidth)
-                    }
+                    .frame(width: (idiom == .pad ? UIScreen.screenHeight/2 : UIScreen.screenWidth), height: (idiom == .pad ? UIScreen.screenHeight/2 : UIScreen.screenWidth))
                     .scaledToFit()
                     .ignoresSafeArea()
                     .tag(index)
             }
         }
-        .if(idiom == .pad) { view in
-            view.frame(width: UIScreen.screenHeight/2, height: UIScreen.screenHeight/2)
-        }
-        .if(idiom != .pad) { view in
-            view.frame(width: UIScreen.screenWidth, height: UIScreen.screenWidth)
-        }
+        .frame(width: (idiom == .pad ? UIScreen.screenHeight/2 : UIScreen.screenWidth), height: (idiom == .pad ? UIScreen.screenHeight/2 : UIScreen.screenWidth))
         .tabViewStyle(.page)
     }
     
@@ -249,7 +234,9 @@ struct DetailView: View {
                     moc.delete(spots[i])
                     do {
                         try moc.save()
-                        
+                        if !canShare {
+                            imageOffset = 0
+                        }
                         presentationMode.wrappedValue.dismiss()
                     } catch {
                         print("couldnt save")
@@ -265,6 +252,9 @@ struct DetailView: View {
     
     private var backButtonView: some View {
         Button {
+            if !canShare {
+                imageOffset = 0
+            }
             presentationMode.wrappedValue.dismiss()
         } label: {
             Image(systemName: backImage)
@@ -432,7 +422,9 @@ struct DetailView: View {
         .background(
             Rectangle()
                 .foregroundColor(Color(UIColor.secondarySystemBackground))
-                .shadow(color: Color.black.opacity(0.3), radius: 5)
+                .cornerRadius(radius: 20, corners: [.topLeft, .topRight])
+                .shadow(color: Color.black.opacity(0.8), radius: 5)
+                .mask(Rectangle().padding(.top, -20))
         )
         .onAppear {
             if (mapViewModel.isAuthorized) {

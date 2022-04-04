@@ -40,6 +40,7 @@ struct DiscoverSheetShared: View {
     @State private var showSaveAlert = false
     @State private var showingCannotSavePrivateAlert = false
     @State private var newName = ""
+    @State private var imageOffset: CGFloat = -50
     @State private var isSaved: Bool = false
     @State private var tags: [String] = []
     @State private var images: [UIImage] = []
@@ -55,8 +56,15 @@ struct DiscoverSheetShared: View {
             if(cloudViewModel.shared.count == 1) {
                 ZStack {
                     displayImage
+                        .offset(y: imageOffset)
+                    VStack {
+                        Spacer()
+                            .frame(height: (idiom == .pad ? UIScreen.screenHeight/2 - 65 : UIScreen.screenWidth - 65))
+                        detailSheet
+                    }
                     topButtonRow
                     middleButtonRow
+                        .offset(y: -50)
                     if (showingImage) {
                         ImagePopUp(showingImage: $showingImage, image: images[selection])
                             .transition(.scale)
@@ -139,10 +147,7 @@ struct DiscoverSheetShared: View {
         VStack {
             Spacer()
                 .ignoresSafeArea()
-                .frame(height: UIScreen.screenWidth)
-                .if(idiom == .pad) { view in
-                    view.frame(maxWidth: UIScreen.screenHeight/2, maxHeight: UIScreen.screenHeight/2)
-                }
+                .frame(width: (idiom == .pad ? UIScreen.screenHeight/2 : UIScreen.screenWidth), height: (idiom == .pad ? UIScreen.screenHeight/2 : UIScreen.screenWidth))
             HStack {
                 enlargeImageButton
                     .padding()
@@ -174,6 +179,7 @@ struct DiscoverSheetShared: View {
     
     private var backButton: some View {
         Button {
+            imageOffset = 0
             presentationMode.wrappedValue.dismiss()
         } label: {
             Image(systemName: "chevron.down")
@@ -192,28 +198,18 @@ struct DiscoverSheetShared: View {
                 if (!images.isEmpty) {
                     Image(uiImage: images[0])
                         .resizable()
-                        .if(idiom == .pad) { view in
-                            view.frame(width: UIScreen.screenHeight/2, height: UIScreen.screenHeight/2)
-                        }
-                        .if(idiom != .pad) { view in
-                            view.frame(width: UIScreen.screenWidth, height: UIScreen.screenWidth)
-                        }
+                        .frame(width: (idiom == .pad ? UIScreen.screenHeight/2 : UIScreen.screenWidth), height: (idiom == .pad ? UIScreen.screenHeight/2 : UIScreen.screenWidth))
                         .scaledToFit()
                         .ignoresSafeArea()
                 } else {
                     Image(uiImage: defaultImages.errorImage!)
                         .resizable()
-                        .if(idiom == .pad) { view in
-                            view.frame(width: UIScreen.screenHeight/2, height: UIScreen.screenHeight/2)
-                        }
-                        .if(idiom != .pad) { view in
-                            view.frame(width: UIScreen.screenWidth, height: UIScreen.screenWidth)
-                        }
+                        .frame(width: (idiom == .pad ? UIScreen.screenHeight/2 : UIScreen.screenWidth), height: (idiom == .pad ? UIScreen.screenHeight/2 : UIScreen.screenWidth))
                         .scaledToFit()
                         .ignoresSafeArea()
                 }
             }
-            detailSheet
+            Spacer()
         }
     }
     
@@ -221,23 +217,13 @@ struct DiscoverSheetShared: View {
         TabView(selection: $selection) {
             ForEach(images.indices, id: \.self) { index in
                 Image(uiImage: images[index]).resizable()
-                    .if(idiom == .pad) { view in
-                        view.frame(width: UIScreen.screenHeight/2, height: UIScreen.screenHeight/2)
-                    }
-                    .if(idiom != .pad) { view in
-                        view.frame(width: UIScreen.screenWidth, height: UIScreen.screenWidth)
-                    }
+                    .frame(width: (idiom == .pad ? UIScreen.screenHeight/2 : UIScreen.screenWidth), height: (idiom == .pad ? UIScreen.screenHeight/2 : UIScreen.screenWidth))
                     .scaledToFit()
                     .ignoresSafeArea()
                     .tag(index)
             }
         }
-        .if(idiom == .pad) { view in
-            view.frame(width: UIScreen.screenHeight/2, height: UIScreen.screenHeight/2)
-        }
-        .if(idiom != .pad) { view in
-            view.frame(width: UIScreen.screenWidth, height: UIScreen.screenWidth)
-        }
+        .frame(width: (idiom == .pad ? UIScreen.screenHeight/2 : UIScreen.screenWidth), height: (idiom == .pad ? UIScreen.screenHeight/2 : UIScreen.screenWidth))
         .tabViewStyle(.page)
     }
     
@@ -280,6 +266,7 @@ struct DiscoverSheetShared: View {
                                     return
                                 }
                             }
+                            imageOffset = 0
                             presentationMode.wrappedValue.dismiss()
                         }
                     } catch {
@@ -562,7 +549,9 @@ struct DiscoverSheetShared: View {
         .background(
             Rectangle()
                 .foregroundColor(Color(UIColor.secondarySystemBackground))
-                .shadow(color: Color.black.opacity(0.3), radius: 5)
+                .cornerRadius(radius: 20, corners: [.topLeft, .topRight])
+                .shadow(color: Color.black.opacity(0.8), radius: 5)
+                .mask(Rectangle().padding(.top, -20))
         )
     }
     
