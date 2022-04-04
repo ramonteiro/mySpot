@@ -158,7 +158,7 @@ struct SettingsView: View {
                                 UserDefaults.standard.set(Double(1000), forKey: "discovernotikm")
                                 UserDefaults.standard.set(filters, forKey: "filters")
                             }
-                            try? await cloudViewModel.unsubscribe(id: "NewSpotDiscover")
+                            try? await cloudViewModel.unsubscribeAll()
                             do {
                                 try await cloudViewModel.subscribeToNewSpot(fixedLocation: location, radiusInKm: radius, filters: filters)
                                 cloudViewModel.notiNewSpotOn = true
@@ -191,7 +191,7 @@ struct SettingsView: View {
                     Task {
                         discoverProcess = true
                         do {
-                            try await cloudViewModel.unsubscribe(id: "NewSpotDiscover")
+                            try await cloudViewModel.unsubscribeAll()
                             cloudViewModel.notiNewSpotOn = false
                             UserDefaults.standard.set(false, forKey: "discovernot")
                         } catch {

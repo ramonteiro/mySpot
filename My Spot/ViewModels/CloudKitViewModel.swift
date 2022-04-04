@@ -10,8 +10,6 @@ import CloudKit
 
 class CloudKitViewModel: ObservableObject {
     
-    @Published var totalMapSize = 2
-    @Published var notiPlaylistOn = false
     @Published var notiNewSpotOn = false
     @Published var systemColorIndex = 0
     @Published var systemColorArray: [Color] = [.red,.green,.pink,.blue,.indigo,.mint,.orange,.purple,.teal,.yellow, .gray]
@@ -44,11 +42,6 @@ class CloudKitViewModel: ObservableObject {
             notiNewSpotOn = UserDefaults.standard.bool(forKey: "discovernot")
         } else {
             UserDefaults.standard.set(false, forKey: "discovernot")
-        }
-        if (UserDefaults.standard.valueExists(forKey: "playlistnot")) {
-            notiPlaylistOn = UserDefaults.standard.bool(forKey: "playlistnot")
-        } else {
-            UserDefaults.standard.set(false, forKey: "playlistnot")
         }
         if UserDefaults.standard.valueExists(forKey: "customColorA") {
             systemColorArray[systemColorArray.count - 1] = Color(uiColor: UIColor(red: UserDefaults.standard.double(forKey: "customColorR"), green: UserDefaults.standard.double(forKey: "customColorG"), blue: UserDefaults.standard.double(forKey: "customColorB"), alpha: UserDefaults.standard.double(forKey: "customColorA")))
@@ -638,8 +631,8 @@ class CloudKitViewModel: ObservableObject {
         do {
             let success = try await UNUserNotificationCenter.current().requestAuthorization(options: options)
             if success {
-                await UIApplication.shared.registerForRemoteNotifications()
                 DispatchQueue.main.async {
+                    UIApplication.shared.registerForRemoteNotifications()
                     self.notiPermission = 2
                 }
             } else {
@@ -654,13 +647,16 @@ class CloudKitViewModel: ObservableObject {
         }
     }
     
-    func unsubscribe(id: CKSubscription.ID) async throws {
-        _ = try await CKContainer.default().publicCloudDatabase.deleteSubscription(withID: id)
+    func unsubscribeAll() async throws {
+        let subs = try await CKContainer.default().publicCloudDatabase.allSubscriptions()
+        for sub in subs {
+            _ = try await CKContainer.default().publicCloudDatabase.deleteSubscription(withID: sub.subscriptionID)
+        }
     }
     
     func subscribeToNewSpot(fixedLocation: CLLocation, radiusInKm: CGFloat, filters: [String]) async throws {
         let predicate = NSPredicate(format: "distanceToLocation:fromLocation:(location, %@) < %f", fixedLocation, radiusInKm)
-        var subscription = CKQuerySubscription(recordType: "Spots", predicate: predicate, subscriptionID: "NewSpotDiscover", options: .firesOnRecordCreation)
+        var subscription = CKQuerySubscription(recordType: "Spots", predicate: predicate, options: .firesOnRecordCreation)
         if !filters.isEmpty {
             var compoundPredicate = NSCompoundPredicate()
             if filters.count == 1 {
@@ -678,7 +674,7 @@ class CloudKitViewModel: ObservableObject {
                 let compundOr = NSCompoundPredicate(type: .or, subpredicates: [predicate2, predicate3, predicate4])
                 compoundPredicate = NSCompoundPredicate(type: .and, subpredicates: [predicate, compundOr])
             }
-            subscription = CKQuerySubscription(recordType: "Spots", predicate: compoundPredicate, subscriptionID: "NewSpotDiscover", options: .firesOnRecordCreation)
+            subscription = CKQuerySubscription(recordType: "Spots", predicate: compoundPredicate, options: .firesOnRecordCreation)
         }
         let notification = CKSubscription.NotificationInfo()
         notification.title = "My Spot"
@@ -689,9 +685,5 @@ class CloudKitViewModel: ObservableObject {
         notification.desiredKeys = ["id"]
         subscription.notificationInfo = notification
         try await CKContainer.default().publicCloudDatabase.save(subscription)
-    }
-    
-    private func subscribeToSharedPlaylist() {
-        
     }
 }

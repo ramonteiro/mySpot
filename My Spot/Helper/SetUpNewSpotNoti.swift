@@ -80,11 +80,12 @@ struct SetUpNewSpotNoti: View {
                             await cloudViewModel.checkNotificationPermission()
                             if cloudViewModel.notiPermission == 2 ||  cloudViewModel.notiPermission == 3 { // allowed
                                 // unsub from old noti
-                                try? await cloudViewModel.unsubscribe(id: "NewSpotDiscover")
+                                try? await cloudViewModel.unsubscribeAll()
                                 
                                 // sub
                                 do {
                                     try await cloudViewModel.subscribeToNewSpot(fixedLocation: location, radiusInKm: distanceKm, filters: filters)
+                                    print("SUCCess")
                                     UserDefaults.standard.set(placeName, forKey: "discovernotiname")
                                     newPlace.toggle()
                                     UserDefaults.standard.set(Double(centerRegion.center.latitude), forKey: "discovernotix")
