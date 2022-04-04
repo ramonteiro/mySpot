@@ -21,7 +21,6 @@ struct SettingsView: View {
     @State private var message = "Message to My Spot developer: "
     @State private var discoverNoti = false
     @State private var filters: [String] = []
-    @State private var playlistNoti = false
     @State private var discoverProcess = false
     @State private var unableToAddSpot = 0 // 0: ok, 1: no connection, 2: no permission
     @State private var showingErrorNoPermission = false
@@ -69,18 +68,6 @@ struct SettingsView: View {
                 } header: {
                     Text("Color Scheme")
                         .font(.headline)
-                }
-
-                Section {
-                    Toggle(isOn: $playlistNoti) {
-                        Text("Shared Playlists")
-                    }
-                    .tint(cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex])
-                } header: {
-                    Text("Notifications")
-                        .font(.headline)
-                } footer: {
-                    Text("Alerts when new spots are added to shared playlists.")
                 }
                 Section {
                     Toggle(isOn: $discoverNoti) {
@@ -288,8 +275,10 @@ struct SettingsView: View {
             }
         }
         .onAppear {
+            if cloudViewModel.notiNewSpotOn ==  true {
+                preventDoubleTrigger = true
+            }
             discoverNoti = cloudViewModel.notiNewSpotOn
-            playlistNoti = cloudViewModel.notiPlaylistOn
         }
     }
 }

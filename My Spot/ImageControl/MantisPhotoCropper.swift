@@ -31,14 +31,13 @@ struct MantisPhotoCropper: UIViewControllerRepresentable {
             let editor = Mantis.cropViewController(image: image, config: config)
             editor.delegate = context.coordinator
             return editor
-        } else {
-            cloudViewModel.isErrorMessage = "Unable To Load Image"
-            cloudViewModel.isErrorMessageDetails = "This error is unknown. Please try again."
-            cloudViewModel.isError.toggle()
-            let editor = Mantis.cropViewController(image: defaultImages.errorImage!, config: config)
-            editor.delegate = context.coordinator
-            return editor
         }
+        cloudViewModel.isErrorMessage = "Unable To Load Image"
+        cloudViewModel.isErrorMessageDetails = "This error is unknown. Please try again."
+        cloudViewModel.isError.toggle()
+        let editor = Mantis.cropViewController(image: defaultImages.errorImage!, config: config)
+        editor.delegate = context.coordinator
+        return editor
     }
 }
 

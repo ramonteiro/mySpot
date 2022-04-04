@@ -206,7 +206,7 @@ struct MySpotsView: View {
                             AddSpotSheet(isSaving: $isSaving, showingCannotSavePublicAlert: $showingCannotSavePublicAlert)
                         }
                     } else {
-                        ProgressView().progressViewStyle(.circular)
+                        ProgressView().progressViewStyle(.circular).padding()
                     }
                 }
             }

@@ -199,7 +199,9 @@ struct AddSpotSheet: View {
                                 ChoosePhoto(image: $imageTemp, didCancel: $didCancel)
                                     .onDisappear {
                                         if (!didCancel) {
-                                            activeSheet = .cropperSheet
+                                            DispatchQueue.main.asyncAfter(deadline: .now()+1) {
+                                                activeSheet = .cropperSheet
+                                            }
                                         } else {
                                             activeSheet = nil
                                         }
@@ -290,7 +292,7 @@ struct AddSpotSheet: View {
                                 }
                                 .tint(.blue)
                                 .padding()
-                                .disabled(disableSave)
+                                .disabled(disableSave || isSaving)
                             }
                             ToolbarItemGroup(placement: .navigationBarLeading) {
                                 Button("Delete") {

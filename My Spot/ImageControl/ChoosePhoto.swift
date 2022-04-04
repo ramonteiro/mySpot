@@ -34,9 +34,9 @@ struct ChoosePhoto: UIViewControllerRepresentable {
         init(_ parent: ChoosePhoto) {
             self.parent = parent
         }
-
+        
         func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
-            picker.dismiss(animated: true)
+            picker.dismiss(animated: true, completion: nil)
 
             if let provider = results.first?.itemProvider {
                 if provider.canLoadObject(ofClass: UIImage.self) {
