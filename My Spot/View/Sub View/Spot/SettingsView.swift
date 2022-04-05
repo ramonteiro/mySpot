@@ -20,7 +20,6 @@ struct SettingsView: View {
     @State private var newPlace = false
     @State private var message = "Message to My Spot developer: "
     @State private var discoverNoti = false
-    @State private var filters: [String] = []
     @State private var discoverProcess = false
     @State private var unableToAddSpot = 0 // 0: ok, 1: no connection, 2: no permission
     @State private var showingErrorNoPermission = false
@@ -90,7 +89,7 @@ struct SettingsView: View {
                         Text("Area Set To: \(placeName)")
                     }
                 } footer: {
-                    Text("Alerts when new spots are added to around a location. Tap 'Configure' to set up the area where new spots should alert you.")
+                    Text("Alerts when new spots are added to around a location, within a 10 mile radius. Tap 'Configure' to set up the area where new spots should alert you.")
                 }
                 Section {
                     Button {
@@ -147,20 +146,14 @@ struct SettingsView: View {
                         if cloudViewModel.notiPermission == 2 ||  cloudViewModel.notiPermission == 3 { // allowed/provisional
                             // subscribe
                             var location = CLLocation(latitude: mapViewModel.region.center.latitude, longitude: mapViewModel.region.center.longitude)
-                            var radius: CGFloat = 1000
                             if (UserDefaults.standard.valueExists(forKey: "discovernotix")) {
                                 location = CLLocation(latitude: UserDefaults.standard.double(forKey: "discovernotix"), longitude: UserDefaults.standard.double(forKey: "discovernotiy"))
-                                radius = UserDefaults.standard.double(forKey: "discovernotikm")
-                                filters = UserDefaults.standard.stringArray(forKey: "filters") ?? []
                             } else {
                                 UserDefaults.standard.set(Double(mapViewModel.region.center.latitude), forKey: "discovernotix")
                                 UserDefaults.standard.set(Double(mapViewModel.region.center.longitude), forKey: "discovernotiy")
-                                UserDefaults.standard.set(Double(1000), forKey: "discovernotikm")
-                                UserDefaults.standard.set(filters, forKey: "filters")
                             }
-                            try? await cloudViewModel.unsubscribeAll()
                             do {
-                                try await cloudViewModel.subscribeToNewSpot(fixedLocation: location, radiusInKm: radius, filters: filters)
+                                try await cloudViewModel.subscribeToNewSpot(fixedLocation: location)
                                 cloudViewModel.notiNewSpotOn = true
                                 UserDefaults.standard.set(true, forKey: "discovernot")
                             } catch {
@@ -228,6 +221,10 @@ struct SettingsView: View {
             .onAppear {
                 if UserDefaults.standard.valueExists(forKey: "discovernotiname") {
                     placeName = UserDefaults.standard.string(forKey: "discovernotiname") ?? ""
+                } else {
+                    mapViewModel.getPlacmarkOfLocationLessPrecise(location: CLLocation(latitude: mapViewModel.region.center.latitude, longitude: mapViewModel.region.center.longitude)) { place in
+                        placeName = place
+                    }
                 }
             }
             .fullScreenCover(isPresented: $showingConfigure, onDismiss: {
