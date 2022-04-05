@@ -324,7 +324,7 @@ class CloudKitViewModel: ObservableObject {
             query.sortDescriptors = [creation, distance]
         }
         
-        let results = try await CKContainer.default().publicCloudDatabase.records(matching: query, desiredKeys: desiredKeys, resultsLimit: 20)
+        let results = try await CKContainer.default().publicCloudDatabase.records(matching: query, desiredKeys: desiredKeys, resultsLimit: 10)
         DispatchQueue.main.async {
             self.spots.removeAll()
             self.cursorMain = nil

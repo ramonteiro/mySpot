@@ -286,6 +286,7 @@ struct DetailView: View {
                 pu.toggle()
                 showingCannotSavePublicAlert = false
             }
+            presentationMode.wrappedValue.dismiss()
         }) {
             SpotEditSheet(spot: spot, showingCannotSavePublicAlert: $showingCannotSavePublicAlert)
         }

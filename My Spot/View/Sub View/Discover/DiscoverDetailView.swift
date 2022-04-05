@@ -213,18 +213,14 @@ struct DiscoverDetailView: View {
         VStack(spacing: 0) {
             if (images.count > 1) {
                 multipleImages
+                
             } else {
                 if (!images.isEmpty) {
                     if (cloudViewModel.spots[index].isMultipleImages != 0) {
                         ZStack {
                             Image(uiImage: images[0])
                                 .resizable()
-                                .if(idiom == .pad) { view in
-                                    view.frame(width: UIScreen.screenHeight/2, height: UIScreen.screenHeight/2)
-                                }
-                                .if(idiom != .pad) { view in
-                                    view.frame(width: UIScreen.screenWidth, height: UIScreen.screenWidth)
-                                }
+                                .frame(width: (idiom == .pad ? UIScreen.screenHeight/2 : UIScreen.screenWidth), height: (idiom == .pad ? UIScreen.screenHeight/2 : UIScreen.screenWidth))
                                 .scaledToFit()
                                 .ignoresSafeArea()
                             VStack {
@@ -237,27 +233,18 @@ struct DiscoverDetailView: View {
                                 }
                             }
                         }
+                        .frame(width: (idiom == .pad ? UIScreen.screenHeight/2 : UIScreen.screenWidth), height: (idiom == .pad ? UIScreen.screenHeight/2 : UIScreen.screenWidth))
                     } else {
                         Image(uiImage: images[0])
                             .resizable()
-                            .if(idiom == .pad) { view in
-                                view.frame(width: UIScreen.screenHeight/2, height: UIScreen.screenHeight/2)
-                            }
-                            .if(idiom != .pad) { view in
-                                view.frame(width: UIScreen.screenWidth, height: UIScreen.screenWidth)
-                            }
+                            .frame(width: (idiom == .pad ? UIScreen.screenHeight/2 : UIScreen.screenWidth), height: (idiom == .pad ? UIScreen.screenHeight/2 : UIScreen.screenWidth))
                             .scaledToFit()
                             .ignoresSafeArea()
                     }
                 } else {
                     Image(uiImage: defaultImages.errorImage!)
                         .resizable()
-                        .if(idiom == .pad) { view in
-                            view.frame(width: UIScreen.screenHeight/2, height: UIScreen.screenHeight/2)
-                        }
-                        .if(idiom != .pad) { view in
-                            view.frame(width: UIScreen.screenWidth, height: UIScreen.screenWidth)
-                        }
+                        .frame(width: (idiom == .pad ? UIScreen.screenHeight/2 : UIScreen.screenWidth), height: (idiom == .pad ? UIScreen.screenHeight/2 : UIScreen.screenWidth))
                         .scaledToFit()
                         .ignoresSafeArea()
                 }
@@ -270,23 +257,13 @@ struct DiscoverDetailView: View {
         TabView(selection: $selection) {
             ForEach(images.indices, id: \.self) { index in
                 Image(uiImage: images[index]).resizable()
-                    .if(idiom == .pad) { view in
-                        view.frame(width: UIScreen.screenHeight/2, height: UIScreen.screenHeight/2)
-                    }
-                    .if(idiom != .pad) { view in
-                        view.frame(width: UIScreen.screenWidth, height: UIScreen.screenWidth)
-                    }
+                    .frame(width: (idiom == .pad ? UIScreen.screenHeight/2 : UIScreen.screenWidth), height: (idiom == .pad ? UIScreen.screenHeight/2 : UIScreen.screenWidth))
                     .scaledToFit()
                     .ignoresSafeArea()
                     .tag(index)
             }
         }
-        .if(idiom == .pad) { view in
-            view.frame(width: UIScreen.screenHeight/2, height: UIScreen.screenHeight/2)
-        }
-        .if(idiom != .pad) { view in
-            view.frame(width: UIScreen.screenWidth, height: UIScreen.screenWidth)
-        }
+        .frame(width: (idiom == .pad ? UIScreen.screenHeight/2 : UIScreen.screenWidth), height: (idiom == .pad ? UIScreen.screenHeight/2 : UIScreen.screenWidth))
         .tabViewStyle(.page)
     }
     

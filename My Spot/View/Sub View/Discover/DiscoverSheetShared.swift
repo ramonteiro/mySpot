@@ -196,11 +196,31 @@ struct DiscoverSheetShared: View {
                 multipleImages
             } else {
                 if (!images.isEmpty) {
-                    Image(uiImage: images[0])
-                        .resizable()
+                    if (cloudViewModel.shared[0].isMultipleImages != 0) {
+                        ZStack {
+                            Image(uiImage: images[0])
+                                .resizable()
+                                .frame(width: (idiom == .pad ? UIScreen.screenHeight/2 : UIScreen.screenWidth), height: (idiom == .pad ? UIScreen.screenHeight/2 : UIScreen.screenWidth))
+                                .scaledToFit()
+                                .ignoresSafeArea()
+                            VStack {
+                                Spacer()
+                                HStack {
+                                    Spacer()
+                                    ProgressView()
+                                        .frame(width: 30, height: 30)
+                                    Spacer()
+                                }
+                            }
+                        }
                         .frame(width: (idiom == .pad ? UIScreen.screenHeight/2 : UIScreen.screenWidth), height: (idiom == .pad ? UIScreen.screenHeight/2 : UIScreen.screenWidth))
-                        .scaledToFit()
-                        .ignoresSafeArea()
+                    } else {
+                        Image(uiImage: images[0])
+                            .resizable()
+                            .frame(width: (idiom == .pad ? UIScreen.screenHeight/2 : UIScreen.screenWidth), height: (idiom == .pad ? UIScreen.screenHeight/2 : UIScreen.screenWidth))
+                            .scaledToFit()
+                            .ignoresSafeArea()
+                    }
                 } else {
                     Image(uiImage: defaultImages.errorImage!)
                         .resizable()
