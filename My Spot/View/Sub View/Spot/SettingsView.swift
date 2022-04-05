@@ -89,7 +89,7 @@ struct SettingsView: View {
                         Text("Area Set To: \(placeName)")
                     }
                 } footer: {
-                    Text("Alerts when new spots are added to around a location, within a 10 mile radius. Tap 'Configure' to set up the area where new spots should alert you.")
+                    Text("Alerts when new spots are added to your location, within a 10 mile radius. Tap 'Configure' to change the location where new spots should alert you.")
                 }
                 Section {
                     Slider(value: $limits, in: 1...30, step: 1) { didChange in
