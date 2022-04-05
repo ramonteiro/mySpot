@@ -19,12 +19,11 @@ Everyone! Whether you are a skater, hiker, mountain biker, etc, or maybe you jus
 
 ---How to Use My Spot---
 
-Demo Video: https://youtu.be/THxhz0TkbG0
+Demo Video: https://youtu.be/Q0FO_jjDHzA
 
 When starting My Spot you are greeted with the my spots tab where you can start by adding a spot. These spots are stored locally in core data unless the public slider is checked in which case it is uploaded to a database hoted in cloudkit.
 
 Quick interaction:
-- press the location arrow button to sort spots by your location, this is disabled if location access was denied. 
 - press the map button to show the spots in the current tab on a map. In the map press the top left to exit, swipe through locations or tap on new locations to change, tap on the location preview to bring up a detailed description, press the top right arrow to focus on user location, press the top right line to get directions to selected spot.
 
 Discover tab:
@@ -49,7 +48,8 @@ My Spot needs the following:
 
 In order to run this project with cloukit:
 
-- you must change signing and capabilities to your own apple developer accont with a container
+- you must change signing and capabilities to your own apple developer accont with an icloud container
 - that container must be in entitlements as well
 - the discover tab will load indefinitely until a spot is uploaded as public (is will keep searching for spots until the cloudkit container is empty) 
 - the container must also alow for sorting by creation date and distance in indexes
+- a small package named, mantis is used to crop photos to 1:1. This package should automatically be downloaded by xcode's package manager
