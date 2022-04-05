@@ -25,7 +25,7 @@ struct SettingsView: View {
     @State private var showingErrorNoPermission = false
     @State private var showingErrorNoConnection = false
     @State private var preventDoubleTrigger = false // stops onchange from triggering itself
-    
+    @State private var limits: Double = 10
     var body: some View {
         NavigationView {
             Form {
@@ -70,7 +70,7 @@ struct SettingsView: View {
                 }
                 Section {
                     Toggle(isOn: $discoverNoti) {
-                        Text("New Spots")
+                        Text("New Spots Notification")
                     }
                     .disabled(discoverProcess)
                     .tint(cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex])
@@ -90,6 +90,18 @@ struct SettingsView: View {
                     }
                 } footer: {
                     Text("Alerts when new spots are added to around a location, within a 10 mile radius. Tap 'Configure' to set up the area where new spots should alert you.")
+                }
+                Section {
+                    Slider(value: $limits, in: 1...30, step: 1) { didChange in
+                        if didChange {
+                            let generator = UINotificationFeedbackGenerator()
+                            generator.notificationOccurred(.success)
+                        }
+                    }
+                } header: {
+                    Text("Max Spots To Load: \(Int(limits))")
+                } footer: {
+                    Text("Set how many spots to load at once. If load times are slow, lower this number.")
                 }
                 Section {
                     Button {
@@ -204,6 +216,10 @@ struct SettingsView: View {
                     preventDoubleTrigger = false
                 }
             }
+            .onChange(of: limits) { newValue in
+                UserDefaults.standard.set(Int(limits), forKey: "limit")
+                cloudViewModel.limit = Int(limits)
+            }
             .alert("Notification Permissions Denied", isPresented: $showingErrorNoPermission) {
                 Button("Settings") {
                     guard let url = URL(string: UIApplication.openSettingsURLString) else { return }
@@ -226,6 +242,7 @@ struct SettingsView: View {
                         placeName = place
                     }
                 }
+                limits = Double(cloudViewModel.limit)
             }
             .fullScreenCover(isPresented: $showingConfigure, onDismiss: {
                 if unableToAddSpot == 2 {

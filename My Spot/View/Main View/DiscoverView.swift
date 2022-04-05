@@ -335,7 +335,7 @@ struct DiscoverView: View {
         .onTapGesture {
             if let cursor = cloudViewModel.cursorMain {
                 Task {
-                    await cloudViewModel.fetchMoreSpotsPublic(cursor: cursor, desiredKeys: cloudViewModel.desiredKeys, resultLimit: 20)
+                    await cloudViewModel.fetchMoreSpotsPublic(cursor: cursor, desiredKeys: cloudViewModel.desiredKeys, resultLimit: cloudViewModel.limit)
                 }
             }
         }

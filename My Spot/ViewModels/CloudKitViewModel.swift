@@ -24,6 +24,7 @@ class CloudKitViewModel: ObservableObject {
     @Published var isErrorMessage = ""
     @Published var isErrorMessageDetails = ""
     @Published var isPostError = false
+    @Published var limit = 10
     @Published var radiusInMeters: Double = 0
     @Published var notiPermission = 0 // 0: not determined, 1: denied, 2: allowed, 3: provisional, 4: ephemeral, 5: unknown
     @Published var cursorMain: CKQueryOperation.Cursor?
@@ -35,6 +36,11 @@ class CloudKitViewModel: ObservableObject {
     }
     
     private func setUserDefaults() {
+        if (UserDefaults.standard.valueExists(forKey: "limit")) {
+            limit = UserDefaults.standard.integer(forKey: "limit")
+        } else {
+            UserDefaults.standard.set(10, forKey: "limit")
+        }
         if (UserDefaults.standard.valueExists(forKey: "savedDistance")) {
             radiusInMeters = Double(UserDefaults.standard.integer(forKey: "savedDistance"))
         }
@@ -324,7 +330,7 @@ class CloudKitViewModel: ObservableObject {
             query.sortDescriptors = [creation, distance]
         }
         
-        let results = try await CKContainer.default().publicCloudDatabase.records(matching: query, desiredKeys: desiredKeys, resultsLimit: 10)
+        let results = try await CKContainer.default().publicCloudDatabase.records(matching: query, desiredKeys: desiredKeys, resultsLimit: limit)
         DispatchQueue.main.async {
             self.spots.removeAll()
             self.cursorMain = nil
