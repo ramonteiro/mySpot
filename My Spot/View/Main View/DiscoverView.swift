@@ -157,8 +157,10 @@ struct DiscoverView: View {
                 )
                 .onAppear {
                     if cloudViewModel.spots.count != 0 {
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                            hasError.toggle()
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                            withAnimation {
+                                hasError.toggle()
+                            }
                         }
                     }
                 }

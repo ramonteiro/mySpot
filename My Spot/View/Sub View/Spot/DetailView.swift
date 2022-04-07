@@ -30,6 +30,7 @@ struct DetailView: View {
     @State private var scope:String = "Private"
     @State private var tags: [String] = []
     @State private var showingImage = false
+    @State private var expand = false
     @State private var deleteAlert = false
     @State private var distance: String = ""
     @State private var exists = true
@@ -81,12 +82,13 @@ struct DetailView: View {
                 .offset(y: imageOffset)
             VStack {
                 Spacer()
-                    .frame(height: (idiom == .pad ? UIScreen.screenHeight/2 - 65 : UIScreen.screenWidth - 65))
+                    .frame(height: (expand ? 90 : (idiom == .pad ? UIScreen.screenHeight/2 - 65 : UIScreen.screenWidth - 65)))
                 detailSheet
             }
             topButtonRow
             middleButtonRow
                 .offset(y: -50)
+                .opacity(expand ? 0: 1)
             if (showingImage) {
                 ImagePopUp(showingImage: $showingImage, image: images[selection])
                     .transition(.scale)
@@ -220,6 +222,8 @@ struct DetailView: View {
     
     private var deleteButton: some View {
         Button {
+            let generator = UINotificationFeedbackGenerator()
+            generator.notificationOccurred(.warning)
             deleteAlert.toggle()
         } label: {
             Image(systemName: "trash.fill")
@@ -294,126 +298,140 @@ struct DetailView: View {
     }
     
     private var detailSheet: some View {
-        ScrollView(showsIndicators: false) {
-            
-            if (!(spot.locationName?.isEmpty ?? true)) {
+        ZStack {
+            ScrollView(showsIndicators: false) {
+                Image(systemName: (expand ? "x.circle.fill" : "arrow.up.circle.fill"))
+                    .resizable()
+                    .frame(width: (expand ? 50 : 30), height: (expand ? 50 : 30))
+                    .foregroundColor(Color.secondary)
+                    .onTapGesture {
+                        let generator = UINotificationFeedbackGenerator()
+                        generator.notificationOccurred(.success)
+                        withAnimation {
+                            expand.toggle()
+                        }
+                    }
+                    .padding(.top, 5)
+                
+                if (!(spot.locationName?.isEmpty ?? true)) {
+                    HStack {
+                        Image(systemName: "mappin")
+                            .font(.system(size: 15, weight: .light))
+                            .foregroundColor(Color.gray)
+                        Text("\(spot.locationName ?? "")")
+                            .font(.system(size: 15, weight: .light))
+                            .foregroundColor(Color.gray)
+                            .padding(.leading, 1)
+                        Spacer()
+                    }
+                    .padding([.leading, .trailing], 30)
+                }
+                
+                
                 HStack {
-                    Image(systemName: "mappin")
-                        .font(.system(size: 15, weight: .light))
-                        .foregroundColor(Color.gray)
-                    Text("\(spot.locationName ?? "")")
-                        .font(.system(size: 15, weight: .light))
-                        .foregroundColor(Color.gray)
-                        .padding(.leading, 1)
+                    Text("\(spot.name ?? "")")
+                        .font(.system(size: 45, weight: .heavy))
                     Spacer()
                 }
-                .padding([.top, .leading, .trailing], 30)
-            }
-            
-            
-            HStack {
-                Text("\(spot.name ?? "")")
-                    .font(.system(size: 45, weight: .heavy))
-                Spacer()
-            }
-            .padding(.leading, 30)
-            .padding(.trailing, 5)
-            
-            HStack {
-                Text("By: \(spot.founder ?? "")")
-                    .font(.system(size: 15, weight: .light))
-                    .foregroundColor(Color.gray)
-                Spacer()
-                Text("\(spot.date?.components(separatedBy: ";")[0] ?? "")")
-                    .font(.system(size: 15, weight: .light))
-                    .foregroundColor(Color.gray)
-            }
-            .padding([.leading, .trailing], 30)
-            
-            if (!(spot.tags?.isEmpty ?? true)) {
-                ScrollView(.horizontal, showsIndicators: false) {
-                    HStack {
-                        ForEach(tags, id: \.self) { tag in
-                            Text(tag)
-                                .font(.system(size: 12, weight: .regular))
-                                .lineLimit(2)
-                                .foregroundColor(.white)
-                                .padding(5)
-                                .background(.tint)
-                                .cornerRadius(5)
-                        }
-                    }
-                }
-                .padding([.leading, .trailing], 30)
-                .offset(y: 5)
-            }
-            HStack(spacing: 5) {
-                Text(spot.details ?? "")
-                Spacer()
-            }
-            .padding(.top, 10)
-            .padding([.leading, .trailing], 30)
-            
-            ViewSingleSpotOnMap(singlePin: [SinglePin(name: spot.name ?? "", coordinate: CLLocationCoordinate2D(latitude: spot.x, longitude: spot.y))])
-                .aspectRatio(contentMode: .fit)
-                .cornerRadius(15)
-                .padding([.leading, .trailing], 30)
-            
-            Button {
-                let routeMeTo = MKMapItem(placemark: MKPlacemark(coordinate: CLLocationCoordinate2D(latitude: spot.x, longitude: spot.y)))
-                routeMeTo.name = spot.name ?? "Spot"
-                routeMeTo.openInMaps(launchOptions: nil)
-            } label: {
-                Text("Take Me To \(spot.name ?? "")")
-                    .padding(.horizontal)
-            }
-            .buttonStyle(.borderedProminent)
-            .padding(.top, 10)
-            .padding([.leading, .trailing], 30)
-            
-            if (!distance.isEmpty) {
-                Text("\(distance) away")
-                    .foregroundColor(.gray)
-                    .font(.system(size: 15, weight: .light))
-                    .padding(.bottom, 1)
-            }
-            
-            HStack {
-                Image(systemName: "globe")
-                    .font(.system(size: 15, weight: .light))
-                    .foregroundColor(Color.gray)
-                Text("\(scope)")
-                    .font(.system(size: 15, weight: .light))
-                    .foregroundColor(Color.gray)
-                    .onChange(of: spot.isPublic) { newValue in
-                        if (newValue) {
-                            scope = "Public"
-                        } else {
-                            scope = "Private"
-                        }
-                    }
-                if (spot.isPublic && spot.likes >= 0) {
-                    Image(systemName: "heart.fill")
+                .padding(.leading, 30)
+                .padding(.trailing, 5)
+                
+                HStack {
+                    Text("By: \(spot.founder ?? "")")
                         .font(.system(size: 15, weight: .light))
                         .foregroundColor(Color.gray)
-                    Text("\(Int(spot.likes))")
+                    Spacer()
+                    Text("\(spot.date?.components(separatedBy: ";")[0] ?? "")")
                         .font(.system(size: 15, weight: .light))
                         .foregroundColor(Color.gray)
                 }
-            }
-            .padding(.bottom, 20)
-            .onAppear {
-                if spot.isPublic {
-                    Task {
-                        do {
-                            let l = try await cloudViewModel.getLikes(idString: spot.dbid ?? "")
-                            if let l = l {
-                                spot.likes = Double(l)
+                .padding([.leading, .trailing], 30)
+                
+                if (!(spot.tags?.isEmpty ?? true)) {
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        HStack {
+                            ForEach(tags, id: \.self) { tag in
+                                Text(tag)
+                                    .font(.system(size: 12, weight: .regular))
+                                    .lineLimit(2)
+                                    .foregroundColor(.white)
+                                    .padding(5)
+                                    .background(.tint)
+                                    .cornerRadius(5)
+                            }
+                        }
+                    }
+                    .padding([.leading, .trailing], 30)
+                    .offset(y: 5)
+                }
+                HStack(spacing: 5) {
+                    Text(spot.details ?? "")
+                    Spacer()
+                }
+                .padding(.top, 10)
+                .padding([.leading, .trailing], 30)
+                
+                ViewSingleSpotOnMap(singlePin: [SinglePin(name: spot.name ?? "", coordinate: CLLocationCoordinate2D(latitude: spot.x, longitude: spot.y))])
+                    .aspectRatio(contentMode: .fit)
+                    .cornerRadius(15)
+                    .padding([.leading, .trailing], 30)
+                
+                Button {
+                    let routeMeTo = MKMapItem(placemark: MKPlacemark(coordinate: CLLocationCoordinate2D(latitude: spot.x, longitude: spot.y)))
+                    routeMeTo.name = spot.name ?? "Spot"
+                    routeMeTo.openInMaps(launchOptions: nil)
+                } label: {
+                    Text("Take Me To \(spot.name ?? "")")
+                        .padding(.horizontal)
+                }
+                .buttonStyle(.borderedProminent)
+                .padding(.top, 10)
+                .padding([.leading, .trailing], 30)
+                
+                if (!distance.isEmpty) {
+                    Text("\(distance) away")
+                        .foregroundColor(.gray)
+                        .font(.system(size: 15, weight: .light))
+                        .padding(.bottom, 1)
+                }
+                
+                HStack {
+                    Image(systemName: "globe")
+                        .font(.system(size: 15, weight: .light))
+                        .foregroundColor(Color.gray)
+                    Text("\(scope)")
+                        .font(.system(size: 15, weight: .light))
+                        .foregroundColor(Color.gray)
+                        .onChange(of: spot.isPublic) { newValue in
+                            if (newValue) {
+                                scope = "Public"
                             } else {
+                                scope = "Private"
+                            }
+                        }
+                    if (spot.isPublic && spot.likes >= 0) {
+                        Image(systemName: "heart.fill")
+                            .font(.system(size: 15, weight: .light))
+                            .foregroundColor(Color.gray)
+                        Text("\(Int(spot.likes))")
+                            .font(.system(size: 15, weight: .light))
+                            .foregroundColor(Color.gray)
+                    }
+                }
+                .padding(.bottom, 20)
+                .onAppear {
+                    if spot.isPublic {
+                        Task {
+                            do {
+                                let l = try await cloudViewModel.getLikes(idString: spot.dbid ?? "")
+                                if let l = l {
+                                    spot.likes = Double(l)
+                                } else {
+                                    spot.likes = -1
+                                }
+                            } catch {
                                 spot.likes = -1
                             }
-                        } catch {
-                            spot.likes = -1
                         }
                     }
                 }

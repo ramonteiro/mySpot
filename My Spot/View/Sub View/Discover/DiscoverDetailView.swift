@@ -49,6 +49,7 @@ struct DiscoverDetailView: View {
     @State private var showingSaveSheet = false
     @State private var didLike = false
     @State private var noType = false
+    @State private var expand = false
     @State private var spotInCD = false
     @State private var attemptToReport = false
     @FocusState private var nameIsFocused: Bool
@@ -63,12 +64,13 @@ struct DiscoverDetailView: View {
                         .offset(y: imageOffset)
                     VStack {
                         Spacer()
-                            .frame(height: (idiom == .pad ? UIScreen.screenHeight/2 - 65 : UIScreen.screenWidth - 65))
+                            .frame(height: (expand ? 90 : (idiom == .pad ? UIScreen.screenHeight/2 - 65 : UIScreen.screenWidth - 65)))
                         detailSheet
                     }
                     topButtonRow
                     middleButtonRow
                         .offset(y: -50)
+                        .opacity(expand ? 0: 1)
                     if (showingImage) {
                         ImagePopUp(showingImage: $showingImage, image: images[selection])
                             .transition(.scale)
@@ -284,6 +286,8 @@ struct DiscoverDetailView: View {
     
     private var deleteButton: some View { // if myspot
         Button {
+            let generator = UINotificationFeedbackGenerator()
+            generator.notificationOccurred(.warning)
             deleteAlert.toggle()
         } label: {
             Image(systemName: "trash.fill")
@@ -411,9 +415,57 @@ struct DiscoverDetailView: View {
         }
     }
     
+    private var expandButton: some View {
+        Image(systemName: (expand ? "x.circle.fill" : "arrow.up.circle.fill"))
+            .resizable()
+            .frame(width: (expand ? 50 : 30), height: (expand ? 50 : 30))
+            .foregroundColor(Color.secondary)
+            .onTapGesture {
+                let generator = UINotificationFeedbackGenerator()
+                generator.notificationOccurred(.success)
+                withAnimation {
+                    expand.toggle()
+                }
+            }
+            .padding(.top, 5)
+    }
+    
+    private var bottomHalf: some View {
+        VStack {
+            if (!distance.isEmpty) {
+                Text("\(distance) away")
+                    .foregroundColor(.gray)
+                    .font(.system(size: 15, weight: .light))
+                    .padding([.top, .bottom], 10)
+            }
+            if (!attemptToReport) {
+                if !hasReported {
+                    Button {
+                        showingReportAlert = true
+                    } label: {
+                        HStack {
+                            Text("Report Spot")
+                            Image(systemName: "exclamationmark.triangle.fill")
+                        }
+                    }
+                    .padding([.top, .bottom], 10)
+                } else {
+                    HStack {
+                        Text("Report Received")
+                        Image(systemName: "checkmark.square.fill")
+                    }
+                    .padding([.top, .bottom], 10)
+                }
+            } else {
+                ProgressView().progressViewStyle(.circular)
+                    .padding([.top, .bottom], 10)
+            }
+        }
+    }
+    
     private var detailSheet: some View {
         ScrollView(showsIndicators: false) {
-            
+            expandButton
             if (!cloudViewModel.spots[index].locationName.isEmpty) {
                 HStack {
                     Image(systemName: "mappin")
@@ -425,9 +477,8 @@ struct DiscoverDetailView: View {
                         .padding(.leading, 1)
                     Spacer()
                 }
-                .padding([.top, .leading, .trailing], 30)
+                .padding([.leading, .trailing], 30)
             }
-            
             
             HStack {
                 Text("\(cloudViewModel.spots[index].name)")
@@ -502,34 +553,7 @@ struct DiscoverDetailView: View {
             .padding(.top, 10)
             .padding([.leading, .trailing], 30)
             
-            if (!distance.isEmpty) {
-                Text("\(distance) away")
-                    .foregroundColor(.gray)
-                    .font(.system(size: 15, weight: .light))
-                    .padding([.top, .bottom], 10)
-            }
-            if !attemptToReport {
-                if !hasReported {
-                    Button {
-                        showingReportAlert = true
-                    } label: {
-                        HStack {
-                            Text("Report Spot")
-                            Image(systemName: "exclamationmark.triangle.fill")
-                        }
-                    }
-                    .padding([.top, .bottom], 10)
-                } else {
-                    HStack {
-                        Text("Report Received")
-                        Image(systemName: "checkmark.square.fill")
-                    }
-                    .padding([.top, .bottom], 10)
-                }
-            } else {
-                ProgressView().progressViewStyle(.circular)
-                    .padding([.top, .bottom], 10)
-            }
+            bottomHalf
         }
         .confirmationDialog("How should this spot be reported?", isPresented: $showingReportAlert) {
             Button("Offensive") {
