@@ -24,7 +24,7 @@ struct ImagePopUp: View {
             }
             
             // pin image sides to nearly the end of any screen size
-            .frame(width: UIScreen.screenWidth - 50, height: ((UIScreen.screenWidth - 50) * image.size.height * 0.1)/(image.size.width * 0.1))
+            .frame(width: UIScreen.screenWidth, height: ((UIScreen.screenWidth) * image.size.height * 0.1)/(image.size.width * 0.1))
             .cornerRadius(30)
             .overlay(
                     RoundedRectangle(cornerRadius: 30)
@@ -40,7 +40,7 @@ struct ImagePopUp: View {
             }
             .background(.ultraThinMaterial)
             .clipShape(Circle())
-            .offset(x: (UIScreen.screenWidth - 50) / 2 - 30, y: -(((UIScreen.screenWidth - 50) * image.size.height * 0.1)/(image.size.width * 0.1) / 2) + 30)
+            .offset(x: (UIScreen.screenWidth) / 2 - 30, y: -(((UIScreen.screenWidth) * image.size.height * 0.1)/(image.size.width * 0.1) / 2) + 30)
         }
     }
 }

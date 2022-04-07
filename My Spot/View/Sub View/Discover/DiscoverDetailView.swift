@@ -54,7 +54,6 @@ struct DiscoverDetailView: View {
     @State private var attemptToReport = false
     @FocusState private var nameIsFocused: Bool
     @State private var hasReported: Bool = false
-    private var idiom : UIUserInterfaceIdiom { UIDevice.current.userInterfaceIdiom }
     
     var body: some View {
         ZStack {
@@ -64,13 +63,12 @@ struct DiscoverDetailView: View {
                         .offset(y: imageOffset)
                     VStack {
                         Spacer()
-                            .frame(height: (expand ? 90 : (idiom == .pad ? UIScreen.screenHeight/2 - 65 : UIScreen.screenWidth - 65)))
+                            .frame(height: (expand ? 90 : UIScreen.screenWidth - 65))
                         detailSheet
                     }
                     topButtonRow
                     middleButtonRow
                         .offset(y: -50)
-                        .opacity(expand ? 0: 1)
                     if (showingImage) {
                         ImagePopUp(showingImage: $showingImage, image: images[selection])
                             .transition(.scale)
@@ -162,16 +160,16 @@ struct DiscoverDetailView: View {
             Spacer()
                 .ignoresSafeArea()
                 .frame(height: UIScreen.screenWidth)
-                .if(idiom == .pad) { view in
-                    view.frame(maxHeight: UIScreen.screenHeight/2)
-                }
             HStack {
                 enlargeImageButton
                     .padding()
-                    .offset(y: -30)
+                    .rotationEffect(Angle(degrees: (expand ? 360 : 0)), anchor: UnitPoint(x: 0.5, y: 0.5))
+                    .offset(x: (expand ? -50 : 0), y: -30)
                 Spacer()
                 downloadButton
                     .padding()
+                    .rotationEffect(Angle(degrees: (expand ? 360 : 0)), anchor: UnitPoint(x: 0.5, y: 0.5))
+                    .offset(x: (expand ? 100 : 0))
             }
             .offset(y: -60)
             Spacer()
@@ -222,7 +220,7 @@ struct DiscoverDetailView: View {
                         ZStack {
                             Image(uiImage: images[0])
                                 .resizable()
-                                .frame(width: (idiom == .pad ? UIScreen.screenHeight/2 : UIScreen.screenWidth), height: (idiom == .pad ? UIScreen.screenHeight/2 : UIScreen.screenWidth))
+                                .frame(width: UIScreen.screenWidth, height: UIScreen.screenWidth)
                                 .scaledToFit()
                                 .ignoresSafeArea()
                             VStack {
@@ -235,18 +233,18 @@ struct DiscoverDetailView: View {
                                 }
                             }
                         }
-                        .frame(width: (idiom == .pad ? UIScreen.screenHeight/2 : UIScreen.screenWidth), height: (idiom == .pad ? UIScreen.screenHeight/2 : UIScreen.screenWidth))
+                        .frame(width: UIScreen.screenWidth, height: UIScreen.screenWidth)
                     } else {
                         Image(uiImage: images[0])
                             .resizable()
-                            .frame(width: (idiom == .pad ? UIScreen.screenHeight/2 : UIScreen.screenWidth), height: (idiom == .pad ? UIScreen.screenHeight/2 : UIScreen.screenWidth))
+                            .frame(width: UIScreen.screenWidth, height: UIScreen.screenWidth)
                             .scaledToFit()
                             .ignoresSafeArea()
                     }
                 } else {
                     Image(uiImage: defaultImages.errorImage!)
                         .resizable()
-                        .frame(width: (idiom == .pad ? UIScreen.screenHeight/2 : UIScreen.screenWidth), height: (idiom == .pad ? UIScreen.screenHeight/2 : UIScreen.screenWidth))
+                        .frame(width: UIScreen.screenWidth, height: UIScreen.screenWidth)
                         .scaledToFit()
                         .ignoresSafeArea()
                 }
@@ -259,13 +257,13 @@ struct DiscoverDetailView: View {
         TabView(selection: $selection) {
             ForEach(images.indices, id: \.self) { index in
                 Image(uiImage: images[index]).resizable()
-                    .frame(width: (idiom == .pad ? UIScreen.screenHeight/2 : UIScreen.screenWidth), height: (idiom == .pad ? UIScreen.screenHeight/2 : UIScreen.screenWidth))
+                    .frame(width: UIScreen.screenWidth, height: UIScreen.screenWidth)
                     .scaledToFit()
                     .ignoresSafeArea()
                     .tag(index)
             }
         }
-        .frame(width: (idiom == .pad ? UIScreen.screenHeight/2 : UIScreen.screenWidth), height: (idiom == .pad ? UIScreen.screenHeight/2 : UIScreen.screenWidth))
+        .frame(width: UIScreen.screenWidth, height: UIScreen.screenWidth)
         .tabViewStyle(.page)
     }
     
