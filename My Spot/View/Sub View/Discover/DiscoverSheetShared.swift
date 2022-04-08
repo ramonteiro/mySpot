@@ -130,10 +130,10 @@ struct DiscoverSheetShared: View {
                 NamePopupView(isPresented: $showingSaveSheet, text: $newName, saved: $isSaving)
             }
         }
-        .alert("Unable To Save Spot", isPresented: $showingCannotSavePrivateAlert) {
-            Button("OK", role: .cancel) { }
+        .alert("Unable To Save Spot".localized(), isPresented: $showingCannotSavePrivateAlert) {
+            Button("OK".localized(), role: .cancel) { }
         } message: {
-            Text("Failed to save spot. Please try again.")
+            Text("Failed to save spot. Please try again.".localized())
         }
         .navigationBarHidden(true)
         .ignoresSafeArea(.all, edges: [.top, .bottom])
@@ -278,8 +278,8 @@ struct DiscoverSheetShared: View {
                 .padding(10)
                 .shadow(color: Color.black.opacity(0.5), radius: 5)
         }
-        .alert("Are You Sure You Want To Delete \(cloudViewModel.shared[0].name)?", isPresented: $deleteAlert) {
-            Button("Delete", role: .destructive) {
+        .alert("Are You Sure You Want To Delete ".localized() + (cloudViewModel.shared[0].name) + "?", isPresented: $deleteAlert) {
+            Button("Delete".localized(), role: .destructive) {
                 let spotID = cloudViewModel.shared[0].record.recordID
                 Task {
                     do {
@@ -297,15 +297,15 @@ struct DiscoverSheetShared: View {
                         }
                     } catch {
                         DispatchQueue.main.async {
-                            cloudViewModel.isErrorMessage = "Error Deleting Spot"
-                            cloudViewModel.isErrorMessageDetails = "Please check internet connection and try again."
+                            cloudViewModel.isErrorMessage = "Error Deleting Spot".localized()
+                            cloudViewModel.isErrorMessageDetails = "Please check internet connection and try again.".localized()
                             cloudViewModel.isError.toggle()
                         }
                     }
                 }
             }
         } message: {
-            Text("Spot will be removed from discover tab and no longer sharable. If this spot is still in 'My Spots' tab, it will not be deleted there.")
+            Text("Spot will be removed from 'Discover' tab and no longer sharable. If this spot is still in 'My Spots' tab, it will not be deleted there.".localized())
         }
     }
     
@@ -400,7 +400,7 @@ struct DiscoverSheetShared: View {
     private var bottomHalf: some View {
         VStack {
             if (!distance.isEmpty) {
-                Text("\(distance) away")
+                Text((distance) + "away".localized())
                     .foregroundColor(.gray)
                     .font(.system(size: 15, weight: .light))
                     .padding([.top, .bottom], 10)
@@ -412,14 +412,14 @@ struct DiscoverSheetShared: View {
                         showingReportAlert = true
                     } label: {
                         HStack {
-                            Text("Report Spot")
+                            Text("Report Spot".localized())
                             Image(systemName: "exclamationmark.triangle.fill")
                         }
                     }
                     .padding([.top, .bottom], 10)
                 } else {
                     HStack {
-                        Text("Report Received")
+                        Text("Report Received".localized())
                         Image(systemName: "checkmark.square.fill")
                     }
                     .padding([.top, .bottom], 10)
@@ -460,7 +460,7 @@ struct DiscoverSheetShared: View {
             .padding(.trailing, 5)
             
             HStack {
-                Text("By: \(cloudViewModel.shared[0].founder)")
+                Text("By: ".localized() + (cloudViewModel.shared[0].founder))
                     .font(.system(size: 15, weight: .light))
                     .foregroundColor(Color.gray)
                 Spacer()
@@ -517,7 +517,7 @@ struct DiscoverSheetShared: View {
                 routeMeTo.name = cloudViewModel.shared[0].name
                 routeMeTo.openInMaps(launchOptions: nil)
             } label: {
-                Text("Take Me To \(cloudViewModel.shared[0].name)")
+                Text("Take Me To ".localized() + (cloudViewModel.shared[0].name))
                     .padding(.horizontal)
             }
             .buttonStyle(.borderedProminent)
@@ -526,8 +526,8 @@ struct DiscoverSheetShared: View {
             
             bottomHalf
         }
-        .confirmationDialog("How should this spot be reported?", isPresented: $showingReportAlert) {
-            Button("Offensive") {
+        .confirmationDialog("How should this spot be reported?".localized(), isPresented: $showingReportAlert) {
+            Button("Offensive".localized()) {
                 let spot = cloudViewModel.shared[0]
                 Task {
                     attemptToReport = true
@@ -542,7 +542,7 @@ struct DiscoverSheetShared: View {
                     attemptToReport = false
                 }
             }
-            Button("Inappropriate") {
+            Button("Inappropriate".localized()) {
                 let spot = cloudViewModel.shared[0]
                 Task {
                     attemptToReport = true
@@ -557,7 +557,7 @@ struct DiscoverSheetShared: View {
                     attemptToReport = false
                 }
             }
-            Button("Spam") {
+            Button("Spam".localized()) {
                 let spot = cloudViewModel.shared[0]
                 Task {
                     attemptToReport = true
@@ -572,7 +572,7 @@ struct DiscoverSheetShared: View {
                 }
                 attemptToReport = false
             }
-            Button("Dangerous") {
+            Button("Dangerous".localized()) {
                 let spot = cloudViewModel.shared[0]
                 Task {
                     attemptToReport = true
@@ -587,7 +587,7 @@ struct DiscoverSheetShared: View {
                     attemptToReport = false
                 }
             }
-            Button("Cancel", role: .cancel) { }
+            Button("Cancel".localized(), role: .cancel) { }
         }
         .onAppear {
             if (mapViewModel.isAuthorized) {

@@ -28,7 +28,7 @@ struct MySpotsView: View {
     @State private var toBeDeleted: IndexSet?
     @State private var filteredSpots: [Spot] = []
     @State private var searchText = ""
-    @State private var sortBy = "Name"
+    @State private var sortBy = "Name".localized()
     @State private var showingCannotSavePublicAlert = false
     @State private var pu = false
     @State private var isSaving = false
@@ -45,18 +45,18 @@ struct MySpotsView: View {
         NavigationView {
             listFiltered
                 .onChange(of: sortBy) { sortType in
-                    if (sortType == "Name") {
+                    if (sortType == "Name".localized()) {
                         sortName()
-                    } else if (sortType == "Newest") {
+                    } else if (sortType == "Newest".localized()) {
                         sortDate()
-                    } else if (sortType == "Closest") {
+                    } else if (sortType == "Closest".localized()) {
                         sortClosest()
                     }
                 }
-                .alert("Unable To Upload Spot", isPresented: $pu) {
-                    Button("OK", role: .cancel) { }
+                .alert("Unable To Upload Spot".localized(), isPresented: $pu) {
+                    Button("OK".localized(), role: .cancel) { }
                 } message: {
-                    Text("Please check internet connection and try again.")
+                    Text("Please check internet connection and try again.".localized())
                 }
         }
         .navigationViewStyle(.stack)
@@ -88,7 +88,7 @@ struct MySpotsView: View {
             let distanceFromSpot2 = distanceBetween(x1: UserX, x2: spot2.x, y1: UserY, y2: spot2.y)
             return distanceFromSpot1 < distanceFromSpot2
         }
-        sortBy = "Closest"
+        sortBy = "Closest".localized()
         UserDefaults.standard.set(sortBy, forKey: "savedSort")
     }
     
@@ -102,7 +102,7 @@ struct MySpotsView: View {
                 return false
             }
         }
-        sortBy = "Name"
+        sortBy = "Name".localized()
         UserDefaults.standard.set(sortBy, forKey: "savedSort")
     }
     
@@ -120,7 +120,7 @@ struct MySpotsView: View {
                 return false
             }
         }
-        sortBy = "Newest"
+        sortBy = "Newest".localized()
         UserDefaults.standard.set(sortBy, forKey: "savedSort")
     }
     
@@ -131,7 +131,7 @@ struct MySpotsView: View {
                     NavigationLink(destination: DetailView(canShare: true, fromPlaylist: false, spot: spot)) {
                         SpotRow(spot: spot)
                             .alert(isPresented: self.$showingDeleteAlert) {
-                                Alert(title: Text("Are you sure you want to delete?"), message: Text(""), primaryButton: .destructive(Text("Delete")) {
+                                Alert(title: Text("Are you sure you want to delete?".localized()), message: Text(""), primaryButton: .destructive(Text("Delete".localized())) {
                                     self.deleteFiltered(at: self.toBeDeleted!)
                                     self.toBeDeleted = nil
                                 }, secondaryButton: .cancel() {
@@ -144,24 +144,24 @@ struct MySpotsView: View {
                 .onDelete(perform: deleteRow)
             }
             .animation(.default, value: searchResults)
-            .searchable(text: $searchText, prompt: "Search All Spots")
+            .searchable(text: $searchText, prompt: "Search All Spots".localized())
             if (spots.count == 0) {
                 VStack(spacing: 6) {
                     HStack {
                         Spacer()
-                        Text("No Spots Here Yet!")
+                        Text("No Spots Here Yet!".localized())
                         Spacer()
                     }
                     HStack {
                         Spacer()
                         HStack {
-                            Text("Add Some With The")
+                            Text("Add Some With The".localized())
                                 .font(.subheadline)
                                 .foregroundColor(.gray)
                             Image(systemName: "plus")
                                 .font(.subheadline)
                                 .foregroundColor(.gray)
-                            Text("Button Above")
+                            Text("Button Above".localized())
                                 .font(.subheadline)
                                 .foregroundColor(.gray)
                         }
@@ -225,9 +225,9 @@ struct MySpotsView: View {
     
     private func setFilteringType() {
         if (UserDefaults.standard.valueExists(forKey: "savedSort")) {
-            sortBy = UserDefaults.standard.string(forKey: "savedSort") ?? "Name"
-            if sortBy == "Likes" {
-                sortBy = "Newest"
+            sortBy = (UserDefaults.standard.string(forKey: "savedSort") ?? "Name").localized()
+            if sortBy == "Likes".localized() {
+                sortBy = "Newest".localized()
                 let dateFormatter = DateFormatter()
                 dateFormatter.dateFormat = "MMM d, yyyy; HH:mm:ss"
                 filteredSpots = spots.sorted { (spot1, spot2) -> Bool in
@@ -241,7 +241,7 @@ struct MySpotsView: View {
                         return false
                     }
                 }
-            } else if (sortBy == "Name") {
+            } else if (sortBy == "Name".localized()) {
                 filteredSpots = spots.sorted { (spot1, spot2) -> Bool in
                     guard let name1 = spot1.name else { return true }
                     guard let name2 = spot2.name else { return true }
@@ -251,7 +251,7 @@ struct MySpotsView: View {
                         return false
                     }
                 }
-            } else if (sortBy == "Newest") {
+            } else if (sortBy == "Newest".localized()) {
                 let dateFormatter = DateFormatter()
                 dateFormatter.dateFormat = "MMM d, yyyy; HH:mm:ss"
                 filteredSpots = spots.sorted { (spot1, spot2) -> Bool in
@@ -265,7 +265,7 @@ struct MySpotsView: View {
                         return false
                     }
                 }
-            } else if (sortBy == "Closest" && mapViewModel.isAuthorized) {
+            } else if (sortBy == "Closest".localized() && mapViewModel.isAuthorized) {
                 filteredSpots = spots.sorted { (spot1, spot2) -> Bool in
                     guard let UserY = mapViewModel.locationManager?.location?.coordinate.longitude else { return true }
                     guard let UserX = mapViewModel.locationManager?.location?.coordinate.latitude else { return true }
@@ -273,7 +273,7 @@ struct MySpotsView: View {
                     let distanceFromSpot2 = distanceBetween(x1: UserX, x2: spot2.x, y1: UserY, y2: spot2.y)
                     return distanceFromSpot1 < distanceFromSpot2
                 }
-            } else if (sortBy == "Closest" && !mapViewModel.isAuthorized) {
+            } else if (sortBy == "Closest".localized() && !mapViewModel.isAuthorized) {
                 filteredSpots = spots.sorted { (spot1, spot2) -> Bool in
                     guard let name1 = spot1.name else { return true }
                     guard let name2 = spot2.name else { return true }
@@ -283,7 +283,7 @@ struct MySpotsView: View {
                         return false
                     }
                 }
-                sortBy = "Name"
+                sortBy = "Name".localized()
                 UserDefaults.standard.set(sortBy, forKey: "savedSort")
             }
         } else {
@@ -296,7 +296,7 @@ struct MySpotsView: View {
                     return false
                 }
             }
-            sortBy = "Closest"
+            sortBy = "Closest".localized()
             UserDefaults.standard.set(sortBy, forKey: "savedSort")
         }
     }
@@ -306,18 +306,18 @@ struct MySpotsView: View {
             Button {
                 sortClosest()
             } label: {
-                Text("Sort By Closest")
+                Text("Sort By Closest".localized())
             }
             .disabled(!mapViewModel.isAuthorized)
             Button {
                 sortDate()
             } label: {
-                Text("Sort By Newest")
+                Text("Sort By Newest".localized())
             }
             Button {
                 sortName()
             } label: {
-                Text("Sort By Name")
+                Text("Sort By Name".localized())
             }
         } label: {
             HStack {

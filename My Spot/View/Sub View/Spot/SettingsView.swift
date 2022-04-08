@@ -18,7 +18,7 @@ struct SettingsView: View {
     @State private var showingConfigure = false
     @State private var placeName = ""
     @State private var newPlace = false
-    @State private var message = "Message to My Spot developer: "
+    @State private var message = "Message to My Spot developer: ".localized()
     @State private var discoverNoti = false
     @State private var discoverProcess = false
     @State private var unableToAddSpot = 0 // 0: ok, 1: no connection, 2: no permission
@@ -61,16 +61,16 @@ struct SettingsView: View {
                     }
                     if (cloudViewModel.systemColorIndex == cloudViewModel.systemColorArray.count - 1) {
                         ColorPicker(selection: $cloudViewModel.systemColorArray[cloudViewModel.systemColorArray.count - 1], supportsOpacity: false) {
-                            Text("Edit Custom Color")
+                            Text("Edit Custom Color".localized())
                         }
                     }
                 } header: {
-                    Text("Color Scheme")
+                    Text("Color Scheme".localized())
                         .font(.headline)
                 }
                 Section {
                     Toggle(isOn: $discoverNoti) {
-                        Text("New Spots Notification")
+                        Text("New Spots Notification".localized())
                     }
                     .disabled(discoverProcess)
                     .tint(cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex])
@@ -78,7 +78,7 @@ struct SettingsView: View {
                         Button {
                             showingConfigure.toggle()
                         } label: {
-                            Text("Configure")
+                            Text("Configure".localized())
                                 .foregroundColor(cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex])
                                 .disabled(discoverProcess)
                         }
@@ -86,10 +86,10 @@ struct SettingsView: View {
                     
                 } header: {
                     if (cloudViewModel.notiNewSpotOn && !placeName.isEmpty) {
-                        Text("Area Set To: \(placeName)")
+                        Text("Area Set To: ".localized() + (placeName))
                     }
                 } footer: {
-                    Text("Alerts when new spots are added to your location, within a 10 mile radius. Tap 'Configure' to change the location where new spots should alert you.")
+                    Text("Alerts when new spots are added to your location, within a 10 mile radius. Tap 'Configure' to change the location where new spots should alert you.".localized())
                 }
                 Section {
                     Slider(value: $limits, in: 1...30, step: 1) { didChange in
@@ -99,22 +99,22 @@ struct SettingsView: View {
                         }
                     }
                 } header: {
-                    Text("Max Spots To Load: \(Int(limits))")
+                    Text("Max Spots To Load: ".localized() + String(Int(limits)))
                 } footer: {
-                    Text("Set how many spots to load at once. If load times are slow, lower this number.")
+                    Text("Set how many spots to load at once. If load times are slow, lower this number.".localized())
                 }
                 Section {
                     Button {
                         showingMailSheet = true
                     } label: {
-                        Text("Email Developer")
+                        Text("Email Developer".localized())
                             .foregroundColor(colorScheme == .dark ? .white : .black)
                     }
                 } header: {
-                    Text("Help")
+                    Text("Help".localized())
                         .font(.headline)
                 } footer: {
-                    Text("Ask questions, submit bugs, or suggest new features. All comments are welcomed and I will read every email sent!")
+                    Text("Ask questions, submit bugs, or suggest new features. All comments are welcomed and I will read every email sent!".localized())
                 }
                 Section {
                     Button {
@@ -127,11 +127,11 @@ struct SettingsView: View {
                             UIApplication.shared.open(youtubeUrl)
                         }
                     } label: {
-                        Text("Video Tutorial")
+                        Text("Video Tutorial".localized())
                             .foregroundColor(colorScheme == .dark ? .white : .black)
                     }
                 } footer: {
-                    Text("Youtube video with timestamps to demonstrate how to use My Spot.")
+                    Text("Youtube video with timestamps to demonstrate how to use My Spot.".localized())
                 }
                 Section {
                     Button {
@@ -139,11 +139,11 @@ struct SettingsView: View {
                             UIApplication.shared.open(url)
                         }
                     } label: {
-                        Text("About Me")
+                        Text("About Me".localized())
                             .foregroundColor(colorScheme == .dark ? .white : .black)
                     }
                 } footer: {
-                    Text("A link to my wordpress site with short detail about me and the current privacy policy in My Spot.")
+                    Text("A link to my wordpress site with short detail about me and the current privacy policy in My Spot.".localized())
                 }
             }
             .onChange(of: discoverNoti) { newValue in
@@ -220,19 +220,19 @@ struct SettingsView: View {
                 UserDefaults.standard.set(Int(limits), forKey: "limit")
                 cloudViewModel.limit = Int(limits)
             }
-            .alert("Notification Permissions Denied", isPresented: $showingErrorNoPermission) {
-                Button("Settings") {
+            .alert("Notification Permissions Denied".localized(), isPresented: $showingErrorNoPermission) {
+                Button("Settings".localized()) {
                     guard let url = URL(string: UIApplication.openSettingsURLString) else { return }
                     UIApplication.shared.open(url)
                 }
-                Button("Cancel", role: .cancel) { }
+                Button("Cancel".localized(), role: .cancel) { }
             } message: {
-                Text("Please check settings and make sure notifications are on for My Spot.")
+                Text("Please check settings and make sure notifications are on for My Spot.".localized())
             }
-            .alert("Connection Error", isPresented: $showingErrorNoConnection) {
-                Button("OK", role: .cancel) { }
+            .alert("Connection Error".localized(), isPresented: $showingErrorNoConnection) {
+                Button("OK".localized(), role: .cancel) { }
             } message: {
-                Text("Please check internet connection and try again.")
+                Text("Please check internet connection and try again.".localized())
             }
             .onAppear {
                 if UserDefaults.standard.valueExists(forKey: "discovernotiname") {
@@ -286,7 +286,7 @@ struct SettingsView: View {
                 UserDefaults.standard.set(Double(blue), forKey: "customColorB")
                 UserDefaults.standard.set(Double(alpha), forKey: "customColorA")
             }
-            .navigationTitle("Settings")
+            .navigationTitle("Settings".localized())
             .navigationViewStyle(.stack)
             .interactiveDismissDisabled(true)
             .toolbar {
@@ -294,7 +294,7 @@ struct SettingsView: View {
                     Button {
                         presentationMode.wrappedValue.dismiss()
                     } label: {
-                        Text("Done")
+                        Text("Done".localized())
                             .foregroundColor(cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex])
                     }
                 }

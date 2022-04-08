@@ -60,8 +60,8 @@ class CloudKitViewModel: ObservableObject {
     
     func checkDeepLink(url: URL) async {
         guard let host = URLComponents(url: url, resolvingAgainstBaseURL: true)?.host else {
-            isErrorMessage = "Invalid Link"
-            isErrorMessageDetails = "Check that the link was not modified and try again."
+            isErrorMessage = "Invalid Link".localized()
+            isErrorMessageDetails = "Check that the link was not modified and try again.".localized()
             isError.toggle()
             return
         }
@@ -130,8 +130,8 @@ class CloudKitViewModel: ObservableObject {
             }
         } catch {
             DispatchQueue.main.async {
-                self.isErrorMessage = "Unable To Find Spot"
-                self.isErrorMessageDetails = "This is due to poor internet connection or the spot you are looking for has been deleted by the founder."
+                self.isErrorMessage = "Unable To Find Spot".localized()
+                self.isErrorMessageDetails = "This is due to poor internet connection or the spot you are looking for has been deleted by the founder.".localized()
                 self.isError.toggle()
             }
         }
@@ -585,7 +585,7 @@ class CloudKitViewModel: ObservableObject {
     
     
     func shareSheet(index i: Int) {
-        let activityView = UIActivityViewController(activityItems: ["Check out, \"\(spots[i].name)\" on My Spot! ", URL(string: "myspot://" + (spots[i].record.recordID.recordName)) ?? "", "\n\nIf you don't have My Spot, get it on the Appstore here: ", URL(string: "https://apps.apple.com/us/app/my-spot-exploration/id1613618373")!], applicationActivities: nil)
+        let activityView = UIActivityViewController(activityItems: ["Check out, \"".localized(), spots[i].name, "\" on My Spot! ".localized(), URL(string: "myspot://" + (spots[i].record.recordID.recordName)) ?? "", "\n\nIf you don't have My Spot, get it on the Appstore here: ".localized(), URL(string: "https://apps.apple.com/us/app/my-spot-exploration/id1613618373")!], applicationActivities: nil)
         let allScenes = UIApplication.shared.connectedScenes
         let scene = allScenes.first { $0.activationState == .foregroundActive }
         if let windowScene = scene as? UIWindowScene {
@@ -594,7 +594,7 @@ class CloudKitViewModel: ObservableObject {
     }
     
     func shareSheetFromLocal(id: String, name: String) {
-        let activityView = UIActivityViewController(activityItems: ["Check out, \"\(name)\" on My Spot! ", URL(string: "myspot://" + (id)) ?? "", "\n\nIf you don't have My Spot, get it on the Appstore here: ", URL(string: "https://apps.apple.com/us/app/my-spot-exploration/id1613618373")!], applicationActivities: nil)
+        let activityView = UIActivityViewController(activityItems: ["Check out, \"".localized(), name, "\" on My Spot! ".localized(), URL(string: "myspot://" + (id)) ?? "", "\n\nIf you don't have My Spot, get it on the Appstore here: ".localized(), URL(string: "https://apps.apple.com/us/app/my-spot-exploration/id1613618373")!], applicationActivities: nil)
         let allScenes = UIApplication.shared.connectedScenes
         let scene = allScenes.first { $0.activationState == .foregroundActive }
         if let windowScene = scene as? UIWindowScene {
@@ -674,7 +674,7 @@ class CloudKitViewModel: ObservableObject {
         let subscription = CKQuerySubscription(recordType: "Spots", predicate: predicate, options: .firesOnRecordCreation)
         let notification = CKSubscription.NotificationInfo()
         notification.title = "My Spot"
-        notification.alertBody = "A new spot was added to your area!"
+        notification.alertBody = "A new spot was added to your area!".localized()
         notification.soundName = "default"
         notification.shouldBadge = true
         notification.desiredKeys = ["id"]

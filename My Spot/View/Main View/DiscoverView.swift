@@ -22,7 +22,7 @@ struct DiscoverView: View {
     @State private var showingMapSheet = false
     @State private var searchText = ""
     @State private var searchLocationName = ""
-    @State private var sortBy = "Closest"
+    @State private var sortBy = "Closest".localized()
     @State private var distance = 0
     @State private var hasSearched = false
     @State private var isMetric = false
@@ -45,7 +45,7 @@ struct DiscoverView: View {
         .onAppear {
             mapViewModel.searchingHere = mapViewModel.region
             if (UserDefaults.standard.valueExists(forKey: "savedSort")) {
-                sortBy = UserDefaults.standard.string(forKey: "savedSort") ?? "Closest"
+                sortBy = (UserDefaults.standard.string(forKey: "savedSort") ?? "Closest").localized()
             }
             if (UserDefaults.standard.valueExists(forKey: "savedDistance")) {
                 distance = UserDefaults.standard.integer(forKey: "savedDistance")
@@ -69,7 +69,7 @@ struct DiscoverView: View {
         VStack(spacing: 6) {
             HStack {
                 Spacer()
-                Text("You Must Be Signed In To Icloud To Disover And Share Spots")
+                Text("You Must Be Signed In To Icloud To Disover And Share Spots".localized())
                     .multilineTextAlignment(.center)
                     .padding(.horizontal)
                 Spacer()
@@ -84,7 +84,7 @@ struct DiscoverView: View {
                         })
                     }
                 } label: {
-                    Text("Please Sign In Or Create An Account In Settings").font(.subheadline).foregroundColor(.gray)
+                    Text("Please Sign In Or Create An Account In Settings".localized()).font(.subheadline).foregroundColor(.gray)
                         .multilineTextAlignment(.center)
                         .padding(.horizontal)
                 }
@@ -123,7 +123,7 @@ struct DiscoverView: View {
             listSpots
             if (cloudViewModel.isFetching) {
                 ZStack {
-                    ProgressView("Loading Spots")
+                    ProgressView("Loading Spots".localized())
                         .padding()
                         .background(
                             RoundedRectangle(cornerRadius: 10)
@@ -135,14 +135,14 @@ struct DiscoverView: View {
                 VStack {
                     HStack {
                         Spacer()
-                        Text("Unable to load spots")
+                        Text("Unable to load spots".localized())
                             .foregroundColor(.gray)
                             .font(.headline)
                         Spacer()
                     }
                     HStack {
                         Spacer()
-                        Text("Try refreshing or checking your internet connection")
+                        Text("Try refreshing or checking your internet connection".localized())
                             .foregroundColor(.gray)
                             .font(.subheadline)
                             .multilineTextAlignment(.center)
@@ -221,7 +221,7 @@ struct DiscoverView: View {
             }
             NavigationLink(destination: DiscoverDetailView(index: index ?? 0, canShare: true), isActive: $showPlaceDetail) { EmptyView() }.isDetailLink(false)
         }
-        .navigationTitle("Discover")
+        .navigationTitle("Discover".localized())
         .toolbar {
             ToolbarItemGroup(placement: .navigationBarTrailing) {
                 Menu {
@@ -232,9 +232,9 @@ struct DiscoverView: View {
                         loadSpotsFromDB(location: CLLocation(latitude: mapViewModel.searchingHere.center.latitude, longitude: mapViewModel.searchingHere.center.longitude), radiusInMeters: CGFloat(distance), filteringBy: sortBy)
                     } label: {
                         if isMetric {
-                            Text("Max Range Of 5 Km")
+                            Text("Max Range Of 5 Km".localized())
                         } else {
-                            Text("Max Range Of 5 Mi")
+                            Text("Max Range Of 5 Mi".localized())
                         }
                     }
                     Button {
@@ -244,9 +244,9 @@ struct DiscoverView: View {
                         loadSpotsFromDB(location: CLLocation(latitude: mapViewModel.searchingHere.center.latitude, longitude: mapViewModel.searchingHere.center.longitude), radiusInMeters: CGFloat(distance), filteringBy: sortBy)
                     } label: {
                         if isMetric {
-                            Text("Max Range Of 10 Km")
+                            Text("Max Range Of 10 Km".localized())
                         } else {
-                            Text("Max Range Of 10 Mi")
+                            Text("Max Range Of 10 Mi".localized())
                         }
                     }
                     Button {
@@ -256,9 +256,9 @@ struct DiscoverView: View {
                         loadSpotsFromDB(location: CLLocation(latitude: mapViewModel.searchingHere.center.latitude, longitude: mapViewModel.searchingHere.center.longitude), radiusInMeters: CGFloat(distance), filteringBy: sortBy)
                     } label: {
                         if isMetric {
-                            Text("Max Range Of 25 Km")
+                            Text("Max Range Of 25 Km".localized())
                         } else {
-                            Text("Max Range Of 25 Mi")
+                            Text("Max Range Of 25 Mi".localized())
                         }
                     }
                     Button {
@@ -268,9 +268,9 @@ struct DiscoverView: View {
                         loadSpotsFromDB(location: CLLocation(latitude: mapViewModel.searchingHere.center.latitude, longitude: mapViewModel.searchingHere.center.longitude), radiusInMeters: CGFloat(distance), filteringBy: sortBy)
                     } label: {
                         if isMetric {
-                            Text("Max Range Of 50 Km")
+                            Text("Max Range Of 50 Km".localized())
                         } else {
-                            Text("Max Range Of 50 Mi")
+                            Text("Max Range Of 50 Mi".localized())
                         }
                     }
                     Button {
@@ -280,9 +280,9 @@ struct DiscoverView: View {
                         loadSpotsFromDB(location: CLLocation(latitude: mapViewModel.searchingHere.center.latitude, longitude: mapViewModel.searchingHere.center.longitude), radiusInMeters: CGFloat(distance), filteringBy: sortBy)
                     } label: {
                         if isMetric {
-                            Text("Max Range Of 100 Km")
+                            Text("Max Range Of 100 Km".localized())
                         } else {
-                            Text("Max Range Of 100 Mi")
+                            Text("Max Range Of 100 Mi".localized())
                         }
                     }
                     Button {
@@ -291,20 +291,20 @@ struct DiscoverView: View {
                         mapViewModel.checkLocationAuthorization()
                         loadSpotsFromDB(location: CLLocation(latitude: mapViewModel.searchingHere.center.latitude, longitude: mapViewModel.searchingHere.center.longitude), radiusInMeters: CGFloat(distance), filteringBy: sortBy)
                     } label: {
-                        Text("Anywhere In The World")
+                        Text("Anywhere In The World".localized())
                     }
                 } label: {
                     HStack {
                         Image(systemName: "line.3.horizontal.decrease")
                         if isMetric {
                             if distance == 0 {
-                                Text("Any")
+                                Text("Any".localized())
                             } else {
                                 Text("\(distance) Km")
                             }
                         } else {
                             if distance == 0 {
-                                Text("Any")
+                                Text("Any".localized())
                             } else {
                                 Text("\(distance) Mi")
                             }
@@ -330,7 +330,7 @@ struct DiscoverView: View {
     private var loadMoreSpots: some View {
         HStack {
             Spacer()
-            Text("Load More Spots")
+            Text("Load More Spots".localized())
                 .foregroundColor(cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex])
             Spacer()
         }
@@ -348,22 +348,22 @@ struct DiscoverView: View {
             Button {
                 sortLikes()
             } label: {
-                Text("Sort By Likes")
+                Text("Sort By Likes".localized())
             }
             Button {
                 sortClosest()
             } label: {
-                Text("Sort By Closest")
+                Text("Sort By Closest".localized())
             }
             Button {
                 sortDate()
             } label: {
-                Text("Sort By Newest")
+                Text("Sort By Newest".localized())
             }
             Button {
                 sortName()
             } label: {
-                Text("Sort By Name")
+                Text("Sort By Name".localized())
             }
         } label: {
             HStack {
@@ -374,25 +374,25 @@ struct DiscoverView: View {
     }
     
     private func sortClosest() {
-        sortBy = "Closest"
+        sortBy = "Closest".localized()
         UserDefaults.standard.set(sortBy, forKey: "savedSort")
         loadSpotsFromDB(location: CLLocation(latitude: mapViewModel.searchingHere.center.latitude, longitude: mapViewModel.searchingHere.center.longitude), radiusInMeters: CGFloat(distance), filteringBy: sortBy)
     }
     
     private func sortName() {
-        sortBy = "Name"
+        sortBy = "Name".localized()
         UserDefaults.standard.set(sortBy, forKey: "savedSort")
         loadSpotsFromDB(location: CLLocation(latitude: mapViewModel.searchingHere.center.latitude, longitude: mapViewModel.searchingHere.center.longitude), radiusInMeters: CGFloat(distance), filteringBy: sortBy)
     }
     
     private func sortDate() {
-        sortBy = "Newest"
+        sortBy = "Newest".localized()
         UserDefaults.standard.set(sortBy, forKey: "savedSort")
         loadSpotsFromDB(location: CLLocation(latitude: mapViewModel.searchingHere.center.latitude, longitude: mapViewModel.searchingHere.center.longitude), radiusInMeters: CGFloat(distance), filteringBy: sortBy)
     }
     
     private func sortLikes() {
-        sortBy = "Likes"
+        sortBy = "Likes".localized()
         UserDefaults.standard.set(sortBy, forKey: "savedSort")
         loadSpotsFromDB(location: CLLocation(latitude: mapViewModel.searchingHere.center.latitude, longitude: mapViewModel.searchingHere.center.longitude), radiusInMeters: CGFloat(distance), filteringBy: sortBy)
     }
@@ -414,7 +414,7 @@ struct SearchBar: View {
                 .foregroundColor(Color(UIColor.secondarySystemBackground))
             HStack {
                 Image(systemName: "magnifyingglass")
-                TextField("Search \(searchName)", text: $searchText)
+                TextField("Search ".localized() + searchName, text: $searchText)
                     .submitLabel(.search)
                     .onSubmit {
                         if !searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {

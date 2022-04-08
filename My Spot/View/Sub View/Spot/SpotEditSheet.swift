@@ -71,7 +71,7 @@ struct SpotEditSheet: View {
             NavigationView {
                 Form {
                     Section {
-                        TextField("Enter Spot Name", text: $name)
+                        TextField("Enter Spot Name".localized(), text: $name)
                             .onReceive(Just(name)) { _ in
                                 if (name.count > MaxCharLength.names) {
                                     name = String(name.prefix(MaxCharLength.names))
@@ -83,11 +83,11 @@ struct SpotEditSheet: View {
                             .focused($focusState, equals: .name)
                             .submitLabel(.next)
                     } header: {
-                        Text("Spot Name*")
+                        Text("Spot Name*".localized())
                     }
                     if !fromDB {
                         Section {
-                            TextField("Enter Founder's Name", text: $founder)
+                            TextField("Enter Founder's Name".localized(), text: $founder)
                                 .focused($focusState, equals: .founder)
                                 .submitLabel(.next)
                                 .textContentType(.givenName)
@@ -100,7 +100,7 @@ struct SpotEditSheet: View {
                                     }
                                 }
                         } header: {
-                            Text("Founder's Name*")
+                            Text("Founder's Name*".localized())
                         }
                     }
                     if (!fromDB) {
@@ -110,14 +110,14 @@ struct SpotEditSheet: View {
                                     isPublic = wasPublic
                                 }
                         } header: {
-                            Text("Share Spot")
+                            Text("Share Spot".localized())
                         } footer: {
                             if wasPublic {
-                                Text("Setting a public spot to private will remove it from discvoer tab.")
+                                Text("Setting a public spot to private will remove it from discvoer tab.".localized())
                                     .font(.footnote)
                                     .foregroundColor(.gray)
                             } else {
-                                Text("Public spots are shown in discover tab to other users.")
+                                Text("Public spots are shown in discover tab to other users.".localized())
                                     .font(.footnote)
                                     .foregroundColor(.gray)
                             }
@@ -135,9 +135,9 @@ struct SpotEditSheet: View {
                             }
                         }
                     } header: {
-                        Text("Spot Description")
+                        Text("Spot Description".localized())
                     } footer: {
-                        Text("Use # to add tags. Example: #hiking #skating")
+                        Text("Use # to add tags. Example: #hiking #skating".localized())
                             .font(.footnote)
                             .foregroundColor(.gray)
                     }
@@ -171,9 +171,9 @@ struct SpotEditSheet: View {
                             }
                         }
                     } header: {
-                        Text("Photo of Spot")
+                        Text("Photo of Spot".localized())
                     } footer: {
-                        Text("Only 1 image is required (up to 3).")
+                        Text("Only 1 image is required (up to 3).".localized())
                             .font(.footnote)
                             .foregroundColor(.gray)
                     }
@@ -192,29 +192,29 @@ struct SpotEditSheet: View {
                         focusState = nil
                     }
                 }
-                .alert("Unable To Save Spot", isPresented: $showingCannotSavePrivateAlert) {
-                    Button("OK", role: .cancel) { }
+                .alert("Unable To Save Spot".localized(), isPresented: $showingCannotSavePrivateAlert) {
+                    Button("OK".localized(), role: .cancel) { }
                 } message: {
-                    Text("Failed to save spot. Please try again.")
+                    Text("Failed to save spot. Please try again.".localized())
                 }
-                .alert("Unable To Remove Public Spot", isPresented: $showingCannotDeleteAlert) {
-                    Button("OK", role: .cancel) { }
+                .alert("Unable To Remove Public Spot".localized(), isPresented: $showingCannotDeleteAlert) {
+                    Button("OK".localized(), role: .cancel) { }
                 } message: {
-                    Text("Failed to remove spot from discover tab. Please check connection and try again.")
+                    Text("Failed to remove spot from discover tab. Please check connection and try again.".localized())
                 }
-                .alert("Unable To Save Public Spot", isPresented: $showingCannotSavePrivateAlert) {
-                    Button("OK", role: .cancel) { }
+                .alert("Unable To Save Public Spot".localized(), isPresented: $showingCannotSavePrivateAlert) {
+                    Button("OK".localized(), role: .cancel) { }
                 } message: {
-                    Text("Failed to save public spot. Please check connection and try again.")
+                    Text("Failed to save public spot. Please check connection and try again.".localized())
                 }
-                .confirmationDialog("Choose Image From Photos or Camera", isPresented: $showingAddImageAlert) {
-                    Button("Camera") {
+                .confirmationDialog("Choose Image From Photos or Camera".localized(), isPresented: $showingAddImageAlert) {
+                    Button("Camera".localized()) {
                         activeSheet = .cameraSheet
                     }
-                    Button("Photos") {
+                    Button("Photos".localized()) {
                         activeSheet = .cameraRollSheet
                     }
-                    Button("Cancel", role: .cancel) { }
+                    Button("Cancel".localized(), role: .cancel) { }
                 }
                 .fullScreenCover(item: $activeSheet) { item in
                     switch item {
@@ -266,7 +266,7 @@ struct SpotEditSheet: View {
                         }
                     }
                     ToolbarItemGroup(placement: .navigationBarTrailing) {
-                        Button("Save") {
+                        Button("Save".localized()) {
                             tags = descript.findTags()
                             if (isPublic && wasPublic) {
                                 Task {
@@ -299,7 +299,7 @@ struct SpotEditSheet: View {
                         .disabled(keepDisabled)
                     }
                     ToolbarItemGroup(placement: .navigationBarLeading) {
-                        Button("Cancel") {
+                        Button("Cancel".localized()) {
                             name = ""
                             founder = ""
                             descript = ""
@@ -345,7 +345,7 @@ struct SpotEditSheet: View {
                             }
                             .disabled(focusState == .descript)
                             Spacer()
-                            Button("Done") {
+                            Button("Done".localized()) {
                                 focusState = nil
                             }
                         }
@@ -356,7 +356,7 @@ struct SpotEditSheet: View {
             if isSaving {
                 Color.black.opacity(0.5)
                     .ignoresSafeArea()
-                ProgressView("Saving")
+                ProgressView("Saving".localized())
                     .padding()
                     .background(
                         RoundedRectangle(cornerRadius: 10)
@@ -610,6 +610,6 @@ struct SpotEditSheet: View {
     }
     
     private var displayIsPublicPrompt: some View {
-        Toggle("Public", isOn: $isPublic)
+        Toggle("Public".localized(), isOn: $isPublic)
     }
 }

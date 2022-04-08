@@ -27,7 +27,7 @@ struct DetailPlaylistView: View {
     @State private var showingMapSheet = false
     @State private var filteredSpots: [Spot] = []
     @State private var searchText = ""
-    @State private var sortBy = "Name"
+    @State private var sortBy = "Name".localized()
     
     private var searchResults: [Spot] {
             if searchText.isEmpty {
@@ -71,11 +71,11 @@ struct DetailPlaylistView: View {
             if (playlist.spotArr.count > 0) {
                 listFiltered
                     .onChange(of: sortBy) { sortType in
-                        if (sortType == "Name") {
+                        if (sortType == "Name".localized()) {
                             sortName()
-                        } else if (sortType == "Newest") {
+                        } else if (sortType == "Newest".localized()) {
                             sortDate()
-                        } else if (sortType == "Closest") {
+                        } else if (sortType == "Closest".localized()) {
                             sortClosest()
                         }
                     }
@@ -105,7 +105,7 @@ struct DetailPlaylistView: View {
                     .sheet(isPresented: $showingAddSpotToPlaylistSheet, onDismiss: setFilteringType) {
                         AddSpotToPlaylistSheet(currPlaylist: playlist)
                     }
-                    Button("Edit") {
+                    Button("Edit".localized()) {
                         showingEditSheet = true
                     }
                     .sheet(isPresented: $showingEditSheet) {
@@ -131,18 +131,18 @@ struct DetailPlaylistView: View {
             Button {
                 sortClosest()
             } label: {
-                Text("Sort By Closest")
+                Text("Sort By Closest".localized())
             }
             .disabled(!mapViewModel.isAuthorized)
             Button {
                 sortDate()
             } label: {
-                Text("Sort By Newest")
+                Text("Sort By Newest".localized())
             }
             Button {
                 sortName()
             } label: {
-                Text("Sort By Name")
+                Text("Sort By Name".localized())
             }
         } label: {
             HStack {
@@ -154,8 +154,8 @@ struct DetailPlaylistView: View {
     
     private func setFilteringType() {
             if (UserDefaults.standard.valueExists(forKey: "savedSort")) {
-                sortBy = UserDefaults.standard.string(forKey: "savedSort") ?? "Name"
-                if (sortBy == "Name") {
+                sortBy = (UserDefaults.standard.string(forKey: "savedSort") ?? "Name").localized()
+                if (sortBy == "Name".localized()) {
                     filteredSpots = playlist.spotArr.sorted { (spot1, spot2) -> Bool in
                         guard let name1 = spot1.name else { return true }
                         guard let name2 = spot2.name else { return true }
@@ -165,7 +165,7 @@ struct DetailPlaylistView: View {
                             return false
                         }
                     }
-                } else if (sortBy == "Newest") {
+                } else if (sortBy == "Newest".localized()) {
                     let dateFormatter = DateFormatter()
                     dateFormatter.dateFormat = "MMM d, yyyy; HH:mm:ss"
                     filteredSpots = playlist.spotArr.sorted { (spot1, spot2) -> Bool in
@@ -179,7 +179,7 @@ struct DetailPlaylistView: View {
                             return false
                         }
                     }
-                } else if (sortBy == "Closest" && mapViewModel.isAuthorized) {
+                } else if (sortBy == "Closest".localized() && mapViewModel.isAuthorized) {
                     filteredSpots = playlist.spotArr.sorted { (spot1, spot2) -> Bool in
                         guard let UserY = mapViewModel.locationManager?.location?.coordinate.longitude else { return true }
                         guard let UserX = mapViewModel.locationManager?.location?.coordinate.latitude else { return true }
@@ -187,7 +187,7 @@ struct DetailPlaylistView: View {
                         let distanceFromSpot2 = distanceBetween(x1: UserX, x2: spot2.x, y1: UserY, y2: spot2.y)
                         return distanceFromSpot1 < distanceFromSpot2
                     }
-                } else if (sortBy == "Closest" && !mapViewModel.isAuthorized) {
+                } else if (sortBy == "Closest".localized() && !mapViewModel.isAuthorized) {
                     filteredSpots = playlist.spotArr.sorted { (spot1, spot2) -> Bool in
                         guard let name1 = spot1.name else { return true }
                         guard let name2 = spot2.name else { return true }
@@ -197,7 +197,7 @@ struct DetailPlaylistView: View {
                             return false
                         }
                     }
-                    sortBy = "Name"
+                    sortBy = "Name".localized()
                     UserDefaults.standard.set(sortBy, forKey: "savedSort")
                 }
             } else {
@@ -210,7 +210,7 @@ struct DetailPlaylistView: View {
                         return false
                     }
                 }
-                sortBy = "Closest"
+                sortBy = "Closest".localized()
                 UserDefaults.standard.set(sortBy, forKey: "savedSort")
             }
     }
@@ -229,7 +229,7 @@ struct DetailPlaylistView: View {
                 }
                 .onDelete(perform: self.deleteFiltered)
             }
-            .searchable(text: $searchText, prompt: "Search \(playlist.name ?? "")\(playlist.emoji ?? "")")
+            .searchable(text: $searchText, prompt: "Search ".localized() + (playlist.name ?? "") + (playlist.emoji ?? ""))
         }
     }
     
@@ -237,19 +237,19 @@ struct DetailPlaylistView: View {
         VStack(spacing: 6) {
             HStack {
                 Spacer()
-                Text("No Spots Here Yet!")
+                Text("No Spots Here Yet!".localized())
                 Spacer()
             }
             HStack {
                 Spacer()
                 HStack {
-                    Text("Add Some With The")
+                    Text("Add Some With The".localized())
                         .font(.subheadline)
                         .foregroundColor(.gray)
                     Image(systemName: "plus")
                         .font(.subheadline)
                         .foregroundColor(.gray)
-                    Text("Button Above")
+                    Text("Button Above".localized())
                         .font(.subheadline)
                         .foregroundColor(.gray)
                 }
@@ -266,7 +266,7 @@ struct DetailPlaylistView: View {
             let distanceFromSpot2 = distanceBetween(x1: UserX, x2: spot2.x, y1: UserY, y2: spot2.y)
             return distanceFromSpot1 < distanceFromSpot2
         }
-        sortBy = "Closest"
+        sortBy = "Closest".localized()
         UserDefaults.standard.set(sortBy, forKey: "savedSort")
     }
     
@@ -280,7 +280,7 @@ struct DetailPlaylistView: View {
                 return false
             }
         }
-        sortBy = "Name"
+        sortBy = "Name".localized()
         UserDefaults.standard.set(sortBy, forKey: "savedSort")
     }
     
@@ -298,7 +298,7 @@ struct DetailPlaylistView: View {
                 return false
             }
         }
-        sortBy = "Newest"
+        sortBy = "Newest".localized()
         UserDefaults.standard.set(sortBy, forKey: "savedSort")
     }
 }

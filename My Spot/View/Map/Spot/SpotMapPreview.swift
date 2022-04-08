@@ -11,7 +11,7 @@ import CoreLocation
 struct SpotMapPreview: View {
     
     let spot: Spot
-    @State private var scope:String = "Private"
+    @State private var scope:String = "Private".localized()
     @State private var tags: [String] = []
     @State private var pad:CGFloat = 20
     @State private var distance: String = ""
@@ -50,12 +50,12 @@ struct SpotMapPreview: View {
                         Spacer()
                     }
                     HStack {
-                        Text("By: \(spot.founder ?? "")")
+                        Text("By: ".localized() + (spot.founder ?? ""))
                             .font(.subheadline)
                             .foregroundColor(.white)
                         Spacer()
                         if (!distance.isEmpty) {
-                            Text("\(distance) away")
+                            Text((distance) + "away".localized())
                                 .foregroundColor(.white)
                                 .font(.subheadline)
                         } else {
@@ -91,9 +91,9 @@ struct SpotMapPreview: View {
         .onAppear {
             tags = spot.tags?.components(separatedBy: ", ") ?? []
             if (spot.isPublic) {
-                scope = "Public"
+                scope = "Public".localized()
             } else {
-                scope = "Private"
+                scope = "Private".localized()
             }
             if (mapViewModel.isAuthorized) {
                 calculateDistance()

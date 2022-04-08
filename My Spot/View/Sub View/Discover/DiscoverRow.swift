@@ -29,7 +29,7 @@ struct DiscoverRow: View {
                         .cornerRadius(10)
                         .shadow(color: Color.black.opacity(0.3), radius: 5)
                 } else {
-                    ProgressView("Loading Image")
+                    ProgressView("Loading Image".localized())
                         .frame(width: 100, height: 120, alignment: .center)
                         .cornerRadius(20)
                 }
@@ -99,17 +99,17 @@ struct DiscoverRow: View {
     
     private func calculateDistance() -> String {
         if !mapViewModel.isAuthorized {
-            return "Cannot Find Location"
+            return "Cannot Find Location".localized()
         }
         var distance = ""
         let userLocation = CLLocation(latitude: mapViewModel.region.center.latitude, longitude: mapViewModel.region.center.longitude)
         let distanceInMeters = userLocation.distance(from: spot.location)
         if isMetric() {
             let distanceDouble = distanceInMeters / 1000
-            distance = String(format: "%.1f", distanceDouble) + " km away"
+            distance = String(format: "%.1f", distanceDouble) + " km" + "away".localized()
         } else {
             let distanceDouble = distanceInMeters / 1609.344
-            distance = String(format: "%.1f", distanceDouble) + " mi away"
+            distance = String(format: "%.1f", distanceDouble) + " mi" + "away".localized()
         }
         return distance
         

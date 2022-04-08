@@ -58,7 +58,7 @@ struct ViewOnlyUserOnMap: View {
     }
     
     private var displayCustomLocationButton: some View {
-        Button(customLocation ? "My Location" : "Custom Location") {
+        Button(customLocation ? "My Location".localized() : "Custom Location".localized()) {
             withAnimation {
                 customLocation.toggle()
             }
@@ -96,9 +96,9 @@ struct ViewOnlyUserOnMap: View {
                 Image(systemName: "location").imageScale(.large)
             } else {
                 if !hasSet {
-                    Text("Save")
+                    Text("Save".localized())
                 } else {
-                    Text("Edit")
+                    Text("Edit".localized())
                 }
             }
         }

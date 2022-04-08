@@ -112,10 +112,10 @@ struct DiscoverMapPreview: View {
         let distanceInMeters = userLocation.distance(from: spot.location)
         if isMetric() {
             let distanceDouble = distanceInMeters / 1000
-            distance = String(format: "%.1f", distanceDouble) + " km away"
+            distance = String(format: "%.1f", distanceDouble) + " km" + "away".localized()
         } else {
             let distanceDouble = distanceInMeters / 1609.344
-            distance = String(format: "%.1f", distanceDouble) + " mi away"
+            distance = String(format: "%.1f", distanceDouble) + " mi" + "away".localized()
         }
         return distance
     }

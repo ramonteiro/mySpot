@@ -27,7 +27,7 @@ struct DetailView: View {
     @EnvironmentObject var tabController: TabController
     @State private var showingEditSheet = false
     @State private var backImage = "chevron.left"
-    @State private var scope:String = "Private"
+    @State private var scope:String = "Private".localized()
     @State private var tags: [String] = []
     @State private var showingImage = false
     @State private var expand = false
@@ -44,10 +44,10 @@ struct DetailView: View {
         ZStack {
             if (exists) {
                 displaySpot
-                    .alert("Unable To Save Spot", isPresented: $pu) {
+                    .alert("Unable To Save Spot".localized(), isPresented: $pu) {
                         Button("OK", role: .cancel) { }
                     } message: {
-                        Text("Failed to upload spot. Spot is now set to private, please try again later and check internet connection.")
+                        Text("Failed to upload spot. Spot is now set to private, please try again later and check internet connection.".localized())
                     }
                     .onChange(of: tabController.playlistPopToRoot) { _ in
                         if (fromPlaylist) {
@@ -105,9 +105,9 @@ struct DetailView: View {
             
             tags = spot.tags?.components(separatedBy: ", ") ?? []
             if (spot.isPublic) {
-                scope = "Public"
+                scope = "Public".localized()
             } else {
-                scope = "Private"
+                scope = "Private".localized()
             }
             if (canShare) {
                 backImage = "chevron.left"
@@ -231,8 +231,8 @@ struct DetailView: View {
                 .padding(10)
                 .shadow(color: Color.black.opacity(0.5), radius: 5)
         }
-        .alert("Are you sure you want to delete \(spot.name ?? "").", isPresented: $deleteAlert) {
-            Button("Delete", role: .destructive) {
+        .alert("Are you sure you want to delete ".localized() + (spot.name ?? "") + "?", isPresented: $deleteAlert) {
+            Button("Delete".localized(), role: .destructive) {
                 if let i = spots.firstIndex(of: spot) {
                     moc.delete(spots[i])
                     do {
@@ -248,7 +248,7 @@ struct DetailView: View {
                 }
             }
         } message: {
-            Text("Spot will be removed from 'My Spots' tab. If this spot is still in 'Discover' tab, it will not be deleted there.")
+            Text("Spot will be removed from 'My Spots' tab. If this spot is still in 'Discover' tab, it will not be deleted there.".localized())
         }
 
     }
@@ -380,7 +380,7 @@ struct DetailView: View {
                     routeMeTo.name = spot.name ?? "Spot"
                     routeMeTo.openInMaps(launchOptions: nil)
                 } label: {
-                    Text("Take Me To \(spot.name ?? "")")
+                    Text("Take Me To ".localized() + (spot.name ?? ""))
                         .padding(.horizontal)
                 }
                 .buttonStyle(.borderedProminent)
@@ -388,7 +388,7 @@ struct DetailView: View {
                 .padding([.leading, .trailing], 30)
                 
                 if (!distance.isEmpty) {
-                    Text("\(distance) away")
+                    Text((distance) + "away".localized())
                         .foregroundColor(.gray)
                         .font(.system(size: 15, weight: .light))
                         .padding(.bottom, 1)
@@ -403,9 +403,9 @@ struct DetailView: View {
                         .foregroundColor(Color.gray)
                         .onChange(of: spot.isPublic) { newValue in
                             if (newValue) {
-                                scope = "Public"
+                                scope = "Public".localized()
                             } else {
-                                scope = "Private"
+                                scope = "Private".localized()
                             }
                         }
                     if (spot.isPublic && spot.likes >= 0) {

@@ -34,10 +34,10 @@ struct ViewDiscoverSpots: View {
                 spotRegion = mapViewModel.searchingHere
                 originalRegion = spotRegion
             }
-            .alert("Unable To Find New Spots", isPresented: $showingErrorConnection) {
-                Button("OK", role: .cancel) { }
+            .alert("Unable To Find New Spots".localized(), isPresented: $showingErrorConnection) {
+                Button("OK".localized(), role: .cancel) { }
             } message: {
-                Text("Connection Error. Please check internet connection and try again.")
+                Text("Connection Error. Please check internet connection and try again.".localized())
             }
     }
 
@@ -150,7 +150,7 @@ struct ViewDiscoverSpots: View {
         Button {
             Task {
                 do {
-                    sortBy = "Closest"
+                    sortBy = "Closest".localized()
                     UserDefaults.standard.set(sortBy, forKey: "savedSort")
                     try await cloudViewModel.fetchSpotPublic(userLocation: CLLocation(latitude: spotRegion.center.latitude, longitude: spotRegion.center.longitude), filteringBy: sortBy, search: searchText)
                     originalRegion = spotRegion
@@ -160,7 +160,7 @@ struct ViewDiscoverSpots: View {
                 }
             }
         } label: {
-            Text("Search Here")
+            Text("Search Here".localized())
         }
         .shadow(color: Color.black.opacity(0.3), radius: 5)
         .buttonStyle(.borderedProminent)

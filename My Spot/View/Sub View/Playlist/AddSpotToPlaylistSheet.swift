@@ -56,30 +56,30 @@ struct AddSpotToPlaylistSheet: View {
         }
         .toolbar {
             ToolbarItemGroup(placement: .navigationBarTrailing) {
-                Button("Done") {
+                Button("Done".localized()) {
                     try? moc.save()
                     close()
                 }
                 .padding()
             }
         }
-        .navigationTitle("Add Spots")
+        .navigationTitle("Add Spots".localized())
     }
     
     private var messageNoSpotsAvailable: some View {
         HStack {
             Spacer()
-            Text("No Spots Available To Add")
+            Text("No Spots Available To Add".localized())
             Spacer()
         }
         .toolbar {
             ToolbarItemGroup(placement: .navigationBarTrailing) {
-                Button("Done") {
+                Button("Done".localized()) {
                     close()
                 }
                 .padding()
             }
         }
-        .navigationTitle("Add Spots")
+        .navigationTitle("Add Spots".localized())
     }
 }

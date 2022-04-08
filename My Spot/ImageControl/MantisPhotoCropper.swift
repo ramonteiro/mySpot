@@ -32,8 +32,8 @@ struct MantisPhotoCropper: UIViewControllerRepresentable {
             editor.delegate = context.coordinator
             return editor
         }
-        cloudViewModel.isErrorMessage = "Unable To Load Image"
-        cloudViewModel.isErrorMessageDetails = "This error is unknown. Please try again."
+        cloudViewModel.isErrorMessage = "Unable To Load Image".localized()
+        cloudViewModel.isErrorMessageDetails = "This error is unknown. Please try again.".localized()
         cloudViewModel.isError.toggle()
         let editor = Mantis.cropViewController(image: defaultImages.errorImage!, config: config)
         editor.delegate = context.coordinator

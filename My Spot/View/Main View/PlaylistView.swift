@@ -35,7 +35,7 @@ struct PlaylistView: View {
                     }
                     .onDelete(perform: self.delete)
                 }
-                .navigationTitle("Playlists")
+                .navigationTitle("Playlists".localized())
                 .toolbar {
                     ToolbarItemGroup(placement: .navigationBarTrailing) {
                         Button {
@@ -60,19 +60,19 @@ struct PlaylistView: View {
         VStack(spacing: 6) {
             HStack {
                 Spacer()
-                Text("No Playlists Here Yet!")
+                Text("No Playlists Here Yet!".localized())
                 Spacer()
             }
             HStack {
                 Spacer()
                 HStack {
-                    Text("Add Some With The")
+                    Text("Add Some With The".localized())
                         .font(.subheadline)
                         .foregroundColor(.gray)
                     Image(systemName: "plus")
                         .font(.subheadline)
                         .foregroundColor(.gray)
-                    Text("Button Above")
+                    Text("Button Above".localized())
                         .font(.subheadline)
                         .foregroundColor(.gray)
                 }

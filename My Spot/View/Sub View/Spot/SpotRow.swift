@@ -15,7 +15,7 @@ import CoreLocation
 
 struct SpotRow: View {
     @ObservedObject var spot: Spot
-    @State private var scope:String = "Private"
+    @State private var scope:String = "Private".localized()
     @State private var tags: [String] = []
     @State private var exists = true
     @State private var distance: String = ""
@@ -63,7 +63,7 @@ struct SpotRow: View {
                     .fontWeight(.bold)
                     .lineLimit(1)
                 
-                Text("By: \(spot.founder ?? "")")
+                Text("By: ".localized() + (spot.founder ?? ""))
                     .font(.subheadline)
                     .foregroundColor(Color.gray)
                     .lineLimit(1)
@@ -87,7 +87,7 @@ struct SpotRow: View {
                     }
                 }
                 if (!distance.isEmpty) {
-                    Text("\(distance) away")
+                    Text((distance) + "away".localized())
                         .foregroundColor(Color.gray)
                         .font(.subheadline)
                 }
@@ -115,9 +115,9 @@ struct SpotRow: View {
         .onAppear {
             tags = spot.tags?.components(separatedBy: ", ") ?? []
             if (spot.isPublic) {
-                scope = "Public"
+                scope = "Public".localized()
             } else {
-                scope = "Private"
+                scope = "Private".localized()
             }
             if (mapViewModel.isAuthorized) {
                 calculateDistance()

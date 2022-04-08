@@ -27,13 +27,13 @@ struct ContentView: View {
             DiscoverView()
                 .tabItem() {
                     Image(systemName: "magnifyingglass")
-                    Text("Discover")
+                    Text("Discover".localized())
                 }
                 .tag(Tab.discover)
             PlaylistView()
                 .tabItem() {
                     Image(systemName: "books.vertical")
-                    Text("Playlists")
+                    Text("Playlists".localized())
                 }
                 .tag(Tab.playlists)
         }
@@ -88,7 +88,7 @@ struct ContentView: View {
             errorAlert.toggle()
         }
         .alert(cloudViewModel.isErrorMessage, isPresented: $errorAlert) {
-            Button("OK", role: .cancel) { }
+            Button("OK".localized(), role: .cancel) { }
         } message: {
             Text(cloudViewModel.isErrorMessageDetails)
         }

@@ -22,7 +22,7 @@ struct NamePopupView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
             HStack {
-                Text("Enter Spot Name")
+                Text("Enter Spot Name".localized())
                     .font(.system(size: 25, weight: .bold, design: .default))
                 Spacer()
                 Button {
@@ -62,7 +62,7 @@ struct NamePopupView: View {
                     saved = true
                     isPresented = false
                 } label: {
-                    Text("Save")
+                    Text("Save".localized())
                 }
                 .frame(width: 80, height: 36)
                 .background(cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex])

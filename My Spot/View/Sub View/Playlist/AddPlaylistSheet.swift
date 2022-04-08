@@ -40,12 +40,12 @@ struct AddPlaylistSheet: View {
                 Section {
                     playlistNamePrompt
                 } header: {
-                    Text("Playlist Name*")
+                    Text("Playlist Name*".localized())
                 }
                 Section {
                     emojiPrompt
                 } header: {
-                    Text("Emoji ID*")
+                    Text("Emoji ID*".localized())
                 }
             }
             .onSubmit {
@@ -56,7 +56,7 @@ struct AddPlaylistSheet: View {
                     focusState = nil
                 }
             }
-            .navigationTitle("Create Playlist")
+            .navigationTitle("Create Playlist".localized())
             .toolbar {
                 ToolbarItemGroup(placement: .keyboard) {
                     HStack {
@@ -111,13 +111,13 @@ struct AddPlaylistSheet: View {
     }
     
     private var doneButton: some View {
-        Button("Done") {
+        Button("Done".localized()) {
             focusState = nil
         }
     }
     
     private var saveButton: some View {
-        Button("Save") {
+        Button("Save".localized()) {
             save()
             close()
         }
@@ -127,17 +127,17 @@ struct AddPlaylistSheet: View {
     }
     
     private var deleteButton: some View {
-        Button("Delete") {
+        Button("Delete".localized()) {
             showingAlert = true
         }
-        .alert("Are you sure you want to delete playlist?", isPresented: $showingAlert) {
-            Button("Delete", role: .destructive) { close() }
+        .alert("Are you sure you want to delete playlist?".localized(), isPresented: $showingAlert) {
+            Button("Delete".localized(), role: .destructive) { close() }
         }
         .padding()
     }
     
     private var playlistNamePrompt: some View {
-        TextField("Enter Playlist Name", text: $name)
+        TextField("Enter Playlist Name".localized(), text: $name)
             .focused($focusState, equals: .name)
             .submitLabel(.next)
             .onReceive(Just(name)) { _ in
@@ -148,7 +148,7 @@ struct AddPlaylistSheet: View {
     }
     
     private var emojiPrompt: some View {
-        EmojiTextField(text: $emoji, placeholder: "Enter Emoji")
+        EmojiTextField(text: $emoji, placeholder: "Enter Emoji".localized())
             .focused($focusState, equals: .emoji)
             .submitLabel(.done)
             .onReceive(Just(emoji), perform: { _ in

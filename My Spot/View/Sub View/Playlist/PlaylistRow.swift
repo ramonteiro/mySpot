@@ -35,7 +35,7 @@ struct PlaylistRow: View {
                         } else if (playlist.spotArr.count == 1) {
                             Text("\(playlist.spotArr.count) spot").font(.subheadline).foregroundColor(.gray)
                         } else {
-                            Text("Empty Playlist").font(.subheadline).foregroundColor(.gray)
+                            Text("Empty Playlist".localized()).font(.subheadline).foregroundColor(.gray)
                         }
                         
                         if !(playlist.spotArr.count == 0) {

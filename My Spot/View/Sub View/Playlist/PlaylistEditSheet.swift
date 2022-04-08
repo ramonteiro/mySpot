@@ -30,7 +30,7 @@ struct PlaylistEditSheet: View {
                 NavigationView {
                     Form {
                         Section {
-                            TextField("Enter Playlist Name", text: $name)
+                            TextField("Enter Playlist Name".localized(), text: $name)
                                 .onReceive(Just(name)) { _ in
                                     if (name.count > MaxCharLength.names) {
                                         name = String(name.prefix(MaxCharLength.names))
@@ -42,10 +42,10 @@ struct PlaylistEditSheet: View {
                                 .focused($focusState, equals: .name)
                                 .submitLabel(.next)
                         } header: {
-                            Text("Playlist Name*")
+                            Text("Playlist Name*".localized())
                         }
                         Section {
-                            EmojiTextField(text: $emoji, placeholder: "Enter Emoji")
+                            EmojiTextField(text: $emoji, placeholder: "Enter Emoji".localized())
                                 .onReceive(Just(emoji), perform: { _ in
                                     self.emoji = String(self.emoji.onlyEmoji().prefix(MaxCharLength.emojis))
                                 })
@@ -55,7 +55,7 @@ struct PlaylistEditSheet: View {
                                 .focused($focusState, equals: .emoji)
                                 .submitLabel(.done)
                         } header: {
-                            Text("Emoji*")
+                            Text("Emoji*".localized())
                         }
                     }
                     .onSubmit {
@@ -69,7 +69,7 @@ struct PlaylistEditSheet: View {
                     .navigationTitle(name)
                     .toolbar {
                         ToolbarItemGroup(placement: .navigationBarLeading) {
-                            Button("Cancel") {
+                            Button("Cancel".localized()) {
                                 name = ""
                                 emoji = ""
                                 presentationMode.wrappedValue.dismiss()
@@ -77,7 +77,7 @@ struct PlaylistEditSheet: View {
                             .padding(.leading)
                         }
                         ToolbarItemGroup(placement: .navigationBarTrailing) {
-                            Button("Save") {
+                            Button("Save".localized()) {
                                 saveChanges()
                             }
                             .padding(.trailing)
@@ -109,7 +109,7 @@ struct PlaylistEditSheet: View {
                                 }
                                 .disabled(focusState == .emoji)
                                 Spacer()
-                                Button("Done") {
+                                Button("Done".localized()) {
                                     focusState = nil
                                 }
                             }

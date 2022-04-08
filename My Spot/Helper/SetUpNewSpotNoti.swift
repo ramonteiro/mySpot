@@ -16,7 +16,7 @@ struct SetUpNewSpotNoti: View {
     @Environment(\.presentationMode) var presentationMode
     @State private var centerRegion = MKCoordinateRegion()
     @State private var locations = [MKPointAnnotation]()
-    @State private var distance: String = "Diameter: "
+    @State private var distance: String = "Diameter: ".localized()
     @State private var isMetric = false
     @State private var saving: Bool = false
     @Binding var newPlace: Bool
@@ -31,7 +31,7 @@ struct SetUpNewSpotNoti: View {
                 if (saving) {
                     Color.black.opacity(0.5)
                         .ignoresSafeArea()
-                    ProgressView("Saving")
+                    ProgressView("Saving".localized())
                         .padding()
                         .background(
                             RoundedRectangle(cornerRadius: 10)
@@ -56,7 +56,7 @@ struct SetUpNewSpotNoti: View {
             .navigationViewStyle(.stack)
             .toolbar {
                 ToolbarItemGroup(placement: .navigationBarTrailing) {
-                    Button("Save") {
+                    Button("Save".localized()) {
                         Task {
                             let location = CLLocation(latitude: centerRegion.center.latitude, longitude: centerRegion.center.longitude)
                             saving = true
@@ -95,7 +95,7 @@ struct SetUpNewSpotNoti: View {
                 }
                 ToolbarItemGroup(placement: .bottomBar) {
                     VStack {
-                        Text("Radius: 10 Miles")
+                        Text("Radius: 10 Miles".localized())
                             .foregroundColor(.white)
                             .padding([.leading,.trailing])
                             .padding(.vertical, 2)
@@ -107,7 +107,7 @@ struct SetUpNewSpotNoti: View {
                     }
                 }
                 ToolbarItemGroup(placement: .navigationBarLeading) {
-                    Button("Cancel", role: .destructive) {
+                    Button("Cancel".localized(), role: .destructive) {
                         presentationMode.wrappedValue.dismiss()
                     }
                     .buttonStyle(.borderedProminent)

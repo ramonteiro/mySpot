@@ -60,6 +60,7 @@
 		C515042927D8540A009F0DCD /* TabController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C515042827D8540A009F0DCD /* TabController.swift */; };
 		C515042C27D95225009F0DCD /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C515042B27D95225009F0DCD /* LaunchScreen.storyboard */; };
 		C56F499F27E05CE300BCBB8F /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = C56F499E27E05CE300BCBB8F /* Extensions.swift */; };
+		C584876D27FFB73300D38636 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = C584876F27FFB73300D38636 /* Localizable.strings */; };
 		C587027427E27F1900DFB6C4 /* MailViewCallback.swift in Sources */ = {isa = PBXBuildFile; fileRef = C587027327E27F1900DFB6C4 /* MailViewCallback.swift */; };
 		C5886FAC27F5FC48000E574A /* Report+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5886FAA27F5FC48000E574A /* Report+CoreDataClass.swift */; };
 		C5886FAD27F5FC48000E574A /* Report+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5886FAB27F5FC48000E574A /* Report+CoreDataProperties.swift */; };
@@ -123,6 +124,17 @@
 		C515042A27D95154009F0DCD /* My-Spot-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "My-Spot-Info.plist"; sourceTree = SOURCE_ROOT; };
 		C515042B27D95225009F0DCD /* LaunchScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
 		C56F499E27E05CE300BCBB8F /* Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
+		C584876E27FFB73300D38636 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
+		C584877027FFB73500D38636 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Localizable.strings"; sourceTree = "<group>"; };
+		C584877127FFB73700D38636 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/Localizable.strings; sourceTree = "<group>"; };
+		C584877227FFB73B00D38636 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/Localizable.strings; sourceTree = "<group>"; };
+		C584877327FFB73C00D38636 /* hi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = hi; path = hi.lproj/Localizable.strings; sourceTree = "<group>"; };
+		C584877427FFB73D00D38636 /* id */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = id; path = id.lproj/Localizable.strings; sourceTree = "<group>"; };
+		C584877527FFB73D00D38636 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/Localizable.strings; sourceTree = "<group>"; };
+		C584877627FFB73E00D38636 /* ko */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ko; path = ko.lproj/Localizable.strings; sourceTree = "<group>"; };
+		C584877727FFB73E00D38636 /* pt-BR */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "pt-BR"; path = "pt-BR.lproj/Localizable.strings"; sourceTree = "<group>"; };
+		C584877827FFB74000D38636 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/Localizable.strings; sourceTree = "<group>"; };
+		C584877927FFB74100D38636 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/Localizable.strings; sourceTree = "<group>"; };
 		C587027327E27F1900DFB6C4 /* MailViewCallback.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MailViewCallback.swift; sourceTree = "<group>"; };
 		C5886FAA27F5FC48000E574A /* Report+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Report+CoreDataClass.swift"; sourceTree = SOURCE_ROOT; };
 		C5886FAB27F5FC48000E574A /* Report+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Report+CoreDataProperties.swift"; sourceTree = SOURCE_ROOT; };
@@ -186,6 +198,7 @@
 				C515042B27D95225009F0DCD /* LaunchScreen.storyboard */,
 				C51503BD27D7C52C009F0DCD /* My Spot.entitlements */,
 				C51503B127D7C349009F0DCD /* Assets.xcassets */,
+				C584876F27FFB73300D38636 /* Localizable.strings */,
 				C50CF4AC27F13971001A9698 /* ViewModels */,
 				C50CF4AB27F13949001A9698 /* ImageControl */,
 				C515041F27D7CABD009F0DCD /* Helper */,
@@ -398,6 +411,16 @@
 			knownRegions = (
 				en,
 				Base,
+				hi,
+				ja,
+				"zh-Hans",
+				ko,
+				ru,
+				de,
+				es,
+				"pt-BR",
+				fr,
+				id,
 			);
 			mainGroup = C51503A127D7C347009F0DCD;
 			packageReferences = (
@@ -418,6 +441,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				C515042C27D95225009F0DCD /* LaunchScreen.storyboard in Resources */,
+				C584876D27FFB73300D38636 /* Localizable.strings in Resources */,
 				C51503B527D7C349009F0DCD /* Preview Assets.xcassets in Resources */,
 				C51503B227D7C349009F0DCD /* Assets.xcassets in Resources */,
 			);
@@ -487,6 +511,27 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		C584876F27FFB73300D38636 /* Localizable.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				C584876E27FFB73300D38636 /* en */,
+				C584877027FFB73500D38636 /* zh-Hans */,
+				C584877127FFB73700D38636 /* fr */,
+				C584877227FFB73B00D38636 /* de */,
+				C584877327FFB73C00D38636 /* hi */,
+				C584877427FFB73D00D38636 /* id */,
+				C584877527FFB73D00D38636 /* ja */,
+				C584877627FFB73E00D38636 /* ko */,
+				C584877727FFB73E00D38636 /* pt-BR */,
+				C584877827FFB74000D38636 /* ru */,
+				C584877927FFB74100D38636 /* es */,
+			);
+			name = Localizable.strings;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
 		C51503B627D7C349009F0DCD /* Debug */ = {
