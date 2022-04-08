@@ -41,6 +41,7 @@ struct MapAnnotationDiscover: View {
                             .foregroundColor(Color(UIColor.secondarySystemBackground))
                     )
                     .offset(y: -30)
+                    .lineLimit(1)
             }
         }
     }

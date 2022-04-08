@@ -55,7 +55,7 @@ struct SpotMapPreview: View {
                             .foregroundColor(.white)
                         Spacer()
                         if (!distance.isEmpty) {
-                            Text((distance) + "away".localized())
+                            Text((distance) + " away".localized())
                                 .foregroundColor(.white)
                                 .font(.subheadline)
                         } else {

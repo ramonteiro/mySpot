@@ -76,6 +76,7 @@ struct MapAnnotationView: View {
                         .padding(.bottom , UIScreen.main.bounds.height * (40/812))
                     if (isSelected) {
                         Text(spot.name ?? "")
+                            .lineLimit(1)
                             .padding(5)
                             .background(
                                 RoundedRectangle(cornerRadius: 30)

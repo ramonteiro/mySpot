@@ -388,7 +388,7 @@ struct DetailView: View {
                 .padding([.leading, .trailing], 30)
                 
                 if (!distance.isEmpty) {
-                    Text((distance) + "away".localized())
+                    Text((distance) + " away".localized())
                         .foregroundColor(.gray)
                         .font(.system(size: 15, weight: .light))
                         .padding(.bottom, 1)

@@ -400,7 +400,7 @@ struct DiscoverSheetShared: View {
     private var bottomHalf: some View {
         VStack {
             if (!distance.isEmpty) {
-                Text((distance) + "away".localized())
+                Text((distance) + " away".localized())
                     .foregroundColor(.gray)
                     .font(.system(size: 15, weight: .light))
                     .padding([.top, .bottom], 10)

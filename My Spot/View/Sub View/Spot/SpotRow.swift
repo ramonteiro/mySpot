@@ -87,7 +87,7 @@ struct SpotRow: View {
                     }
                 }
                 if (!distance.isEmpty) {
-                    Text((distance) + "away".localized())
+                    Text((distance) + " away".localized())
                         .foregroundColor(Color.gray)
                         .font(.subheadline)
                 }
