@@ -1,10 +1,3 @@
-/* 
-  Localizable.strings
-  My Spot
-
-  Created by Isaac Paschall on 4/7/22.
-  
-*/
 "Invalid Link" = ""
 "Check that the link was not modified and try again." = ""
 "Unable To Find Spot" = ""
