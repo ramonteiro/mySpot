@@ -23,7 +23,7 @@ struct DiscoverMapPreview: View {
                 VStack {
                     HStack {
                         if (!spot.locationName.isEmpty) {
-                            Image(systemName: "mappin")
+                            Image(systemName: (spot.customLocation != 0 ? "mappin" : "figure.wave"))
                                 .font(.subheadline)
                                 .foregroundColor(.white)
                             Text(spot.locationName)

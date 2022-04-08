@@ -153,6 +153,7 @@ struct DiscoverSheetShared: View {
                     .padding()
                     .rotationEffect(Angle(degrees: (expand ? 360 : 0)), anchor: UnitPoint(x: 0.5, y: 0.5))
                     .offset(x: (expand ? -50 : 0), y: -30)
+                    .opacity(expand ? 0 : 1)
                 Spacer()
                 downloadButton
                     .padding()
@@ -437,7 +438,7 @@ struct DiscoverSheetShared: View {
             
             if (!cloudViewModel.shared[0].locationName.isEmpty) {
                 HStack {
-                    Image(systemName: "mappin")
+                    Image(systemName: (cloudViewModel.shared[0].customLocation != 0 ? "mappin" : "figure.wave"))
                         .font(.system(size: 15, weight: .light))
                         .foregroundColor(Color.gray)
                     Text("\(cloudViewModel.shared[0].locationName)")
@@ -637,6 +638,11 @@ struct DiscoverSheetShared: View {
         }
         newSpot.tags = cloudViewModel.shared[0].type
         newSpot.date = cloudViewModel.shared[0].date
+        if cloudViewModel.shared[0].customLocation == 1 {
+            newSpot.wasThere = false
+        } else {
+            newSpot.wasThere = true
+        }
         newSpot.id = UUID()
         newSpot.dbid = cloudViewModel.shared[0].record.recordID.recordName
         do {

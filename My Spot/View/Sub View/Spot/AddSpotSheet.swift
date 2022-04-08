@@ -24,6 +24,7 @@ struct AddSpotSheet: View {
     
     @State private var showingAlert = false
     @State private var showingAddImageAlert = false
+    @State private var usingCustomLocation = false
     @Binding var isSaving: Bool
     
     @State private var name = ""
@@ -34,6 +35,7 @@ struct AddSpotSheet: View {
     @State private var isPublic = false
     
     @State private var long = 1.0
+    @State private var centerRegion = MKCoordinateRegion()
     @State private var lat = 1.0
     @State private var imageTemp: UIImage?
     @State private var images: [UIImage?]?
@@ -72,8 +74,8 @@ struct AddSpotSheet: View {
     
     var body: some View {
         ZStack {
-            if (mapViewModel.isAuthorized) {
-                if (lat != 1.0) {
+            if (mapViewModel.isAuthorized || usingCustomLocation) {
+                if (lat != 1.0 || usingCustomLocation) {
                     NavigationView {
                         Form {
                             Section {
@@ -115,16 +117,21 @@ struct AddSpotSheet: View {
                                 Text("Date Found")
                             }
                             Section {
-                                ViewOnlyUserOnMap()
-                                    .aspectRatio(contentMode: .fit)
+                                ViewOnlyUserOnMap(customLocation: $usingCustomLocation, locationName: $locationName, centerRegion: $centerRegion)
+                                    .frame(height: UIScreen.screenHeight * 0.6)
+                                    .aspectRatio(contentMode: .fill)
                                     .cornerRadius(15)
                             } header: {
-                                Text("Spot Location \(locationName)")
+                                HStack {
+                                    Image(systemName: (usingCustomLocation ? "mappin" : "figure.wave"))
+                                    Text("\(locationName)")
+                                }
                             } footer: {
                                 Text("Location is permanent and cannot be changed after creating spot.")
                                     .font(.footnote)
                                     .foregroundColor(.gray)
                             }
+                            
                             Section {
                                 if (images?.count ?? 0 > 0) {
                                     List {
@@ -300,7 +307,7 @@ struct AddSpotSheet: View {
                         mapViewModel.checkLocationAuthorization()
                         lat = getLatitude()
                         long = getLongitude()
-                        mapViewModel.getPlacmarkOfLocation(location: CLLocation(latitude: lat, longitude: long), completionHandler: { location in
+                        mapViewModel.getPlacmarkOfLocation(location: CLLocation(latitude: mapViewModel.region.center.latitude, longitude: mapViewModel.region.center.longitude), completionHandler: { location in
                             locationName = location
                         })
                     }
@@ -318,6 +325,11 @@ struct AddSpotSheet: View {
                     Button("Settings") {
                         guard let url = URL(string: UIApplication.openSettingsURLString) else { return }
                         UIApplication.shared.open(url)
+                    }
+                    .padding(.bottom)
+                    Text("Or create a spot with a custom location")
+                    Button("Set Custom Location") {
+                        usingCustomLocation = true
                     }
                 }
             }
@@ -426,12 +438,19 @@ struct AddSpotSheet: View {
             }
         }
         UserDefaults.standard.set(founder, forKey: UserDefaultKeys.founder)
+        if (usingCustomLocation) {
+            newSpot.x = centerRegion.center.latitude
+            newSpot.y = centerRegion.center.longitude
+            newSpot.wasThere = false
+        } else {
+            newSpot.x = lat
+            newSpot.y = long
+            newSpot.wasThere = true
+        }
         newSpot.founder = founder
         newSpot.details = descript
         newSpot.name = name
         newSpot.fromDB = false
-        newSpot.x = lat
-        newSpot.y = long
         newSpot.isPublic = false
         newSpot.date = getDate()
         newSpot.tags = tags
@@ -492,7 +511,7 @@ struct AddSpotSheet: View {
                 }
             }
             do {
-                let id = try await cloudViewModel.addSpotToPublic(name: name, founder: founder, date: getDate(), locationName: locationName, x: lat, y: long, description: descript, type: tags, image: imageData, image2: imageData2, image3: imageData3, isMultipleImages: (images?.count ?? 1) - 1)
+                let id = try await cloudViewModel.addSpotToPublic(name: name, founder: founder, date: getDate(), locationName: locationName, x: (usingCustomLocation ? centerRegion.center.latitude : lat), y: (usingCustomLocation ? centerRegion.center.longitude : long), description: descript, type: tags, image: imageData, image2: imageData2, image3: imageData3, isMultipleImages: (images?.count ?? 1) - 1, customLocation: usingCustomLocation)
                 if !id.isEmpty {
                     newSpot.dbid = id
                     newSpot.isPublic = true
@@ -510,8 +529,15 @@ struct AddSpotSheet: View {
             newSpot.name = name
             newSpot.likes = 0
             newSpot.fromDB = false
-            newSpot.x = lat
-            newSpot.y = long
+            if (usingCustomLocation) {
+                newSpot.x = centerRegion.center.latitude
+                newSpot.y = centerRegion.center.longitude
+                newSpot.wasThere = false
+            } else {
+                newSpot.x = lat
+                newSpot.y = long
+                newSpot.wasThere = true
+            }
             newSpot.date = getDate()
             newSpot.tags = tags
             newSpot.locationName = locationName

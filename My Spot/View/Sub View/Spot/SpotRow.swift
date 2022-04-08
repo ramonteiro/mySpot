@@ -78,7 +78,7 @@ struct SpotRow: View {
                 }
                 if (!(spot.locationName?.isEmpty ?? true)) {
                     HStack(alignment: .center) {
-                        Image(systemName: "mappin")
+                        Image(systemName: (!spot.wasThere ? "mappin" : "figure.wave"))
                             .foregroundColor(Color.gray)
                             .font(.subheadline)
                         Text(spot.locationName ?? "")

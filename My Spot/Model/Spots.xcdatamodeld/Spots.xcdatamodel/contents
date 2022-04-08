@@ -27,6 +27,7 @@
         <attribute name="locationName" optional="YES" attributeType="String"/>
         <attribute name="name" attributeType="String" defaultValueString=""/>
         <attribute name="tags" optional="YES" attributeType="String"/>
+        <attribute name="wasThere" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
         <attribute name="x" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
         <attribute name="y" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
         <relationship name="playlist" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Playlist" inverseName="spot" inverseEntity="Playlist"/>
@@ -35,6 +36,6 @@
         <element name="Likes" positionX="-54" positionY="90" width="128" height="44"/>
         <element name="Playlist" positionX="-63" positionY="54" width="128" height="14"/>
         <element name="Report" positionX="-54" positionY="108" width="128" height="44"/>
-        <element name="Spot" positionX="-63" positionY="-18" width="128" height="284"/>
+        <element name="Spot" positionX="-63" positionY="-18" width="128" height="299"/>
     </elements>
 </model>

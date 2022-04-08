@@ -25,7 +25,7 @@ struct SpotMapPreview: View {
                 VStack {
                     HStack {
                         if (!(spot.locationName?.isEmpty ?? true)) {
-                            Image(systemName: "mappin")
+                            Image(systemName: (!spot.wasThere ? "mappin" : "figure.wave"))
                                 .font(.subheadline)
                                 .foregroundColor(.white)
                             Text(spot.locationName ?? "")

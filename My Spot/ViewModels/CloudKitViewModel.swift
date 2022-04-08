@@ -28,7 +28,7 @@ class CloudKitViewModel: ObservableObject {
     @Published var radiusInMeters: Double = 0
     @Published var notiPermission = 0 // 0: not determined, 1: denied, 2: allowed, 3: provisional, 4: ephemeral, 5: unknown
     @Published var cursorMain: CKQueryOperation.Cursor?
-    @Published var desiredKeys = ["name", "founder", "date", "location", "likes", "inappropriate", "offensive", "dangerous", "spam", "id", "userID", "image", "type", "isMultipleImages", "locationName", "description"]
+    @Published var desiredKeys = ["name", "founder", "date", "location", "likes", "inappropriate", "offensive", "dangerous", "spam", "id", "userID", "image", "type", "isMultipleImages", "locationName", "description", "customLocation"]
     
     init() {
         getiCloudStatus()
@@ -72,6 +72,7 @@ class CloudKitViewModel: ObservableObject {
                 guard let founder = record["founder"] as? String else { return }
                 guard let date = record["date"] as? String else { return }
                 guard let location = record["location"] as? CLLocation else { return }
+                guard let customLocation = record["customLocation"] as? Int else { return }
                 var types = ""
                 var description = ""
                 var locationName = ""
@@ -117,14 +118,14 @@ class CloudKitViewModel: ObservableObject {
                     guard let data3 = try? Data(contentsOf: image3URL) else { return }
                     let image2 = UIImage(data: data2)
                     let image3 = UIImage(data: data3)
-                    self.shared = [SpotFromCloud(id: id, name: name, founder: founder, description: description, date: date, location: location, type: types, imageURL: imageURL ?? URL(fileURLWithPath: "none"),  image2URL: image2 , image3URL: image3, isMultipleImages: isMultipleImages , likes: likes, offensive: offensive, spam: spam, inappropriate: inappropriate, dangerous: dangerous, locationName: locationName, userID: user, record: record)]
+                    self.shared = [SpotFromCloud(id: id, name: name, founder: founder, description: description, date: date, location: location, type: types, imageURL: imageURL ?? URL(fileURLWithPath: "none"),  image2URL: image2 , image3URL: image3, isMultipleImages: isMultipleImages , likes: likes, offensive: offensive, spam: spam, inappropriate: inappropriate, dangerous: dangerous, customLocation: customLocation, locationName: locationName, userID: user, record: record)]
                 } else if let image2Check = record["image2"] as? CKAsset {
                     let image2URL = image2Check.fileURL ?? URL(fileURLWithPath: "none")
                     guard let data2 = try? Data(contentsOf: image2URL) else { return }
                     let image2 = UIImage(data: data2)
-                    self.shared = [SpotFromCloud(id: id, name: name, founder: founder, description: description, date: date, location: location, type: types, imageURL: imageURL ?? URL(fileURLWithPath: "none"),  image2URL: image2 , image3URL: nil, isMultipleImages: isMultipleImages , likes: likes, offensive: offensive, spam: spam, inappropriate: inappropriate, dangerous: dangerous, locationName: locationName, userID: user, record: record)]
+                    self.shared = [SpotFromCloud(id: id, name: name, founder: founder, description: description, date: date, location: location, type: types, imageURL: imageURL ?? URL(fileURLWithPath: "none"),  image2URL: image2 , image3URL: nil, isMultipleImages: isMultipleImages , likes: likes, offensive: offensive, spam: spam, inappropriate: inappropriate, dangerous: dangerous, customLocation: customLocation, locationName: locationName, userID: user, record: record)]
                 } else {
-                    self.shared = [SpotFromCloud(id: id, name: name, founder: founder, description: description, date: date, location: location, type: types, imageURL: imageURL ?? URL(fileURLWithPath: "none"),  image2URL: nil , image3URL: nil, isMultipleImages: isMultipleImages , likes: likes, offensive: offensive, spam: spam, inappropriate: inappropriate, dangerous: dangerous, locationName: locationName, userID: user, record: record)]
+                    self.shared = [SpotFromCloud(id: id, name: name, founder: founder, description: description, date: date, location: location, type: types, imageURL: imageURL ?? URL(fileURLWithPath: "none"),  image2URL: nil , image3URL: nil, isMultipleImages: isMultipleImages , likes: likes, offensive: offensive, spam: spam, inappropriate: inappropriate, dangerous: dangerous, customLocation: customLocation, locationName: locationName, userID: user, record: record)]
                 }
             }
         } catch {
@@ -193,7 +194,7 @@ class CloudKitViewModel: ObservableObject {
         return resizedImage
     }
     
-    func addSpotToPublic(name: String, founder: String, date: String, locationName: String, x: Double, y: Double, description: String, type: String, image: Data, image2: Data?, image3: Data?, isMultipleImages: Int) async throws -> String {
+    func addSpotToPublic(name: String, founder: String, date: String, locationName: String, x: Double, y: Double, description: String, type: String, image: Data, image2: Data?, image3: Data?, isMultipleImages: Int, customLocation: Bool) async throws -> String {
         
         let newSpot = CKRecord(recordType: "Spots")
         newSpot["name"] = name
@@ -211,6 +212,11 @@ class CloudKitViewModel: ObservableObject {
         newSpot["inappropriate"] = 0
         newSpot["spam"] = 0
         newSpot["dangerous"] = 0
+        if customLocation {
+            newSpot["customLocation"] = 1
+        } else {
+            newSpot["customLocation"] = 0
+        }
         
         if let image2 = image2 {
             do {
@@ -347,6 +353,7 @@ class CloudKitViewModel: ObservableObject {
                     guard let id = record["id"] as? String else { return }
                     guard let user = record["userID"] as? String else { return }
                     guard let image = record["image"] as? CKAsset else { return }
+                    guard let customLocation = record["customLocation"] as? Int else { return }
                     var isMultipleImages = 0
                     if let m = record["isMultipleImages"] as? Int {
                         isMultipleImages = m
@@ -380,7 +387,7 @@ class CloudKitViewModel: ObservableObject {
                         locationName = locationNameCheck
                     }
                     let imageURL = image.fileURL
-                    self.spots.append(SpotFromCloud(id: id, name: name, founder: founder, description: description, date: date, location: location, type: types, imageURL: imageURL ?? URL(fileURLWithPath: "none"),  image2URL: nil , image3URL: nil, isMultipleImages: isMultipleImages , likes: likes, offensive: offensive, spam: spam, inappropriate: inappropriate, dangerous: dangerous, locationName: locationName, userID: user, record: record))
+                    self.spots.append(SpotFromCloud(id: id, name: name, founder: founder, description: description, date: date, location: location, type: types, imageURL: imageURL ?? URL(fileURLWithPath: "none"),  image2URL: nil , image3URL: nil, isMultipleImages: isMultipleImages , likes: likes, offensive: offensive, spam: spam, inappropriate: inappropriate, dangerous: dangerous, customLocation: customLocation, locationName: locationName, userID: user, record: record))
                 }
             case .failure(let error):
                 print("\(error)")
@@ -511,6 +518,7 @@ class CloudKitViewModel: ObservableObject {
                         guard let id = record["id"] as? String else { return }
                         guard let user = record["userID"] as? String else { return }
                         guard let image = record["image"] as? CKAsset else { return }
+                        guard let customLocation = record["customLocation"] as? Int else { return }
                         var isMultipleImages = 0
                         if let m = record["isMultipleImages"] as? Int {
                             isMultipleImages = m
@@ -544,7 +552,7 @@ class CloudKitViewModel: ObservableObject {
                             locationName = locationNameCheck
                         }
                         let imageURL = image.fileURL
-                        self.spots.append(SpotFromCloud(id: id, name: name, founder: founder, description: description, date: date, location: location, type: types, imageURL: imageURL ?? URL(fileURLWithPath: "none"),  image2URL: nil , image3URL: nil, isMultipleImages: isMultipleImages , likes: likes, offensive: offensive, spam: spam, inappropriate: inappropriate, dangerous: dangerous, locationName: locationName, userID: user, record: record))
+                        self.spots.append(SpotFromCloud(id: id, name: name, founder: founder, description: description, date: date, location: location, type: types, imageURL: imageURL ?? URL(fileURLWithPath: "none"),  image2URL: nil , image3URL: nil, isMultipleImages: isMultipleImages , likes: likes, offensive: offensive, spam: spam, inappropriate: inappropriate, dangerous: dangerous, customLocation: customLocation, locationName: locationName, userID: user, record: record))
                     }
                 case .failure(let error):
                     print("\(error)")

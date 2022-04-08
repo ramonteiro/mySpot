@@ -166,6 +166,7 @@ struct DetailView: View {
                     .padding()
                     .rotationEffect(Angle(degrees: (expand ? 360 : 0)), anchor: UnitPoint(x: 0.5, y: 0.5))
                     .offset(x: (expand ? -50 : 0), y: -30)
+                    .opacity(expand ? 0 : 1)
                 Spacer()
                 editButton
                     .padding()
@@ -313,7 +314,7 @@ struct DetailView: View {
                 
                 if (!(spot.locationName?.isEmpty ?? true)) {
                     HStack {
-                        Image(systemName: "mappin")
+                        Image(systemName: (!spot.wasThere ? "mappin" : "figure.wave"))
                             .font(.system(size: 15, weight: .light))
                             .foregroundColor(Color.gray)
                         Text("\(spot.locationName ?? "")")

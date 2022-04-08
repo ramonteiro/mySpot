@@ -63,7 +63,7 @@ struct DiscoverRow: View {
                 }
                 if (!spot.locationName.isEmpty) {
                     HStack(alignment: .center) {
-                        Image(systemName: "mappin")
+                        Image(systemName: (spot.customLocation != 0 ? "mappin" : "figure.wave"))
                             .foregroundColor(Color.gray)
                             .font(.subheadline)
                         Text(spot.locationName)

@@ -26,6 +26,7 @@ struct SpotFromCloud: Hashable, Identifiable {
     var spam: Int
     var inappropriate: Int
     var dangerous: Int
+    let customLocation: Int
     let locationName: String
     let userID: String
     let record: CKRecord

@@ -165,6 +165,7 @@ struct DiscoverDetailView: View {
                     .padding()
                     .rotationEffect(Angle(degrees: (expand ? 360 : 0)), anchor: UnitPoint(x: 0.5, y: 0.5))
                     .offset(x: (expand ? -50 : 0), y: -30)
+                    .opacity(expand ? 0 : 1)
                 Spacer()
                 downloadButton
                     .padding()
@@ -466,7 +467,7 @@ struct DiscoverDetailView: View {
             expandButton
             if (!cloudViewModel.spots[index].locationName.isEmpty) {
                 HStack {
-                    Image(systemName: "mappin")
+                    Image(systemName: (cloudViewModel.spots[index].customLocation != 0 ? "mappin" : "figure.wave"))
                         .font(.system(size: 15, weight: .light))
                         .foregroundColor(Color.gray)
                     Text("\(cloudViewModel.spots[index].locationName)")
@@ -665,6 +666,11 @@ struct DiscoverDetailView: View {
         }
         newSpot.tags = cloudViewModel.spots[index].type
         newSpot.date = cloudViewModel.spots[index].date
+        if cloudViewModel.spots[index].customLocation == 1 {
+            newSpot.wasThere = false
+        } else {
+            newSpot.wasThere = true
+        }
         newSpot.id = UUID()
         newSpot.dbid = cloudViewModel.spots[index].record.recordID.recordName
         do {

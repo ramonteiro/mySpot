@@ -25,7 +25,7 @@ struct SetUpNewSpotNoti: View {
     var body: some View {
         NavigationView {
             ZStack {
-                MapView(centerRegion: $centerRegion, annotations: locations)
+                MapView(centerRegion: $centerRegion, annotations: locations, isForNotifications: true)
                 Cross()
                     .stroke(cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex])
                 if (saving) {
@@ -140,12 +140,13 @@ struct MapView: UIViewRepresentable {
     @EnvironmentObject var mapViewModel: MapViewModel
     @Binding var centerRegion: MKCoordinateRegion
     var annotations: [MKPointAnnotation]
+    var isForNotifications: Bool
     
     func makeUIView(context: Context) -> some MKMapView {
         let mapView = MKMapView()
         mapView.showsCompass = false
         mapView.showsUserLocation = mapViewModel.isAuthorized
-        if (UserDefaults.standard.valueExists(forKey: "discovernotiy")) {
+        if (UserDefaults.standard.valueExists(forKey: "discovernotiy") && isForNotifications) {
             let y = UserDefaults.standard.double(forKey: "discovernotiy")
             let x = UserDefaults.standard.double(forKey: "discovernotix")
             let location = CLLocationCoordinate2D(latitude: x, longitude: y)
