@@ -38,7 +38,7 @@
 "Name" = "이름";
 "Newest" = "최신";
 "Likes" = "좋아요";
-"Search " = "검색";
+"Search " = "검색 ";
 "Unable To Upload Spot" = "업로드 할 수 없습니다";
 "OK" = "확인";
 "Please check internet connection and try again." = "인터넷 연결을 확인하고 다시 시도하십시오.";
@@ -141,4 +141,8 @@
 "Unable To Find New Spots" = "새로운 점을 찾을 수 없습니다";
 "Connection Error. Please check internet connection and try again." = "연결 오류. 인터넷 연결을 확인하고 다시 시도하십시오.";
 "Search Here" = "여기에서 검색하십시오";
-
+"Max Range Of 5 Mi" = "최대 범위의 5 마일";
+"Max Range Of 10 Mi" = "최대 범위의 10 마일";
+"Max Range Of 25 Mi" = "최대 범위의 25 마일";
+"Max Range Of 50 Mi" = "최대 범위의 50 마일";
+"Max Range Of 100 Mi" = "최대 범위의 100 마일";

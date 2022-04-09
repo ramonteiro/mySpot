@@ -38,7 +38,7 @@
 "Name" = "Name";
 "Newest" = "Neueste";
 "Likes" = "Likes";
-"Search " = "Suche";
+"Search " = "Suche ";
 "Unable To Upload Spot" = "Spot kann nicht hochgeladen werden";
 "OK" = "OK";
 "Please check internet connection and try again." = "Bitte überprüfen Sie die Internetverbindung und versuchen Sie es erneut.";
@@ -141,4 +141,8 @@
 "Unable To Find New Spots" = "Keine neuen Flecken finden können";
 "Connection Error. Please check internet connection and try again." = "Verbindungsfehler. Bitte überprüfen Sie die Internetverbindung und versuchen Sie es erneut.";
 "Search Here" = "Suche hier";
-
+"Max Range Of 5 Mi" = "Maximummer Reichweite von 5 Meilen";
+"Max Range Of 10 Mi" = "Maximummer Reichweite von 10 Meilen";
+"Max Range Of 25 Mi" = "Maximummer Reichweite von 25 Meilen";
+"Max Range Of 50 Mi" = "Maximummer Reichweite von 50 Meilen";
+"Max Range Of 100 Mi" = "Maximummer Reichweite von 100 Meilen";

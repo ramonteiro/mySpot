@@ -38,7 +38,7 @@
 "Name" = "Nama";
 "Newest" = "Terbaru";
 "Likes" = "Suka.";
-"Search " = "Mencari";
+"Search " = "Mencari ";
 "Unable To Upload Spot" = "Tidak dapat mengunggah spot";
 "OK" = "Oke";
 "Please check internet connection and try again." = "Silakan periksa koneksi internet dan coba lagi.";
@@ -141,4 +141,8 @@
 "Unable To Find New Spots" = "Tidak dapat menemukan tempat baru";
 "Connection Error. Please check internet connection and try again." = "Koneksi error. Silakan periksa koneksi internet dan coba lagi.";
 "Search Here" = "Cari di sini";
-
+"Max Range Of 5 Mi" = "Rentang Max 5 mil";
+"Max Range Of 10 Mi" = "Rentang Max 10 mil";
+"Max Range Of 25 Mi" = "Rentang Max 25 mil";
+"Max Range Of 50 Mi" = "Rentang Max 50 mil";
+"Max Range Of 100 Mi" = "Rentang Max 100 mil";

@@ -38,7 +38,7 @@
 "Name" = "Nom";
 "Newest" = "Nouveau";
 "Likes" = "Aime";
-"Search " = "Recherche";
+"Search " = "Recherche ";
 "Unable To Upload Spot" = "Impossible de télécharger une place";
 "OK" = "D'ACCORD";
 "Please check internet connection and try again." = "Veuillez vérifier la connexion Internet et réessayer.";
@@ -141,4 +141,8 @@
 "Unable To Find New Spots" = "Impossible de trouver de nouvelles taches";
 "Connection Error. Please check internet connection and try again." = "Erreur de connexion. Veuillez vérifier la connexion Internet et réessayer.";
 "Search Here" = "Cherche ici";
-
+"Max Range Of 5 Mi" = "Max gamme de 5 miles";
+"Max Range Of 10 Mi" = "Max gamme de 10 miles";
+"Max Range Of 25 Mi" = "Max gamme de 25 miles";
+"Max Range Of 50 Mi" = "Max gamme de 50 miles";
+"Max Range Of 100 Mi" = "Max gamme de 100 miles";

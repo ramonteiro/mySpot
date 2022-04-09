@@ -38,7 +38,7 @@
 "Name" = "名前";
 "Newest" = "最新";
 "Likes" = "li";
-"Search " = "探す";
+"Search " = "探す ";
 "Unable To Upload Spot" = "スポットをアップロードできません";
 "OK" = "わかった";
 "Please check internet connection and try again." = "インターネット接続を確認してもう一度やり直してください。";
@@ -141,4 +141,8 @@
 "Unable To Find New Spots" = "新しいスポットを見つけることができません";
 "Connection Error. Please check internet connection and try again." = "接続エラー。インターネット接続を確認してもう一度やり直してください。";
 "Search Here" = "検索";
-
+"Max Range Of 5 Mi" = "5マイルの最大範囲";
+"Max Range Of 10 Mi" = "10マイルの最大範囲";
+"Max Range Of 25 Mi" = "25マイルの最大範囲";
+"Max Range Of 50 Mi" = "50マイルの最大範囲";
+"Max Range Of 100 Mi" = "100マイルの最大範囲";

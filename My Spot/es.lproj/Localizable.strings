@@ -38,7 +38,7 @@
 "Name" = "Nombre";
 "Newest" = "El más nuevo";
 "Likes" = "Gustos";
-"Search " = "Búsqueda";
+"Search " = "Búsqueda ";
 "Unable To Upload Spot" = "Incapaz de subir al punto";
 "OK" = "DE ACUERDO";
 "Please check internet connection and try again." = "Por favor revise la conexión a Internet y vuelva a intentarlo.";
@@ -141,4 +141,8 @@
 "Unable To Find New Spots" = "Incapaz de encontrar nuevos lugares";
 "Connection Error. Please check internet connection and try again." = "Error de conexión. Por favor revise la conexión a Internet y vuelva a intentarlo.";
 "Search Here" = "Busca aquí";
-
+"Max Range Of 5 Mi" = "Rango máximo de 5 millas";
+"Max Range Of 10 Mi" = "Rango máximo de 10 millas";
+"Max Range Of 25 Mi" = "Rango máximo de 25 millas";
+"Max Range Of 50 Mi" = "Rango máximo de 50 millas";
+"Max Range Of 100 Mi" = "Rango máximo de 100 millas";

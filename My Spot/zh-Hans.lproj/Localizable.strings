@@ -38,7 +38,7 @@
 "Name" = "姓名";
 "Newest" = "最新";
 "Likes" = "喜欢";
-"Search " = "搜索";
+"Search " = "搜索 ";
 "Unable To Upload Spot" = "无法上传点";
 "OK" = "好的";
 "Please check internet connection and try again." = "请检查互联网连接，然后重试。";
@@ -141,4 +141,9 @@
 "Unable To Find New Spots" = "无法找到新的景点";
 "Connection Error. Please check internet connection and try again." = "连接错误。请检查互联网连接，然后重试。";
 "Search Here" = "在这里搜索";
+"Max Range Of 5 Mi" = "最大范围为5英里";
+"Max Range Of 10 Mi" = "最大范围为10英里";
+"Max Range Of 25 Mi" = "最大范围为25英里";
+"Max Range Of 50 Mi" = "最大范围为50英里";
+"Max Range Of 100 Mi" = "最大范围为100英里";
 

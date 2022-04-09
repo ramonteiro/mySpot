@@ -38,7 +38,7 @@
 "Name" = "Назва";
 "Newest" = "Новітній";
 "Likes" = "Любить";
-"Search " = "Пошук";
+"Search " = "Пошук ";
 "Unable To Upload Spot" = "Неможливо завантажити місце";
 "OK" = "добре";
 "Please check internet connection and try again." = "Будь ласка, перевірте підключення до Інтернету та повторіть спробу.";
@@ -141,4 +141,8 @@
 "Unable To Find New Spots" = "Неможливо знайти нові плями";
 "Connection Error. Please check internet connection and try again." = "Помилка з'єднання. Будь ласка, перевірте підключення до Інтернету та повторіть спробу.";
 "Search Here" = "Пошук тут";
-
+"Max Range Of 5 Mi" = "Максимальний діапазон 5 миль";
+"Max Range Of 10 Mi" = "Максимальний діапазон 10 миль";
+"Max Range Of 25 Mi" = "Максимальний діапазон 25 миль";
+"Max Range Of 50 Mi" = "Максимальний діапазон 50 миль";
+"Max Range Of 100 Mi" = "Максимальний діапазон 100 миль";
