@@ -118,7 +118,7 @@ struct SettingsView: View {
                 }
                 Section {
                     Button {
-                        let youtubeId = "Q0FO_jjDHzA"
+                        let youtubeId = "UcQJhaeTPng"
                         var youtubeUrl = URL(string:"youtube://\(youtubeId)")!
                         if UIApplication.shared.canOpenURL(youtubeUrl){
                             UIApplication.shared.open(youtubeUrl)
