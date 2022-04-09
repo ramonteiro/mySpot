@@ -33,6 +33,7 @@ struct SpotEditSheet: View {
     @State private var images: [UIImage]?
     @Binding var showingCannotSavePublicAlert: Bool
     @State private var showingCannotSavePrivateAlert: Bool = false
+    @Binding var didChange: Bool
     
     
     private enum Field {
@@ -426,6 +427,7 @@ struct SpotEditSheet: View {
             generator.notificationOccurred(.warning)
             return
         }
+        didChange = true
         presentationMode.wrappedValue.dismiss()
     }
     
@@ -490,6 +492,7 @@ struct SpotEditSheet: View {
         if !spot.isPublic {
             showingCannotSavePublicAlert = true
         }
+        didChange = true
         presentationMode.wrappedValue.dismiss()
     }
     
@@ -531,6 +534,7 @@ struct SpotEditSheet: View {
                 generator.notificationOccurred(.warning)
                 return
             }
+            didChange = true
             presentationMode.wrappedValue.dismiss()
         } catch {
             spot.isPublic = true
@@ -606,6 +610,7 @@ struct SpotEditSheet: View {
             generator.notificationOccurred(.warning)
             return
         }
+        didChange = true
         presentationMode.wrappedValue.dismiss()
     }
     

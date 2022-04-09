@@ -29,6 +29,7 @@ struct DetailView: View {
     @State private var backImage = "chevron.left"
     @State private var scope:String = "Private".localized()
     @State private var tags: [String] = []
+    @State private var didChange = false
     @State private var showingImage = false
     @State private var expand = false
     @State private var deleteAlert = false
@@ -289,9 +290,11 @@ struct DetailView: View {
                 pu.toggle()
                 showingCannotSavePublicAlert = false
             }
-            presentationMode.wrappedValue.dismiss()
+            if didChange {
+                presentationMode.wrappedValue.dismiss()
+            }
         }) {
-            SpotEditSheet(spot: spot, showingCannotSavePublicAlert: $showingCannotSavePublicAlert)
+            SpotEditSheet(spot: spot, showingCannotSavePublicAlert: $showingCannotSavePublicAlert, didChange: $didChange)
         }
         .disabled(spot.isPublic && !cloudViewModel.isSignedInToiCloud)
     }
