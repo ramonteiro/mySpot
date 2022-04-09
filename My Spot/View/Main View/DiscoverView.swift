@@ -69,7 +69,7 @@ struct DiscoverView: View {
         VStack(spacing: 6) {
             HStack {
                 Spacer()
-                Text("You Must Be Signed In To Icloud To Disover And Share Spots".localized())
+                Text("You Must Be Signed In To iCloud To Disover And Share Spots".localized())
                     .multilineTextAlignment(.center)
                     .padding(.horizontal)
                 Spacer()

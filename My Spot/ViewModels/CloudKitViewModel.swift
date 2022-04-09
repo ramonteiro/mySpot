@@ -353,7 +353,10 @@ class CloudKitViewModel: ObservableObject {
                     guard let id = record["id"] as? String else { return }
                     guard let user = record["userID"] as? String else { return }
                     guard let image = record["image"] as? CKAsset else { return }
-                    guard let customLocation = record["customLocation"] as? Int else { return }
+                    var customLocation = 0
+                    if let customLocationChecked = record["customLocation"] as? Int {
+                        customLocation = customLocationChecked
+                    }
                     var isMultipleImages = 0
                     if let m = record["isMultipleImages"] as? Int {
                         isMultipleImages = m
@@ -518,7 +521,10 @@ class CloudKitViewModel: ObservableObject {
                         guard let id = record["id"] as? String else { return }
                         guard let user = record["userID"] as? String else { return }
                         guard let image = record["image"] as? CKAsset else { return }
-                        guard let customLocation = record["customLocation"] as? Int else { return }
+                        var customLocation = 0
+                        if let customLocationChecked = record["customLocation"] as? Int {
+                            customLocation = customLocationChecked
+                        }
                         var isMultipleImages = 0
                         if let m = record["isMultipleImages"] as? Int {
                             isMultipleImages = m
