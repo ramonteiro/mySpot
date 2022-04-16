@@ -111,7 +111,7 @@
 "Failed to upload spot. Spot is now set to private, please try again later and check internet connection." = "未能上传点。现货现在设置为私人，请稍后再试并检查Internet连接。";
 "Enter Spot Name" = "输入点名称";
 "Private" = "私人的";
-"Setting a public spot to private will remove it from discvoer tab." = "将公共场所设置为私人会将其从Discvoer中删除。";
+"Setting a public spot to private will remove it from discover tab." = "将公共场所设置为私人会将其从Discover中删除。";
 "Public spots are shown in discover tab to other users." = "公共场所显示在“发现”选项卡中给其他用户。";
 "Unable To Remove Public Spot" = "无法删除公共场所";
 "Failed to remove spot from discover tab. Please check connection and try again." = "无法从“发现”选项卡中删除斑点。请检查连接并再试一次。";

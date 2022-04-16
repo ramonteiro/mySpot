@@ -6,7 +6,7 @@
 "Check internet conection and try again." = "Compruebe la conexión a Internet y vuelva a intentarlo.";
 "Check out, \"" = "Mirar, \"";
 "\" on My Spot! " = "\" con My Spot!";
-"\n\nIf you don't have My Spot, get it on the Appstore here: " = "\n\nSi no tienes mi lugar, consíguelo en la AppStore aquí: ";
+"\n\nIf you don't have My Spot, get it on the Appstore here: " = "\n\nSi no tienes My Spot, consíguelo en la AppStore aquí: ";
 "A new spot was added to your area!" = "¡Se añadió un nuevo lugar a su área!";
 "Unable To Load Image" = "No se puede cargar la imagen";
 "This error is unknown. Please try again." = "Este error es desconocido. Inténtalo de nuevo.";
@@ -18,7 +18,7 @@
 "Cancel" = "Cancelar";
 "You Must Be Signed In To iCloud To Disover And Share Spots" = "Debe iniciar sesión en iCloud para desbloquear y compartir puntos";
 "Please Sign In Or Create An Account In Settings" = "Por favor, inicie sesión o cree una cuenta en la configuración";
-"Loading Spots" = "Manchas de carga";
+"Loading Spots" = "Cargando Lugares";
 "Unable to load spots" = "No se pueden cargar puntos";
 "Try refreshing or checking your internet connection" = "Intente refrescarse o revisar su conexión a Internet";
 "Discover" = "Descubrir";
@@ -29,8 +29,8 @@
 "Max Range Of 100 Km" = "Rango máximo de 100 kilómetros";
 "Anywhere In The World" = "En cualquier lugar del mundo";
 "Any" = "Ninguna";
-"Load More Spots" = "Carga mas manchas";
-"Sort By Likes" = "Ordenar por me gustaOrdenar por el más cercano";
+"Load More Spots" = "Carga Mas Lugares";
+"Sort By Likes" = "Ordenar por me gusta";
 "Sort By Closest" = "Ordenar por el más cercano";
 "Sort By Newest" = "Ordenar por el más nuevo";
 "Sort By Name" = "Ordenar por nombre";
@@ -45,7 +45,7 @@
 "Delete" = "Borrar";
 "Are you sure you want to delete?" = "¿Estas seguro que quieres borrarlo?";
 "Search All Spots" = "Buscar todos los lugares";
-"No Spots Here Yet!" = "¡No hay manchas aquí todavía!";
+"No Spots Here Yet!" = "¡No hay lugares aquí todavía!";
 "Add Some With The" = "Añadir algunos con el";
 "Button Above" = "Botón arriba";
 "Playlists" = "Reproducciónes";
@@ -88,7 +88,7 @@
 "Founder's Name*" = "Nombre del fundador *";
 "Share Spot" = "Parte de la acción";
 "Public spots are shown in discover tab to other users." = "Los puntos públicos se muestran en la pestaña Discover a otros usuarios.";
-"Spot Description" = "Descripción del manchado";
+"Spot Description" = "Descripción del lugar";
 "Use # to add tags. Example: #hiking #skating" = "Utilice # para agregar etiquetas. Ejemplo: #hiking #skating";
 "Date Found" = "Fecha encontrada";
 "Location is permanent and cannot be changed after creating spot." = "La ubicación es permanente y no se puede cambiar después de crear un lugar.";
@@ -111,8 +111,8 @@
 "Failed to upload spot. Spot is now set to private, please try again later and check internet connection." = "Error al subir al punto. El lugar ahora está establecido en privado, inténtelo de nuevo más tarde y verifique la conexión a Internet.";
 "Enter Spot Name" = "Ingrese el nombre del punto";
 "Private" = "Privado";
-"Setting a public spot to private will remove it from discvoer tab." = "Establecer un lugar público para privarlo lo eliminará de la pestaña Discboer.";
-"Public spots are shown in discover tab to other users." = "Los puntos públicos se muestran en la pestaña Discover a otros usuarios.";
+"Setting a public spot to private will remove it from discover tab." = "Establecer un lugar público para privarlo lo eliminará de la pestaña descubir.";
+"Public spots are shown in discover tab to other users." = "Los puntos públicos se muestran en la pestaña Descubrir a otros usuarios.";
 "Unable To Remove Public Spot" = "No se puede eliminar el punto público";
 "Failed to remove spot from discover tab. Please check connection and try again." = "Error al eliminar el punto desde la pestaña Descubrir. Por favor revise la conexión y vuelva a intentarlo.";
 "Unable To Save Public Spot" = "No se puede guardar el lugar público";

@@ -295,7 +295,7 @@ struct DiscoverDetailView: View {
                 .padding(10)
                 .shadow(color: Color.black.opacity(0.5), radius: 5)
         }
-        .alert("Are You Sure You Want To Delete ".localized() + (cloudViewModel.spots[index].name) + "?", isPresented: $deleteAlert) {
+        .alert("Are You Sure You Want To Delete ".localized() + (cloudViewModel.spots[index].name) + "?".localized(), isPresented: $deleteAlert) {
             Button("Delete".localized(), role: .destructive) {
                 let spotID = cloudViewModel.spots[index].record.recordID
                 Task {

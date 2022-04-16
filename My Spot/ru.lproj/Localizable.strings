@@ -111,7 +111,7 @@
 "Failed to upload spot. Spot is now set to private, please try again later and check internet connection." = "Не удалось загрузить место. Теперь SPOTE находится в частном порядке, пожалуйста, попробуйте позже позже и проверить подключение к Интернету.";
 "Enter Spot Name" = "Введите имя пятна";
 "Private" = "Частный";
-"Setting a public spot to private will remove it from discvoer tab." = "Установка общедоступного места для частной, удалит его с вкладки Discvoer.";
+"Setting a public spot to private will remove it from discover tab." = "Установка общедоступного места для частной, удалит его с вкладки discover.";
 "Public spots are shown in discover tab to other users." = "Публичные места показаны на вкладке «Откройте для других пользователей».";
 "Unable To Remove Public Spot" = "Невозможно удалить общественное место";
 "Failed to remove spot from discover tab. Please check connection and try again." = "Не удалось удалить место на вкладке «Открыть». Пожалуйста, проверьте соединение и попробуйте снова.";

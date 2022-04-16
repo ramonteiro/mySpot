@@ -111,7 +111,7 @@
 "Failed to upload spot. Spot is now set to private, please try again later and check internet connection." = "स्पॉट अपलोड करने में विफल। स्पॉट अब निजी पर सेट है, कृपया बाद में पुनः प्रयास करें और इंटरनेट कनेक्शन की जांच करें।";
 "Enter Spot Name" = "स्पॉट नाम दर्ज करें";
 "Private" = "निजी";
-"Setting a public spot to private will remove it from discvoer tab." = "निजी को सार्वजनिक स्थान सेट करना इसे डिस्कवर टैब से हटा देगा।";
+"Setting a public spot to private will remove it from discover tab." = "निजी को सार्वजनिक स्थान सेट करना इसे डिस्कवर टैब से हटा देगा।";
 "Public spots are shown in discover tab to other users." = "सार्वजनिक स्पॉट अन्य उपयोगकर्ताओं को डिस्कवर टैब में दिखाए जाते हैं।";
 "Unable To Remove Public Spot" = "सार्वजनिक स्थान को हटाने में असमर्थ";
 "Failed to remove spot from discover tab. Please check connection and try again." = "डिस्कवर टैब से स्पॉट को हटाने में विफल। कृपया कनेक्शन जांचें और पुनः प्रयास करें।";

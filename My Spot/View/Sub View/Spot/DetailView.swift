@@ -232,7 +232,7 @@ struct DetailView: View {
                 .padding(10)
                 .shadow(color: Color.black.opacity(0.5), radius: 5)
         }
-        .alert("Are you sure you want to delete ".localized() + (spot.name ?? "") + "?", isPresented: $deleteAlert) {
+        .alert("Are you sure you want to delete ".localized() + (spot.name ?? "") + "?".localized(), isPresented: $deleteAlert) {
             Button("Delete".localized(), role: .destructive) {
                 if let i = spots.firstIndex(of: spot) {
                     moc.delete(spots[i])

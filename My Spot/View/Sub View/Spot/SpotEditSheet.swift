@@ -114,7 +114,7 @@ struct SpotEditSheet: View {
                             Text("Share Spot".localized())
                         } footer: {
                             if wasPublic {
-                                Text("Setting a public spot to private will remove it from discvoer tab.".localized())
+                                Text("Setting a public spot to private will remove it from discover tab.".localized())
                                     .font(.footnote)
                                     .foregroundColor(.gray)
                             } else {

@@ -278,7 +278,7 @@ struct DiscoverSheetShared: View {
                 .padding(10)
                 .shadow(color: Color.black.opacity(0.5), radius: 5)
         }
-        .alert("Are You Sure You Want To Delete ".localized() + (cloudViewModel.shared[0].name) + "?", isPresented: $deleteAlert) {
+        .alert("Are You Sure You Want To Delete ".localized() + (cloudViewModel.shared[0].name) + "?".localized(), isPresented: $deleteAlert) {
             Button("Delete".localized(), role: .destructive) {
                 let spotID = cloudViewModel.shared[0].record.recordID
                 Task {

@@ -111,7 +111,7 @@
 "Failed to upload spot. Spot is now set to private, please try again later and check internet connection." = "Не вдалося завантажити місце. Тепер місце встановлюється приватним, будь ласка, спробуйте пізніше і перевірте підключення до Інтернету.";
 "Enter Spot Name" = "Введіть назву місця";
 "Private" = "Приватний";
-"Setting a public spot to private will remove it from discvoer tab." = "Встановлення публічного місця для приватного вилучить його з вкладки DiscVoer.";
+"Setting a public spot to private will remove it from discover tab." = "Встановлення публічного місця для приватного вилучить його з вкладки discover.";
 "Public spots are shown in discover tab to other users." = "Публічні плями відображаються в Tab для інших користувачів.";
 "Unable To Remove Public Spot" = "Неможливо видалити публічне місце";
 "Failed to remove spot from discover tab. Please check connection and try again." = "Не вдалося видалити місце з Tab. Перевірте підключення та повторіть спробу.";

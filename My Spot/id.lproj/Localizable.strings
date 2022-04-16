@@ -111,7 +111,7 @@
 "Failed to upload spot. Spot is now set to private, please try again later and check internet connection." = "Gagal mengunggah tempat. Spot sekarang disetel ke pribadi, silakan coba lagi nanti dan periksa koneksi internet.";
 "Enter Spot Name" = "Masukkan nama spot.";
 "Private" = "Pribadi";
-"Setting a public spot to private will remove it from discvoer tab." = "Menetapkan tempat publik untuk pribadi akan menghapusnya dari tab Pengasih.";
+"Setting a public spot to private will remove it from discover tab." = "Menetapkan tempat publik untuk pribadi akan menghapusnya dari tab Pengasih.";
 "Public spots are shown in discover tab to other users." = "Tempat-tempat umum ditampilkan di tab Temukan ke pengguna lain.";
 "Unable To Remove Public Spot" = "Tidak dapat menghapus tempat umum";
 "Failed to remove spot from discover tab. Please check connection and try again." = "Gagal menghapus spot dari tab temukan. Silakan periksa koneksi dan coba lagi.";

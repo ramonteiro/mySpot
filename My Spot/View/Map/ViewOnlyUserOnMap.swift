@@ -80,12 +80,6 @@ struct ViewOnlyUserOnMap: View {
                     spotRegion = mapViewModel.region
                 }
             } else {
-                let newPoint = MKPointAnnotation()
-                newPoint.coordinate = centerRegion.center
-                locations.append(newPoint)
-                if locations.count > 1 {
-                    locations.removeFirst()
-                }
                 mapViewModel.getPlacmarkOfLocation(location: CLLocation(latitude: centerRegion.center.latitude, longitude: centerRegion.center.longitude), completionHandler: { location in
                     locationName = location
                 })

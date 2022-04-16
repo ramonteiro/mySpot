@@ -111,7 +111,7 @@
 "Failed to upload spot. Spot is now set to private, please try again later and check internet connection." = "지점을 업로드하지 못했습니다. 현장이 이제 비공개로 설정되어 있습니다. 나중에 다시 시도하고 인터넷 연결을 확인하십시오.";
 "Enter Spot Name" = "자리 이름을 입력하십시오";
 "Private" = "사적인";
-"Setting a public spot to private will remove it from discvoer tab." = "공용 스팟을 비공개로 설정하면 Discvoer 탭에서 제거합니다.";
+"Setting a public spot to private will remove it from discover tab." = "공용 스팟을 비공개로 설정하면 discover 탭에서 제거합니다.";
 "Public spots are shown in discover tab to other users." = "공개 스폿은 발견 탭에 다른 사용자에게 표시됩니다.";
 "Unable To Remove Public Spot" = "공공 장소를 제거 할 수 없습니다";
 "Failed to remove spot from discover tab. Please check connection and try again." = "발견 탭에서 지점을 제거하지 못했습니다. 연결을 확인하고 다시 시도하십시오.";

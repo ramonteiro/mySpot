@@ -111,7 +111,7 @@
 "Failed to upload spot. Spot is now set to private, please try again later and check internet connection." = "スポットのアップロードに失敗しました。スポットがプライベートに設定されているので、後でもう一度やり直してインターネット接続を確認してください。";
 "Enter Spot Name" = "スポット名を入力してください";
 "Private" = "プライベート";
-"Setting a public spot to private will remove it from discvoer tab." = "公開スポットをプライベートに設定すると、Discvoerタブから削除されます。";
+"Setting a public spot to private will remove it from discover tab." = "公開スポットをプライベートに設定すると、discoverタブから削除されます。";
 "Public spots are shown in discover tab to other users." = "パブリックスポットは他のユーザーにTABの発見に表示されます。";
 "Unable To Remove Public Spot" = "公開スポットを削除できません";
 "Failed to remove spot from discover tab. Please check connection and try again." = "[Discover]タブから[スポット]を削除できませんでした。接続を確認してもう一度やり直してください。";

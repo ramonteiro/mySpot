@@ -111,7 +111,7 @@
 "Failed to upload spot. Spot is now set to private, please try again later and check internet connection." = "Falha ao enviar o ponto. O ponto está agora definido como privado, por favor, tente novamente mais tarde e verifique a conexão com a Internet.";
 "Enter Spot Name" = "Digite o nome do ponto";
 "Private" = "Privado";
-"Setting a public spot to private will remove it from discvoer tab." = "Definir um local público para privado irá removê-lo da guia do discvoer.";
+"Setting a public spot to private will remove it from discover tab." = "Definir um local público para privado irá removê-lo da guia do discover.";
 "Public spots are shown in discover tab to other users." = "Pontos públicos são mostrados na guia Discover para outros usuários.";
 "Unable To Remove Public Spot" = "Não é possível remover o local público";
 "Failed to remove spot from discover tab. Please check connection and try again." = "Falha ao remover o ponto da guia Discover. Por favor, verifique a conexão e tente novamente.";
