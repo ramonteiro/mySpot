@@ -26,6 +26,8 @@ struct AddSpotSheet: View {
     @State private var showingAddImageAlert = false
     @State private var usingCustomLocation = false
     @State private var hasSet = false
+    @State private var isFromImagesUnedited = false
+    @State private var indexFromUnedited = 0
     @Binding var isSaving: Bool
     
     @State private var name = ""
@@ -40,6 +42,7 @@ struct AddSpotSheet: View {
     @State private var lat = 1.0
     @State private var imageTemp: UIImage?
     @State private var images: [UIImage?]?
+    @State private var imagesUnedited: [UIImage?]?
     @Binding var showingCannotSavePublicAlert: Bool
     @State private var showingCannotSavePrivateAlert: Bool = false
     
@@ -136,24 +139,35 @@ struct AddSpotSheet: View {
                             Section {
                                 if (images?.count ?? 0 > 0) {
                                     List {
-                                        ForEach(images ?? [UIImage(systemName: "exclamationmark.triangle")], id: \.self) { images in
-                                            if let images = images {
+                                        ForEach(images!.indices, id: \.self) { i in
+                                            if let image = images?[i] {
                                                 HStack {
                                                     Spacer()
-                                                    Image(uiImage: images)
+                                                    Image(uiImage: image)
                                                         .resizable()
                                                         .scaledToFit()
                                                         .frame(width: UIScreen.screenWidth / 2, alignment: .center)
                                                         .cornerRadius(10)
+                                                        .onTapGesture {
+                                                            guard let imageTmp = imagesUnedited?[i] else { return }
+                                                            imageTemp = imageTmp
+                                                            if let _ = imageTemp {
+                                                                indexFromUnedited = i
+                                                                isFromImagesUnedited = true
+                                                                activeSheet = .cropperSheet
+                                                            }
+                                                        }
                                                     Spacer()
                                                 }
                                             }
                                         }
                                         .onMove { indexSet, offset in
                                             images!.move(fromOffsets: indexSet, toOffset: offset)
+                                            imagesUnedited!.move(fromOffsets: indexSet, toOffset: offset)
                                         }
                                         .onDelete { indexSet in
                                             images!.remove(atOffsets: indexSet)
+                                            imagesUnedited!.remove(atOffsets: indexSet)
                                         }
                                     }
                                 }
@@ -195,6 +209,8 @@ struct AddSpotSheet: View {
                                 TakePhoto(selectedImage: $imageTemp)
                                     .onDisappear {
                                         if (imageTemp != nil) {
+                                            imagesUnedited?.append(imageTemp)
+                                            isFromImagesUnedited = false
                                             activeSheet = .cropperSheet
                                         } else {
                                             activeSheet = nil
@@ -204,6 +220,8 @@ struct AddSpotSheet: View {
                             case .cameraRollSheet:
                                 ChoosePhoto() { image in
                                     imageTemp = image
+                                    imagesUnedited?.append(imageTemp)
+                                    isFromImagesUnedited = false
                                     activeSheet = .cropperSheet
                                 }
                                 .ignoresSafeArea()
@@ -211,9 +229,16 @@ struct AddSpotSheet: View {
                                 MantisPhotoCropper(selectedImage: $imageTemp)
                                     .onDisappear {
                                         if let _ = imageTemp {
-                                            images?.append(imageTemp)
+                                            if isFromImagesUnedited {
+                                                images?[indexFromUnedited] = imageTemp
+                                            } else {
+                                                images?.append(imageTemp)
+                                            }
+                                        } else {
+                                            imagesUnedited?.removeLast()
                                         }
                                         imageTemp = nil
+                                        isFromImagesUnedited = false
                                     }
                                     .ignoresSafeArea()
                             }
@@ -339,6 +364,7 @@ struct AddSpotSheet: View {
             lat = getLatitude()
             long = getLongitude()
             images = []
+            imagesUnedited = []
         }
         .disabled(isSaving)
     }

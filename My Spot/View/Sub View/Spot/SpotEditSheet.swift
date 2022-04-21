@@ -21,6 +21,8 @@ struct SpotEditSheet: View {
     @State private var isPublic = false
     @State private var wasPublic = false
     @State private var isSaving = false
+    @State private var isFromImagesUnedited = false
+    @State private var indexFromUnedited = 0
     @State private var founder = ""
     @State private var descript = ""
     @State private var nameInTitle = ""
@@ -31,6 +33,7 @@ struct SpotEditSheet: View {
     @State private var showingCannotDeleteAlert = false
     @State private var imageTemp: UIImage?
     @State private var images: [UIImage]?
+    @State private var imagesUnedited: [UIImage?]?
     @Binding var showingCannotSavePublicAlert: Bool
     @State private var showingCannotSavePrivateAlert: Bool = false
     @Binding var didChange: Bool
@@ -148,25 +151,36 @@ struct SpotEditSheet: View {
                     Section {
                         if (images?.count ?? 0 > 0) {
                             List {
-                                ForEach(images ?? [defaultImages.errorImage!], id: \.self) { images in
-                                    if let images = images {
+                                ForEach(images!.indices, id: \.self) { i in
+                                    if let image = images?[i] {
                                         HStack {
                                             Spacer()
-                                            Image(uiImage: images)
+                                            Image(uiImage: image)
                                                 .resizable()
                                                 .scaledToFit()
                                                 .frame(width: UIScreen.screenWidth / 2, alignment: .center)
                                                 .cornerRadius(10)
+                                                .onTapGesture {
+                                                    guard let imageTmp = imagesUnedited?[i] else { return }
+                                                    imageTemp = imageTmp
+                                                    if let _ = imageTemp {
+                                                        indexFromUnedited = i
+                                                        isFromImagesUnedited = true
+                                                        activeSheet = .cropperSheet
+                                                    }
+                                                }
                                             Spacer()
                                         }
                                     }
                                 }
                                 .onMove { indexSet, offset in
                                     images!.move(fromOffsets: indexSet, toOffset: offset)
+                                    imagesUnedited!.move(fromOffsets: indexSet, toOffset: offset)
                                     imageChanged = true
                                 }
                                 .onDelete { indexSet in
                                     images!.remove(atOffsets: indexSet)
+                                    imagesUnedited!.remove(atOffsets: indexSet)
                                     imageChanged = true
                                 }
                             }
@@ -223,6 +237,8 @@ struct SpotEditSheet: View {
                         TakePhoto(selectedImage: $imageTemp)
                             .onDisappear {
                                 if (imageTemp != nil) {
+                                    imagesUnedited?.append(imageTemp)
+                                    isFromImagesUnedited = false
                                     activeSheet = .cropperSheet
                                 } else {
                                     activeSheet = nil
@@ -232,6 +248,8 @@ struct SpotEditSheet: View {
                     case .cameraRollSheet:
                         ChoosePhoto() { image in
                             imageTemp = image
+                            imagesUnedited?.append(imageTemp)
+                            isFromImagesUnedited = false
                             activeSheet = .cropperSheet
                         }
                         .ignoresSafeArea()
@@ -239,10 +257,17 @@ struct SpotEditSheet: View {
                         MantisPhotoCropper(selectedImage: $imageTemp)
                             .onDisappear {
                                 if let _ = imageTemp {
-                                    images?.append(imageTemp ?? defaultImages.errorImage!)
+                                    if isFromImagesUnedited {
+                                        images?[indexFromUnedited] = imageTemp ?? defaultImages.errorImage!
+                                    } else {
+                                        images?.append(imageTemp ?? defaultImages.errorImage!)
+                                    }
                                     imageChanged = true
+                                } else {
+                                    imagesUnedited?.removeLast()
                                 }
                                 imageTemp = nil
+                                isFromImagesUnedited = false
                             }
                             .ignoresSafeArea()
                     }
@@ -379,6 +404,7 @@ struct SpotEditSheet: View {
             } else if let _ = spot.image {
                 images?.append(spot.image ?? defaultImages.errorImage!)
             }
+            imagesUnedited = images
         }
         .disabled(isSaving)
     }
