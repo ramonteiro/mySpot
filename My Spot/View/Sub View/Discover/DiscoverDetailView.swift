@@ -185,7 +185,7 @@ struct DiscoverDetailView: View {
                 if (mySpot) {
                     deleteButton
                 }
-                if (canShare) {
+                if (canShare && UIDevice.current.userInterfaceIdiom != .pad) {
                     canShareButton
                 }
                 displayLikeButton

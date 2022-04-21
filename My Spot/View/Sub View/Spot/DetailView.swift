@@ -148,7 +148,7 @@ struct DetailView: View {
                 backButtonView
                 Spacer()
                 deleteButton
-                if (canShare && spot.isPublic) {
+                if (canShare && spot.isPublic && UIDevice.current.userInterfaceIdiom != .pad) {
                     shareButton
                 }
             }
