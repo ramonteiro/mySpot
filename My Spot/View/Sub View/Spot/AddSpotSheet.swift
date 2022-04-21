@@ -25,6 +25,7 @@ struct AddSpotSheet: View {
     @State private var showingAlert = false
     @State private var showingAddImageAlert = false
     @State private var usingCustomLocation = false
+    @State private var hasSet = false
     @Binding var isSaving: Bool
     
     @State private var name = ""
@@ -44,7 +45,7 @@ struct AddSpotSheet: View {
     
     
     private var disableSave: Bool {
-        name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || images?.isEmpty ?? true || founder.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || (isPublic && !cloudViewModel.isSignedInToiCloud)
+        name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || images?.isEmpty ?? true || founder.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || (isPublic && !cloudViewModel.isSignedInToiCloud) || (usingCustomLocation && !hasSet)
     }
     
     private enum Field {
@@ -117,7 +118,7 @@ struct AddSpotSheet: View {
                                 Text("Date Found".localized())
                             }
                             Section {
-                                ViewOnlyUserOnMap(customLocation: $usingCustomLocation, locationName: $locationName, centerRegion: $centerRegion)
+                                ViewOnlyUserOnMap(customLocation: $usingCustomLocation, hasSet: $hasSet, locationName: $locationName, centerRegion: $centerRegion)
                                     .frame(height: UIScreen.screenHeight * 0.6)
                                     .aspectRatio(contentMode: .fill)
                                     .cornerRadius(15)

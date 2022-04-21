@@ -18,7 +18,7 @@ struct ViewOnlyUserOnMap: View {
     @EnvironmentObject var mapViewModel: MapViewModel
     @EnvironmentObject var cloudViewModel: CloudKitViewModel
     @Binding var customLocation: Bool
-    @State private var hasSet = false
+    @Binding var hasSet: Bool
     @Binding var locationName: String
     @State private var locations = [MKPointAnnotation]()
     @Binding var centerRegion: MKCoordinateRegion
@@ -50,6 +50,12 @@ struct ViewOnlyUserOnMap: View {
                     displayCustomLocationButton
                     Spacer()
                 }
+            }
+        }
+        .onChange(of: hasSet) { newValue in
+            if newValue {
+                UserDefaults.standard.set(Double(centerRegion.center.longitude), forKey: "tempPinY")
+                UserDefaults.standard.set(Double(centerRegion.center.latitude), forKey: "tempPinX")
             }
         }
         .onAppear {

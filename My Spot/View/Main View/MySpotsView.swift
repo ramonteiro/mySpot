@@ -190,6 +190,7 @@ struct MySpotsView: View {
                     .disabled(spots.isEmpty)
                     if !isSaving {
                         Button {
+                            UserDefaults.standard.set(Double(-1.0), forKey: "tempPinX")
                             showingAddSheet.toggle()
                         } label: {
                             Image(systemName: "plus").imageScale(.large)

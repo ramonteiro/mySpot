@@ -153,7 +153,11 @@ struct MapView: UIViewRepresentable {
             let newRegion = MKCoordinateRegion(center: location, span: mapViewModel.region.span)
             mapView.setRegion(newRegion, animated: true)
         } else {
-            mapView.setRegion(mapViewModel.region, animated: true)
+            if (UserDefaults.standard.valueExists(forKey: "tempPinX") && UserDefaults.standard.double(forKey: "tempPinX") != -1.0) {
+                mapView.setRegion(MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: UserDefaults.standard.double(forKey: "tempPinX"), longitude: UserDefaults.standard.double(forKey: "tempPinY")), span: mapViewModel.region.span), animated: true)
+            } else {
+                mapView.setRegion(mapViewModel.region, animated: true)
+            }
         }
         mapView.delegate = context.coordinator
         return mapView
