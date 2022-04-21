@@ -53,7 +53,7 @@ struct SetUpNewSpotNoti: View {
             }
             .interactiveDismissDisabled()
             .ignoresSafeArea()
-            .navigationViewStyle(.stack)
+            .navigationViewStyle(.automatic)
             .toolbar {
                 ToolbarItemGroup(placement: .navigationBarTrailing) {
                     Button("Save".localized()) {

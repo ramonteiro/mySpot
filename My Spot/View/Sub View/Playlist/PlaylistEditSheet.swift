@@ -116,7 +116,7 @@ struct PlaylistEditSheet: View {
                         }
                     }
                 }
-                .navigationViewStyle(.stack)
+                .navigationViewStyle(.automatic)
             }
         }
         .onAppear {

@@ -94,7 +94,7 @@ struct AddPlaylistSheet: View {
                 }
             }
         }
-        .navigationViewStyle(.stack)
+        .navigationViewStyle(.automatic)
         .interactiveDismissDisabled()
     }
 

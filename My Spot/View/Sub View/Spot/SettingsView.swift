@@ -287,7 +287,7 @@ struct SettingsView: View {
                 UserDefaults.standard.set(Double(alpha), forKey: "customColorA")
             }
             .navigationTitle("Settings".localized())
-            .navigationViewStyle(.stack)
+            .navigationViewStyle(.automatic)
             .interactiveDismissDisabled(true)
             .toolbar {
                 ToolbarItemGroup(placement: .navigationBarTrailing) {

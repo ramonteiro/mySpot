@@ -248,7 +248,7 @@ struct SpotEditSheet: View {
                     }
                 }
                 .navigationTitle(name)
-                .navigationViewStyle(.stack)
+                .navigationViewStyle(.automatic)
                 .toolbar {
                     ToolbarItemGroup(placement: .bottomBar) {
                         HStack {

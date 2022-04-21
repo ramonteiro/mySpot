@@ -218,7 +218,7 @@ struct AddSpotSheet: View {
                             }
                         }
                         .navigationTitle("Create Spot".localized())
-                        .navigationViewStyle(.stack)
+                        .navigationViewStyle(.automatic)
                         .toolbar {
                             ToolbarItemGroup(placement: .bottomBar) {
                                 HStack {

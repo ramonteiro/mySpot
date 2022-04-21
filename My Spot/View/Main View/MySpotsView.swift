@@ -59,7 +59,7 @@ struct MySpotsView: View {
                     Text("Please check internet connection and try again.".localized())
                 }
         }
-        .navigationViewStyle(.stack)
+        .navigationViewStyle(.automatic)
         .onAppear {
             mapViewModel.checkLocationAuthorization()
             setFilteringType()

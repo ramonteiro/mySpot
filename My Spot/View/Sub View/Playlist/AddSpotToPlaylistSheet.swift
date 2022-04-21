@@ -28,7 +28,7 @@ struct AddSpotToPlaylistSheet: View {
                 messageNoSpotsAvailable
             }
         }
-        .navigationViewStyle(.stack)
+        .navigationViewStyle(.automatic)
         .interactiveDismissDisabled()
         .onAppear {
             for i in spots {

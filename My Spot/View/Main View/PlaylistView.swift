@@ -53,7 +53,7 @@ struct PlaylistView: View {
                 }
             }
         }
-        .navigationViewStyle(.stack)
+        .navigationViewStyle(.automatic)
     }
     
     private var noPlaylistPrompt: some View {
