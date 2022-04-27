@@ -478,7 +478,7 @@ struct SpotEditSheet: View {
                 }
             }
             do {
-                let id = try await cloudViewModel.addSpotToPublic(name: name, founder: founder, date: spot.date ?? "", locationName: spot.locationName ?? "", x: spot.x, y: spot.y, description: descript, type: tags, image: imageData, image2: imageData2, image3: imageData3, isMultipleImages: (images?.count ?? 1) - 1, customLocation: spot.wasThere)
+                let id = try await cloudViewModel.addSpotToPublic(name: name, founder: founder, date: spot.date ?? "", locationName: spot.locationName ?? "", x: spot.x, y: spot.y, description: descript, type: tags, image: imageData, image2: imageData2, image3: imageData3, isMultipleImages: (images?.count ?? 1) - 1, customLocation: !spot.wasThere)
                 if !id.isEmpty {
                     spot.dbid = id
                     spot.isPublic = true
