@@ -19,7 +19,8 @@ Everyone! Whether you are a skater, hiker, mountain biker, etc, or maybe you jus
 
 ---How to Use My Spot---
 
-Demo Video: https://youtu.be/Q0FO_jjDHzA
+Demo Video: My Spot - Exploration Full Demo
+https://youtu.be/UcQJhaeTPng
 
 When starting My Spot you are greeted with the my spots tab where you can start by adding a spot. These spots are stored locally in core data unless the public slider is checked in which case it is uploaded to a database hoted in cloudkit.
 
@@ -35,6 +36,7 @@ My Spot needs the following:
 - an icloud account to upload, download, or browse spots hosted with cloudkit
 - location services to create a spot (Spots MUST be created in the location, cooridinates are taken from gps and connot be entered manually)
 - camera access to take a photo of spot (Spot photos cannot be taken from photo library)
+- (optional) notifications to alert users when new spots are added to their area.
 
 ---libraries used---
 
