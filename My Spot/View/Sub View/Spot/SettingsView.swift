@@ -118,23 +118,6 @@ struct SettingsView: View {
                 }
                 Section {
                     Button {
-                        let youtubeId = "UcQJhaeTPng"
-                        var youtubeUrl = URL(string:"youtube://\(youtubeId)")!
-                        if UIApplication.shared.canOpenURL(youtubeUrl){
-                            UIApplication.shared.open(youtubeUrl)
-                        } else{
-                            youtubeUrl = URL(string:"https://www.youtube.com/watch?v=\(youtubeId)")!
-                            UIApplication.shared.open(youtubeUrl)
-                        }
-                    } label: {
-                        Text("Video Tutorial".localized())
-                            .foregroundColor(colorScheme == .dark ? .white : .black)
-                    }
-                } footer: {
-                    Text("Youtube video with timestamps to demonstrate how to use My Spot.".localized())
-                }
-                Section {
-                    Button {
                         if let url = URL(string:"https://wp.me/PdMUcQ-7") {
                             UIApplication.shared.open(url)
                         }
