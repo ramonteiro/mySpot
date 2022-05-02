@@ -58,15 +58,21 @@ class CloudKitViewModel: ObservableObject {
         try await CKContainer.default().publicCloudDatabase.deleteRecord(withID: id)
     }
     
-    func checkDeepLink(url: URL) async {
-        guard let host = URLComponents(url: url, resolvingAgainstBaseURL: true)?.host else {
-            isErrorMessage = "Invalid Link".localized()
-            isErrorMessageDetails = "Check that the link was not modified and try again.".localized()
-            isError.toggle()
-            return
+    func checkDeepLink(url: URL, isFromNoti: Bool) async {
+        var recordName = ""
+        if isFromNoti {
+            recordName = ""
+        } else {
+            guard let host = URLComponents(url: url, resolvingAgainstBaseURL: true)?.host else {
+                isErrorMessage = "Invalid Link".localized()
+                isErrorMessageDetails = "Check that the link was not modified and try again.".localized()
+                isError.toggle()
+                return
+            }
+            recordName = host
         }
         do {
-            let record = try await CKContainer.default().publicCloudDatabase.record(for: CKRecord.ID(recordName: host))
+            let record = try await CKContainer.default().publicCloudDatabase.record(for: CKRecord.ID(recordName: recordName))
             DispatchQueue.main.async {
                 guard let name = record["name"] as? String else { return }
                 guard let founder = record["founder"] as? String else { return }
