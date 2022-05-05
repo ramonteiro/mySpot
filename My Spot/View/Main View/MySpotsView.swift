@@ -191,6 +191,7 @@ struct MySpotsView: View {
                     if !isSaving {
                         Button {
                             UserDefaults.standard.set(Double(-1.0), forKey: "tempPinX")
+                            Task { try? await cloudViewModel.isBanned() }
                             showingAddSheet.toggle()
                         } label: {
                             Image(systemName: "plus").imageScale(.large)

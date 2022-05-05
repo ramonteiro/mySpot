@@ -271,6 +271,7 @@ struct DetailView: View {
     
     private var editButton: some View {
         Button {
+            Task { try? await cloudViewModel.isBanned() }
             showingEditSheet = true
         } label: {
             Image(systemName: "slider.horizontal.3")

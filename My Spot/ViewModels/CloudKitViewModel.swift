@@ -198,6 +198,19 @@ class CloudKitViewModel: ObservableObject {
         return resizedImage
     }
     
+    func isBanned() async throws -> Bool {
+        let predicate = NSPredicate(format: "userid == %@", userID)
+        let query = CKQuery(recordType: "Bans", predicate: predicate)
+        let results = try await CKContainer.default().publicCloudDatabase.records(matching: query, resultsLimit: 1)
+        if results.matchResults.isEmpty {
+            UserDefaults.standard.set(false, forKey: "isBanned")
+            return false
+        } else {
+            UserDefaults.standard.set(true, forKey: "isBanned")
+            return true
+        }
+    }
+    
     func addSpotToPublic(name: String, founder: String, date: String, locationName: String, x: Double, y: Double, description: String, type: String, image: Data, image2: Data?, image3: Data?, isMultipleImages: Int, customLocation: Bool) async throws -> String {
         
         let newSpot = CKRecord(recordType: "Spots")

@@ -362,6 +362,9 @@ struct AddSpotSheet: View {
             }
         }
         .onAppear {
+            if (UserDefaults.standard.valueExists(forKey: "isBanned") && UserDefaults.standard.bool(forKey: "isBanned")) {
+                isPublic = false
+            }
             lat = getLatitude()
             long = getLongitude()
             images = []
@@ -385,7 +388,9 @@ struct AddSpotSheet: View {
     
     private var displayIsPublicPrompt: some View {
         VStack {
-            if (cloudViewModel.isSignedInToiCloud) {
+            if (UserDefaults.standard.valueExists(forKey: "isBanned") && UserDefaults.standard.bool(forKey: "isBanned")) {
+                Text("You Are Banned".localized())
+            } else if (cloudViewModel.isSignedInToiCloud) {
                 Toggle("Public".localized(), isOn: $isPublic)
             } else if (!cloudViewModel.isSignedInToiCloud) {
                 Text("You Must Be Signed In To iCloud To Disover And Share Spots".localized())

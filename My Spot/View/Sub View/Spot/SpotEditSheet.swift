@@ -391,6 +391,9 @@ struct SpotEditSheet: View {
             }
         }
         .onAppear {
+            if (UserDefaults.standard.valueExists(forKey: "isBanned") && UserDefaults.standard.bool(forKey: "isBanned")) {
+                isPublic = false
+            }
             wasPublic = spot.isPublic
             fromDB = isFromDB()
             images = []
@@ -641,6 +644,14 @@ struct SpotEditSheet: View {
     }
     
     private var displayIsPublicPrompt: some View {
-        Toggle("Public".localized(), isOn: $isPublic)
+        VStack {
+            if (UserDefaults.standard.valueExists(forKey: "isBanned") && UserDefaults.standard.bool(forKey: "isBanned")) {
+                Text("You Are Banned".localized())
+            } else if (cloudViewModel.isSignedInToiCloud) {
+                Toggle("Public".localized(), isOn: $isPublic)
+            } else if (!cloudViewModel.isSignedInToiCloud) {
+                Text("You Must Be Signed In To iCloud To Disover And Share Spots".localized())
+            }
+        }
     }
 }
