@@ -13,6 +13,8 @@ struct ContentView: View {
     @EnvironmentObject var cloudViewModel: CloudKitViewModel
     @EnvironmentObject var mapViewModel: MapViewModel
     @StateObject private var tabController = TabController()
+    @FetchRequest(sortDescriptors: []) var colors: FetchedResults<CustomColor>
+    @Environment(\.managedObjectContext) var moc
     @State private var showSharedSpotSheet = false
     @State private var errorAlert = false
     
@@ -93,5 +95,30 @@ struct ContentView: View {
             Text(cloudViewModel.isErrorMessageDetails)
         }
         .environmentObject(tabController)
+        .onAppear {
+            if colors.isEmpty {
+                let newColor = CustomColor(context: moc)
+                newColor.colorIndex = 0
+                newColor.colorR = 128
+                newColor.colorA = 128
+                newColor.name = ""
+                newColor.colorB = 128
+                newColor.colorG = 128
+                do {
+                    try moc.save()
+                    cloudViewModel.systemColorArray[cloudViewModel.systemColorArray.count - 1] = Color(uiColor: UIColor(red: colors[0].colorR, green: colors[0].colorG, blue: colors[0].colorB, alpha: colors[0].colorA))
+                    cloudViewModel.systemColorIndex = Int(colors[0].colorIndex)
+                    cloudViewModel.savedName = colors[0].name ?? ""
+                } catch {
+                    print("error reading moc")
+                }
+            } else {
+                cloudViewModel.systemColorArray[cloudViewModel.systemColorArray.count - 1] = Color(uiColor: UIColor(red: colors[0].colorR, green: colors[0].colorG, blue: colors[0].colorB, alpha: colors[0].colorA))
+                cloudViewModel.systemColorIndex = Int(colors[0].colorIndex)
+            }
+            if UIApplication.shared.applicationIconBadgeNumber > 0 {
+                UIApplication.shared.applicationIconBadgeNumber = 0
+            }
+        }
     }
 }

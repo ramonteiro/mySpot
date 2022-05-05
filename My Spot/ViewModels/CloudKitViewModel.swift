@@ -21,6 +21,7 @@ class CloudKitViewModel: ObservableObject {
     @Published var canRefresh = false
     @Published var isFetching = false
     @Published var isError = false
+    @Published var savedName = ""
     @Published var isErrorMessage = ""
     @Published var isErrorMessageDetails = ""
     @Published var isPostError = false
@@ -48,9 +49,6 @@ class CloudKitViewModel: ObservableObject {
             notiNewSpotOn = UserDefaults.standard.bool(forKey: "discovernot")
         } else {
             UserDefaults.standard.set(false, forKey: "discovernot")
-        }
-        if UserDefaults.standard.valueExists(forKey: "customColorA") {
-            systemColorArray[systemColorArray.count - 1] = Color(uiColor: UIColor(red: UserDefaults.standard.double(forKey: "customColorR"), green: UserDefaults.standard.double(forKey: "customColorG"), blue: UserDefaults.standard.double(forKey: "customColorB"), alpha: UserDefaults.standard.double(forKey: "customColorA")))
         }
     }
     
@@ -479,17 +477,10 @@ class CloudKitViewModel: ObservableObject {
         return true
     }
     
-    func likeSpot(spot: SpotFromCloud, like: Bool) async -> Bool {
+    func likeSpot(spot: SpotFromCloud) async -> Bool {
         guard let _ = spot.record["likes"] else { return false }
-        if (spot.likes < 1 && !like) {
-            return false
-        }
         let record = spot.record
-        if (like) {
-            record["likes"]! += 1
-        } else {
-            record["likes"]! -= 1
-        }
+        record["likes"]! += 1
         do {
             try await CKContainer.default().publicCloudDatabase.save(record)
             return true
@@ -498,15 +489,14 @@ class CloudKitViewModel: ObservableObject {
         }
     }
     
-    func report(spot: SpotFromCloud, report: String) async -> Bool {
-        guard let _ = spot.record[report] else { return false }
+    func report(spot: SpotFromCloud, report: String) async {
+        guard let _ = spot.record[report] else { return }
         let record = spot.record
         record[report]! += 1
         do {
             try await CKContainer.default().publicCloudDatabase.save(record)
-            return true
         } catch {
-            return false
+            print("failed to send report!")
         }
     }
     
@@ -689,7 +679,6 @@ class CloudKitViewModel: ObservableObject {
         notification.alertBody = "A new spot was added to your area!".localized()
         notification.soundName = "default"
         notification.shouldBadge = true
-        notification.desiredKeys = ["id"]
         subscription.notificationInfo = notification
         try await CKContainer.default().publicCloudDatabase.save(subscription)
     }

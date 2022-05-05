@@ -1,16 +1,18 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="20086" systemVersion="21E258" minimumToolsVersion="Automatic" sourceLanguage="Swift" usedWithCloudKit="YES" userDefinedModelVersionIdentifier="">
-    <entity name="Likes" representedClassName="Likes" syncable="YES">
-        <attribute name="likedId" optional="YES" attributeType="String"/>
+    <entity name="CustomColor" representedClassName="CustomColor" syncable="YES" codeGenerationType="class">
+        <attribute name="colorA" attributeType="Double" defaultValueString="128" usesScalarValueType="YES"/>
+        <attribute name="colorB" attributeType="Double" defaultValueString="128" usesScalarValueType="YES"/>
+        <attribute name="colorG" attributeType="Double" defaultValueString="128" usesScalarValueType="YES"/>
+        <attribute name="colorIndex" attributeType="Double" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="colorR" attributeType="Double" defaultValueString="128" usesScalarValueType="YES"/>
+        <attribute name="name" attributeType="String" defaultValueString=""/>
     </entity>
     <entity name="Playlist" representedClassName="Playlist" syncable="YES">
         <attribute name="emoji" optional="YES" attributeType="String"/>
         <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
         <attribute name="name" optional="YES" attributeType="String"/>
         <relationship name="spot" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Spot" inverseName="playlist" inverseEntity="Spot"/>
-    </entity>
-    <entity name="Report" representedClassName="Report" syncable="YES">
-        <attribute name="reportid" optional="YES" attributeType="String"/>
     </entity>
     <entity name="Spot" representedClassName="Spot" syncable="YES">
         <attribute name="date" optional="YES" attributeType="String"/>
@@ -33,9 +35,8 @@
         <relationship name="playlist" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Playlist" inverseName="spot" inverseEntity="Playlist"/>
     </entity>
     <elements>
-        <element name="Likes" positionX="-54" positionY="90" width="128" height="44"/>
-        <element name="Playlist" positionX="-63" positionY="54" width="128" height="14"/>
-        <element name="Report" positionX="-54" positionY="108" width="128" height="44"/>
         <element name="Spot" positionX="-63" positionY="-18" width="128" height="299"/>
+        <element name="Playlist" positionX="-45" positionY="108" width="128" height="89"/>
+        <element name="CustomColor" positionX="-36" positionY="144" width="128" height="119"/>
     </elements>
 </model>

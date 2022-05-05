@@ -62,11 +62,6 @@
 		C56011B52800E66A00C49597 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = C56011B72800E66A00C49597 /* Localizable.strings */; };
 		C56F499F27E05CE300BCBB8F /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = C56F499E27E05CE300BCBB8F /* Extensions.swift */; };
 		C587027427E27F1900DFB6C4 /* MailViewCallback.swift in Sources */ = {isa = PBXBuildFile; fileRef = C587027327E27F1900DFB6C4 /* MailViewCallback.swift */; };
-		C5886FAC27F5FC48000E574A /* Report+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5886FAA27F5FC48000E574A /* Report+CoreDataClass.swift */; };
-		C5886FAD27F5FC48000E574A /* Report+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5886FAB27F5FC48000E574A /* Report+CoreDataProperties.swift */; };
-		C5DCA373282076CA00DC67CE /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5DCA372282076CA00DC67CE /* AppDelegate.swift */; };
-		C5F44E8D27DD3818001E9E32 /* Likes+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5F44E8B27DD3818001E9E32 /* Likes+CoreDataClass.swift */; };
-		C5F44E8E27DD3818001E9E32 /* Likes+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5F44E8C27DD3818001E9E32 /* Likes+CoreDataProperties.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -138,11 +133,6 @@
 		C56011C22800F64000C49597 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/Localizable.strings; sourceTree = "<group>"; };
 		C56F499E27E05CE300BCBB8F /* Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
 		C587027327E27F1900DFB6C4 /* MailViewCallback.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MailViewCallback.swift; sourceTree = "<group>"; };
-		C5886FAA27F5FC48000E574A /* Report+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Report+CoreDataClass.swift"; sourceTree = SOURCE_ROOT; };
-		C5886FAB27F5FC48000E574A /* Report+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Report+CoreDataProperties.swift"; sourceTree = SOURCE_ROOT; };
-		C5DCA372282076CA00DC67CE /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		C5F44E8B27DD3818001E9E32 /* Likes+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Likes+CoreDataClass.swift"; sourceTree = "<group>"; };
-		C5F44E8C27DD3818001E9E32 /* Likes+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Likes+CoreDataProperties.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -210,7 +200,6 @@
 				C51503AD27D7C347009F0DCD /* My_SpotApp.swift */,
 				C51503AF27D7C347009F0DCD /* ContentView.swift */,
 				C56011B72800E66A00C49597 /* Localizable.strings */,
-				C5DCA372282076CA00DC67CE /* AppDelegate.swift */,
 			);
 			path = "My Spot";
 			sourceTree = "<group>";
@@ -234,10 +223,6 @@
 		C51503D327D7C848009F0DCD /* Model */ = {
 			isa = PBXGroup;
 			children = (
-				C5886FAA27F5FC48000E574A /* Report+CoreDataClass.swift */,
-				C5886FAB27F5FC48000E574A /* Report+CoreDataProperties.swift */,
-				C5F44E8B27DD3818001E9E32 /* Likes+CoreDataClass.swift */,
-				C5F44E8C27DD3818001E9E32 /* Likes+CoreDataProperties.swift */,
 				C51503DA27D7C856009F0DCD /* CoreDataManager.swift */,
 				C51503D627D7C856009F0DCD /* Playlist+CoreDataClass.swift */,
 				C51503D727D7C856009F0DCD /* Playlist+CoreDataProperties.swift */,
@@ -466,7 +451,6 @@
 				C51503E127D7C856009F0DCD /* Spot+CoreDataClass.swift in Sources */,
 				C502D4FB27E1A6310057A65C /* SpotEditSheet.swift in Sources */,
 				C51503E427D7C856009F0DCD /* Spots.xcdatamodeld in Sources */,
-				C5886FAD27F5FC48000E574A /* Report+CoreDataProperties.swift in Sources */,
 				C50CF4AA27F13915001A9698 /* ChoosePhoto.swift in Sources */,
 				C51503E227D7C856009F0DCD /* Spot+CoreDataProperties.swift in Sources */,
 				C51503B027D7C347009F0DCD /* ContentView.swift in Sources */,
@@ -487,7 +471,6 @@
 				C587027427E27F1900DFB6C4 /* MailViewCallback.swift in Sources */,
 				C515040727D7CA7B009F0DCD /* DiscoverRow.swift in Sources */,
 				C515042527D7CAC6009F0DCD /* UIEmojiTextField.swift in Sources */,
-				C5886FAC27F5FC48000E574A /* Report+CoreDataClass.swift in Sources */,
 				C515040E27D7CA87009F0DCD /* PlaylistRow.swift in Sources */,
 				C515041E27D7CAB1009F0DCD /* ViewPlaylistMap.swift in Sources */,
 				C515040D27D7CA87009F0DCD /* DetailedPlaylistView.swift in Sources */,
@@ -502,12 +485,9 @@
 				C501FC1C27E4419A008FEFA1 /* BottomPopupView.swift in Sources */,
 				C50CF4AE27F395E2001A9698 /* SettingsView.swift in Sources */,
 				C515041627D7CAA3009F0DCD /* MapAnnotationView.swift in Sources */,
-				C5F44E8D27DD3818001E9E32 /* Likes+CoreDataClass.swift in Sources */,
-				C5F44E8E27DD3818001E9E32 /* Likes+CoreDataProperties.swift in Sources */,
 				C515041027D7CA87009F0DCD /* AddPlaylistSheet.swift in Sources */,
 				C56F499F27E05CE300BCBB8F /* Extensions.swift in Sources */,
 				C51503DE27D7C856009F0DCD /* SpotFromCloud.swift in Sources */,
-				C5DCA373282076CA00DC67CE /* AppDelegate.swift in Sources */,
 				C502D4FD27E1B63D0057A65C /* DiscoverSheetShared.swift in Sources */,
 				C51503FE27D7CA60009F0DCD /* PlaylistView.swift in Sources */,
 				C515040227D7CA72009F0DCD /* SpotRow.swift in Sources */,

@@ -412,7 +412,7 @@ struct DetailView: View {
                             }
                         }
                     if (spot.isPublic && spot.likes >= 0) {
-                        Image(systemName: "heart.fill")
+                        Image(systemName: "icloud.and.arrow.down")
                             .font(.system(size: 15, weight: .light))
                             .foregroundColor(Color.gray)
                         Text("\(Int(spot.likes))")

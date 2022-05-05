@@ -10,8 +10,6 @@ import SwiftUI
 @main
 struct My_SpotApp: App {
     
-    @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
-    
     @State private var showSharedSpotSheet = false
     
     // initialize core data
@@ -36,16 +34,6 @@ struct My_SpotApp: App {
                 .onOpenURL { url in
                     Task {
                         await cloudViewModel.checkDeepLink(url: url, isFromNoti: false)
-                    }
-                }
-                .onAppear {
-                    if (UserDefaults.standard.valueExists(forKey: "systemcolor")) {
-                        cloudViewModel.systemColorIndex = UserDefaults.standard.integer(forKey: "systemcolor")
-                    } else {
-                        UserDefaults.standard.set(0, forKey: "systemcolor")
-                    }
-                    if UIApplication.shared.applicationIconBadgeNumber > 0 {
-                        UIApplication.shared.applicationIconBadgeNumber = UIApplication.shared.applicationIconBadgeNumber - 1
                     }
                 }
                 .tint(cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex])

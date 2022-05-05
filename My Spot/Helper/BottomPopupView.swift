@@ -18,6 +18,7 @@ struct NamePopupView: View {
     @Binding var isPresented: Bool
     @Binding var text: String
     @Binding var saved: Bool
+    var spotName: String
     
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -37,7 +38,7 @@ struct NamePopupView: View {
                         .foregroundColor(.white)
                 }
             }
-            TextField("", text: $text)
+            TextField("", text: $text, prompt: Text(spotName))
                 .frame(height: 36)
                 .padding([.leading, .trailing], 10)
                 .background(Color.gray.opacity(0.3))
@@ -68,7 +69,6 @@ struct NamePopupView: View {
                 .background(cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex])
                 .foregroundColor(.white)
                 .cornerRadius(10)
-                .disabled(text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
             }
             .padding(.bottom, 20)
         }

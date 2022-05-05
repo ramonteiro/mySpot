@@ -11,8 +11,10 @@ import CoreLocation
 struct SettingsView: View {
     
     @Environment(\.presentationMode) var presentationMode
+    @FetchRequest(sortDescriptors: []) var colors: FetchedResults<CustomColor>
     @EnvironmentObject var cloudViewModel: CloudKitViewModel
     @EnvironmentObject var mapViewModel: MapViewModel
+    @Environment(\.managedObjectContext) var moc
     @Environment(\.colorScheme) var colorScheme
     @State private var showingMailSheet = false
     @State private var showingConfigure = false
@@ -26,6 +28,7 @@ struct SettingsView: View {
     @State private var showingErrorNoConnection = false
     @State private var preventDoubleTrigger = false // stops onchange from triggering itself
     @State private var limits: Double = 10
+    @State private var showNotiView = false
     var body: some View {
         NavigationView {
             Form {
@@ -40,7 +43,10 @@ struct SettingsView: View {
                                         .background(Circle().foregroundColor(cloudViewModel.systemColorArray[i]))
                                         .onTapGesture {
                                             cloudViewModel.systemColorIndex = i
-                                            UserDefaults.standard.set(i, forKey: "systemcolor")
+                                            if (!colors.isEmpty) {
+                                                colors[0].colorIndex = Double(i)
+                                                try? moc.save()
+                                            }
                                         }
                                 } else {
                                     ZStack {
@@ -50,7 +56,10 @@ struct SettingsView: View {
                                             .background(Circle().foregroundColor(cloudViewModel.systemColorArray[i]))
                                             .onTapGesture {
                                                 cloudViewModel.systemColorIndex = i
-                                                UserDefaults.standard.set(i, forKey: "systemcolor")
+                                                if (!colors.isEmpty) {
+                                                    colors[0].colorIndex = Double(i)
+                                                    try? moc.save()
+                                                }
                                             }
                                         Image(systemName: "pencil")
                                             .frame(width: 40, height: 40)
@@ -83,7 +92,6 @@ struct SettingsView: View {
                                 .disabled(discoverProcess)
                         }
                     }
-                    
                 } header: {
                     if (cloudViewModel.notiNewSpotOn && !placeName.isEmpty) {
                         Text("Area Set To: ".localized() + (placeName))
@@ -264,10 +272,13 @@ struct SettingsView: View {
                 var alpha: CGFloat = 0
 
                 color.getRed(&red, green: &green, blue: &blue, alpha: &alpha)
-                UserDefaults.standard.set(Double(red), forKey: "customColorR")
-                UserDefaults.standard.set(Double(green), forKey: "customColorG")
-                UserDefaults.standard.set(Double(blue), forKey: "customColorB")
-                UserDefaults.standard.set(Double(alpha), forKey: "customColorA")
+                if (!colors.isEmpty) {
+                    colors[0].colorG = green
+                    colors[0].colorB = blue
+                    colors[0].colorR = red
+                    colors[0].colorA = alpha
+                    try? moc.save()
+                }
             }
             .navigationTitle("Settings".localized())
             .navigationViewStyle(.automatic)

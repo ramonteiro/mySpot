@@ -21,15 +21,12 @@ struct DiscoverDetailView: View {
     @FetchRequest(sortDescriptors: []) var spots: FetchedResults<Spot>
     @Environment(\.managedObjectContext) var moc
     @Environment(\.presentationMode) var presentationMode
-    @FetchRequest(sortDescriptors: []) var likedIds: FetchedResults<Likes>
-    @FetchRequest(sortDescriptors: []) var reportIds: FetchedResults<Report>
     @EnvironmentObject var tabController: TabController
     @EnvironmentObject var mapViewModel: MapViewModel
     @EnvironmentObject var cloudViewModel: CloudKitViewModel
     @Environment(\.colorScheme) var colorScheme
     
     let canShare: Bool
-    @State private var deletedSpot: [Spot] = []
     @State private var backImage = "chevron.left"
     @State private var mySpot = false
     @State private var distance: String = ""
@@ -39,7 +36,6 @@ struct DiscoverDetailView: View {
     @State private var showSaveAlert = false
     @State private var showingCannotSavePrivateAlert = false
     @State private var isSaving = false
-    @State private var likeButton = "heart"
     @State private var newName = ""
     @State private var isSaved: Bool = false
     @State private var imageOffset: CGFloat = -50
@@ -47,7 +43,6 @@ struct DiscoverDetailView: View {
     @State private var images: [UIImage] = []
     @State private var showingImage = false
     @State private var showingSaveSheet = false
-    @State private var didLike = false
     @State private var noType = false
     @State private var expand = false
     @State private var spotInCD = false
@@ -82,6 +77,13 @@ struct DiscoverDetailView: View {
                     if newValue {
                         Task {
                             showSaveAlert = true
+                            let spot = cloudViewModel.spots[index]
+                            let didLike = await cloudViewModel.likeSpot(spot: spot)
+                            if (didLike) {
+                                DispatchQueue.main.async {
+                                    cloudViewModel.spots[index].likes += 1
+                                }
+                            }
                             await save()
                             showSaveAlert = false
                         }
@@ -111,30 +113,13 @@ struct DiscoverDetailView: View {
                     
                     isSaving = false
                     newName = ""
-                    var didlike = false
-                    for i in likedIds {
-                        if i.likedId == cloudViewModel.spots[index].record.recordID.recordName {
-                            didlike = true
-                            break
-                        }
-                    }
-                    for i in reportIds {
-                        if i.reportid == cloudViewModel.spots[index].record.recordID.recordName {
-                            hasReported = true
-                            break
-                        }
-                    }
-                    if (didlike) {
-                        likeButton = "heart.fill"
-                    }
-                    // add hasreport
                     cloudViewModel.canRefresh = false
                 }
             }
         }
         .popup(isPresented: $showingSaveSheet) {
             BottomPopupView {
-                NamePopupView(isPresented: $showingSaveSheet, text: $newName, saved: $isSaving)
+                NamePopupView(isPresented: $showingSaveSheet, text: $newName, saved: $isSaving, spotName: cloudViewModel.spots[index].name)
             }
         }
         .alert("Unable To Save Spot".localized(), isPresented: $showingCannotSavePrivateAlert) {
@@ -188,7 +173,6 @@ struct DiscoverDetailView: View {
                 if (canShare && UIDevice.current.userInterfaceIdiom != .pad) {
                     canShareButton
                 }
-                displayLikeButton
             }
             .padding(.top, 30)
             Spacer()
@@ -364,56 +348,6 @@ struct DiscoverDetailView: View {
         }
     }
     
-    private var displayLikeButton: some View {
-        Button {
-            let spot = cloudViewModel.spots[index]
-            if (likeButton == "heart") {
-                Task {
-                    didLike = await cloudViewModel.likeSpot(spot: spot, like: true)
-                    if (didLike) {
-                        DispatchQueue.main.async {
-                            let newLike = Likes(context: moc)
-                            newLike.likedId = cloudViewModel.spots[index].record.recordID.recordName
-                            try? moc.save()
-                            likeButton = "heart.fill"
-                            cloudViewModel.spots[index].likes += 1
-                            didLike = false
-                        }
-                    }
-                }
-            } else {
-                Task {
-                    didLike = await cloudViewModel.likeSpot(spot: spot, like: false)
-                    if (didLike) {
-                        DispatchQueue.main.async {
-                            for i in likedIds {
-                                if (i.likedId == cloudViewModel.spots[index].record.recordID.recordName) {
-                                    moc.delete(i)
-                                    try? moc.save()
-                                    break
-                                }
-                            }
-                            likeButton = "heart"
-                            cloudViewModel.spots[index].likes -= 1
-                            didLike = false
-                        }
-                    }
-                }
-            }
-        } label: {
-            if (!didLike) {
-                Image(systemName: likeButton)
-                    .foregroundColor(.white)
-                    .font(.system(size: 30, weight: .regular))
-                    .padding(10)
-                    .shadow(color: Color.black.opacity(0.5), radius: 5)
-            } else {
-                ProgressView()
-                    .padding(10)
-            }
-        }
-    }
-    
     private var expandButton: some View {
         Image(systemName: (expand ? "x.circle.fill" : "arrow.up.circle.fill"))
             .resizable()
@@ -499,7 +433,7 @@ struct DiscoverDetailView: View {
             .padding([.leading, .trailing], 30)
             
             HStack {
-                Image(systemName: "heart.fill")
+                Image(systemName: "icloud.and.arrow.down")
                     .font(.system(size: 15, weight: .light))
                     .foregroundColor(Color.gray)
                 Text("\(cloudViewModel.spots[index].likes)")
@@ -559,14 +493,8 @@ struct DiscoverDetailView: View {
                 let spot = cloudViewModel.spots[index]
                 Task {
                     attemptToReport = true
-                    hasReported = await cloudViewModel.report(spot: spot, report: "offensive")
-                    if hasReported {
-                        DispatchQueue.main.async {
-                            let newReport = Report(context: moc)
-                            newReport.reportid = cloudViewModel.spots[index].record.recordID.recordName
-                            try? moc.save()
-                        }
-                    }
+                    await cloudViewModel.report(spot: spot, report: "offensive")
+                    hasReported = true
                     attemptToReport = false
                 }
             }
@@ -574,14 +502,8 @@ struct DiscoverDetailView: View {
                 let spot = cloudViewModel.spots[index]
                 Task {
                     attemptToReport = true
-                    hasReported = await cloudViewModel.report(spot: spot, report: "inappropriate")
-                    if hasReported {
-                        DispatchQueue.main.async {
-                            let newReport = Report(context: moc)
-                            newReport.reportid = cloudViewModel.spots[index].record.recordID.recordName
-                            try? moc.save()
-                        }
-                    }
+                    await cloudViewModel.report(spot: spot, report: "inappropriate")
+                    hasReported = true
                     attemptToReport = false
                 }
             }
@@ -589,14 +511,8 @@ struct DiscoverDetailView: View {
                 let spot = cloudViewModel.spots[index]
                 Task {
                     attemptToReport = true
-                    hasReported = await cloudViewModel.report(spot: spot, report: "spam")
-                    if hasReported {
-                        DispatchQueue.main.async {
-                            let newReport = Report(context: moc)
-                            newReport.reportid = cloudViewModel.spots[index].record.recordID.recordName
-                            try? moc.save()
-                        }
-                    }
+                    await cloudViewModel.report(spot: spot, report: "spam")
+                    hasReported = true
                     attemptToReport = false
                 }
             }
@@ -604,14 +520,8 @@ struct DiscoverDetailView: View {
                 let spot = cloudViewModel.spots[index]
                 Task {
                     attemptToReport = true
-                    hasReported = await cloudViewModel.report(spot: spot, report: "dangerous")
-                    if hasReported {
-                        DispatchQueue.main.async {
-                            let newReport = Report(context: moc)
-                            newReport.reportid = cloudViewModel.spots[index].record.recordID.recordName
-                            try? moc.save()
-                        }
-                    }
+                    await cloudViewModel.report(spot: spot, report: "dangerous")
+                    hasReported = true
                     attemptToReport = false
                 }
             }
@@ -655,7 +565,7 @@ struct DiscoverDetailView: View {
             newSpot.image2 = images[1]
         }
         newSpot.locationName = cloudViewModel.spots[index].locationName
-        newSpot.name = newName
+        newSpot.name = (newName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? cloudViewModel.spots[index].name : newName)
         newSpot.x = cloudViewModel.spots[index].location.coordinate.latitude
         newSpot.y = cloudViewModel.spots[index].location.coordinate.longitude
         newSpot.isPublic = false

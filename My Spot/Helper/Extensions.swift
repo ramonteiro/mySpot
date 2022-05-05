@@ -118,3 +118,24 @@ extension String {
         return NSLocalizedString(self, tableName: "Localizable", bundle: .main, value: self, comment: self)
     }
 }
+
+
+// badge for buttons
+struct Badge: View {
+    @Binding var count: Int
+    @Binding var color: Color
+
+    var body: some View {
+        ZStack(alignment: .topTrailing) {
+            Color.clear
+            Text(String(count))
+                .font(.system(size: 16))
+                .padding(5)
+                .background(color)
+                .clipShape(Circle())
+                // custom positioning in the top-right corner
+                .alignmentGuide(.top) { $0[.bottom] }
+                .alignmentGuide(.trailing) { $0[.trailing] - $0.width * 0.25 }
+        }
+    }
+}

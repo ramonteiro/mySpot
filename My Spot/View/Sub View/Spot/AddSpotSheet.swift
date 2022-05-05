@@ -20,6 +20,7 @@ struct AddSpotSheet: View {
     @Environment(\.presentationMode) var presentationMode
     @Environment(\.managedObjectContext) var moc
     @EnvironmentObject var mapViewModel: MapViewModel
+    @FetchRequest(sortDescriptors: []) var colors: FetchedResults<CustomColor>
     @EnvironmentObject var cloudViewModel: CloudKitViewModel
     
     @State private var showingAlert = false
@@ -35,7 +36,7 @@ struct AddSpotSheet: View {
     @State private var descript = ""
     @State private var tags = ""
     @State private var locationName = ""
-    @State private var isPublic = false
+    @State private var isPublic = true
     
     @State private var long = 1.0
     @State private var centerRegion = MKCoordinateRegion()
@@ -90,8 +91,8 @@ struct AddSpotSheet: View {
                             Section {
                                 displayFounderPrompt
                                     .onAppear {
-                                        if (UserDefaults.standard.valueExists(forKey: UserDefaultKeys.founder) && founder.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty) {
-                                            founder = UserDefaults.standard.value(forKey: UserDefaultKeys.founder) as! String
+                                        if (!colors.isEmpty && !(colors[0].name?.isEmpty ?? true) && founder.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty) {
+                                            founder = colors[0].name ?? ""
                                         }
                                     }
                             } header: {
@@ -550,7 +551,9 @@ struct AddSpotSheet: View {
                 newSpot.dbid = ""
                 newSpot.isPublic = false
             }
-            UserDefaults.standard.set(founder, forKey: UserDefaultKeys.founder)
+            if (!colors.isEmpty) {
+                colors[0].name = founder
+            }
             newSpot.founder = founder
             newSpot.details = descript
             newSpot.name = name
