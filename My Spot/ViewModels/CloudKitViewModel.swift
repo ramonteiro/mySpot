@@ -280,6 +280,7 @@ class CloudKitViewModel: ObservableObject {
             DispatchQueue.main.async {
                 if let id = returnedID {
                     self?.userID = id.recordName
+                    UserDefaults(suiteName: "group.com.isaacpaschall.My-Spot")?.set(self?.userID, forKey: "userid")
                 }
             }
         }
