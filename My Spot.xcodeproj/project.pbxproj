@@ -13,6 +13,26 @@
 		C502D4F927E1A02C0057A65C /* PlaylistEditSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = C502D4F827E1A02C0057A65C /* PlaylistEditSheet.swift */; };
 		C502D4FB27E1A6310057A65C /* SpotEditSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = C502D4FA27E1A6310057A65C /* SpotEditSheet.swift */; };
 		C502D4FD27E1B63D0057A65C /* DiscoverSheetShared.swift in Sources */ = {isa = PBXBuildFile; fileRef = C502D4FC27E1B63D0057A65C /* DiscoverSheetShared.swift */; };
+		C5071570282584AC000F344C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C507156F282584AC000F344C /* Assets.xcassets */; };
+		C5071576282584AC000F344C /* MySpotWatch WatchKit Extension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = C5071575282584AC000F344C /* MySpotWatch WatchKit Extension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		C507157B282584AC000F344C /* My_SpotApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = C507157A282584AC000F344C /* My_SpotApp.swift */; };
+		C507157D282584AC000F344C /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C507157C282584AC000F344C /* ContentView.swift */; };
+		C507157F282584AC000F344C /* NotificationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C507157E282584AC000F344C /* NotificationController.swift */; };
+		C5071581282584AC000F344C /* NotificationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5071580282584AC000F344C /* NotificationView.swift */; };
+		C5071583282584AC000F344C /* ComplicationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5071582282584AC000F344C /* ComplicationController.swift */; };
+		C5071585282584AD000F344C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C5071584282584AD000F344C /* Assets.xcassets */; };
+		C5071588282584AD000F344C /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C5071587282584AD000F344C /* Preview Assets.xcassets */; };
+		C507158D282584AD000F344C /* MySpotWatch.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = C507156D282584AB000F344C /* MySpotWatch.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		C507159828258645000F344C /* MapViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C507159728258645000F344C /* MapViewModel.swift */; };
+		C507159A28258650000F344C /* CloudKitViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C507159928258650000F344C /* CloudKitViewModel.swift */; };
+		C507159D282586B1000F344C /* SpotModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C507159C282586B1000F344C /* SpotModel.swift */; };
+		C507159E28258FA8000F344C /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = C56011B72800E66A00C49597 /* Localizable.strings */; };
+		C507159F28258FA8000F344C /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = C56011B72800E66A00C49597 /* Localizable.strings */; };
+		C50715A028258FF1000F344C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C507156F282584AC000F344C /* Assets.xcassets */; };
+		C50715A2282596EF000F344C /* ListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C50715A1282596EF000F344C /* ListView.swift */; };
+		C50715A728259CB3000F344C /* DetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C50715A628259CB3000F344C /* DetailView.swift */; };
+		C50715A928259CD2000F344C /* RowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C50715A828259CD2000F344C /* RowView.swift */; };
+		C50715AB28259EB5000F344C /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C50715AA28259EB5000F344C /* CloudKit.framework */; };
 		C50CF4A627F122DB001A9698 /* Mantis in Frameworks */ = {isa = PBXBuildFile; productRef = C50CF4A527F122DB001A9698 /* Mantis */; };
 		C50CF4A827F12328001A9698 /* MantisPhotoCropper.swift in Sources */ = {isa = PBXBuildFile; fileRef = C50CF4A727F12328001A9698 /* MantisPhotoCropper.swift */; };
 		C50CF4AA27F13915001A9698 /* ChoosePhoto.swift in Sources */ = {isa = PBXBuildFile; fileRef = C50CF4A927F13915001A9698 /* ChoosePhoto.swift */; };
@@ -74,6 +94,20 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		C5071577282584AC000F344C /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = C51503A227D7C347009F0DCD /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = C5071574282584AC000F344C;
+			remoteInfo = "MySpotWatch WatchKit Extension";
+		};
+		C507158B282584AD000F344C /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = C51503A227D7C347009F0DCD /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = C507156C282584AB000F344C;
+			remoteInfo = MySpotWatch;
+		};
 		C5D295582823719300FBA01E /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = C51503A227D7C347009F0DCD /* Project object */;
@@ -84,6 +118,28 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
+		C507158E282584AD000F344C /* Embed Watch Content */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "$(CONTENTS_FOLDER_PATH)/Watch";
+			dstSubfolderSpec = 16;
+			files = (
+				C507158D282584AD000F344C /* MySpotWatch.app in Embed Watch Content */,
+			);
+			name = "Embed Watch Content";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C5071591282584AD000F344C /* Embed App Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				C5071576282584AC000F344C /* MySpotWatch WatchKit Extension.appex in Embed App Extensions */,
+			);
+			name = "Embed App Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		C5D2955E2823719300FBA01E /* Embed App Extensions */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -104,6 +160,27 @@
 		C502D4F827E1A02C0057A65C /* PlaylistEditSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistEditSheet.swift; sourceTree = "<group>"; };
 		C502D4FA27E1A6310057A65C /* SpotEditSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpotEditSheet.swift; sourceTree = "<group>"; };
 		C502D4FC27E1B63D0057A65C /* DiscoverSheetShared.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiscoverSheetShared.swift; sourceTree = "<group>"; };
+		C507156D282584AB000F344C /* MySpotWatch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MySpotWatch.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		C507156F282584AC000F344C /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		C5071575282584AC000F344C /* MySpotWatch WatchKit Extension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "MySpotWatch WatchKit Extension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
+		C507157A282584AC000F344C /* My_SpotApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = My_SpotApp.swift; sourceTree = "<group>"; };
+		C507157C282584AC000F344C /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		C507157E282584AC000F344C /* NotificationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationController.swift; sourceTree = "<group>"; };
+		C5071580282584AC000F344C /* NotificationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationView.swift; sourceTree = "<group>"; };
+		C5071582282584AC000F344C /* ComplicationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComplicationController.swift; sourceTree = "<group>"; };
+		C5071584282584AD000F344C /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		C5071587282584AD000F344C /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		C5071589282584AD000F344C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		C507158A282584AD000F344C /* PushNotificationPayload.apns */ = {isa = PBXFileReference; lastKnownFileType = text; path = PushNotificationPayload.apns; sourceTree = "<group>"; };
+		C507159728258645000F344C /* MapViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapViewModel.swift; sourceTree = "<group>"; };
+		C507159928258650000F344C /* CloudKitViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudKitViewModel.swift; sourceTree = "<group>"; };
+		C507159C282586B1000F344C /* SpotModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpotModel.swift; sourceTree = "<group>"; };
+		C50715A1282596EF000F344C /* ListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListView.swift; sourceTree = "<group>"; };
+		C50715A3282597A3000F344C /* MySpotWatch.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = MySpotWatch.entitlements; sourceTree = "<group>"; };
+		C50715A4282597AB000F344C /* MySpotWatch WatchKit Extension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "MySpotWatch WatchKit Extension.entitlements"; sourceTree = "<group>"; };
+		C50715A628259CB3000F344C /* DetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailView.swift; sourceTree = "<group>"; };
+		C50715A828259CD2000F344C /* RowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RowView.swift; sourceTree = "<group>"; };
+		C50715AA28259EB5000F344C /* CloudKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CloudKit.framework; path = Platforms/WatchOS.platform/Developer/SDKs/WatchOS8.5.sdk/System/Library/Frameworks/CloudKit.framework; sourceTree = DEVELOPER_DIR; };
 		C50CF4A727F12328001A9698 /* MantisPhotoCropper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MantisPhotoCropper.swift; sourceTree = "<group>"; };
 		C50CF4A927F13915001A9698 /* ChoosePhoto.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChoosePhoto.swift; sourceTree = "<group>"; };
 		C50CF4AD27F395E2001A9698 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
@@ -177,6 +254,14 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		C5071572282584AC000F344C /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C50715AB28259EB5000F344C /* CloudKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		C51503A727D7C347009F0DCD /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -199,6 +284,70 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		C507156E282584AB000F344C /* MySpotWatch */ = {
+			isa = PBXGroup;
+			children = (
+				C50715A3282597A3000F344C /* MySpotWatch.entitlements */,
+				C507156F282584AC000F344C /* Assets.xcassets */,
+			);
+			path = MySpotWatch;
+			sourceTree = "<group>";
+		};
+		C5071579282584AC000F344C /* MySpotWatch WatchKit Extension */ = {
+			isa = PBXGroup;
+			children = (
+				C50715A528259C9F000F344C /* View */,
+				C50715A4282597AB000F344C /* MySpotWatch WatchKit Extension.entitlements */,
+				C507159B282586A4000F344C /* Model */,
+				C507159628258634000F344C /* ViewModel */,
+				C507157A282584AC000F344C /* My_SpotApp.swift */,
+				C507157E282584AC000F344C /* NotificationController.swift */,
+				C5071582282584AC000F344C /* ComplicationController.swift */,
+				C5071584282584AD000F344C /* Assets.xcassets */,
+				C5071589282584AD000F344C /* Info.plist */,
+				C507158A282584AD000F344C /* PushNotificationPayload.apns */,
+				C5071586282584AD000F344C /* Preview Content */,
+			);
+			path = "MySpotWatch WatchKit Extension";
+			sourceTree = "<group>";
+		};
+		C5071586282584AD000F344C /* Preview Content */ = {
+			isa = PBXGroup;
+			children = (
+				C5071587282584AD000F344C /* Preview Assets.xcassets */,
+			);
+			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		C507159628258634000F344C /* ViewModel */ = {
+			isa = PBXGroup;
+			children = (
+				C507159728258645000F344C /* MapViewModel.swift */,
+				C507159928258650000F344C /* CloudKitViewModel.swift */,
+			);
+			path = ViewModel;
+			sourceTree = "<group>";
+		};
+		C507159B282586A4000F344C /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				C507159C282586B1000F344C /* SpotModel.swift */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		C50715A528259C9F000F344C /* View */ = {
+			isa = PBXGroup;
+			children = (
+				C507157C282584AC000F344C /* ContentView.swift */,
+				C5071580282584AC000F344C /* NotificationView.swift */,
+				C50715A1282596EF000F344C /* ListView.swift */,
+				C50715A628259CB3000F344C /* DetailView.swift */,
+				C50715A828259CD2000F344C /* RowView.swift */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
 		C50CF4AB27F13949001A9698 /* ImageControl */ = {
 			isa = PBXGroup;
 			children = (
@@ -224,6 +373,8 @@
 				C5D2955F28238C9C00FBA01E /* MySpotWidgetExtension.entitlements */,
 				C51503AC27D7C347009F0DCD /* My Spot */,
 				C5D2954F2823719100FBA01E /* MySpotWidget */,
+				C507156E282584AB000F344C /* MySpotWatch */,
+				C5071579282584AC000F344C /* MySpotWatch WatchKit Extension */,
 				C51503AB27D7C347009F0DCD /* Products */,
 				C51503BE27D7C531009F0DCD /* Frameworks */,
 			);
@@ -234,6 +385,8 @@
 			children = (
 				C51503AA27D7C347009F0DCD /* My Spot.app */,
 				C5D2954A2823719100FBA01E /* MySpotWidgetExtension.appex */,
+				C507156D282584AB000F344C /* MySpotWatch.app */,
+				C5071575282584AC000F344C /* MySpotWatch WatchKit Extension.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -269,6 +422,7 @@
 		C51503BE27D7C531009F0DCD /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				C50715AA28259EB5000F344C /* CloudKit.framework */,
 				C51503BF27D7C531009F0DCD /* CloudKit.framework */,
 				C5D2954B2823719100FBA01E /* WidgetKit.framework */,
 				C5D2954D2823719100FBA01E /* SwiftUI.framework */,
@@ -425,6 +579,40 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		C507156C282584AB000F344C /* MySpotWatch */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = C5071595282584AD000F344C /* Build configuration list for PBXNativeTarget "MySpotWatch" */;
+			buildPhases = (
+				C507156B282584AB000F344C /* Resources */,
+				C5071591282584AD000F344C /* Embed App Extensions */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				C5071578282584AC000F344C /* PBXTargetDependency */,
+			);
+			name = MySpotWatch;
+			productName = MySpotWatch;
+			productReference = C507156D282584AB000F344C /* MySpotWatch.app */;
+			productType = "com.apple.product-type.application.watchapp2";
+		};
+		C5071574282584AC000F344C /* MySpotWatch WatchKit Extension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = C5071594282584AD000F344C /* Build configuration list for PBXNativeTarget "MySpotWatch WatchKit Extension" */;
+			buildPhases = (
+				C5071571282584AC000F344C /* Sources */,
+				C5071572282584AC000F344C /* Frameworks */,
+				C5071573282584AC000F344C /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "MySpotWatch WatchKit Extension";
+			productName = "MySpotWatch WatchKit Extension";
+			productReference = C5071575282584AC000F344C /* MySpotWatch WatchKit Extension.appex */;
+			productType = "com.apple.product-type.watchkit2-extension";
+		};
 		C51503A927D7C347009F0DCD /* My Spot */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = C51503B827D7C349009F0DCD /* Build configuration list for PBXNativeTarget "My Spot" */;
@@ -433,11 +621,13 @@
 				C51503A727D7C347009F0DCD /* Frameworks */,
 				C51503A827D7C347009F0DCD /* Resources */,
 				C5D2955E2823719300FBA01E /* Embed App Extensions */,
+				C507158E282584AD000F344C /* Embed Watch Content */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 				C5D295592823719300FBA01E /* PBXTargetDependency */,
+				C507158C282584AD000F344C /* PBXTargetDependency */,
 			);
 			name = "My Spot";
 			packageProductDependencies = (
@@ -474,6 +664,12 @@
 				LastSwiftUpdateCheck = 1330;
 				LastUpgradeCheck = 1320;
 				TargetAttributes = {
+					C507156C282584AB000F344C = {
+						CreatedOnToolsVersion = 13.3.1;
+					};
+					C5071574282584AC000F344C = {
+						CreatedOnToolsVersion = 13.3.1;
+					};
 					C51503A927D7C347009F0DCD = {
 						CreatedOnToolsVersion = 13.2.1;
 					};
@@ -511,11 +707,33 @@
 			targets = (
 				C51503A927D7C347009F0DCD /* My Spot */,
 				C5D295492823719100FBA01E /* MySpotWidgetExtension */,
+				C507156C282584AB000F344C /* MySpotWatch */,
+				C5071574282584AC000F344C /* MySpotWatch WatchKit Extension */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		C507156B282584AB000F344C /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C5071570282584AC000F344C /* Assets.xcassets in Resources */,
+				C507159E28258FA8000F344C /* Localizable.strings in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C5071573282584AC000F344C /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C5071588282584AD000F344C /* Preview Assets.xcassets in Resources */,
+				C507159F28258FA8000F344C /* Localizable.strings in Resources */,
+				C50715A028258FF1000F344C /* Assets.xcassets in Resources */,
+				C5071585282584AD000F344C /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		C51503A827D7C347009F0DCD /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -539,6 +757,24 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		C5071571282584AC000F344C /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C507157F282584AC000F344C /* NotificationController.swift in Sources */,
+				C507159D282586B1000F344C /* SpotModel.swift in Sources */,
+				C507157D282584AC000F344C /* ContentView.swift in Sources */,
+				C50715A728259CB3000F344C /* DetailView.swift in Sources */,
+				C5071583282584AC000F344C /* ComplicationController.swift in Sources */,
+				C507157B282584AC000F344C /* My_SpotApp.swift in Sources */,
+				C5071581282584AC000F344C /* NotificationView.swift in Sources */,
+				C507159828258645000F344C /* MapViewModel.swift in Sources */,
+				C50715A928259CD2000F344C /* RowView.swift in Sources */,
+				C507159A28258650000F344C /* CloudKitViewModel.swift in Sources */,
+				C50715A2282596EF000F344C /* ListView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		C51503A627D7C347009F0DCD /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -608,6 +844,16 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		C5071578282584AC000F344C /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = C5071574282584AC000F344C /* MySpotWatch WatchKit Extension */;
+			targetProxy = C5071577282584AC000F344C /* PBXContainerItemProxy */;
+		};
+		C507158C282584AD000F344C /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = C507156C282584AB000F344C /* MySpotWatch */;
+			targetProxy = C507158B282584AD000F344C /* PBXContainerItemProxy */;
+		};
 		C5D295592823719300FBA01E /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = C5D295492823719100FBA01E /* MySpotWidgetExtension */;
@@ -638,6 +884,130 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
+		C507158F282584AD000F344C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = MySpotWatch/MySpotWatch.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 2HAP7LLHCJ;
+				GENERATE_INFOPLIST_FILE = YES;
+				IBSC_MODULE = MySpotWatch_WatchKit_Extension;
+				INFOPLIST_KEY_CFBundleDisplayName = MySpotWatch;
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "My Spot needs location to find spots close to you";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = "com.isaacpaschall.My-Spot";
+				MARKETING_VERSION = 1.4;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.isaacpaschall.My-Spot.watchkitapp";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 8.5;
+			};
+			name = Debug;
+		};
+		C5071590282584AD000F344C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = MySpotWatch/MySpotWatch.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 2HAP7LLHCJ;
+				GENERATE_INFOPLIST_FILE = YES;
+				IBSC_MODULE = MySpotWatch_WatchKit_Extension;
+				INFOPLIST_KEY_CFBundleDisplayName = MySpotWatch;
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "My Spot needs location to find spots close to you";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = "com.isaacpaschall.My-Spot";
+				MARKETING_VERSION = 1.4;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.isaacpaschall.My-Spot.watchkitapp";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 8.5;
+			};
+			name = Release;
+		};
+		C5071592282584AD000F344C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_COMPLICATION_NAME = Complication;
+				CODE_SIGN_ENTITLEMENTS = "MySpotWatch WatchKit Extension/MySpotWatch WatchKit Extension.entitlements";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"MySpotWatch WatchKit Extension/Preview Content\"";
+				DEVELOPMENT_TEAM = 2HAP7LLHCJ;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "MySpotWatch WatchKit Extension/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "MySpotWatch WatchKit Extension";
+				INFOPLIST_KEY_CLKComplicationPrincipalClass = MySpotWatch_WatchKit_Extension.ComplicationController;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "My Spot needs location to find spots close to you";
+				INFOPLIST_KEY_WKRunsIndependentlyOfCompanionApp = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.4;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.isaacpaschall.My-Spot.watchkitapp.watchkitextension";
+				PRODUCT_NAME = "${TARGET_NAME}";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 8.5;
+			};
+			name = Debug;
+		};
+		C5071593282584AD000F344C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_COMPLICATION_NAME = Complication;
+				CODE_SIGN_ENTITLEMENTS = "MySpotWatch WatchKit Extension/MySpotWatch WatchKit Extension.entitlements";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"MySpotWatch WatchKit Extension/Preview Content\"";
+				DEVELOPMENT_TEAM = 2HAP7LLHCJ;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "MySpotWatch WatchKit Extension/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "MySpotWatch WatchKit Extension";
+				INFOPLIST_KEY_CLKComplicationPrincipalClass = MySpotWatch_WatchKit_Extension.ComplicationController;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "My Spot needs location to find spots close to you";
+				INFOPLIST_KEY_WKRunsIndependentlyOfCompanionApp = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.4;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.isaacpaschall.My-Spot.watchkitapp.watchkitextension";
+				PRODUCT_NAME = "${TARGET_NAME}";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 8.5;
+			};
+			name = Release;
+		};
 		C51503B627D7C349009F0DCD /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -893,6 +1263,24 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		C5071594282584AD000F344C /* Build configuration list for PBXNativeTarget "MySpotWatch WatchKit Extension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C5071592282584AD000F344C /* Debug */,
+				C5071593282584AD000F344C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		C5071595282584AD000F344C /* Build configuration list for PBXNativeTarget "MySpotWatch" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C507158F282584AD000F344C /* Debug */,
+				C5071590282584AD000F344C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		C51503A527D7C347009F0DCD /* Build configuration list for PBXProject "My Spot" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
