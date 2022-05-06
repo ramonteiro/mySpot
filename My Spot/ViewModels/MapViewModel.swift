@@ -81,6 +81,7 @@ final class MapViewModel: NSObject, ObservableObject, CLLocationManagerDelegate 
             region.center.longitude = UserDefaults.standard.double(forKey: UserDefaultKeys.lastKnownUserLocationY)
         }
     }
+    //
     
     func getPlacmarkOfLocation(location: CLLocation, completionHandler: @escaping (String) -> Void) {
         let geo = CLGeocoder()
