@@ -26,19 +26,21 @@ struct SpotEntry: TimelineEntry {
     let locationName: String
     let userx: Double
     let usery: Double
+    let isNoLocation: Bool
     let spot: [Spot]
 }
 
 struct Provider: TimelineProvider {
     
-    var cloudViewModel = CloudKitViewModel()
-    var mapViewModel = WidgetLocationManager()
-    let emptySpot = SpotEntry(locationName: "Coconino County",userx: 33.71447172967623, usery: -112.29073153451222, spot: [
+    var cloudViewModel: CloudKitViewModel
+    var mapViewModel: WidgetLocationManager
+    let emptySpot = SpotEntry(locationName: "Coconino County",userx: 33.71447172967623, usery: -112.29073153451222, isNoLocation: false, spot: [
         Spot(spotid: "", name: "Antelope Canyon", customLocation: false, locationName: "Grand Canyon", image: (UIImage(named: "atelopeCanyon")?.jpegData(compressionQuality: 0.9))!, x: 36.8619, y: -111.3743),
         Spot(spotid: "", name: "South Rim Trail", customLocation: false, locationName: "Grand Canyon", image: (UIImage(named: "southRim")?.jpegData(compressionQuality: 0.9))!, x: 36.056198, y: -112.125198),
         Spot(spotid: "", name: "Havasu Falls", customLocation: false, locationName: "Grand Canyon", image: (UIImage(named: "havasuFalls")?.jpegData(compressionQuality: 0.9))!, x: 36.2552, y: -112.6979),
         Spot(spotid: "", name: "Fire Point", customLocation: false, locationName: "Grand Canyon", image: (UIImage(named: "firePoint")?.jpegData(compressionQuality: 0.9))!, x: 36.3558152, y: -112.3615679)
     ])
+    let noLocation = SpotEntry(locationName: "", userx: 0, usery: 0, isNoLocation: true, spot: [Spot(spotid: "", name: "", customLocation: false, locationName: "", image: Data(), x: 0, y: 0)])
     
     func placeholder(in context: Context) -> SpotEntry {
         let entry = emptySpot
@@ -48,13 +50,13 @@ struct Provider: TimelineProvider {
     func getSnapshot(in context: Context, completion: @escaping (SpotEntry) -> Void) {
         if context.isPreview {
             completion(emptySpot)
-        } else {
+        } else if mapViewModel.locationManager!.isAuthorizedForWidgetUpdates {
             mapViewModel.fetchLocation { location in
                 getPlacmarkOfLocation(location: location) { locationName in
                     cloudViewModel.fetchSpotPublic(userLocation: location, resultLimit: 4) { (result) in
                         switch result {
                         case .success(let entry):
-                            completion(SpotEntry(locationName: locationName, userx: location.coordinate.latitude, usery: location.coordinate.longitude, spot: entry))
+                            completion(SpotEntry(locationName: locationName, userx: location.coordinate.latitude, usery: location.coordinate.longitude, isNoLocation: false, spot: entry))
                         case .failure(let error):
                             print("snapshot Error: \(error)")
                             completion(emptySpot)
@@ -62,25 +64,32 @@ struct Provider: TimelineProvider {
                     }
                 }
             }
+        } else {
+            completion(noLocation)
         }
     }
     
     func getTimeline(in context: Context, completion: @escaping (Timeline<SpotEntry>) -> Void) {
-        mapViewModel.fetchLocation { location in
-            getPlacmarkOfLocation(location: location) { locationName in
-                cloudViewModel.fetchSpotPublic(userLocation: location, resultLimit: 4) { (result) in
-                    switch result {
-                    case .success(let entry):
-                        let entry = SpotEntry(locationName: locationName, userx: location.coordinate.latitude, usery: location.coordinate.longitude, spot: entry)
-                        let timeline = Timeline(entries: [entry], policy: .atEnd)
-                        completion(timeline)
-                    case .failure(let error):
-                        print("TimeLine Error: \(error)")
-                        let timeline = Timeline(entries: [emptySpot], policy: .after(Date().addingTimeInterval(60 * 2)))
-                        completion(timeline)
+        if mapViewModel.locationManager!.isAuthorizedForWidgetUpdates {
+            mapViewModel.fetchLocation { location in
+                getPlacmarkOfLocation(location: location) { locationName in
+                    cloudViewModel.fetchSpotPublic(userLocation: location, resultLimit: 4) { (result) in
+                        switch result {
+                        case .success(let entry):
+                            let entry = SpotEntry(locationName: locationName, userx: location.coordinate.latitude, usery: location.coordinate.longitude, isNoLocation: false, spot: entry)
+                            let timeline = Timeline(entries: [entry], policy: .never)
+                            completion(timeline)
+                        case .failure(let error):
+                            print("TimeLine Error: \(error)")
+                            let timeline = Timeline(entries: [emptySpot], policy: .after(Date().addingTimeInterval(60 * 2)))
+                            completion(timeline)
+                        }
                     }
                 }
             }
+        } else {
+            let timeline = Timeline(entries: [noLocation], policy: .never)
+            completion(timeline)
         }
     }
     
@@ -201,13 +210,20 @@ struct WidgetEntryView: View {
     
     @ViewBuilder
     var body: some View {
-        switch family {
-        case .systemSmall:
-            SmallWidgetView(entry: entry)
-        case .systemMedium:
-            MediumWidgetView(entry: entry)
-        default:
-            LargeWidgetView(entry: entry)
+        if !entry.isNoLocation {
+            switch family {
+            case .systemSmall:
+                SmallWidgetView(entry: entry)
+            case .systemMedium:
+                MediumWidgetView(entry: entry)
+            default:
+                LargeWidgetView(entry: entry)
+            }
+        } else {
+            Text("Location Services Disabled".localized())
+                .font(.system(size: 12))
+                .fontWeight(.bold)
+                .lineLimit(1)
         }
     }
 }
@@ -289,12 +305,21 @@ struct WidgetHeader: View {
     
     var body: some View {
         HStack {
-            Text(locationName)
-                .foregroundColor(colorScheme == .dark ? Color.white : Color.black)
-                .font(.system(size: 14))
-                .fontWeight(.bold)
-                .lineLimit(1)
-                .padding(.leading, 15)
+            if !locationName.isEmpty {
+                Text(locationName)
+                    .foregroundColor(colorScheme == .dark ? Color.white : Color.black)
+                    .font(.system(size: 14))
+                    .fontWeight(.bold)
+                    .lineLimit(1)
+                    .padding(.leading, 15)
+            } else {
+                Text("Near Your Location".localized())
+                    .foregroundColor(colorScheme == .dark ? Color.white : Color.black)
+                    .font(.system(size: 14))
+                    .fontWeight(.bold)
+                    .lineLimit(1)
+                    .padding(.leading, 15)
+            }
             Spacer()
             Image(uiImage: UIImage(named: "logo.png")!)
                 .resizable()
@@ -315,39 +340,20 @@ struct WidgetTile: View {
     var body: some View {
         GeometryReader { geo in
             ZStack {
-                HStack(spacing: 0) {
-                    Link(destination: URL(string: "myspot://" + (spot.spotid))!) {
-                        Image(uiImage: (UIImage(data: spot.image) ?? UIImage(systemName: "exclamationmark.triangle"))!)
-                            .resizable()
-                            .scaledToFill()
-                            .frame(width: geo.size.width, height: geo.size.height)
-                    }
+                Link(destination: URL(string: "myspot://" + (spot.spotid))!) {
+                    Image(uiImage: (UIImage(data: spot.image) ?? UIImage(systemName: "exclamationmark.triangle"))!)
+                        .resizable()
+                        .scaledToFill()
+                        .frame(width: geo.size.width, height: geo.size.height)
                 }
+                Color.black.opacity(0.4)
                 VStack(alignment: .leading, spacing: 0) {
-                    if (!(spot.locationName.isEmpty)) {
-                        HStack {
-                            locationName
-                            Spacer()
-                        }
-                        HStack {
-                            distanceAway
-                            Spacer()
-                        }
-                    } else {
-                        HStack {
-                            distanceAway
-                            Spacer()
-                        }
-                    }
                     Spacer()
-                    Text(spot.name)
-                        .foregroundColor(colorScheme == .dark ? Color.white : Color.black)
-                        .font(.system(size: 16))
-                        .fontWeight(.bold)
-                        .padding(.bottom, 10)
-                        .lineLimit(1)
-                        .frame(width: geo.size.width)
-                        .background(.ultraThinMaterial)
+                    titleName
+                    if (!(spot.locationName.isEmpty)) {
+                        locationName
+                    }
+                    distanceAway
                 }
                 .frame(width: geo.size.width)
             }
@@ -355,30 +361,43 @@ struct WidgetTile: View {
         }
     }
     
+    private var titleName: some View {
+        HStack {
+            Text(spot.name)
+                .foregroundColor(.white)
+                .font(.system(size: 18))
+                .fontWeight(.bold)
+                .lineLimit(1)
+            Spacer()
+        }
+        .padding(.leading, 10)
+    }
+    
     private var locationName: some View {
         HStack(spacing: 5) {
             Image(systemName: (!spot.customLocation ? "mappin" : "figure.wave"))
-                .font(.system(size: 12))
+                .font(.system(size: 14))
                 .foregroundColor(.white)
                 .lineLimit(1)
-                .shadow(color: .black, radius: 0.4)
             Text(spot.locationName)
-                .font(.system(size: 12))
-                .foregroundColor(colorScheme == .dark ? Color.white : Color.black)
+                .font(.system(size: 14))
+                .foregroundColor(.white)
                 .lineLimit(1)
-                .shadow(color: .black, radius: 0.4)
+            Spacer()
         }
         .padding(.leading, 10)
     }
     
     private var distanceAway: some View {
-        Text(calculateDistance(x: spot.x, y: spot.y))
-            .foregroundColor(.white)
-            .font(.system(size: 12))
-            .lineLimit(1)
-            .shadow(radius: 4)
-            .padding(.leading, 10)
-            .shadow(color: .black, radius: 0.4)
+        HStack {
+            Text(calculateDistance(x: spot.x, y: spot.y))
+                .foregroundColor(.white)
+                .font(.system(size: 14))
+                .lineLimit(1)
+                .shadow(radius: 4)
+            Spacer()
+        }
+        .padding([.leading, .bottom], 10)
     }
     
     private func calculateDistance(x: Double, y: Double) -> String {
@@ -415,10 +434,12 @@ struct WidgetTile: View {
 
 @main
 struct WidgetMain: Widget {
+    var mapViewModel = WidgetLocationManager()
+    var cloudViewModel = CloudKitViewModel()
     private let kind = "MySpotWidget"
     
     var body: some WidgetConfiguration {
-        StaticConfiguration(kind: kind, provider: Provider()) { entry in
+        StaticConfiguration(kind: kind, provider: Provider(cloudViewModel: cloudViewModel, mapViewModel: mapViewModel)) { entry in
             WidgetEntryView(entry: entry)
         }
         .configurationDisplayName("Spots Near Me")
