@@ -298,6 +298,7 @@ struct SmallWidgetView: View {
     }
 }
 
+// header
 struct WidgetHeader: View {
     
     let locationName: String
