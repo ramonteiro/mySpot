@@ -113,7 +113,7 @@ struct DiscoverSheetShared: View {
         }
         .popup(isPresented: $showingSaveSheet) {
             BottomPopupView {
-                NamePopupView(isPresented: $showingSaveSheet, text: $newName, saved: $isSaving, spotName: cloudViewModel.shared[0].name)
+                NamePopupView(isPresented: $showingSaveSheet, text: $newName, saved: $isSaving, spotName: (cloudViewModel.shared.isEmpty ? "" : cloudViewModel.shared[0].name))
             }
         }
         .alert("Unable To Save Spot".localized(), isPresented: $showingCannotSavePrivateAlert) {
