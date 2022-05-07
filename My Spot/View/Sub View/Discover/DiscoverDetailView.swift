@@ -479,8 +479,11 @@ struct DiscoverDetailView: View {
                 routeMeTo.name = cloudViewModel.spots[index].name
                 routeMeTo.openInMaps(launchOptions: nil)
             } label: {
-                Text("Take Me To \(cloudViewModel.spots[index].name)")
-                    .padding(.horizontal)
+                HStack {
+                    Image(systemName: "location.fill")
+                    Text(cloudViewModel.spots[index].name)
+                }
+                .padding(.horizontal)
             }
             .buttonStyle(.borderedProminent)
             .padding(.top, 10)

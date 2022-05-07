@@ -10,10 +10,7 @@ import SwiftUI
 @main
 struct My_SpotApp: App {
     
-    @State private var showSharedSpotSheet = false
-    
-    // initialize core data
-    @StateObject private var dataController = CoreDataManager()
+    @StateObject private var phoneViewModel = PhoneViewModel()
     
     // initialize mapViewModel
     @StateObject private var mapViewModel = MapViewModel()
@@ -28,9 +25,10 @@ struct My_SpotApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
-                .environment(\.managedObjectContext, dataController.container.viewContext)
+                .environment(\.managedObjectContext, phoneViewModel.dataController.container.viewContext)
                 .environmentObject(mapViewModel)
                 .environmentObject(cloudViewModel)
+                .environmentObject(phoneViewModel)
                 .onOpenURL { url in
                     Task {
                         await cloudViewModel.checkDeepLink(url: url, isFromNoti: false)

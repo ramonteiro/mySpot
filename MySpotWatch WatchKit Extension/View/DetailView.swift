@@ -37,7 +37,10 @@ struct DetailView: View {
                 routeMeTo.name = spot.name
                 routeMeTo.openInMaps(launchOptions: nil)
             } label: {
-                Text("Take Me To \(spot.name)")
+                HStack {
+                    Image(systemName: "location.fill")
+                    Text(spot.name)
+                }
             }
         }
         .onAppear {

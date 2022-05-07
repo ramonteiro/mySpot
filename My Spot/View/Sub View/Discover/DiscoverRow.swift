@@ -54,7 +54,7 @@ struct DiscoverRow: View {
                     .foregroundColor(Color.gray)
                 
                 HStack(alignment: .center) {
-                    Image(systemName: "heart.fill")
+                    Image(systemName: "icloud.and.arrow.down")
                         .font(.subheadline)
                         .foregroundColor(Color.gray)
                     Text("\(spot.likes)")

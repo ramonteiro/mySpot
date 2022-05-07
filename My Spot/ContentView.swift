@@ -12,6 +12,7 @@ struct ContentView: View {
     @Environment(\.scenePhase) private var scenePhase
     @EnvironmentObject var cloudViewModel: CloudKitViewModel
     @EnvironmentObject var mapViewModel: MapViewModel
+    @EnvironmentObject var phoneViewModel: PhoneViewModel
     @StateObject private var tabController = TabController()
     @FetchRequest(sortDescriptors: []) var colors: FetchedResults<CustomColor>
     @Environment(\.managedObjectContext) var moc

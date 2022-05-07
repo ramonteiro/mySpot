@@ -451,8 +451,11 @@ struct DiscoverSheetShared: View {
                 routeMeTo.name = cloudViewModel.shared[0].name
                 routeMeTo.openInMaps(launchOptions: nil)
             } label: {
-                Text("Take Me To ".localized() + (cloudViewModel.shared[0].name))
-                    .padding(.horizontal)
+                HStack {
+                    Image(systemName: "location.fill")
+                    Text(cloudViewModel.shared[0].name)
+                }
+                .padding(.horizontal)
             }
             .buttonStyle(.borderedProminent)
             .padding(.top, 10)

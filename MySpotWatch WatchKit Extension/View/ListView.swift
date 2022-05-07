@@ -12,6 +12,7 @@ struct ListView: View {
     let distance: Double
     let maxLoad: Int
     @ObservedObject var mapViewModel: WatchLocationManager
+    @ObservedObject var watchViewModel: WatchViewModel
     @State private var spots: [Spot] = []
     @State private var hasLoaded = false
     @State private var isError = false
@@ -40,6 +41,14 @@ struct ListView: View {
                     ForEach(spots, id: \.self) { spot in
                         NavigationLink(destination: DetailView(mapViewModel: mapViewModel, spot: spot)) {
                             RowView(spot: spot)
+                                .swipeActions {
+                                    Button {
+                                        watchViewModel.sendSpotId(id: spot.spotid)
+                                    } label: {
+                                        Image(systemName: "icloud.and.arrow.down")
+                                    }
+                                    .tint(.blue)
+                                }
                         }
                     }
                 }

@@ -10,12 +10,13 @@ import SwiftUI
 @main
 struct My_SpotApp: App {
     
+    @StateObject var watchViewModel = WatchViewModel()
     @StateObject var mapViewModel = WatchLocationManager()
     
     @SceneBuilder var body: some Scene {
         WindowGroup {
             NavigationView {
-                ContentView(mapViewModel: mapViewModel)
+                ContentView(mapViewModel: mapViewModel, watchViewModel: watchViewModel)
             }
         }
 

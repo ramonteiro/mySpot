@@ -384,8 +384,11 @@ struct DetailView: View {
                     routeMeTo.name = spot.name ?? "Spot"
                     routeMeTo.openInMaps(launchOptions: nil)
                 } label: {
-                    Text("Take Me To ".localized() + (spot.name ?? ""))
-                        .padding(.horizontal)
+                    HStack {
+                        Image(systemName: "location.fill")
+                        Text(spot.name ?? "")
+                    }
+                    .padding(.horizontal)
                 }
                 .buttonStyle(.borderedProminent)
                 .padding(.top, 10)

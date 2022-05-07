@@ -79,6 +79,8 @@
 		C515042527D7CAC6009F0DCD /* UIEmojiTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = C515042227D7CAC6009F0DCD /* UIEmojiTextField.swift */; };
 		C515042927D8540A009F0DCD /* TabController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C515042827D8540A009F0DCD /* TabController.swift */; };
 		C515042C27D95225009F0DCD /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C515042B27D95225009F0DCD /* LaunchScreen.storyboard */; };
+		C5552CC22826472900AF2683 /* PhoneViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5552CC12826472800AF2683 /* PhoneViewModel.swift */; };
+		C5552CC42826482A00AF2683 /* WatchViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5552CC32826482A00AF2683 /* WatchViewModel.swift */; };
 		C56011B52800E66A00C49597 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = C56011B72800E66A00C49597 /* Localizable.strings */; };
 		C56F499F27E05CE300BCBB8F /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = C56F499E27E05CE300BCBB8F /* Extensions.swift */; };
 		C587027427E27F1900DFB6C4 /* MailViewCallback.swift in Sources */ = {isa = PBXBuildFile; fileRef = C587027327E27F1900DFB6C4 /* MailViewCallback.swift */; };
@@ -229,6 +231,8 @@
 		C515042827D8540A009F0DCD /* TabController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabController.swift; sourceTree = "<group>"; };
 		C515042A27D95154009F0DCD /* My-Spot-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "My-Spot-Info.plist"; sourceTree = SOURCE_ROOT; };
 		C515042B27D95225009F0DCD /* LaunchScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
+		C5552CC12826472800AF2683 /* PhoneViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhoneViewModel.swift; sourceTree = "<group>"; };
+		C5552CC32826482A00AF2683 /* WatchViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchViewModel.swift; sourceTree = "<group>"; };
 		C56011B62800E66A00C49597 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		C56011B82800E66D00C49597 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		C56011B92800E86B00C49597 /* pt-BR */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "pt-BR"; path = "pt-BR.lproj/Localizable.strings"; sourceTree = "<group>"; };
@@ -324,6 +328,7 @@
 			children = (
 				C507159728258645000F344C /* MapViewModel.swift */,
 				C507159928258650000F344C /* CloudKitViewModel.swift */,
+				C5552CC32826482A00AF2683 /* WatchViewModel.swift */,
 			);
 			path = ViewModel;
 			sourceTree = "<group>";
@@ -363,6 +368,7 @@
 			children = (
 				C51503F127D7CA1D009F0DCD /* MapViewModel.swift */,
 				C51503E627D7C87D009F0DCD /* CloudKitViewModel.swift */,
+				C5552CC12826472800AF2683 /* PhoneViewModel.swift */,
 			);
 			path = ViewModels;
 			sourceTree = "<group>";
@@ -763,6 +769,7 @@
 			files = (
 				C507157F282584AC000F344C /* NotificationController.swift in Sources */,
 				C507159D282586B1000F344C /* SpotModel.swift in Sources */,
+				C5552CC42826482A00AF2683 /* WatchViewModel.swift in Sources */,
 				C507157D282584AC000F344C /* ContentView.swift in Sources */,
 				C50715A728259CB3000F344C /* DetailView.swift in Sources */,
 				C5071583282584AC000F344C /* ComplicationController.swift in Sources */,
@@ -797,6 +804,7 @@
 				C501FC1827E3FAB7008FEFA1 /* ZoomableScrollView.swift in Sources */,
 				C51503FD27D7CA60009F0DCD /* DiscoverView.swift in Sources */,
 				C51503DD27D7C856009F0DCD /* UIImageTransformer.swift in Sources */,
+				C5552CC22826472900AF2683 /* PhoneViewModel.swift in Sources */,
 				C515040F27D7CA87009F0DCD /* AddSpotToPlaylistSheet.swift in Sources */,
 				C51503F327D7CA1D009F0DCD /* ViewSingleSpotOnMap.swift in Sources */,
 				C51503E027D7C856009F0DCD /* Playlist+CoreDataProperties.swift in Sources */,

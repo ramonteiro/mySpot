@@ -347,7 +347,7 @@ struct WidgetTile: View {
                         .scaledToFill()
                         .frame(width: geo.size.width, height: geo.size.height)
                 }
-                Color.black.opacity(0.4)
+                Color.black.opacity(0.3)
                 VStack(alignment: .leading, spacing: 0) {
                     Spacer()
                     titleName
@@ -443,8 +443,8 @@ struct WidgetMain: Widget {
         StaticConfiguration(kind: kind, provider: Provider(cloudViewModel: cloudViewModel, mapViewModel: mapViewModel)) { entry in
             WidgetEntryView(entry: entry)
         }
-        .configurationDisplayName("Spots Near Me")
-        .description("Shows Spots Closest To You")
+        .configurationDisplayName("Spots Near Me".localized())
+        .description("Shows Spots Closest To You".localized())
         .supportedFamilies([.systemLarge, .systemSmall, .systemMedium])
     }
 }

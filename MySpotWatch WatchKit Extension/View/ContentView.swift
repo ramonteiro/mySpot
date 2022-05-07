@@ -10,10 +10,12 @@ import SwiftUI
 struct ContentView: View {
     
     @ObservedObject var mapViewModel: WatchLocationManager
+    @ObservedObject var watchViewModel: WatchViewModel
     @State private var distance: Double = 10
     @State private var maxLoad: Double = 10
     @State private var isMetric = false
     @State private var showList = false
+    private let nilLocation = CLLocation(latitude: 0, longitude: 0)
     private let range = 5.0...25.0
     
     var body: some View {
@@ -24,14 +26,14 @@ struct ContentView: View {
                         Image(uiImage: UIImage(named: "logo.png")!)
                             .resizable()
                             .frame(width: 30, height: 30)
-                        Text(mapViewModel.locationName.isEmpty ? "Finding Location.." : "\(mapViewModel.locationName)")
+                        Text(mapViewModel.locationName.isEmpty ? (mapViewModel.location != nilLocation ? "Near You" : "Finding Location..") : "\(mapViewModel.locationName)")
                             .multilineTextAlignment(.center)
                             .lineLimit(2)
                     }
                     .padding(.vertical)
-                    if (!mapViewModel.locationName.isEmpty) {
+                    if (mapViewModel.location != nilLocation) {
                         NavigationLink(isActive: $showList) {
-                            ListView(distance: getDistance(), maxLoad: Int(maxLoad), mapViewModel: mapViewModel)
+                            ListView(distance: getDistance(), maxLoad: Int(maxLoad), mapViewModel: mapViewModel, watchViewModel: watchViewModel)
                         } label: {
                             HStack {
                                 Image(systemName: "magnifyingglass")
