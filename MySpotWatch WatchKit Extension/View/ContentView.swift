@@ -26,7 +26,7 @@ struct ContentView: View {
                         Image(uiImage: UIImage(named: "logo.png")!)
                             .resizable()
                             .frame(width: 30, height: 30)
-                        Text(mapViewModel.locationName.isEmpty ? (mapViewModel.location != nilLocation ? "Near You" : "Finding Location..") : "\(mapViewModel.locationName)")
+                        Text(mapViewModel.locationName.isEmpty ? (mapViewModel.location != nilLocation ? "Near You".localized() : "Finding Location..".localized()) : "\(mapViewModel.locationName)")
                             .multilineTextAlignment(.center)
                             .lineLimit(2)
                     }
@@ -37,27 +37,37 @@ struct ContentView: View {
                         } label: {
                             HStack {
                                 Image(systemName: "magnifyingglass")
-                                Text("Search")
+                                Text("Search ".localized())
                             }
                         }
                     }
-                    Text("Range: " + (Int(distance) == 25 ? "Anywhere" : "\(Int(distance)) " + (isMetric ? "km" : "mi")))
+                    Text("Range: ".localized() + (Int(distance) == 25 ? "Anywhere".localized() : "\(Int(distance)) " + (isMetric ? "km" : "mi")))
                         .padding(.vertical)
                     Slider(value: $distance, in: range) {}
-                    Text("Find " + "\(Int(maxLoad)) spots")
+                    Text("Find ".localized() + "\(Int(maxLoad)) spots")
                         .padding(.vertical)
                     Slider(value: $maxLoad, in: range) {}
                 }
             } else {
-                Text("No Location Found")
+                Text("No Location Found".localized())
                     .multilineTextAlignment(.center)
                     .padding(.vertical)
-                Text("Please allow My Spot to use location in settings")
+                Text("Please allow My Spot to use location in settings".localized())
                     .multilineTextAlignment(.center)
                     .font(.subheadline)
             }
         }
+        .onChange(of: maxLoad) { newValue in
+            UserDefaults.standard.set(Int(newValue), forKey: "maxLoad")
+        }
+        .onChange(of: distance) { newValue in
+            UserDefaults.standard.set(Int(newValue), forKey: "distance")
+        }
         .onAppear {
+            if UserDefaults.standard.valueExists(forKey: "maxLoad") {
+                maxLoad = Double(UserDefaults.standard.integer(forKey: "maxLoad"))
+                distance = Double(UserDefaults.standard.integer(forKey: "distance"))
+            }
             isMetric = getUnits()
             mapViewModel.fetchLocation { location in
                 mapViewModel.location = location
@@ -88,5 +98,11 @@ struct ContentView: View {
         } else {
             return false
         }
+    }
+}
+
+extension UserDefaults {
+    func valueExists(forKey key: String) -> Bool {
+        return object(forKey: key) != nil
     }
 }

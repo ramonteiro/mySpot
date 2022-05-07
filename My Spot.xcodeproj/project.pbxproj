@@ -22,7 +22,7 @@
 		C5071583282584AC000F344C /* ComplicationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5071582282584AC000F344C /* ComplicationController.swift */; };
 		C5071585282584AD000F344C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C5071584282584AD000F344C /* Assets.xcassets */; };
 		C5071588282584AD000F344C /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C5071587282584AD000F344C /* Preview Assets.xcassets */; };
-		C507158D282584AD000F344C /* MySpotWatch.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = C507156D282584AB000F344C /* MySpotWatch.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		C507158D282584AD000F344C /* My Spot.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = C507156D282584AB000F344C /* My Spot.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		C507159828258645000F344C /* MapViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C507159728258645000F344C /* MapViewModel.swift */; };
 		C507159A28258650000F344C /* CloudKitViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C507159928258650000F344C /* CloudKitViewModel.swift */; };
 		C507159D282586B1000F344C /* SpotModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C507159C282586B1000F344C /* SpotModel.swift */; };
@@ -81,6 +81,7 @@
 		C515042C27D95225009F0DCD /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C515042B27D95225009F0DCD /* LaunchScreen.storyboard */; };
 		C5552CC22826472900AF2683 /* PhoneViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5552CC12826472800AF2683 /* PhoneViewModel.swift */; };
 		C5552CC42826482A00AF2683 /* WatchViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5552CC32826482A00AF2683 /* WatchViewModel.swift */; };
+		C5552CC728266EB600AF2683 /* MapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5552CC628266EB600AF2683 /* MapView.swift */; };
 		C56011B52800E66A00C49597 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = C56011B72800E66A00C49597 /* Localizable.strings */; };
 		C56F499F27E05CE300BCBB8F /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = C56F499E27E05CE300BCBB8F /* Extensions.swift */; };
 		C587027427E27F1900DFB6C4 /* MailViewCallback.swift in Sources */ = {isa = PBXBuildFile; fileRef = C587027327E27F1900DFB6C4 /* MailViewCallback.swift */; };
@@ -126,7 +127,7 @@
 			dstPath = "$(CONTENTS_FOLDER_PATH)/Watch";
 			dstSubfolderSpec = 16;
 			files = (
-				C507158D282584AD000F344C /* MySpotWatch.app in Embed Watch Content */,
+				C507158D282584AD000F344C /* My Spot.app in Embed Watch Content */,
 			);
 			name = "Embed Watch Content";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -162,7 +163,7 @@
 		C502D4F827E1A02C0057A65C /* PlaylistEditSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistEditSheet.swift; sourceTree = "<group>"; };
 		C502D4FA27E1A6310057A65C /* SpotEditSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpotEditSheet.swift; sourceTree = "<group>"; };
 		C502D4FC27E1B63D0057A65C /* DiscoverSheetShared.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiscoverSheetShared.swift; sourceTree = "<group>"; };
-		C507156D282584AB000F344C /* MySpotWatch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MySpotWatch.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		C507156D282584AB000F344C /* My Spot.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "My Spot.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		C507156F282584AC000F344C /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		C5071575282584AC000F344C /* MySpotWatch WatchKit Extension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "MySpotWatch WatchKit Extension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
 		C507157A282584AC000F344C /* My_SpotApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = My_SpotApp.swift; sourceTree = "<group>"; };
@@ -233,6 +234,7 @@
 		C515042B27D95225009F0DCD /* LaunchScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
 		C5552CC12826472800AF2683 /* PhoneViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhoneViewModel.swift; sourceTree = "<group>"; };
 		C5552CC32826482A00AF2683 /* WatchViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchViewModel.swift; sourceTree = "<group>"; };
+		C5552CC628266EB600AF2683 /* MapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapView.swift; sourceTree = "<group>"; };
 		C56011B62800E66A00C49597 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		C56011B82800E66D00C49597 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		C56011B92800E86B00C49597 /* pt-BR */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "pt-BR"; path = "pt-BR.lproj/Localizable.strings"; sourceTree = "<group>"; };
@@ -349,6 +351,7 @@
 				C50715A1282596EF000F344C /* ListView.swift */,
 				C50715A628259CB3000F344C /* DetailView.swift */,
 				C50715A828259CD2000F344C /* RowView.swift */,
+				C5552CC628266EB600AF2683 /* MapView.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -391,7 +394,7 @@
 			children = (
 				C51503AA27D7C347009F0DCD /* My Spot.app */,
 				C5D2954A2823719100FBA01E /* MySpotWidgetExtension.appex */,
-				C507156D282584AB000F344C /* MySpotWatch.app */,
+				C507156D282584AB000F344C /* My Spot.app */,
 				C5071575282584AC000F344C /* MySpotWatch WatchKit Extension.appex */,
 			);
 			name = Products;
@@ -599,7 +602,7 @@
 			);
 			name = MySpotWatch;
 			productName = MySpotWatch;
-			productReference = C507156D282584AB000F344C /* MySpotWatch.app */;
+			productReference = C507156D282584AB000F344C /* My Spot.app */;
 			productType = "com.apple.product-type.application.watchapp2";
 		};
 		C5071574282584AC000F344C /* MySpotWatch WatchKit Extension */ = {
@@ -771,6 +774,7 @@
 				C507159D282586B1000F344C /* SpotModel.swift in Sources */,
 				C5552CC42826482A00AF2683 /* WatchViewModel.swift in Sources */,
 				C507157D282584AC000F344C /* ContentView.swift in Sources */,
+				C5552CC728266EB600AF2683 /* MapView.swift in Sources */,
 				C50715A728259CB3000F344C /* DetailView.swift in Sources */,
 				C5071583282584AC000F344C /* ComplicationController.swift in Sources */,
 				C507157B282584AC000F344C /* My_SpotApp.swift in Sources */,
@@ -904,13 +908,12 @@
 				DEVELOPMENT_TEAM = 2HAP7LLHCJ;
 				GENERATE_INFOPLIST_FILE = YES;
 				IBSC_MODULE = MySpotWatch_WatchKit_Extension;
-				INFOPLIST_KEY_CFBundleDisplayName = MySpotWatch;
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "My Spot needs location to find spots close to you";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = "com.isaacpaschall.My-Spot";
 				MARKETING_VERSION = 1.4;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.isaacpaschall.My-Spot.watchkitapp";
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = "My Spot";
 				SDKROOT = watchos;
 				SKIP_INSTALL = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -932,13 +935,12 @@
 				DEVELOPMENT_TEAM = 2HAP7LLHCJ;
 				GENERATE_INFOPLIST_FILE = YES;
 				IBSC_MODULE = MySpotWatch_WatchKit_Extension;
-				INFOPLIST_KEY_CFBundleDisplayName = MySpotWatch;
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "My Spot needs location to find spots close to you";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = "com.isaacpaschall.My-Spot";
 				MARKETING_VERSION = 1.4;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.isaacpaschall.My-Spot.watchkitapp";
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = "My Spot";
 				SDKROOT = watchos;
 				SKIP_INSTALL = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -960,7 +962,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "MySpotWatch WatchKit Extension/Info.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = "MySpotWatch WatchKit Extension";
+				INFOPLIST_KEY_CFBundleDisplayName = "My Spot";
 				INFOPLIST_KEY_CLKComplicationPrincipalClass = MySpotWatch_WatchKit_Extension.ComplicationController;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "My Spot needs location to find spots close to you";
@@ -994,7 +996,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "MySpotWatch WatchKit Extension/Info.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = "MySpotWatch WatchKit Extension";
+				INFOPLIST_KEY_CFBundleDisplayName = "My Spot";
 				INFOPLIST_KEY_CLKComplicationPrincipalClass = MySpotWatch_WatchKit_Extension.ComplicationController;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "My Spot needs location to find spots close to you";
@@ -1219,7 +1221,7 @@
 				DEVELOPMENT_TEAM = 2HAP7LLHCJ;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = MySpotWidget/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = MySpotWidget;
+				INFOPLIST_KEY_CFBundleDisplayName = "My Spot";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "My Spot needs your location to provide spots closest to you.";
 				IPHONEOS_DEPLOYMENT_TARGET = 15.4;
@@ -1249,7 +1251,7 @@
 				DEVELOPMENT_TEAM = 2HAP7LLHCJ;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = MySpotWidget/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = MySpotWidget;
+				INFOPLIST_KEY_CFBundleDisplayName = "My Spot";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "My Spot needs your location to provide spots closest to you.";
 				IPHONEOS_DEPLOYMENT_TARGET = 15.4;

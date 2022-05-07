@@ -2,8 +2,6 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>My Spot needs location to find spots close to you</string>
 	<key>NSExtension</key>
 	<dict>
 		<key>NSExtensionAttributes</key>

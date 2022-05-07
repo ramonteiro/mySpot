@@ -21,33 +21,48 @@ struct ListView: View {
     var body: some View {
         VStack {
             if spots.isEmpty && !hasLoaded && !isError {
-                Text("Searching...")
+                Text("Searching...".localized())
             } else if spots.isEmpty && hasLoaded && !isError {
-                Text("No Spots Found")
+                Text("No Spots Found".localized())
                     .multilineTextAlignment(.center)
                     .padding(.vertical)
-                Text("Try expanding your search.")
+                Text("Try expanding your search.".localized())
                     .multilineTextAlignment(.center)
                     .font(.subheadline)
             } else if spots.isEmpty && isError {
-                Text("Error Loading Spots")
+                Text("Error Loading Spots".localized())
                     .multilineTextAlignment(.center)
                     .padding(.vertical)
-                Text("Please check connection and try again")
+                Text("Please check connection and try again".localized())
                     .multilineTextAlignment(.center)
                     .font(.subheadline)
             } else {
                 List {
                     ForEach(spots, id: \.self) { spot in
-                        NavigationLink(destination: DetailView(mapViewModel: mapViewModel, spot: spot)) {
+                        NavigationLink(destination: DetailView(mapViewModel: mapViewModel, watchViewModel: watchViewModel, spot: spot)) {
                             RowView(spot: spot)
-                                .swipeActions {
+                                .swipeActions(edge: .trailing, allowsFullSwipe: true) {
                                     Button {
-                                        watchViewModel.sendSpotId(id: spot.spotid)
+                                        let routeMeTo = MKMapItem(placemark: MKPlacemark(coordinate: CLLocationCoordinate2D(latitude: spot.x, longitude: spot.y)))
+                                        routeMeTo.name = spot.name
+                                        routeMeTo.openInMaps(launchOptions: nil)
                                     } label: {
-                                        Image(systemName: "icloud.and.arrow.down")
+                                        Image(systemName: "location.fill")
+                                            .font(.subheadline)
                                     }
-                                    .tint(.blue)
+                                    .tint(.green)
+                                }
+                                .if(watchViewModel.session.isReachable) { view in
+                                    view.swipeActions(edge: .leading, allowsFullSwipe: true) {
+                                        Button {
+                                            if (watchViewModel.session.isReachable) {
+                                                watchViewModel.sendSpotId(id: spot.spotid)
+                                            }
+                                        } label: {
+                                            Image(systemName: "icloud.and.arrow.down")
+                                        }
+                                        .tint(.blue)
+                                    }
                                 }
                         }
                     }
@@ -69,6 +84,17 @@ struct ListView: View {
                     }
                 }
             }
+        }
+    }
+}
+
+extension View {
+    
+    @ViewBuilder func `if`<Content: View>(_ condition: @autoclosure () -> Bool, transform: (Self) -> Content) -> some View {
+        if condition() {
+            transform(self)
+        } else {
+            self
         }
     }
 }
