@@ -13,6 +13,8 @@ struct DetailView: View {
     @ObservedObject var mapViewModel: WatchLocationManager
     @ObservedObject var watchViewModel: WatchViewModel
     @State private var away = ""
+    @State private var didSend = false
+    @State private var showingDescription = false
     let spot: Spot
     @State private var spotRegion = MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: 33.714712646421, longitude: -112.29072718706581), span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01))
     
@@ -41,6 +43,19 @@ struct DetailView: View {
                 }
             }
             Text(away)
+                .font(.subheadline)
+                .lineLimit(1)
+            if (!spot.description.isEmpty) {
+                Button {
+                    showingDescription.toggle()
+                } label: {
+                    Image(systemName: "note.text")
+                        .font(.subheadline)
+                    Text("Description".localized())
+                        .font(.subheadline)
+                        .lineLimit(1)
+                }
+            }
             Map(coordinateRegion: $spotRegion, interactionModes: [], showsUserLocation: false, annotationItems: [SinglePin(coordinate: CLLocationCoordinate2D(latitude: spot.x, longitude: spot.y))]) { location in
                 MapMarker(coordinate: CLLocationCoordinate2D(latitude: spot.x, longitude: spot.y), tint: .red)
             }
@@ -63,18 +78,24 @@ struct DetailView: View {
                         .font(.subheadline)
                 }
             }
-            if (watchViewModel.session.isReachable) {
+            if (watchViewModel.session.isReachable && !didSend) {
                 Button {
                     watchViewModel.sendSpotId(id: spot.spotid)
+                    withAnimation {
+                        didSend.toggle()
+                    }
                 } label: {
                     HStack {
                         Image(systemName: "icloud.and.arrow.down")
-                            .font(.system(size: 25))
-                        Text("Download On iPhone")
+                            .font(.subheadline)
+                        Text("Download".localized())
                             .font(.subheadline)
                     }
                 }
             }
+        }
+        .sheet(isPresented: $showingDescription) {
+            DescriptionView(description: spot.description)
         }
         .onAppear {
             away = calculateDistance(x: spot.x, y: spot.y)

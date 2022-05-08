@@ -15,23 +15,22 @@ struct ContentView: View {
     @State private var maxLoad: Double = 10
     @State private var isMetric = false
     @State private var showList = false
-    private let nilLocation = CLLocation(latitude: 0, longitude: 0)
     private let range = 5.0...25.0
     
     var body: some View {
         VStack {
-            if (mapViewModel.locationManager?.authorizationStatus == .authorizedWhenInUse || mapViewModel.locationManager?.authorizationStatus == .authorizedAlways) {
+            if (mapViewModel.locationManager?.authorizationStatus != .denied) {
                 ScrollView {
                     HStack {
                         Image(uiImage: UIImage(named: "logo.png")!)
                             .resizable()
                             .frame(width: 30, height: 30)
-                        Text(mapViewModel.locationName.isEmpty ? (mapViewModel.location != nilLocation ? "Near You".localized() : "Finding Location..".localized()) : "\(mapViewModel.locationName)")
+                        Text(mapViewModel.locationName.isEmpty ? "Near You".localized() : "\(mapViewModel.locationName)")
                             .multilineTextAlignment(.center)
                             .lineLimit(2)
                     }
                     .padding(.vertical)
-                    if (mapViewModel.location != nilLocation) {
+                    if (mapViewModel.locationManager!.location != nil) {
                         NavigationLink(isActive: $showList) {
                             ListView(distance: getDistance(), maxLoad: Int(maxLoad), mapViewModel: mapViewModel, watchViewModel: watchViewModel)
                         } label: {
@@ -43,10 +42,10 @@ struct ContentView: View {
                     }
                     Text("Range: ".localized() + (Int(distance) == 25 ? "Anywhere".localized() : "\(Int(distance)) " + (isMetric ? "km" : "mi")))
                         .padding(.vertical)
-                    Slider(value: $distance, in: range) {}
+                    Slider(value: $distance, in: range, step: 5) {}
                     Text("Find ".localized() + "\(Int(maxLoad)) spots")
                         .padding(.vertical)
-                    Slider(value: $maxLoad, in: range) {}
+                    Slider(value: $maxLoad, in: range, step: 5) {}
                 }
             } else {
                 Text("No Location Found".localized())

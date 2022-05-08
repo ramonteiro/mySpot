@@ -9,7 +9,7 @@ import CloudKit
 import SwiftUI
 
 class CloudKitViewModel: ObservableObject {
-    let desiredKeys = ["name", "location", "locationName", "customLocation", "image", "userID"]
+    let desiredKeys = ["name", "location", "locationName", "customLocation", "image", "userID", "description"]
     
     init() { }
     
@@ -42,11 +42,15 @@ class CloudKitViewModel: ObservableObject {
                 if let locationNameCheck = record["locationName"] as? String {
                     locationName = locationNameCheck
                 }
+                var description = ""
+                if let descriptionCheck = record["description"] as? String {
+                    description = descriptionCheck
+                }
                 guard let imageData = try? Data(contentsOf: image.fileURL!) else { return }
                 guard let location = record["location"] as? CLLocation else { return }
                 let x = location.coordinate.latitude
                 let y = location.coordinate.longitude
-                returnedSpots.append(Spot(spotid: record.recordID.recordName,name: name, customLocation: isCustomLocation, locationName: locationName, image: imageData, x: x, y: y))
+                returnedSpots.append(Spot(spotid: record.recordID.recordName,name: name, customLocation: isCustomLocation, locationName: locationName, image: imageData, x: x, y: y, description: description))
             case .failure(let error):
                 print("\(error)")
                 completion(.failure(error))

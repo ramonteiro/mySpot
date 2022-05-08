@@ -15,12 +15,15 @@ struct RowView: View {
             Image(uiImage: (UIImage(data: spot.image) ?? UIImage(systemName: "exclamationmark.triangle"))!)
                 .resizable()
                 .scaledToFill()
-                .frame(width: 50, height: 50)
+                .frame(maxWidth: .infinity)
                 .cornerRadius(10)
             VStack {
-                Text(spot.name)
-                    .font(.system(size: 16))
-                    .lineLimit(2)
+                HStack {
+                    Text(spot.name)
+                        .font(.system(size: 16))
+                        .lineLimit(2)
+                    Spacer()
+                }
                 if !spot.locationName.isEmpty {
                     HStack {
                         Image(systemName: (!spot.customLocation ? "mappin" : "figure.wave"))
@@ -28,9 +31,11 @@ struct RowView: View {
                         Text(spot.locationName)
                             .font(.system(size: 12))
                             .lineLimit(1)
+                        Spacer()
                     }
                 }
             }
+            .frame(width: WKInterfaceDevice.current().screenBounds.size.width * 0.5)
         }
     }
 }

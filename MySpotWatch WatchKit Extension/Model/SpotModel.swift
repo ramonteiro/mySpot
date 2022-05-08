@@ -16,4 +16,5 @@ struct Spot: Identifiable, Codable, Hashable {
     let image: Data
     let x: Double
     let y: Double
+    let description: String
 }

@@ -55,9 +55,7 @@ struct ListView: View {
                                 .if(watchViewModel.session.isReachable) { view in
                                     view.swipeActions(edge: .leading, allowsFullSwipe: true) {
                                         Button {
-                                            if (watchViewModel.session.isReachable) {
-                                                watchViewModel.sendSpotId(id: spot.spotid)
-                                            }
+                                            watchViewModel.sendSpotId(id: spot.spotid)
                                         } label: {
                                             Image(systemName: "icloud.and.arrow.down")
                                         }

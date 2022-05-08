@@ -64,7 +64,6 @@ struct MySpotsView: View {
         .onAppear {
             mapViewModel.checkLocationAuthorization()
             setFilteringType()
-            WidgetCenter.shared.reloadAllTimelines()
         }
         .onChange(of: spots.count) { newValue in
             if (newValue > 0 && filteredSpots.count == 0) {

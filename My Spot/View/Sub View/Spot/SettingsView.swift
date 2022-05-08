@@ -59,6 +59,7 @@ struct SettingsView: View {
                                                 if (!colors.isEmpty) {
                                                     colors[0].colorIndex = Double(i)
                                                     try? moc.save()
+                                                    UserDefaults(suiteName: "group.com.isaacpaschall.My-Spot")?.set(i, forKey: "colorIndex")
                                                 }
                                             }
                                         Image(systemName: "pencil")
@@ -278,6 +279,10 @@ struct SettingsView: View {
                     colors[0].colorR = red
                     colors[0].colorA = alpha
                     try? moc.save()
+                    UserDefaults(suiteName: "group.com.isaacpaschall.My-Spot")?.set(Double(green), forKey: "colorg")
+                    UserDefaults(suiteName: "group.com.isaacpaschall.My-Spot")?.set(Double(blue), forKey: "colorb")
+                    UserDefaults(suiteName: "group.com.isaacpaschall.My-Spot")?.set(Double(red), forKey: "colorr")
+                    UserDefaults(suiteName: "group.com.isaacpaschall.My-Spot")?.set(Double(alpha), forKey: "colora")
                 }
             }
             .navigationTitle("Settings".localized())

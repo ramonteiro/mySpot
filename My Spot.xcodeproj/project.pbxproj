@@ -82,6 +82,7 @@
 		C5552CC22826472900AF2683 /* PhoneViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5552CC12826472800AF2683 /* PhoneViewModel.swift */; };
 		C5552CC42826482A00AF2683 /* WatchViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5552CC32826482A00AF2683 /* WatchViewModel.swift */; };
 		C5552CC728266EB600AF2683 /* MapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5552CC628266EB600AF2683 /* MapView.swift */; };
+		C5552CC928274CB400AF2683 /* DescriptionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5552CC828274CB400AF2683 /* DescriptionView.swift */; };
 		C56011B52800E66A00C49597 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = C56011B72800E66A00C49597 /* Localizable.strings */; };
 		C56F499F27E05CE300BCBB8F /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = C56F499E27E05CE300BCBB8F /* Extensions.swift */; };
 		C587027427E27F1900DFB6C4 /* MailViewCallback.swift in Sources */ = {isa = PBXBuildFile; fileRef = C587027327E27F1900DFB6C4 /* MailViewCallback.swift */; };
@@ -235,6 +236,7 @@
 		C5552CC12826472800AF2683 /* PhoneViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhoneViewModel.swift; sourceTree = "<group>"; };
 		C5552CC32826482A00AF2683 /* WatchViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchViewModel.swift; sourceTree = "<group>"; };
 		C5552CC628266EB600AF2683 /* MapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapView.swift; sourceTree = "<group>"; };
+		C5552CC828274CB400AF2683 /* DescriptionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DescriptionView.swift; sourceTree = "<group>"; };
 		C56011B62800E66A00C49597 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		C56011B82800E66D00C49597 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		C56011B92800E86B00C49597 /* pt-BR */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "pt-BR"; path = "pt-BR.lproj/Localizable.strings"; sourceTree = "<group>"; };
@@ -352,6 +354,7 @@
 				C50715A628259CB3000F344C /* DetailView.swift */,
 				C50715A828259CD2000F344C /* RowView.swift */,
 				C5552CC628266EB600AF2683 /* MapView.swift */,
+				C5552CC828274CB400AF2683 /* DescriptionView.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -771,6 +774,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				C507157F282584AC000F344C /* NotificationController.swift in Sources */,
+				C5552CC928274CB400AF2683 /* DescriptionView.swift in Sources */,
 				C507159D282586B1000F344C /* SpotModel.swift in Sources */,
 				C5552CC42826482A00AF2683 /* WatchViewModel.swift in Sources */,
 				C507157D282584AC000F344C /* ContentView.swift in Sources */,
