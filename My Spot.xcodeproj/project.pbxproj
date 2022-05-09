@@ -83,6 +83,9 @@
 		C5552CC42826482A00AF2683 /* WatchViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5552CC32826482A00AF2683 /* WatchViewModel.swift */; };
 		C5552CC728266EB600AF2683 /* MapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5552CC628266EB600AF2683 /* MapView.swift */; };
 		C5552CC928274CB400AF2683 /* DescriptionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5552CC828274CB400AF2683 /* DescriptionView.swift */; };
+		C5552CCB2827616600AF2683 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5552CCA2827616600AF2683 /* AppDelegate.swift */; };
+		C5552CCD2827696500AF2683 /* NotificationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5552CCC2827696500AF2683 /* NotificationView.swift */; };
+		C5552CCF2828207500AF2683 /* DiscoverDetailNotification.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5552CCE2828207500AF2683 /* DiscoverDetailNotification.swift */; };
 		C56011B52800E66A00C49597 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = C56011B72800E66A00C49597 /* Localizable.strings */; };
 		C56F499F27E05CE300BCBB8F /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = C56F499E27E05CE300BCBB8F /* Extensions.swift */; };
 		C587027427E27F1900DFB6C4 /* MailViewCallback.swift in Sources */ = {isa = PBXBuildFile; fileRef = C587027327E27F1900DFB6C4 /* MailViewCallback.swift */; };
@@ -237,6 +240,9 @@
 		C5552CC32826482A00AF2683 /* WatchViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchViewModel.swift; sourceTree = "<group>"; };
 		C5552CC628266EB600AF2683 /* MapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapView.swift; sourceTree = "<group>"; };
 		C5552CC828274CB400AF2683 /* DescriptionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DescriptionView.swift; sourceTree = "<group>"; };
+		C5552CCA2827616600AF2683 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		C5552CCC2827696500AF2683 /* NotificationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationView.swift; sourceTree = "<group>"; };
+		C5552CCE2828207500AF2683 /* DiscoverDetailNotification.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiscoverDetailNotification.swift; sourceTree = "<group>"; };
 		C56011B62800E66A00C49597 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		C56011B82800E66D00C49597 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		C56011B92800E86B00C49597 /* pt-BR */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "pt-BR"; path = "pt-BR.lproj/Localizable.strings"; sourceTree = "<group>"; };
@@ -419,6 +425,7 @@
 				C51503AD27D7C347009F0DCD /* My_SpotApp.swift */,
 				C51503AF27D7C347009F0DCD /* ContentView.swift */,
 				C56011B72800E66A00C49597 /* Localizable.strings */,
+				C5552CCA2827616600AF2683 /* AppDelegate.swift */,
 			);
 			path = "My Spot";
 			sourceTree = "<group>";
@@ -463,6 +470,7 @@
 				C51503EB27D7C9E2009F0DCD /* Main View */,
 				C51503EA27D7C9DB009F0DCD /* Sub View */,
 				C51503E927D7C9CE009F0DCD /* Map */,
+				C5552CCC2827696500AF2683 /* NotificationView.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -545,6 +553,7 @@
 				C515040627D7CA7B009F0DCD /* DiscoverDetailView.swift */,
 				C515040527D7CA7B009F0DCD /* DiscoverRow.swift */,
 				C502D4FC27E1B63D0057A65C /* DiscoverSheetShared.swift */,
+				C5552CCE2828207500AF2683 /* DiscoverDetailNotification.swift */,
 			);
 			path = Discover;
 			sourceTree = "<group>";
@@ -802,6 +811,7 @@
 				C502D4FB27E1A6310057A65C /* SpotEditSheet.swift in Sources */,
 				C51503E427D7C856009F0DCD /* Spots.xcdatamodeld in Sources */,
 				C50CF4AA27F13915001A9698 /* ChoosePhoto.swift in Sources */,
+				C5552CCB2827616600AF2683 /* AppDelegate.swift in Sources */,
 				C51503E227D7C856009F0DCD /* Spot+CoreDataProperties.swift in Sources */,
 				C51503B027D7C347009F0DCD /* ContentView.swift in Sources */,
 				C515041C27D7CAAA009F0DCD /* ViewDiscoverSpots.swift in Sources */,
@@ -809,6 +819,7 @@
 				C51503FC27D7CA60009F0DCD /* MySpotsView.swift in Sources */,
 				C515041B27D7CAAA009F0DCD /* MapAnnotationDiscover.swift in Sources */,
 				C51503AE27D7C347009F0DCD /* My_SpotApp.swift in Sources */,
+				C5552CCD2827696500AF2683 /* NotificationView.swift in Sources */,
 				C501FC1827E3FAB7008FEFA1 /* ZoomableScrollView.swift in Sources */,
 				C51503FD27D7CA60009F0DCD /* DiscoverView.swift in Sources */,
 				C51503DD27D7C856009F0DCD /* UIImageTransformer.swift in Sources */,
@@ -830,6 +841,7 @@
 				C515040427D7CA72009F0DCD /* DetailView.swift in Sources */,
 				C515041427D7CAA3009F0DCD /* ViewMapSpots.swift in Sources */,
 				C51503E327D7C856009F0DCD /* CoreDataManager.swift in Sources */,
+				C5552CCF2828207500AF2683 /* DiscoverDetailNotification.swift in Sources */,
 				C515041527D7CAA3009F0DCD /* SpotMapPreview.swift in Sources */,
 				C515040327D7CA72009F0DCD /* AddSpotSheet.swift in Sources */,
 				C50CF4A827F12328001A9698 /* MantisPhotoCropper.swift in Sources */,

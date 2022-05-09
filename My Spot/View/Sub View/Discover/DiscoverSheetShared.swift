@@ -322,8 +322,8 @@ struct DiscoverSheetShared: View {
             .frame(width: (expand ? 50 : 30), height: (expand ? 50 : 30))
             .foregroundColor(Color.secondary)
             .onTapGesture {
-                let generator = UINotificationFeedbackGenerator()
-                generator.notificationOccurred(.success)
+                let generator = UIImpactFeedbackGenerator(style: .light)
+                generator.impactOccurred()
                 withAnimation {
                     expand.toggle()
                 }

@@ -117,9 +117,9 @@ struct ContentView: View {
                 cloudViewModel.systemColorArray[cloudViewModel.systemColorArray.count - 1] = Color(uiColor: UIColor(red: colors[0].colorR, green: colors[0].colorG, blue: colors[0].colorB, alpha: colors[0].colorA))
                 cloudViewModel.systemColorIndex = Int(colors[0].colorIndex)
             }
-            if UIApplication.shared.applicationIconBadgeNumber > 0 {
-                UIApplication.shared.applicationIconBadgeNumber = 0
-            }
+//            if UIApplication.shared.applicationIconBadgeNumber > 0 {
+//                UIApplication.shared.applicationIconBadgeNumber = 0
+//            }
         }
     }
 }

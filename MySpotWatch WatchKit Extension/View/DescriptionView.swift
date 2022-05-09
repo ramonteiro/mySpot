@@ -11,7 +11,9 @@ struct DescriptionView: View {
     let description: String
     
     var body: some View {
-        Text(description)
-            .multilineTextAlignment(.leading)
+        ScrollView {
+            Text(description)
+                .multilineTextAlignment(.leading)
+        }
     }
 }

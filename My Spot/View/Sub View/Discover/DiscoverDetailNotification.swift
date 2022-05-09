@@ -1,21 +1,16 @@
 //
-//  DiscoverDetailView.swift
-//  mySpot
+//  DiscoverDetailNotification.swift
+//  My Spot
 //
-//  Created by Isaac Paschall on 2/28/22.
+//  Created by Isaac Paschall on 5/8/22.
 //
-
-/*
- DiscoverDetailView:
- navigation link for each spot from db item in list in root view
- */
 
 import SwiftUI
 import Combine
 import MapKit
 import CoreData
 
-struct DiscoverDetailView: View {
+struct DiscoverDetailNotification: View {
     
     var index: Int
     @FetchRequest(sortDescriptors: []) var spots: FetchedResults<Spot>
@@ -52,7 +47,7 @@ struct DiscoverDetailView: View {
     
     var body: some View {
         ZStack {
-            if(cloudViewModel.spots.count > 0 && cloudViewModel.spots.count >= index + 1) {
+            if(cloudViewModel.notificationSpots.count > 0 && cloudViewModel.notificationSpots.count >= index + 1) {
                 ZStack {
                     displayImage
                         .offset(y: imageOffset)
@@ -77,11 +72,11 @@ struct DiscoverDetailView: View {
                     if newValue {
                         Task {
                             showSaveAlert = true
-                            let spot = cloudViewModel.spots[index]
+                            let spot = cloudViewModel.notificationSpots[index]
                             let didLike = await cloudViewModel.likeSpot(spot: spot)
                             if (didLike) {
                                 DispatchQueue.main.async {
-                                    cloudViewModel.spots[index].likes += 1
+                                    cloudViewModel.notificationSpots[index].likes += 1
                                 }
                             }
                             await save()
@@ -90,16 +85,16 @@ struct DiscoverDetailView: View {
                     }
                 }
                 .onAppear {
-                    mySpot = cloudViewModel.isMySpot(user: cloudViewModel.spots[index].userID)
-                    tags = cloudViewModel.spots[index].type.components(separatedBy: ", ")
+                    mySpot = cloudViewModel.isMySpot(user: cloudViewModel.notificationSpots[index].userID)
+                    tags = cloudViewModel.notificationSpots[index].type.components(separatedBy: ", ")
                     
                     // check for images
-                    let url = cloudViewModel.spots[index].imageURL
+                    let url = cloudViewModel.notificationSpots[index].imageURL
                     if let data = try? Data(contentsOf: url), let image = UIImage(data: data) {
                         self.images.append(image)
                     }
                     Task {
-                        let id = cloudViewModel.spots[index].record.recordID.recordName
+                        let id = cloudViewModel.notificationSpots[index].record.recordID.recordName
                         let fetchedImages: [UIImage?] = await cloudViewModel.fetchImages(id: id)
                         if !fetchedImages.isEmpty {
                             fetchedImages.forEach { image in
@@ -119,7 +114,7 @@ struct DiscoverDetailView: View {
         }
         .popup(isPresented: $showingSaveSheet) {
             BottomPopupView {
-                NamePopupView(isPresented: $showingSaveSheet, text: $newName, saved: $isSaving, spotName: cloudViewModel.spots[index].name)
+                NamePopupView(isPresented: $showingSaveSheet, text: $newName, saved: $isSaving, spotName: cloudViewModel.notificationSpots[index].name)
             }
         }
         .alert("Unable To Save Spot".localized(), isPresented: $showingCannotSavePrivateAlert) {
@@ -130,7 +125,7 @@ struct DiscoverDetailView: View {
         .navigationBarHidden(true)
         .ignoresSafeArea(.all, edges: (canShare ? .top : [.top, .bottom]))
         .onAppear {
-            noType = cloudViewModel.spots[index].type.isEmpty
+            noType = cloudViewModel.notificationSpots[index].type.isEmpty
             spotInCD = isSpotInCoreData()
             if (canShare) {
                 backImage = "chevron.left"
@@ -201,7 +196,7 @@ struct DiscoverDetailView: View {
                 
             } else {
                 if (!images.isEmpty) {
-                    if (cloudViewModel.spots[index].isMultipleImages != 0) {
+                    if (cloudViewModel.notificationSpots[index].isMultipleImages != 0) {
                         ZStack {
                             Image(uiImage: images[0])
                                 .resizable()
@@ -279,9 +274,9 @@ struct DiscoverDetailView: View {
                 .padding(10)
                 .shadow(color: Color.black.opacity(0.5), radius: 5)
         }
-        .alert("Are You Sure You Want To Delete ".localized() + (cloudViewModel.spots[index].name) + "?".localized(), isPresented: $deleteAlert) {
+        .alert("Are You Sure You Want To Delete ".localized() + (cloudViewModel.notificationSpots[index].name) + "?".localized(), isPresented: $deleteAlert) {
             Button("Delete".localized(), role: .destructive) {
-                let spotID = cloudViewModel.spots[index].record.recordID
+                let spotID = cloudViewModel.notificationSpots[index].record.recordID
                 Task {
                     do {
                         try await cloudViewModel.deleteSpot(id: spotID)
@@ -296,7 +291,7 @@ struct DiscoverDetailView: View {
                             if !canShare {
                                 imageOffset = 0
                             }
-                            cloudViewModel.spots.remove(at: index)
+                            cloudViewModel.notificationSpots.remove(at: index)
                             presentationMode.wrappedValue.dismiss()
                         }
                     } catch {
@@ -399,12 +394,12 @@ struct DiscoverDetailView: View {
     private var detailSheet: some View {
         ScrollView(showsIndicators: false) {
             expandButton
-            if (!cloudViewModel.spots[index].locationName.isEmpty) {
+            if (!cloudViewModel.notificationSpots[index].locationName.isEmpty) {
                 HStack {
-                    Image(systemName: (cloudViewModel.spots[index].customLocation != 0 ? "mappin" : "figure.wave"))
+                    Image(systemName: (cloudViewModel.notificationSpots[index].customLocation != 0 ? "mappin" : "figure.wave"))
                         .font(.system(size: 15, weight: .light))
                         .foregroundColor(Color.gray)
-                    Text("\(cloudViewModel.spots[index].locationName)")
+                    Text("\(cloudViewModel.notificationSpots[index].locationName)")
                         .font(.system(size: 15, weight: .light))
                         .foregroundColor(Color.gray)
                         .padding(.leading, 1)
@@ -414,7 +409,7 @@ struct DiscoverDetailView: View {
             }
             
             HStack {
-                Text("\(cloudViewModel.spots[index].name)")
+                Text("\(cloudViewModel.notificationSpots[index].name)")
                     .font(.system(size: 45, weight: .heavy))
                 Spacer()
             }
@@ -422,11 +417,11 @@ struct DiscoverDetailView: View {
             .padding(.trailing, 5)
             
             HStack {
-                Text("By: \(cloudViewModel.spots[index].founder)")
+                Text("By: \(cloudViewModel.notificationSpots[index].founder)")
                     .font(.system(size: 15, weight: .light))
                     .foregroundColor(Color.gray)
                 Spacer()
-                Text("\(cloudViewModel.spots[index].date.components(separatedBy: ";")[0])")
+                Text("\(cloudViewModel.notificationSpots[index].date.components(separatedBy: ";")[0])")
                     .font(.system(size: 15, weight: .light))
                     .foregroundColor(Color.gray)
             }
@@ -436,7 +431,7 @@ struct DiscoverDetailView: View {
                 Image(systemName: "icloud.and.arrow.down")
                     .font(.system(size: 15, weight: .light))
                     .foregroundColor(Color.gray)
-                Text("\(cloudViewModel.spots[index].likes)")
+                Text("\(cloudViewModel.notificationSpots[index].likes)")
                     .font(.system(size: 15, weight: .light))
                     .foregroundColor(Color.gray)
                     .padding(.leading, 1)
@@ -463,25 +458,25 @@ struct DiscoverDetailView: View {
                 .offset(y: 5)
             }
             HStack(spacing: 5) {
-                Text(cloudViewModel.spots[index].description)
+                Text(cloudViewModel.notificationSpots[index].description)
                 Spacer()
             }
             .padding(.top, 10)
             .padding([.leading, .trailing], 30)
             
-            ViewSingleSpotOnMap(singlePin: [SinglePin(name: cloudViewModel.spots[index].name, coordinate: cloudViewModel.spots[index].location.coordinate)])
+            ViewSingleSpotOnMap(singlePin: [SinglePin(name: cloudViewModel.notificationSpots[index].name, coordinate: cloudViewModel.notificationSpots[index].location.coordinate)])
                 .aspectRatio(contentMode: .fit)
                 .cornerRadius(15)
                 .padding([.leading, .trailing], 30)
             
             Button {
-                let routeMeTo = MKMapItem(placemark: MKPlacemark(coordinate: cloudViewModel.spots[index].location.coordinate))
-                routeMeTo.name = cloudViewModel.spots[index].name
+                let routeMeTo = MKMapItem(placemark: MKPlacemark(coordinate: cloudViewModel.notificationSpots[index].location.coordinate))
+                routeMeTo.name = cloudViewModel.notificationSpots[index].name
                 routeMeTo.openInMaps(launchOptions: nil)
             } label: {
                 HStack {
                     Image(systemName: "location.fill")
-                    Text(cloudViewModel.spots[index].name)
+                    Text(cloudViewModel.notificationSpots[index].name)
                 }
                 .padding(.horizontal)
             }
@@ -493,7 +488,7 @@ struct DiscoverDetailView: View {
         }
         .confirmationDialog("How should this spot be reported?".localized(), isPresented: $showingReportAlert) {
             Button("Offensive".localized()) {
-                let spot = cloudViewModel.spots[index]
+                let spot = cloudViewModel.notificationSpots[index]
                 Task {
                     attemptToReport = true
                     await cloudViewModel.report(spot: spot, report: "offensive")
@@ -502,7 +497,7 @@ struct DiscoverDetailView: View {
                 }
             }
             Button("Inappropriate".localized()) {
-                let spot = cloudViewModel.spots[index]
+                let spot = cloudViewModel.notificationSpots[index]
                 Task {
                     attemptToReport = true
                     await cloudViewModel.report(spot: spot, report: "inappropriate")
@@ -511,7 +506,7 @@ struct DiscoverDetailView: View {
                 }
             }
             Button("Spam".localized()) {
-                let spot = cloudViewModel.spots[index]
+                let spot = cloudViewModel.notificationSpots[index]
                 Task {
                     attemptToReport = true
                     await cloudViewModel.report(spot: spot, report: "spam")
@@ -520,7 +515,7 @@ struct DiscoverDetailView: View {
                 }
             }
             Button("Dangerous".localized()) {
-                let spot = cloudViewModel.spots[index]
+                let spot = cloudViewModel.notificationSpots[index]
                 Task {
                     attemptToReport = true
                     await cloudViewModel.report(spot: spot, report: "dangerous")
@@ -548,7 +543,7 @@ struct DiscoverDetailView: View {
     private func isSpotInCoreData() -> Bool {
         var isInSpots = false
         spots.forEach { spot in
-            if spot.dbid == cloudViewModel.spots[index].record.recordID.recordName {
+            if spot.dbid == cloudViewModel.notificationSpots[index].record.recordID.recordName {
                 isInSpots = true
                 return
             }
@@ -558,8 +553,8 @@ struct DiscoverDetailView: View {
     
     private func save() async {
         let newSpot = Spot(context: moc)
-        newSpot.founder = cloudViewModel.spots[index].founder
-        newSpot.details = cloudViewModel.spots[index].description
+        newSpot.founder = cloudViewModel.notificationSpots[index].founder
+        newSpot.details = cloudViewModel.notificationSpots[index].description
         newSpot.image = images[0]
         if images.count == 3 {
             newSpot.image2 = images[1]
@@ -567,25 +562,25 @@ struct DiscoverDetailView: View {
         } else if images.count == 2 {
             newSpot.image2 = images[1]
         }
-        newSpot.locationName = cloudViewModel.spots[index].locationName
-        newSpot.name = (newName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? cloudViewModel.spots[index].name : newName)
-        newSpot.x = cloudViewModel.spots[index].location.coordinate.latitude
-        newSpot.y = cloudViewModel.spots[index].location.coordinate.longitude
+        newSpot.locationName = cloudViewModel.notificationSpots[index].locationName
+        newSpot.name = (newName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? cloudViewModel.notificationSpots[index].name : newName)
+        newSpot.x = cloudViewModel.notificationSpots[index].location.coordinate.latitude
+        newSpot.y = cloudViewModel.notificationSpots[index].location.coordinate.longitude
         newSpot.isPublic = false
-        if cloudViewModel.spots[index].userID != cloudViewModel.userID {
+        if cloudViewModel.notificationSpots[index].userID != cloudViewModel.userID {
             newSpot.fromDB = true
         } else {
             newSpot.fromDB = false
         }
-        newSpot.tags = cloudViewModel.spots[index].type
-        newSpot.date = cloudViewModel.spots[index].date
-        if cloudViewModel.spots[index].customLocation == 1 {
+        newSpot.tags = cloudViewModel.notificationSpots[index].type
+        newSpot.date = cloudViewModel.notificationSpots[index].date
+        if cloudViewModel.notificationSpots[index].customLocation == 1 {
             newSpot.wasThere = false
         } else {
             newSpot.wasThere = true
         }
         newSpot.id = UUID()
-        newSpot.dbid = cloudViewModel.spots[index].record.recordID.recordName
+        newSpot.dbid = cloudViewModel.notificationSpots[index].record.recordID.recordName
         do {
             try moc.save()
             isSaved = true
@@ -600,7 +595,7 @@ struct DiscoverDetailView: View {
     
     private func calculateDistance() {
         let userLocation = CLLocation(latitude: mapViewModel.region.center.latitude, longitude: mapViewModel.region.center.longitude)
-        let distanceInMeters = userLocation.distance(from: cloudViewModel.spots[index].location)
+        let distanceInMeters = userLocation.distance(from: cloudViewModel.notificationSpots[index].location)
         if isMetric() {
             let distanceDouble = distanceInMeters / 1000
             distance = String(format: "%.1f", distanceDouble) + " km"

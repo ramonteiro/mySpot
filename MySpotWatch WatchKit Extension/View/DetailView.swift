@@ -9,7 +9,6 @@ import SwiftUI
 import MapKit
 
 struct DetailView: View {
-    @Environment(\.colorScheme) var colorScheme
     @ObservedObject var mapViewModel: WatchLocationManager
     @ObservedObject var watchViewModel: WatchViewModel
     @State private var away = ""
@@ -27,7 +26,7 @@ struct DetailView: View {
                 .cornerRadius(10)
                 .overlay(
                     RoundedRectangle(cornerRadius: 10)
-                        .stroke((colorScheme == .dark ? Color.white : Color.black), lineWidth: 4)
+                        .stroke(myColor(), lineWidth: 4)
                 )
                 .padding(.vertical)
             Text(spot.name)
@@ -42,7 +41,7 @@ struct DetailView: View {
                         .lineLimit(1)
                 }
             }
-            Text(away)
+            Text(away + " away".localized())
                 .font(.subheadline)
                 .lineLimit(1)
             if (!spot.description.isEmpty) {
@@ -63,7 +62,7 @@ struct DetailView: View {
             .cornerRadius(10)
             .overlay(
                 RoundedRectangle(cornerRadius: 10)
-                    .stroke((colorScheme == .dark ? Color.white : Color.black), lineWidth: 4)
+                    .stroke(myColor(), lineWidth: 4)
             )
             .padding(.vertical)
             Button {
@@ -101,6 +100,13 @@ struct DetailView: View {
             away = calculateDistance(x: spot.x, y: spot.y)
             spotRegion = MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: spot.x, longitude: spot.y), span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05))
         }
+        
+    }
+    
+    private func myColor() -> Color {
+        let systemColorArray: [Color] = [.red,.green,.pink,.blue,.indigo,.mint,.orange,.purple,.teal,.yellow, .gray]
+        return (!(UserDefaults(suiteName: "group.com.isaacpaschall.My-Spot")?.valueExists(forKey: "colora") ?? false) ? .red :
+                    ((UserDefaults(suiteName: "group.com.isaacpaschall.My-Spot")?.integer(forKey: "colorIndex") ?? 0) != systemColorArray.count - 1) ? systemColorArray[UserDefaults(suiteName: "group.com.isaacpaschall.My-Spot")?.integer(forKey: "colorIndex") ?? 0] : Color(uiColor: UIColor(red: (UserDefaults(suiteName: "group.com.isaacpaschall.My-Spot")?.double(forKey: "colorr") ?? 0), green: (UserDefaults(suiteName: "group.com.isaacpaschall.My-Spot")?.double(forKey: "colorg") ?? 0), blue: (UserDefaults(suiteName: "group.com.isaacpaschall.My-Spot")?.double(forKey: "colorb") ?? 0), alpha: (UserDefaults(suiteName: "group.com.isaacpaschall.My-Spot")?.double(forKey: "colora") ?? 0))))
     }
     
     private func calculateDistance(x: Double, y: Double) -> String {

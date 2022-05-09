@@ -103,8 +103,8 @@ struct SettingsView: View {
                 Section {
                     Slider(value: $limits, in: 1...30, step: 1) { didChange in
                         if didChange {
-                            let generator = UINotificationFeedbackGenerator()
-                            generator.notificationOccurred(.success)
+                            let generator = UIImpactFeedbackGenerator(style: .light)
+                            generator.impactOccurred()
                         }
                     }
                 } header: {

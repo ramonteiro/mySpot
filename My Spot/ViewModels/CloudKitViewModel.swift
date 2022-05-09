@@ -17,6 +17,7 @@ class CloudKitViewModel: ObservableObject {
     @Published var error: String = ""
     @Published var spots: [SpotFromCloud] = []
     @Published var shared: [SpotFromCloud] = []
+    @Published var notificationSpots: [SpotFromCloud] = []
     @Published var userID: String = ""
     @Published var canRefresh = false
     @Published var isFetching = false
@@ -317,6 +318,69 @@ class CloudKitViewModel: ObservableObject {
             }
         } catch {
             return []
+        }
+    }
+    
+    func fetchNotificationSpots(recordid: String) async throws {
+        let predicate = NSPredicate(format: "id == %@", recordid)
+        let query = CKQuery(recordType: "Spots", predicate: predicate)
+        
+        let results = try await CKContainer.default().publicCloudDatabase.records(matching: query, desiredKeys: desiredKeys, resultsLimit: 1)
+        results.matchResults.forEach { (_,result) in
+            switch result {
+            case .success(let record):
+                DispatchQueue.main.async {
+                    guard let name = record["name"] as? String else { return }
+                    guard let founder = record["founder"] as? String else { return }
+                    guard let date = record["date"] as? String else { return }
+                    guard let location = record["location"] as? CLLocation else { return }
+                    guard let likes = record["likes"] as? Int else { return }
+                    guard let id = record["id"] as? String else { return }
+                    guard let user = record["userID"] as? String else { return }
+                    guard let image = record["image"] as? CKAsset else { return }
+                    var customLocation = 0
+                    if let customLocationChecked = record["customLocation"] as? Int {
+                        customLocation = customLocationChecked
+                    }
+                    var isMultipleImages = 0
+                    if let m = record["isMultipleImages"] as? Int {
+                        isMultipleImages = m
+                    }
+                    var inappropriate = 0
+                    var offensive = 0
+                    var spam = 0
+                    var dangerous = 0
+                    if let inna = record["inappropriate"] as? Int {
+                        inappropriate = inna
+                    }
+                    if let offen = record["offensive"] as? Int {
+                        offensive = offen
+                    }
+                    if let sp = record["spam"] as? Int {
+                        spam = sp
+                    }
+                    if let dan = record["dangerous"] as? Int {
+                        dangerous = dan
+                    }
+                    var types = ""
+                    var description = ""
+                    var locationName = ""
+                    if let typeCheck = record["type"] as? String {
+                        types = typeCheck
+                    }
+                    if let descriptionCheck = record["description"] as? String {
+                        description = descriptionCheck
+                    }
+                    if let locationNameCheck = record["locationName"] as? String {
+                        locationName = locationNameCheck
+                    }
+                    let imageURL = image.fileURL
+                    self.notificationSpots.append(SpotFromCloud(id: id, name: name, founder: founder, description: description, date: date, location: location, type: types, imageURL: imageURL ?? URL(fileURLWithPath: "none"),  image2URL: nil , image3URL: nil, isMultipleImages: isMultipleImages , likes: likes, offensive: offensive, spam: spam, inappropriate: inappropriate, dangerous: dangerous, customLocation: customLocation, locationName: locationName, userID: user, record: record))
+                }
+            case .failure(let error):
+                print("\(error)")
+                return
+            }
         }
     }
     
@@ -693,6 +757,8 @@ class CloudKitViewModel: ObservableObject {
         notification.alertBody = "A new spot was added to your area!".localized()
         notification.soundName = "default"
         notification.shouldBadge = true
+        notification.desiredKeys = ["id"]
+        notification.shouldSendContentAvailable = true
         subscription.notificationInfo = notification
         try await CKContainer.default().publicCloudDatabase.save(subscription)
     }

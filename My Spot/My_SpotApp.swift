@@ -10,6 +10,9 @@ import SwiftUI
 @main
 struct My_SpotApp: App {
     
+    @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
+    
+    // initialize connection to watch...also conatins core data model
     @StateObject private var phoneViewModel = PhoneViewModel()
     
     // initialize mapViewModel

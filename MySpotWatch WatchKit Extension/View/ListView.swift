@@ -40,7 +40,7 @@ struct ListView: View {
                 List {
                     ForEach(spots, id: \.self) { spot in
                         NavigationLink(destination: DetailView(mapViewModel: mapViewModel, watchViewModel: watchViewModel, spot: spot)) {
-                            RowView(spot: spot)
+                            RowView(mapViewModel: mapViewModel, spot: spot)
                                 .swipeActions(edge: .trailing, allowsFullSwipe: true) {
                                     Button {
                                         let routeMeTo = MKMapItem(placemark: MKPlacemark(coordinate: CLLocationCoordinate2D(latitude: spot.x, longitude: spot.y)))

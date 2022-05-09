@@ -123,7 +123,7 @@ extension String {
 // badge for buttons
 struct Badge: View {
     @Binding var count: Int
-    @Binding var color: Color
+    let color: Color
 
     var body: some View {
         ZStack(alignment: .topTrailing) {
@@ -134,8 +134,8 @@ struct Badge: View {
                 .background(color)
                 .clipShape(Circle())
                 // custom positioning in the top-right corner
-                .alignmentGuide(.top) { $0[.bottom] }
-                .alignmentGuide(.trailing) { $0[.trailing] - $0.width * 0.25 }
+                .alignmentGuide(.top) { $0[.bottom] - $0.height * 0.45 }
+                .alignmentGuide(.trailing) { $0[.trailing] - $0.width * 0.15 }
         }
     }
 }
