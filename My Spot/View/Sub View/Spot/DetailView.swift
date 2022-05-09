@@ -26,6 +26,7 @@ struct DetailView: View {
     @Environment(\.colorScheme) var colorScheme
     @EnvironmentObject var tabController: TabController
     @State private var showingEditSheet = false
+    @State private var didCopy = false
     @State private var backImage = "chevron.left"
     @State private var scope:String = "Private".localized()
     @State private var tags: [String] = []
@@ -394,53 +395,7 @@ struct DetailView: View {
                 .padding(.top, 10)
                 .padding([.leading, .trailing], 30)
                 
-                if (!distance.isEmpty) {
-                    Text((distance) + " away".localized())
-                        .foregroundColor(.gray)
-                        .font(.system(size: 15, weight: .light))
-                        .padding(.bottom, 1)
-                }
-                
-                HStack {
-                    Image(systemName: "globe")
-                        .font(.system(size: 15, weight: .light))
-                        .foregroundColor(Color.gray)
-                    Text("\(scope)")
-                        .font(.system(size: 15, weight: .light))
-                        .foregroundColor(Color.gray)
-                        .onChange(of: spot.isPublic) { newValue in
-                            if (newValue) {
-                                scope = "Public".localized()
-                            } else {
-                                scope = "Private".localized()
-                            }
-                        }
-                    if (spot.isPublic && spot.likes >= 0) {
-                        Image(systemName: "icloud.and.arrow.down")
-                            .font(.system(size: 15, weight: .light))
-                            .foregroundColor(Color.gray)
-                        Text("\(Int(spot.likes))")
-                            .font(.system(size: 15, weight: .light))
-                            .foregroundColor(Color.gray)
-                    }
-                }
-                .padding(.bottom, 20)
-                .onAppear {
-                    if spot.isPublic {
-                        Task {
-                            do {
-                                let l = try await cloudViewModel.getLikes(idString: spot.dbid ?? "")
-                                if let l = l {
-                                    spot.likes = Double(l)
-                                } else {
-                                    spot.likes = -1
-                                }
-                            } catch {
-                                spot.likes = -1
-                            }
-                        }
-                    }
-                }
+                bottomHalf
             }
         }
         .frame(maxWidth: .infinity)
@@ -454,6 +409,84 @@ struct DetailView: View {
         .onAppear {
             if (mapViewModel.isAuthorized) {
                 calculateDistance()
+            }
+        }
+    }
+    
+    private var bottomHalf: some View {
+        VStack {
+            if !didCopy {
+                Button {
+                    let generator = UIImpactFeedbackGenerator(style: .light)
+                    generator.impactOccurred()
+                    let pasteboard = UIPasteboard.general
+                    pasteboard.string = "myspot://" + (spot.dbid ?? "Error")
+                    didCopy = true
+                } label: {
+                    HStack {
+                        Image(systemName: "doc.on.doc.fill")
+                        Text("Share ID".localized())
+                    }
+                    .padding(.horizontal)
+                }
+                .buttonStyle(.borderedProminent)
+                .padding([.top, .bottom], 10)
+                .padding([.leading, .trailing], 30)
+            } else {
+                HStack {
+                    Text("Copied".localized())
+                    Image(systemName: "checkmark.square.fill")
+                }
+                .padding([.top, .bottom], 10)
+                .padding([.leading, .trailing], 30)
+            }
+            
+            if (!distance.isEmpty) {
+                Text((distance) + " away".localized())
+                    .foregroundColor(.gray)
+                    .font(.system(size: 15, weight: .light))
+                    .padding(.bottom, 1)
+            }
+            
+            HStack {
+                Image(systemName: "globe")
+                    .font(.system(size: 15, weight: .light))
+                    .foregroundColor(Color.gray)
+                Text("\(scope)")
+                    .font(.system(size: 15, weight: .light))
+                    .foregroundColor(Color.gray)
+                    .onChange(of: spot.isPublic) { newValue in
+                        if (newValue) {
+                            scope = "Public".localized()
+                        } else {
+                            scope = "Private".localized()
+                        }
+                    }
+                if (spot.isPublic && spot.likes >= 0) {
+                    Image(systemName: "icloud.and.arrow.down")
+                        .font(.system(size: 15, weight: .light))
+                        .foregroundColor(Color.gray)
+                    Text("\(Int(spot.likes))")
+                        .font(.system(size: 15, weight: .light))
+                        .foregroundColor(Color.gray)
+                }
+            }
+            .padding(.bottom, 20)
+            .onAppear {
+                if spot.isPublic {
+                    Task {
+                        do {
+                            let l = try await cloudViewModel.getLikes(idString: spot.dbid ?? "")
+                            if let l = l {
+                                spot.likes = Double(l)
+                            } else {
+                                spot.likes = -1
+                            }
+                        } catch {
+                            spot.likes = -1
+                        }
+                    }
+                }
             }
         }
     }

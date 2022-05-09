@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct NotificationView: View {
+    
+    @Binding var badgeNum: Int
     @Environment(\.presentationMode) var presentationMode
     @EnvironmentObject var cloudViewModel: CloudKitViewModel
     @State private var showDetailView = false
@@ -64,6 +66,7 @@ struct NotificationView: View {
         .onAppear {
             UIApplication.shared.applicationIconBadgeNumber = 0
             UserDefaults.standard.set(0, forKey: "badge")
+            badgeNum = 0
             cloudViewModel.resetBadge()
             reloadData()
         }

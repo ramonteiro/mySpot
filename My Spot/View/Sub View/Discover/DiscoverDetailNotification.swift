@@ -25,6 +25,7 @@ struct DiscoverDetailNotification: View {
     @State private var backImage = "chevron.left"
     @State private var mySpot = false
     @State private var distance: String = ""
+    @State private var didCopy = false
     @State private var deleteAlert = false
     @State private var showingReportAlert = false
     @State private var selection = 0
@@ -337,6 +338,32 @@ struct DiscoverDetailNotification: View {
     
     private var bottomHalf: some View {
         VStack {
+            if !didCopy {
+                Button {
+                    let generator = UIImpactFeedbackGenerator(style: .light)
+                    generator.impactOccurred()
+                    let pasteboard = UIPasteboard.general
+                    pasteboard.string = "myspot://" + (cloudViewModel.notificationSpots[index].record.recordID.recordName)
+                    didCopy = true
+                } label: {
+                    HStack {
+                        Image(systemName: "doc.on.doc.fill")
+                        Text("Share ID".localized())
+                    }
+                    .padding(.horizontal)
+                }
+                .buttonStyle(.borderedProminent)
+                .padding(.top, 10)
+                .padding([.leading, .trailing], 30)
+            } else {
+                HStack {
+                    Text("Copied".localized())
+                    Image(systemName: "checkmark.square.fill")
+                }
+                .padding(.top, 10)
+                .padding([.leading, .trailing], 30)
+            }
+            
             if (!distance.isEmpty) {
                 Text((distance) + " away".localized())
                     .foregroundColor(.gray)
