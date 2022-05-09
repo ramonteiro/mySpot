@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct NotificationView: View {
+    @Environment(\.presentationMode) var presentationMode
     @EnvironmentObject var cloudViewModel: CloudKitViewModel
     @State private var showDetailView = false
     @State private var canLoad = false
@@ -25,21 +26,28 @@ struct NotificationView: View {
                 noSpotsMessage
             } else {
                 stack
-            }
-        }
-        .tint(cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex])
-        .navigationTitle("Notifications".localized())
-        .navigationViewStyle(.stack)
-        .toolbar {
-            ToolbarItemGroup(placement: .navigationBarTrailing) {
-                Button {
-                    let generator = UINotificationFeedbackGenerator()
-                    generator.notificationOccurred(.warning)
-                    showingAlert.toggle()
-                } label: {
-                    Text("Remove All".localized())
-                }
-                .disabled(isFetching || cloudViewModel.notificationSpots.isEmpty)
+                    .navigationTitle("Notifications".localized())
+                    .navigationViewStyle(.stack)
+                    .toolbar {
+                        ToolbarItemGroup(placement: .navigationBarTrailing) {
+                            Button {
+                                let generator = UINotificationFeedbackGenerator()
+                                generator.notificationOccurred(.warning)
+                                showingAlert.toggle()
+                            } label: {
+                                Text("Remove All".localized())
+                                    .foregroundColor(.red)
+                            }
+                            .disabled(isFetching || cloudViewModel.notificationSpots.isEmpty)
+                        }
+                        ToolbarItemGroup(placement: .navigationBarLeading) {
+                            Button {
+                                presentationMode.wrappedValue.dismiss()
+                            } label: {
+                                Text("Done".localized())
+                            }
+                        }
+                    }
             }
         }
         .sheet(isPresented: $showSettings) {
@@ -56,6 +64,7 @@ struct NotificationView: View {
         .onAppear {
             UIApplication.shared.applicationIconBadgeNumber = 0
             UserDefaults.standard.set(0, forKey: "badge")
+            cloudViewModel.resetBadge()
             reloadData()
         }
     }

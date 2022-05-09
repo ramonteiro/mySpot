@@ -15,7 +15,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "C507156C282584AB000F344C"
-               BuildableName = "MySpotWatch.app"
+               BuildableName = "My Spot.app"
                BlueprintName = "MySpotWatch"
                ReferencedContainer = "container:My Spot.xcodeproj">
             </BuildableReference>
@@ -56,16 +56,18 @@
       allowLocationSimulation = "YES"
       launchAutomaticallySubstyle = "8"
       notificationPayloadFile = "MySpotWatch WatchKit Extension/PushNotificationPayload.apns">
-      <BuildableProductRunnable
-         runnableDebuggingMode = "0">
+      <RemoteRunnable
+         runnableDebuggingMode = "2"
+         BundleIdentifier = "com.apple.Carousel"
+         RemotePath = "/(null)">
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "C507156C282584AB000F344C"
-            BuildableName = "MySpotWatch.app"
+            BuildableName = "My Spot.app"
             BlueprintName = "MySpotWatch"
             ReferencedContainer = "container:My Spot.xcodeproj">
          </BuildableReference>
-      </BuildableProductRunnable>
+      </RemoteRunnable>
    </LaunchAction>
    <ProfileAction
       buildConfiguration = "Release"
@@ -75,16 +77,27 @@
       debugDocumentVersioning = "YES"
       launchAutomaticallySubstyle = "8"
       notificationPayloadFile = "MySpotWatch WatchKit Extension/PushNotificationPayload.apns">
-      <BuildableProductRunnable
-         runnableDebuggingMode = "0">
+      <RemoteRunnable
+         runnableDebuggingMode = "2"
+         BundleIdentifier = "com.apple.Carousel"
+         RemotePath = "/(null)">
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "C507156C282584AB000F344C"
-            BuildableName = "MySpotWatch.app"
+            BuildableName = "My Spot.app"
             BlueprintName = "MySpotWatch"
             ReferencedContainer = "container:My Spot.xcodeproj">
          </BuildableReference>
-      </BuildableProductRunnable>
+      </RemoteRunnable>
+      <MacroExpansion>
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "C507156C282584AB000F344C"
+            BuildableName = "My Spot.app"
+            BlueprintName = "MySpotWatch"
+            ReferencedContainer = "container:My Spot.xcodeproj">
+         </BuildableReference>
+      </MacroExpansion>
    </ProfileAction>
    <AnalyzeAction
       buildConfiguration = "Debug">

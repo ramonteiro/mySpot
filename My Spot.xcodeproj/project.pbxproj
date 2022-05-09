@@ -22,7 +22,7 @@
 		C5071583282584AC000F344C /* ComplicationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5071582282584AC000F344C /* ComplicationController.swift */; };
 		C5071585282584AD000F344C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C5071584282584AD000F344C /* Assets.xcassets */; };
 		C5071588282584AD000F344C /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C5071587282584AD000F344C /* Preview Assets.xcassets */; };
-		C507158D282584AD000F344C /* My Spot.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = C507156D282584AB000F344C /* My Spot.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		C507158D282584AD000F344C /* My Spot.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = C507156D282584AB000F344C /* My Spot.app */; platformFilter = ios; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		C507159828258645000F344C /* MapViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C507159728258645000F344C /* MapViewModel.swift */; };
 		C507159A28258650000F344C /* CloudKitViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C507159928258650000F344C /* CloudKitViewModel.swift */; };
 		C507159D282586B1000F344C /* SpotModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C507159C282586B1000F344C /* SpotModel.swift */; };
@@ -95,7 +95,7 @@
 		C5D295542823719300FBA01E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C5D295532823719300FBA01E /* Assets.xcassets */; };
 		C5D295562823719300FBA01E /* MySpotWidget.intentdefinition in Sources */ = {isa = PBXBuildFile; fileRef = C5D295522823719100FBA01E /* MySpotWidget.intentdefinition */; };
 		C5D295572823719300FBA01E /* MySpotWidget.intentdefinition in Sources */ = {isa = PBXBuildFile; fileRef = C5D295522823719100FBA01E /* MySpotWidget.intentdefinition */; };
-		C5D2955A2823719300FBA01E /* MySpotWidgetExtension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = C5D2954A2823719100FBA01E /* MySpotWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		C5D2955A2823719300FBA01E /* MySpotWidgetExtension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = C5D2954A2823719100FBA01E /* MySpotWidgetExtension.appex */; platformFilter = ios; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		C5D2956028238CA400FBA01E /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C51503BF27D7C531009F0DCD /* CloudKit.framework */; };
 		C5D29561282504D700FBA01E /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = C56011B72800E66A00C49597 /* Localizable.strings */; };
 /* End PBXBuildFile section */
@@ -879,11 +879,13 @@
 		};
 		C507158C282584AD000F344C /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
+			platformFilter = ios;
 			target = C507156C282584AB000F344C /* MySpotWatch */;
 			targetProxy = C507158B282584AD000F344C /* PBXContainerItemProxy */;
 		};
 		C5D295592823719300FBA01E /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
+			platformFilter = ios;
 			target = C5D295492823719100FBA01E /* MySpotWidgetExtension */;
 			targetProxy = C5D295582823719300FBA01E /* PBXContainerItemProxy */;
 		};
@@ -1250,6 +1252,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "com.isaacpaschall.My-Spot.w";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
+				SUPPORTS_MACCATALYST = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -1280,6 +1283,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "com.isaacpaschall.My-Spot.w";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
+				SUPPORTS_MACCATALYST = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";

@@ -276,6 +276,16 @@ class CloudKitViewModel: ObservableObject {
         }
     }
     
+    func resetBadge() {
+        let badgeResetOperation = CKModifyBadgeOperation(badgeValue: 0)
+        badgeResetOperation.modifyBadgeCompletionBlock = { (error) -> Void in
+            if error != nil {
+                print(error as Any)
+            }
+        }
+        CKContainer.default().add(badgeResetOperation)
+    }
+    
     private func fetchUserID() {
         CKContainer.default().fetchUserRecordID { [weak self] returnedID, returnedError in
             DispatchQueue.main.async {

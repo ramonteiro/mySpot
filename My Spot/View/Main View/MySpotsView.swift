@@ -242,7 +242,7 @@ struct MySpotsView: View {
         .fullScreenCover(isPresented: $showingSettings) {
             SettingsView()
         }
-        .sheet(isPresented: $showNotificationSheet) {
+        .fullScreenCover(isPresented: $showNotificationSheet) {
             NotificationView()
         }
     }

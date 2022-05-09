@@ -64,7 +64,7 @@ struct DiscoverDetailNotification: View {
                             .transition(.scale)
                     }
                 }
-                .ignoresSafeArea(.all, edges: (canShare ? .top : [.top, .bottom]))
+                .ignoresSafeArea(.all, edges: [.top, .bottom])
                 .onChange(of: tabController.discoverPopToRoot) { _ in
                     presentationMode.wrappedValue.dismiss()
                 }
@@ -123,15 +123,11 @@ struct DiscoverDetailNotification: View {
             Text("Failed to save spot. Please try again.".localized())
         }
         .navigationBarHidden(true)
-        .ignoresSafeArea(.all, edges: (canShare ? .top : [.top, .bottom]))
+        .ignoresSafeArea(.all, edges: [.top, .bottom])
         .onAppear {
             noType = cloudViewModel.notificationSpots[index].type.isEmpty
             spotInCD = isSpotInCoreData()
-            if (canShare) {
-                backImage = "chevron.left"
-            } else {
-                backImage = "chevron.down"
-            }
+            backImage = "chevron.left"
         }
     }
     
@@ -165,9 +161,6 @@ struct DiscoverDetailNotification: View {
                 if (mySpot) {
                     deleteButton
                 }
-                if (canShare && UIDevice.current.userInterfaceIdiom != .pad) {
-                    canShareButton
-                }
             }
             .padding(.top, 30)
             Spacer()
@@ -176,9 +169,7 @@ struct DiscoverDetailNotification: View {
     
     private var backButton: some View {
         Button {
-            if !canShare {
-                imageOffset = 0
-            }
+            imageOffset = 0
             presentationMode.wrappedValue.dismiss()
         } label: {
             Image(systemName: backImage)
@@ -288,9 +279,7 @@ struct DiscoverDetailNotification: View {
                                     return
                                 }
                             }
-                            if !canShare {
-                                imageOffset = 0
-                            }
+                            imageOffset = 0
                             cloudViewModel.notificationSpots.remove(at: index)
                             presentationMode.wrappedValue.dismiss()
                         }
@@ -329,18 +318,6 @@ struct DiscoverDetailNotification: View {
                 .shadow(color: Color.black.opacity(0.3), radius: 5)
         )
         .disabled(spotInCD || isSaved)
-    }
-    
-    private var canShareButton: some View { // if canshare
-        Button {
-            cloudViewModel.shareSheet(index: index)
-        } label: {
-            Image(systemName: "square.and.arrow.up")
-                .foregroundColor(.white)
-                .font(.system(size: 30, weight: .regular))
-                .padding(10)
-                .shadow(color: Color.black.opacity(0.5), radius: 5)
-        }
     }
     
     private var expandButton: some View {
