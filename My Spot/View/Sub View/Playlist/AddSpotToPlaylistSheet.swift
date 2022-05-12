@@ -24,6 +24,7 @@ struct AddSpotToPlaylistSheet: View {
     @State private var addedSpots: [NSManagedObject] = []
     private let stack = CoreDataStack.shared
     @State private var isSaving = false
+    let currentSpots: [String]
     
     var body: some View {
         NavigationView {
@@ -44,7 +45,7 @@ struct AddSpotToPlaylistSheet: View {
             }
             .onAppear {
                 spotsFiltered = spots.filter{ spot in
-                    !spot.isShared && (spot.userId == UserDefaults(suiteName: "group.com.isaacpaschall.My-Spot")?.string(forKey: "userid") || spot.userId == "" || spot.userId == nil)
+                    !spot.isShared && (spot.userId == UserDefaults(suiteName: "group.com.isaacpaschall.My-Spot")?.string(forKey: "userid") || spot.userId == "" || spot.userId == nil) && (!currentSpots.contains("\(spot.name ?? "name")\(spot.x + spot.y)"))
                 }
             }
         }

@@ -101,6 +101,15 @@ struct DetailPlaylistView: View {
         }
     }
     
+    private func getCurrentSpotIds() -> [String] {
+        var matchingStrings: [String] = []
+        for spot in filteredSpots {
+            let string = "\(spot.name ?? "name")\(spot.x + spot.y)"
+            matchingStrings.append(string)
+        }
+        return matchingStrings
+    }
+    
     private var displayDetailedView: some View {
         ZStack {
             if (filteredSpots.count > 0) {
@@ -139,7 +148,7 @@ struct DetailPlaylistView: View {
                     }
                     .disabled(!stack.canEdit(object: playlist))
                     .sheet(isPresented: $showingAddSpotToPlaylistSheet, onDismiss: setFilteringType) {
-                        AddSpotToPlaylistSheet(currPlaylist: playlist)
+                        AddSpotToPlaylistSheet(currPlaylist: playlist, currentSpots: getCurrentSpotIds())
                     }
                     Button("Edit".localized()) {
                         showingEditSheet = true
