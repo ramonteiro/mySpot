@@ -22,11 +22,14 @@ struct SettingsView: View {
     @State private var newPlace = false
     @State private var message = "Message to My Spot developer: ".localized()
     @State private var discoverNoti = false
+    @State private var sharedNoti = false
     @State private var discoverProcess = false
+    @State private var sharedProcess = false
     @State private var unableToAddSpot = 0 // 0: ok, 1: no connection, 2: no permission
     @State private var showingErrorNoPermission = false
     @State private var showingErrorNoConnection = false
     @State private var preventDoubleTrigger = false // stops onchange from triggering itself
+    @State private var preventDoubleTriggerShared = false
     @State private var limits: Double = 10
     @State private var showNotiView = false
     var body: some View {
@@ -101,6 +104,15 @@ struct SettingsView: View {
                     Text("Alerts when new spots are added to your location, within a 10 mile radius. Tap 'Configure' to change the location where new spots should alert you.".localized())
                 }
                 Section {
+                    Toggle(isOn: $sharedNoti) {
+                        Text("Shared Playlists Notification".localized())
+                    }
+                    .disabled(sharedProcess)
+                    .tint(cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex])
+                } footer: {
+                    Text("Alerts when a shared playlist is updated.".localized())
+                }
+                Section {
                     Slider(value: $limits, in: 1...30, step: 1) { didChange in
                         if didChange {
                             let generator = UIImpactFeedbackGenerator(style: .light)
@@ -136,6 +148,70 @@ struct SettingsView: View {
                     }
                 } footer: {
                     Text("A link to my wordpress site with short detail about me and the current privacy policy in My Spot.".localized())
+                }
+            }
+            .onChange(of: sharedNoti) { newValue in
+                if newValue && !preventDoubleTriggerShared {
+                    Task {
+                        sharedProcess = true
+                        await cloudViewModel.checkNotificationPermission()
+                        if cloudViewModel.notiPermission == 0 { // not determined
+                            // ask
+                            await cloudViewModel.requestPermissionNoti()
+                        }
+                        if cloudViewModel.notiPermission == 2 ||  cloudViewModel.notiPermission == 3 { // allowed/provisional
+                            // subscribe
+                            do {
+                                try await cloudViewModel.subscribeToShares()
+                                cloudViewModel.notiSharedOn = true
+                                UserDefaults.standard.set(true, forKey: "sharednot")
+                            } catch {
+                                // alert error connecting
+                                cloudViewModel.notiSharedOn = false
+                                UserDefaults.standard.set(false, forKey: "sharednot")
+                                preventDoubleTriggerShared = true
+                                sharedNoti = false
+                                let generator = UINotificationFeedbackGenerator()
+                                generator.notificationOccurred(.warning)
+                                showingErrorNoConnection = true
+                            }
+                        } else { // denied/unknown
+                            // alert, notifications do not have permission
+                            cloudViewModel.notiSharedOn = false
+                            UserDefaults.standard.set(false, forKey: "sharednot")
+                            preventDoubleTriggerShared = true
+                            sharedNoti = false
+                            let generator = UINotificationFeedbackGenerator()
+                            generator.notificationOccurred(.warning)
+                            showingErrorNoPermission = true
+                        }
+                        sharedProcess = false
+                    }
+                }
+                if !newValue && !preventDoubleTriggerShared {
+                    // unsubscribe
+                    Task {
+                        sharedProcess = true
+                        do {
+                            try await cloudViewModel.unsubscribeAllShared()
+                            try await cloudViewModel.unsubscribeAllPrivate()
+                            cloudViewModel.notiSharedOn = false
+                            UserDefaults.standard.set(false, forKey: "sharednot")
+                        } catch {
+                            // alert no connection
+                            preventDoubleTriggerShared = true
+                            sharedNoti = true
+                            cloudViewModel.notiSharedOn = true
+                            UserDefaults.standard.set(true, forKey: "sharednot")
+                            let generator = UINotificationFeedbackGenerator()
+                            generator.notificationOccurred(.warning)
+                            showingErrorNoConnection = true
+                        }
+                        sharedProcess = false
+                    }
+                }
+                if preventDoubleTriggerShared {
+                    preventDoubleTriggerShared = false
                 }
             }
             .onChange(of: discoverNoti) { newValue in
@@ -188,7 +264,7 @@ struct SettingsView: View {
                     Task {
                         discoverProcess = true
                         do {
-                            try await cloudViewModel.unsubscribeAll()
+                            try await cloudViewModel.unsubscribeAllPublic()
                             cloudViewModel.notiNewSpotOn = false
                             UserDefaults.standard.set(false, forKey: "discovernot")
                         } catch {
@@ -304,6 +380,10 @@ struct SettingsView: View {
                 preventDoubleTrigger = true
             }
             discoverNoti = cloudViewModel.notiNewSpotOn
+            if cloudViewModel.notiSharedOn ==  true {
+                preventDoubleTriggerShared = true
+            }
+            sharedNoti = cloudViewModel.notiSharedOn
         }
     }
 }

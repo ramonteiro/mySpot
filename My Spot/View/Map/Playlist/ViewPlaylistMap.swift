@@ -133,7 +133,7 @@ struct ViewPlaylistMap: View {
             }
         }
         .fullScreenCover(isPresented: $showingDetailsSheet) {
-            DetailView(canShare: false, fromPlaylist: true, spot: filteredSpots[selection])
+            DetailView(canShare: false, fromPlaylist: true, spot: filteredSpots[selection], canEdit: true)
         }
     }
 }

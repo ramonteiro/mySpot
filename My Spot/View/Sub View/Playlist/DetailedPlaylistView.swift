@@ -302,7 +302,7 @@ struct DetailPlaylistView: View {
         ZStack {
             List {
                 ForEach(searchResults) { spot in
-                    NavigationLink(destination: DetailView(canShare: true, fromPlaylist: true, spot: spot)) {
+                    NavigationLink(destination: DetailView(canShare: true, fromPlaylist: true, spot: spot, canEdit: !stack.isShared(object: playlist))) {
                         SpotRow(spot: spot, isShared: false)
                     }
                 }

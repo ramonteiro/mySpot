@@ -121,7 +121,7 @@ struct MySpotsView: View {
         ZStack {
             List {
                 ForEach(searchResults) { spot in
-                    NavigationLink(destination: DetailView(canShare: true, fromPlaylist: false, spot: spot)) {
+                    NavigationLink(destination: DetailView(canShare: true, fromPlaylist: false, spot: spot, canEdit: true)) {
                         SpotRow(spot: spot, isShared: false)
                             .alert(isPresented: self.$showingDeleteAlert) {
                                 Alert(title: Text("Are you sure you want to delete?".localized()), message: Text(""), primaryButton: .destructive(Text("Delete".localized())) {

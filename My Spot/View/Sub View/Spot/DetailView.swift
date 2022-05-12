@@ -41,7 +41,7 @@ struct DetailView: View {
     @State private var images: [UIImage] = []
     @State private var showingCannotSavePublicAlert = false
     @State private var pu = false
-    @State private var canEdit = true
+    @State var canEdit: Bool
     @State private var canDelete = true
     
     var body: some View {
@@ -64,7 +64,9 @@ struct DetailView: View {
                         }
                     }
                     .onAppear {
-                        canEdit = CoreDataStack.shared.canEdit(object: spot)
+                        if canEdit {
+                            canEdit = CoreDataStack.shared.canEdit(object: spot)
+                        }
                         canDelete = CoreDataStack.shared.canDelete(object: spot)
                     }
             }

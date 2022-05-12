@@ -35,6 +35,10 @@ final class AppDelegate: NSObject, UIApplicationDelegate {
                     UserDefaults.standard.set(recordArray, forKey: "newSpotNotiRecords")
                 }
             }
+        } else if notification?.notificationType == .database {
+            if let _ = notification as? CKDatabaseNotification {
+                print("recieved database noti from updating shares")
+            }
         }
         completionHandler(.noData)
     }

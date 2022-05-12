@@ -11,6 +11,7 @@ import CloudKit
 class CloudKitViewModel: ObservableObject {
     
     @Published var notiNewSpotOn = false
+    @Published var notiSharedOn = false
     @Published var systemColorIndex = 0
     @Published var systemColorArray: [Color] = [.red,.green,.pink,.blue,.indigo,.mint,.orange,.purple,.teal,.yellow, .gray]
     @Published var isSignedInToiCloud: Bool = false
@@ -50,6 +51,11 @@ class CloudKitViewModel: ObservableObject {
             notiNewSpotOn = UserDefaults.standard.bool(forKey: "discovernot")
         } else {
             UserDefaults.standard.set(false, forKey: "discovernot")
+        }
+        if (UserDefaults.standard.valueExists(forKey: "sharednot")) {
+            notiSharedOn = UserDefaults.standard.bool(forKey: "sharednot")
+        } else {
+            UserDefaults.standard.set(false, forKey: "sharednot")
         }
     }
     
@@ -751,15 +757,29 @@ class CloudKitViewModel: ObservableObject {
         }
     }
     
-    func unsubscribeAll() async throws {
+    func unsubscribeAllPublic() async throws {
         let subs = try await CKContainer.default().publicCloudDatabase.allSubscriptions()
         for sub in subs {
             _ = try await CKContainer.default().publicCloudDatabase.deleteSubscription(withID: sub.subscriptionID)
         }
     }
     
+    func unsubscribeAllShared() async throws {
+        let subs = try await CKContainer.default().sharedCloudDatabase.allSubscriptions()
+        for sub in subs {
+            _ = try await CKContainer.default().sharedCloudDatabase.deleteSubscription(withID: sub.subscriptionID)
+        }
+    }
+    
+    func unsubscribeAllPrivate() async throws {
+        let subs = try await CKContainer.default().privateCloudDatabase.allSubscriptions()
+        for sub in subs {
+            _ = try await CKContainer.default().privateCloudDatabase.deleteSubscription(withID: sub.subscriptionID)
+        }
+    }
+    
     func subscribeToNewSpot(fixedLocation: CLLocation) async throws {
-        try? await unsubscribeAll()
+        try? await unsubscribeAllPublic()
         let predicate = NSPredicate(format: "distanceToLocation:fromLocation:(location, %@) < %f", fixedLocation, CGFloat(16093.4))
         let subscription = CKQuerySubscription(recordType: "Spots", predicate: predicate, options: .firesOnRecordCreation)
         let notification = CKSubscription.NotificationInfo()
@@ -771,5 +791,30 @@ class CloudKitViewModel: ObservableObject {
         notification.shouldSendContentAvailable = true
         subscription.notificationInfo = notification
         try await CKContainer.default().publicCloudDatabase.save(subscription)
+    }
+    
+    func subscribeToShares() async throws {
+        try? await unsubscribeAllShared()
+        try? await unsubscribeAllPrivate()
+        let subscription = CKDatabaseSubscription(subscriptionID: UUID().uuidString)
+        let notification = CKSubscription.NotificationInfo()
+        subscription.recordType = "cloudkit.share"
+        notification.title = "My Spot"
+        notification.alertBody = "Your shared playlist has been updated.".localized()
+        notification.soundName = "default"
+        notification.shouldBadge = false
+        notification.shouldSendContentAvailable = true
+        subscription.notificationInfo = notification
+        try await CKContainer.default().sharedCloudDatabase.save(subscription)
+        let subscriptionPrivate = CKDatabaseSubscription(subscriptionID: UUID().uuidString)
+        let notificationPrivate = CKSubscription.NotificationInfo()
+        subscriptionPrivate.recordType = "cloudkit.share"
+        notificationPrivate.title = "My Spot"
+        notificationPrivate.alertBody = "Your friend's playlist has been updated.".localized()
+        notificationPrivate.soundName = "default"
+        notificationPrivate.shouldBadge = false
+        notificationPrivate.shouldSendContentAvailable = true
+        subscriptionPrivate.notificationInfo = notification
+        try await CKContainer.default().privateCloudDatabase.save(subscriptionPrivate)
     }
 }
