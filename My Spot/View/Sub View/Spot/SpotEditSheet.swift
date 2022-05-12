@@ -448,14 +448,7 @@ struct SpotEditSheet: View {
         spot.founder = founder
         spot.isPublic = isPublic
         spot.tags = tags
-        do {
-            try moc.save()
-        } catch {
-            showingCannotSavePrivateAlert = true
-            let generator = UINotificationFeedbackGenerator()
-            generator.notificationOccurred(.warning)
-            return
-        }
+        CoreDataStack.shared.save()
         didChange = true
         presentationMode.wrappedValue.dismiss()
     }
@@ -510,14 +503,7 @@ struct SpotEditSheet: View {
         spot.details = descript
         spot.founder = founder
         spot.tags = tags
-        do {
-            try moc.save()
-        } catch {
-            showingCannotSavePrivateAlert = true
-            let generator = UINotificationFeedbackGenerator()
-            generator.notificationOccurred(.warning)
-            return
-        }
+        CoreDataStack.shared.save()
         if !spot.isPublic {
             showingCannotSavePublicAlert = true
         }
@@ -555,14 +541,7 @@ struct SpotEditSheet: View {
             spot.details = descript
             spot.founder = founder
             spot.tags = tags
-            do {
-                try moc.save()
-            } catch {
-                showingCannotSavePrivateAlert = true
-                let generator = UINotificationFeedbackGenerator()
-                generator.notificationOccurred(.warning)
-                return
-            }
+            CoreDataStack.shared.save()
             didChange = true
             presentationMode.wrappedValue.dismiss()
         } catch {
@@ -631,14 +610,7 @@ struct SpotEditSheet: View {
         spot.details = descript
         spot.founder = founder
         spot.tags = tags
-        do {
-            try moc.save()
-        } catch {
-            showingCannotSavePrivateAlert = true
-            let generator = UINotificationFeedbackGenerator()
-            generator.notificationOccurred(.warning)
-            return
-        }
+        CoreDataStack.shared.save()
         didChange = true
         presentationMode.wrappedValue.dismiss()
     }

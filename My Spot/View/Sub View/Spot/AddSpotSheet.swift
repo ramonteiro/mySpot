@@ -480,6 +480,8 @@ struct AddSpotSheet: View {
             newSpot.y = long
             newSpot.wasThere = true
         }
+        newSpot.isShared = false
+        newSpot.userId = cloudViewModel.userID
         newSpot.founder = founder
         newSpot.details = descript
         newSpot.name = name
@@ -489,15 +491,8 @@ struct AddSpotSheet: View {
         newSpot.tags = tags
         newSpot.locationName = locationName
         newSpot.id = UUID()
-        do {
-            try moc.save()
-            askForReview()
-        } catch {
-            showingCannotSavePrivateAlert = true
-            let generator = UINotificationFeedbackGenerator()
-            generator.notificationOccurred(.warning)
-            return
-        }
+        CoreDataStack.shared.save()
+        askForReview()
         close()
     }
     
@@ -577,14 +572,9 @@ struct AddSpotSheet: View {
             newSpot.tags = tags
             newSpot.locationName = locationName
             newSpot.id = UUID()
-            do {
-                try moc.save()
-            } catch {
-                showingCannotSavePrivateAlert = true
-                let generator = UINotificationFeedbackGenerator()
-                generator.notificationOccurred(.warning)
-                return
-            }
+            newSpot.isShared = false
+            newSpot.userId = cloudViewModel.userID
+            CoreDataStack.shared.save()
             if newSpot.isPublic {
                 askForReview()
             } else {

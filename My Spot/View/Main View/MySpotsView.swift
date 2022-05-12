@@ -35,6 +35,7 @@ struct MySpotsView: View {
     @State private var showingCannotSavePublicAlert = false
     @State private var pu = false
     @State private var isSaving = false
+    private var stack = CoreDataStack.shared
     
     private var searchResults: [Spot] {
             if searchText.isEmpty {
@@ -67,19 +68,8 @@ struct MySpotsView: View {
             mapViewModel.checkLocationAuthorization()
             setFilteringType()
         }
-        .onChange(of: spots.count) { newValue in
-            if (newValue > 0 && filteredSpots.count == 0) {
-                mapViewModel.checkLocationAuthorization()
-                setFilteringType()
-            } else if filteredSpots.count > newValue {
-                filteredSpots.forEach { spot in
-                    if !spots.contains(spot) {
-                        if let i = filteredSpots.firstIndex(of: spot) {
-                            filteredSpots.remove(at: i)
-                        }
-                    }
-                }
-            }
+        .onChange(of: spots.count) { _ in
+            setFilteringType()
         }
     }
     
@@ -132,7 +122,7 @@ struct MySpotsView: View {
             List {
                 ForEach(searchResults) { spot in
                     NavigationLink(destination: DetailView(canShare: true, fromPlaylist: false, spot: spot)) {
-                        SpotRow(spot: spot)
+                        SpotRow(spot: spot, isShared: false)
                             .alert(isPresented: self.$showingDeleteAlert) {
                                 Alert(title: Text("Are you sure you want to delete?".localized()), message: Text(""), primaryButton: .destructive(Text("Delete".localized())) {
                                     self.deleteFiltered(at: self.toBeDeleted!)
@@ -148,7 +138,7 @@ struct MySpotsView: View {
             }
             .animation(.default, value: searchResults)
             .searchable(text: $searchText, prompt: "Search All Spots".localized())
-            if (spots.count == 0) {
+            if (filteredSpots.count == 0) {
                 VStack(spacing: 6) {
                     HStack {
                         Spacer()
@@ -197,7 +187,7 @@ struct MySpotsView: View {
                     .fullScreenCover(isPresented: $showingMapSheet) {
                         ViewMapSpots()
                     }
-                    .disabled(spots.isEmpty)
+                    .disabled(filteredSpots.isEmpty)
                     if !isSaving {
                         Button {
                             UserDefaults.standard.set(Double(-1.0), forKey: "tempPinX")
@@ -242,7 +232,7 @@ struct MySpotsView: View {
         .fullScreenCover(isPresented: $showingSettings) {
             SettingsView()
         }
-        .fullScreenCover(isPresented: $showNotificationSheet) {
+        .sheet(isPresented: $showNotificationSheet) {
             NotificationView(badgeNum: $badgeNum)
         }
     }
@@ -327,6 +317,10 @@ struct MySpotsView: View {
             sortBy = "Closest".localized()
             UserDefaults.standard.set(sortBy, forKey: "savedSort")
         }
+        
+        filteredSpots = filteredSpots.filter { spot in
+            !spot.isShared && (spot.userId == UserDefaults(suiteName: "group.com.isaacpaschall.My-Spot")?.string(forKey: "userid") || spot.userId == "" || spot.userId == nil)
+        }
     }
     
     private var displayLocationIcon: some View {
@@ -367,8 +361,7 @@ struct MySpotsView: View {
             spots.forEach { j in
                 if (filteredSpots[i] == j) {
                     DispatchQueue.main.async {
-                        moc.delete(j)
-                        try? moc.save()
+                        stack.deleteSpot(j)
                         return
                     }
                 }

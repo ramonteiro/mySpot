@@ -12,6 +12,8 @@
 
 import SwiftUI
 import MapKit
+import CloudKit
+import CoreData
 
 struct DetailPlaylistView: View {
     
@@ -20,26 +22,46 @@ struct DetailPlaylistView: View {
     @Environment(\.managedObjectContext) var moc
     @Environment(\.presentationMode) var presentationMode
     @EnvironmentObject var tabController: TabController
+    @EnvironmentObject var cloudViewModel: CloudKitViewModel
     
     @State private var showingAddSpotToPlaylistSheet = false
     @State private var showingRemoveSpotToPlaylistSheet = false
+    @State private var share: CKShare?
+    @State private var showShareSheet = false
+    private let stack = CoreDataStack.shared
     @State private var showingEditSheet = false
     @State private var showingMapSheet = false
+    @State private var loadingShare = false
+    @State private var shareIcon = "person.crop.circle"
     @State private var filteredSpots: [Spot] = []
     @State private var searchText = ""
     @State private var sortBy = "Name".localized()
+    @State private var exists = false
     
     private var searchResults: [Spot] {
-            if searchText.isEmpty {
-                return filteredSpots
-            } else {
-                return filteredSpots.filter { ($0.name ?? "").lowercased().contains(searchText.lowercased()) || ($0.tags ?? "").lowercased().contains(searchText.lowercased()) || ($0.founder ?? "").lowercased().contains(searchText.lowercased())}
-            }
+        if searchText.isEmpty {
+            return filteredSpots
+        } else {
+            return filteredSpots.filter { ($0.name ?? "").lowercased().contains(searchText.lowercased()) || ($0.tags ?? "").lowercased().contains(searchText.lowercased()) || ($0.founder ?? "").lowercased().contains(searchText.lowercased())}
         }
+    }
     
     var body: some View {
-        if (playlistExist()) {
-            displayDetailedView
+        ZStack {
+            if (exists) {
+                ZStack {
+                    displayDetailedView
+                    if loadingShare {
+                        Color.black.opacity(0.3)
+                        ProgressView {
+                            Text("Loading".localized())
+                        }
+                    }
+                }
+            }
+        }
+        .onAppear {
+            exists = playlistExist()
         }
     }
     
@@ -55,20 +77,33 @@ struct DetailPlaylistView: View {
         offsets.forEach { i in
             playlist.spotArr.forEach { j in
                 if (filteredSpots[i] == j) {
-                    DispatchQueue.main.async {
-                        j.playlist = nil
-                        try? moc.save()
-                        return
+                    if !stack.isShared(object: j) {
+                        DispatchQueue.main.async {
+                            j.playlist = nil
+                            stack.save()
+                            filteredSpots.remove(atOffsets: offsets)
+                            return
+                        }
+                    } else if stack.canDelete(object: j) {
+                        DispatchQueue.main.async {
+                            j.playlist = nil
+                            stack.deleteSpot(j)
+                            filteredSpots.remove(atOffsets: offsets)
+                            return
+                        }
+                    } else {
+                        let generator = UINotificationFeedbackGenerator()
+                        generator.notificationOccurred(.error)
+                        //TODO: show no permissions alert
                     }
                 }
             }
         }
-        filteredSpots.remove(atOffsets: offsets)
     }
     
     private var displayDetailedView: some View {
         ZStack {
-            if (playlist.spotArr.count > 0) {
+            if (filteredSpots.count > 0) {
                 listFiltered
                     .onChange(of: sortBy) { sortType in
                         if (sortType == "Name".localized()) {
@@ -95,35 +130,73 @@ struct DetailPlaylistView: View {
                     }
                     .disabled(playlist.spotArr.count == 0)
                     .fullScreenCover(isPresented: $showingMapSheet) {
-                        ViewPlaylistMap(playlist: playlist)
+                        ViewPlaylistMap(playlist: playlist, isShared: stack.isShared(object: playlist))
                     }
                     Button{
                         showingAddSpotToPlaylistSheet = true
                     } label: {
                         Image(systemName: "plus").imageScale(.large)
                     }
+                    .disabled(!stack.canEdit(object: playlist))
                     .sheet(isPresented: $showingAddSpotToPlaylistSheet, onDismiss: setFilteringType) {
                         AddSpotToPlaylistSheet(currPlaylist: playlist)
                     }
                     Button("Edit".localized()) {
                         showingEditSheet = true
                     }
+                    .disabled(!stack.canEdit(object: playlist))
                     .sheet(isPresented: $showingEditSheet) {
                         PlaylistEditSheet(playlist: playlist)
                     }
                 }
             }
             ToolbarItemGroup(placement: .navigationBarLeading) {
-                displayLocationIcon
+                HStack(spacing: 0) {
+                    Button {
+                        if !stack.isShared(object: playlist) {
+                            loadingShare = true
+                            Task {
+                                await createShare(playlist)
+                                loadingShare = false
+                            }
+                        } else {
+                            showShareSheet = true
+                        }
+                    } label: {
+                        Image(systemName: shareIcon)
+                    }
+                    displayLocationIcon
+                }
             }
+        }
+        .onChange(of: playlist.spotArr.count) { _ in
+            setFilteringType()
+        }
+        .onChange(of: stack.isShared(object: playlist)) { isShared in
+            if isShared {
+                shareIcon = "person.crop.circle"
+            } else {
+                shareIcon = "person.crop.circle.badge.plus"
+            }
+            setFilteringType()
         }
         .onChange(of: tabController.playlistPopToRoot) { _ in
             presentationMode.wrappedValue.dismiss()
         }
         .onAppear() {
             mapViewModel.checkLocationAuthorization()
+            self.share = stack.getShare(playlist)
+            if !stack.isShared(object: playlist) {
+                shareIcon = "person.crop.circle.badge.plus"
+            }
             setFilteringType()
         }
+        .sheet(isPresented: $showShareSheet) {
+            if let share = share {
+                CloudSharingView(share: share, container: stack.ckContainer, playlist: playlist)
+            }
+        }
+        
     }
     
     private var displayLocationIcon: some View {
@@ -153,54 +226,9 @@ struct DetailPlaylistView: View {
     }
     
     private func setFilteringType() {
-            if (UserDefaults.standard.valueExists(forKey: "savedSort")) {
-                sortBy = (UserDefaults.standard.string(forKey: "savedSort") ?? "Name").localized()
-                if (sortBy == "Name".localized()) {
-                    filteredSpots = playlist.spotArr.sorted { (spot1, spot2) -> Bool in
-                        guard let name1 = spot1.name else { return true }
-                        guard let name2 = spot2.name else { return true }
-                        if (name1 < name2) {
-                            return true
-                        } else {
-                            return false
-                        }
-                    }
-                } else if (sortBy == "Newest".localized()) {
-                    let dateFormatter = DateFormatter()
-                    dateFormatter.dateFormat = "MMM d, yyyy; HH:mm:ss"
-                    filteredSpots = playlist.spotArr.sorted { (spot1, spot2) -> Bool in
-                        guard let dateString1 = spot1.date else { return true }
-                        guard let dateString2 = spot2.date else { return true }
-                        guard let date1 = dateFormatter.date(from: dateString1) else { return true }
-                        guard let date2 = dateFormatter.date(from: dateString2) else { return true }
-                        if (date1 > date2) {
-                            return true
-                        } else {
-                            return false
-                        }
-                    }
-                } else if (sortBy == "Closest".localized() && mapViewModel.isAuthorized) {
-                    filteredSpots = playlist.spotArr.sorted { (spot1, spot2) -> Bool in
-                        guard let UserY = mapViewModel.locationManager?.location?.coordinate.longitude else { return true }
-                        guard let UserX = mapViewModel.locationManager?.location?.coordinate.latitude else { return true }
-                        let distanceFromSpot1 = distanceBetween(x1: UserX, x2: spot1.x, y1: UserY, y2: spot1.y)
-                        let distanceFromSpot2 = distanceBetween(x1: UserX, x2: spot2.x, y1: UserY, y2: spot2.y)
-                        return distanceFromSpot1 < distanceFromSpot2
-                    }
-                } else if (sortBy == "Closest".localized() && !mapViewModel.isAuthorized) {
-                    filteredSpots = playlist.spotArr.sorted { (spot1, spot2) -> Bool in
-                        guard let name1 = spot1.name else { return true }
-                        guard let name2 = spot2.name else { return true }
-                        if (name1 < name2) {
-                            return true
-                        } else {
-                            return false
-                        }
-                    }
-                    sortBy = "Name".localized()
-                    UserDefaults.standard.set(sortBy, forKey: "savedSort")
-                }
-            } else {
+        if (UserDefaults.standard.valueExists(forKey: "savedSort")) {
+            sortBy = (UserDefaults.standard.string(forKey: "savedSort") ?? "Name").localized()
+            if (sortBy == "Name".localized()) {
                 filteredSpots = playlist.spotArr.sorted { (spot1, spot2) -> Bool in
                     guard let name1 = spot1.name else { return true }
                     guard let name2 = spot2.name else { return true }
@@ -210,9 +238,60 @@ struct DetailPlaylistView: View {
                         return false
                     }
                 }
-                sortBy = "Closest".localized()
+            } else if (sortBy == "Newest".localized()) {
+                let dateFormatter = DateFormatter()
+                dateFormatter.dateFormat = "MMM d, yyyy; HH:mm:ss"
+                filteredSpots = playlist.spotArr.sorted { (spot1, spot2) -> Bool in
+                    guard let dateString1 = spot1.date else { return true }
+                    guard let dateString2 = spot2.date else { return true }
+                    guard let date1 = dateFormatter.date(from: dateString1) else { return true }
+                    guard let date2 = dateFormatter.date(from: dateString2) else { return true }
+                    if (date1 > date2) {
+                        return true
+                    } else {
+                        return false
+                    }
+                }
+            } else if (sortBy == "Closest".localized() && mapViewModel.isAuthorized) {
+                filteredSpots = playlist.spotArr.sorted { (spot1, spot2) -> Bool in
+                    guard let UserY = mapViewModel.locationManager?.location?.coordinate.longitude else { return true }
+                    guard let UserX = mapViewModel.locationManager?.location?.coordinate.latitude else { return true }
+                    let distanceFromSpot1 = distanceBetween(x1: UserX, x2: spot1.x, y1: UserY, y2: spot1.y)
+                    let distanceFromSpot2 = distanceBetween(x1: UserX, x2: spot2.x, y1: UserY, y2: spot2.y)
+                    return distanceFromSpot1 < distanceFromSpot2
+                }
+            } else if (sortBy == "Closest".localized() && !mapViewModel.isAuthorized) {
+                filteredSpots = playlist.spotArr.sorted { (spot1, spot2) -> Bool in
+                    guard let name1 = spot1.name else { return true }
+                    guard let name2 = spot2.name else { return true }
+                    if (name1 < name2) {
+                        return true
+                    } else {
+                        return false
+                    }
+                }
+                sortBy = "Name".localized()
                 UserDefaults.standard.set(sortBy, forKey: "savedSort")
             }
+        } else {
+            filteredSpots = playlist.spotArr.sorted { (spot1, spot2) -> Bool in
+                guard let name1 = spot1.name else { return true }
+                guard let name2 = spot2.name else { return true }
+                if (name1 < name2) {
+                    return true
+                } else {
+                    return false
+                }
+            }
+            sortBy = "Closest".localized()
+            UserDefaults.standard.set(sortBy, forKey: "savedSort")
+        }
+        
+        if let _ = share {
+            filteredSpots = filteredSpots.filter { spot in
+                spot.isShared
+            }
+        }
     }
     
     private func distanceBetween(x1: Double, x2: Double, y1: Double, y2: Double) -> Double {
@@ -224,7 +303,7 @@ struct DetailPlaylistView: View {
             List {
                 ForEach(searchResults) { spot in
                     NavigationLink(destination: DetailView(canShare: true, fromPlaylist: true, spot: spot)) {
-                        SpotRow(spot: spot)
+                        SpotRow(spot: spot, isShared: false)
                     }
                 }
                 .onDelete(perform: self.deleteFiltered)
@@ -300,5 +379,104 @@ struct DetailPlaylistView: View {
         }
         sortBy = "Newest".localized()
         UserDefaults.standard.set(sortBy, forKey: "savedSort")
+    }
+}
+
+
+// MARK: Returns CKShare participant permission, methods and properties to share
+extension DetailPlaylistView {
+    private func createShare(_ playlist: Playlist) async {
+        do {
+            let (_, share, _) = try await stack.persistentContainer.share([playlist], to: nil)
+            share[CKShare.SystemFieldKey.title] = playlist.name ?? "Shared Playlist"
+            share[CKShare.SystemFieldKey.thumbnailImageData] = playlist.emoji?.image()
+            var sharedObjects: [NSManagedObject] = []
+            if playlist.spotArr.count > 0 {
+                for spot in playlist.spotArr {
+                    let newSpot = Spot(context: stack.context)
+                    newSpot.id = UUID()
+                    newSpot.isShared = false
+                    newSpot.userId = cloudViewModel.userID
+                    newSpot.date = spot.date
+                    newSpot.dbid = spot.dbid
+                    newSpot.details = spot.details
+                    newSpot.founder = spot.founder
+                    newSpot.fromDB = true
+                    newSpot.image = spot.image
+                    newSpot.image2 = spot.image2
+                    newSpot.image3 = spot.image3
+                    newSpot.isPublic = spot.isPublic
+                    newSpot.likes = spot.likes
+                    newSpot.locationName = spot.locationName
+                    newSpot.tags = spot.tags
+                    newSpot.wasThere = spot.wasThere
+                    newSpot.x = spot.x
+                    newSpot.y = spot.y
+                    newSpot.name = spot.name
+                    newSpot.founder = spot.founder
+                    sharedObjects.append(newSpot)
+                    spot.isShared = true
+                    spot.userId = cloudViewModel.userID
+                    spot.playlist = playlist
+                }
+            }
+            stack.save()
+            self.share = share
+            showShareSheet = true
+            loadingShare = false
+        } catch {
+            print("Failed to create share")
+            //TODO: failed to create share
+            loadingShare = false
+        }
+    }
+    
+    private func string(for permission: CKShare.ParticipantPermission) -> String {
+        switch permission {
+        case .unknown:
+            return "Unknown"
+        case .none:
+            return "None"
+        case .readOnly:
+            return "Read-Only"
+        case .readWrite:
+            return "Read-Write"
+        @unknown default:
+            fatalError("A new value added to CKShare.Participant.Permission")
+        }
+    }
+    
+    private func string(for role: CKShare.ParticipantRole) -> String {
+        switch role {
+        case .owner:
+            return "Owner"
+        case .privateUser:
+            return "Private User"
+        case .publicUser:
+            return "Public User"
+        case .unknown:
+            return "Unknown"
+        @unknown default:
+            fatalError("A new value added to CKShare.Participant.Role")
+        }
+    }
+    
+    private func string(for acceptanceStatus: CKShare.ParticipantAcceptanceStatus) -> String {
+        switch acceptanceStatus {
+        case .accepted:
+            return "Accepted"
+        case .removed:
+            return "Removed"
+        case .pending:
+            return "Invited"
+        case .unknown:
+            return "Unknown"
+        @unknown default:
+            fatalError("A new value added to CKShare.Participant.AcceptanceStatus")
+        }
+    }
+    
+    private var canEdit: Bool {
+        stack.canEdit(object: playlist)
     }
 }

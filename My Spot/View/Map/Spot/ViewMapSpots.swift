@@ -20,12 +20,16 @@ struct ViewMapSpots: View {
     @EnvironmentObject var cloudViewModel: CloudKitViewModel
     @State private var selection = 0
     @State private var showingDetailsSheet = false
+    @State private var spotsFiltered: [Spot] = []
     @State private var spotRegion: MKCoordinateRegion = MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: 33.714712646421, longitude: -112.29072718706581), span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01))
 
     var body: some View {
         displayMap
             .onAppear {
                 spotRegion = mapViewModel.region
+                spotsFiltered = spots.filter{ spot in
+                    !spot.isShared && (spot.userId == UserDefaults(suiteName: "group.com.isaacpaschall.My-Spot")?.string(forKey: "userid") || spot.userId == "" || spot.userId == nil)
+                }
             }
     }
 
@@ -35,8 +39,8 @@ struct ViewMapSpots: View {
     
     private var displayRouteButon: some View {
         Button {
-            let routeMeTo = MKMapItem(placemark: MKPlacemark(coordinate: CLLocationCoordinate2D(latitude: spots[selection].x, longitude: spots[selection].y)))
-            routeMeTo.name = spots[selection].name ?? "Spot"
+            let routeMeTo = MKMapItem(placemark: MKPlacemark(coordinate: CLLocationCoordinate2D(latitude: spotsFiltered[selection].x, longitude: spotsFiltered[selection].y)))
+            routeMeTo.name = spotsFiltered[selection].name ?? "Spot"
             routeMeTo.openInMaps(launchOptions: nil)
         } label: {
             Image(systemName: "point.topleft.down.curvedto.point.bottomright.up").imageScale(.large)
@@ -68,15 +72,15 @@ struct ViewMapSpots: View {
     
     private var displayMap: some View {
         ZStack {
-            Map(coordinateRegion: $spotRegion, interactionModes: [.pan, .zoom], showsUserLocation: mapViewModel.getIsAuthorized(), annotationItems: spots, annotationContent: { location in
+            Map(coordinateRegion: $spotRegion, interactionModes: [.pan, .zoom], showsUserLocation: mapViewModel.getIsAuthorized(), annotationItems: spotsFiltered, annotationContent: { location in
                 MapAnnotation(coordinate: CLLocationCoordinate2D(latitude: location.x, longitude: location.y)) {
-                    MapAnnotationView(color: cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex], spot: location, isSelected: spots[selection] == location)
-                        .scaleEffect(spots[selection] == location ? 1.2 : 0.9)
+                    MapAnnotationView(color: cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex], spot: location, isSelected: spotsFiltered[selection] == location)
+                        .scaleEffect(spotsFiltered[selection] == location ? 1.2 : 0.9)
                         .shadow(color: Color.black.opacity(0.3), radius: 5)
                         .onTapGesture {
-                            selection = spots.firstIndex(of: location) ?? 0
+                            selection = spotsFiltered.firstIndex(of: location) ?? 0
                             withAnimation {
-                                spotRegion = MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: spots[selection].x, longitude: spots[selection].y), span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01))
+                                spotRegion = MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: spotsFiltered[selection].x, longitude: spotsFiltered[selection].y), span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01))
                             }
                         }
                 }
@@ -100,8 +104,8 @@ struct ViewMapSpots: View {
                 
                 ZStack {
                     TabView(selection: $selection) {
-                        ForEach(spots.indices, id: \.self) { index in
-                            SpotMapPreview(spot: spots[index])
+                        ForEach(spotsFiltered.indices, id: \.self) { index in
+                            SpotMapPreview(spot: spotsFiltered[index])
                                 .tag(index)
                                 .onTapGesture {
                                     showingDetailsSheet.toggle()
@@ -113,13 +117,13 @@ struct ViewMapSpots: View {
                 }
                 .onChange(of: selection) { _ in
                     withAnimation {
-                        spotRegion = MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: spots[selection].x, longitude: spots[selection].y), span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01))
+                        spotRegion = MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: spotsFiltered[selection].x, longitude: spotsFiltered[selection].y), span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01))
                     }
                 }
             }
         }
         .fullScreenCover(isPresented: $showingDetailsSheet) {
-            DetailView(canShare: false, fromPlaylist: false, spot: spots[selection])
+            DetailView(canShare: false, fromPlaylist: false, spot: spotsFiltered[selection])
         }
     }
 }

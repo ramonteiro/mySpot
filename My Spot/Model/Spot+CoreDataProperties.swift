@@ -18,12 +18,14 @@ extension Spot {
     }
 
     @NSManaged public var details: String?
+    @NSManaged public var isShared: Bool
     @NSManaged public var id: UUID?
     @NSManaged public var image: UIImage?
     @NSManaged public var image2: UIImage?
     @NSManaged public var image3: UIImage?
     @NSManaged public var likes: Double
     @NSManaged public var name: String?
+    @NSManaged public var userId: String?
     @NSManaged public var x: Double
     @NSManaged public var y: Double
     @NSManaged public var isPublic: Bool

@@ -41,6 +41,8 @@ struct DetailView: View {
     @State private var images: [UIImage] = []
     @State private var showingCannotSavePublicAlert = false
     @State private var pu = false
+    @State private var canEdit = true
+    @State private var canDelete = true
     
     var body: some View {
         ZStack {
@@ -60,6 +62,10 @@ struct DetailView: View {
                         if (!fromPlaylist) {
                             presentationMode.wrappedValue.dismiss()
                         }
+                    }
+                    .onAppear {
+                        canEdit = CoreDataStack.shared.canEdit(object: spot)
+                        canDelete = CoreDataStack.shared.canDelete(object: spot)
                     }
             }
         }
@@ -148,7 +154,9 @@ struct DetailView: View {
             HStack(spacing: 0) {
                 backButtonView
                 Spacer()
-                deleteButton
+                if (canDelete) {
+                    deleteButton
+                }
                 if (canShare && spot.isPublic && UIDevice.current.userInterfaceIdiom != .pad) {
                     shareButton
                 }
@@ -237,16 +245,11 @@ struct DetailView: View {
             Button("Delete".localized(), role: .destructive) {
                 if let i = spots.firstIndex(of: spot) {
                     moc.delete(spots[i])
-                    do {
-                        try moc.save()
-                        if !canShare {
-                            imageOffset = 0
-                        }
-                        presentationMode.wrappedValue.dismiss()
-                    } catch {
-                        print("couldnt save")
+                    CoreDataStack.shared.save()
+                    if !canShare {
+                        imageOffset = 0
                     }
-                    
+                    presentationMode.wrappedValue.dismiss()
                 }
             }
         } message: {
@@ -280,9 +283,10 @@ struct DetailView: View {
                 .padding(15)
                 .foregroundColor(.white)
         }
+        .disabled(!canEdit)
         .background(
             Circle()
-                .foregroundColor(cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex])
+                .foregroundColor((!canEdit ? .gray : cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex]))
                 .shadow(color: Color.black.opacity(0.3), radius: 5)
         )
         .sheet(isPresented: $showingEditSheet, onDismiss: {

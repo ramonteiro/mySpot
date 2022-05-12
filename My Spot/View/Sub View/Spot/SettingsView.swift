@@ -45,7 +45,7 @@ struct SettingsView: View {
                                             cloudViewModel.systemColorIndex = i
                                             if (!colors.isEmpty) {
                                                 colors[0].colorIndex = Double(i)
-                                                try? moc.save()
+                                                CoreDataStack.shared.save()
                                             }
                                         }
                                 } else {
@@ -58,7 +58,7 @@ struct SettingsView: View {
                                                 cloudViewModel.systemColorIndex = i
                                                 if (!colors.isEmpty) {
                                                     colors[0].colorIndex = Double(i)
-                                                    try? moc.save()
+                                                    CoreDataStack.shared.save()
                                                     UserDefaults(suiteName: "group.com.isaacpaschall.My-Spot")?.set(i, forKey: "colorIndex")
                                                 }
                                             }
@@ -278,7 +278,7 @@ struct SettingsView: View {
                     colors[0].colorB = blue
                     colors[0].colorR = red
                     colors[0].colorA = alpha
-                    try? moc.save()
+                    CoreDataStack.shared.save()
                     UserDefaults(suiteName: "group.com.isaacpaschall.My-Spot")?.set(Double(green), forKey: "colorg")
                     UserDefaults(suiteName: "group.com.isaacpaschall.My-Spot")?.set(Double(blue), forKey: "colorb")
                     UserDefaults(suiteName: "group.com.isaacpaschall.My-Spot")?.set(Double(red), forKey: "colorr")

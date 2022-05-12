@@ -8,7 +8,13 @@
 import UIKit
 import CloudKit
 
-class AppDelegate: NSObject, UIApplicationDelegate {
+final class AppDelegate: NSObject, UIApplicationDelegate {
+    
+    func application(_ application: UIApplication, configurationForConnecting connectingSceneSession: UISceneSession, options: UIScene.ConnectionOptions) -> UISceneConfiguration {
+        let sceneConfig = UISceneConfiguration(name: nil, sessionRole: connectingSceneSession.role)
+        sceneConfig.delegateClass = SceneDelegate.self
+        return sceneConfig
+    }
     
     func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable : Any], fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
         let notification = CKNotification(fromRemoteNotificationDictionary: userInfo)
@@ -31,5 +37,20 @@ class AppDelegate: NSObject, UIApplicationDelegate {
             }
         }
         completionHandler(.noData)
+    }
+}
+
+final class SceneDelegate: NSObject, UIWindowSceneDelegate {
+    func windowScene(_ windowScene: UIWindowScene, userDidAcceptCloudKitShareWith cloudKitShareMetadata: CKShare.Metadata) {
+        let shareStore = CoreDataStack.shared.sharedPersistentStore
+        let persistentContainer = CoreDataStack.shared.persistentContainer
+        persistentContainer.acceptShareInvitations(from: [cloudKitShareMetadata], into: shareStore) { _, error in
+            if let error = error {
+                // TODO: error accepting message
+                print("acceptShareInvitation error :\(error)")
+            } else {
+                //TODO: Accepted successfully message.....wait pls for spots to load
+            }
+        }
     }
 }

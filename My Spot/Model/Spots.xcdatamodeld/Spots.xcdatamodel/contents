@@ -25,18 +25,20 @@
         <attribute name="image2" optional="YES" attributeType="Transformable" valueTransformerName="UIImageTransformer" customClassName="UIImage"/>
         <attribute name="image3" optional="YES" attributeType="Transformable" valueTransformerName="UIImageTransformer" customClassName="UIImage"/>
         <attribute name="isPublic" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
+        <attribute name="isShared" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
         <attribute name="likes" optional="YES" attributeType="Double" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="locationName" optional="YES" attributeType="String"/>
         <attribute name="name" attributeType="String" defaultValueString=""/>
         <attribute name="tags" optional="YES" attributeType="String"/>
+        <attribute name="userId" optional="YES" attributeType="String"/>
         <attribute name="wasThere" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
         <attribute name="x" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
         <attribute name="y" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
         <relationship name="playlist" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Playlist" inverseName="spot" inverseEntity="Playlist"/>
     </entity>
     <elements>
-        <element name="Spot" positionX="-63" positionY="-18" width="128" height="299"/>
-        <element name="Playlist" positionX="-45" positionY="108" width="128" height="89"/>
         <element name="CustomColor" positionX="-36" positionY="144" width="128" height="119"/>
+        <element name="Playlist" positionX="-45" positionY="108" width="128" height="89"/>
+        <element name="Spot" positionX="-63" positionY="-18" width="128" height="329"/>
     </elements>
 </model>

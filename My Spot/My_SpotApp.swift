@@ -28,7 +28,7 @@ struct My_SpotApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
-                .environment(\.managedObjectContext, phoneViewModel.dataController.container.viewContext)
+                .environment(\.managedObjectContext, CoreDataStack.shared.context)
                 .environmentObject(mapViewModel)
                 .environmentObject(cloudViewModel)
                 .environmentObject(phoneViewModel)

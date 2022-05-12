@@ -18,7 +18,7 @@ struct PlaylistView: View {
         SortDescriptor(\.name)
     ]) var playlists: FetchedResults<Playlist>
     @Environment(\.managedObjectContext) var moc
-    
+    private let stack = CoreDataStack.shared
     @EnvironmentObject var mapViewModel: MapViewModel
     @EnvironmentObject var cloudViewModel: CloudKitViewModel
     
@@ -30,7 +30,7 @@ struct PlaylistView: View {
                 List {
                     ForEach(playlists) { playlist in
                         NavigationLink(destination: DetailPlaylistView(playlist: playlist)) {
-                            PlaylistRow(playlist: playlist)
+                            PlaylistRow(playlist: playlist, isShared: hasOnePart(playlist: playlist), isSharing: isSharing(playlist: playlist))
                         }
                     }
                     .onDelete(perform: self.delete)
@@ -54,6 +54,23 @@ struct PlaylistView: View {
             }
         }
         .navigationViewStyle(.automatic)
+    }
+    
+    private func hasOnePart(playlist: Playlist) -> Bool {
+        var isShared = false
+        if stack.isShared(object: playlist) {
+            let share = stack.getShare(playlist)
+            share?.participants.forEach { participant in
+                if (participant.acceptanceStatus == .accepted && participant.role != .owner) {
+                    isShared = true
+                }
+            }
+        }
+        return isShared
+    }
+    
+    private func isSharing(playlist: Playlist) -> Bool {
+        return stack.isShared(object: playlist)
     }
     
     private var noPlaylistPrompt: some View {
@@ -85,13 +102,16 @@ struct PlaylistView: View {
         let generator = UINotificationFeedbackGenerator()
         generator.notificationOccurred(.warning)
         offsets.forEach { i in
-            if (playlists[i].spotArr.count > 0) {
-                for place in playlists[i].spotArr {
-                    place.playlist = nil
+            if !stack.isShared(object: playlists[i]) {
+                if (playlists[i].spotArr.count > 0) {
+                    for place in playlists[i].spotArr {
+                        place.playlist = nil
+                    }
                 }
+                stack.delete(playlists[i])
+            } else {
+                stack.delete(playlists[i])
             }
-            moc.delete(playlists[i])
-            try? moc.save()
             return
         }
     }

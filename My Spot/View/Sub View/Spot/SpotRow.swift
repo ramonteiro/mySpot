@@ -20,6 +20,7 @@ struct SpotRow: View {
     @State private var exists = true
     @State private var distance: String = ""
     @EnvironmentObject var mapViewModel: MapViewModel
+    let isShared: Bool
     
     var body: some View {
         ZStack {
@@ -111,6 +112,15 @@ struct SpotRow: View {
                 }
             }
             .padding(.leading, 5)
+            if isShared {
+                Spacer()
+                VStack {
+                    Spacer()
+                    Image(systemName: "checkmark.square.fill")
+                        .foregroundColor(.green)
+                    Spacer()
+                }
+            }
         }
         .onAppear {
             tags = spot.tags?.components(separatedBy: ", ") ?? []

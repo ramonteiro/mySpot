@@ -86,6 +86,7 @@
 		C5552CCB2827616600AF2683 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5552CCA2827616600AF2683 /* AppDelegate.swift */; };
 		C5552CCD2827696500AF2683 /* NotificationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5552CCC2827696500AF2683 /* NotificationView.swift */; };
 		C5552CCF2828207500AF2683 /* DiscoverDetailNotification.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5552CCE2828207500AF2683 /* DiscoverDetailNotification.swift */; };
+		C5552CD128298E6900AF2683 /* CloudSharingController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5552CD028298E6900AF2683 /* CloudSharingController.swift */; };
 		C56011B52800E66A00C49597 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = C56011B72800E66A00C49597 /* Localizable.strings */; };
 		C56F499F27E05CE300BCBB8F /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = C56F499E27E05CE300BCBB8F /* Extensions.swift */; };
 		C587027427E27F1900DFB6C4 /* MailViewCallback.swift in Sources */ = {isa = PBXBuildFile; fileRef = C587027327E27F1900DFB6C4 /* MailViewCallback.swift */; };
@@ -243,6 +244,7 @@
 		C5552CCA2827616600AF2683 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		C5552CCC2827696500AF2683 /* NotificationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationView.swift; sourceTree = "<group>"; };
 		C5552CCE2828207500AF2683 /* DiscoverDetailNotification.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiscoverDetailNotification.swift; sourceTree = "<group>"; };
+		C5552CD028298E6900AF2683 /* CloudSharingController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudSharingController.swift; sourceTree = "<group>"; };
 		C56011B62800E66A00C49597 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		C56011B82800E66D00C49597 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		C56011B92800E86B00C49597 /* pt-BR */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "pt-BR"; path = "pt-BR.lproj/Localizable.strings"; sourceTree = "<group>"; };
@@ -381,6 +383,7 @@
 				C51503F127D7CA1D009F0DCD /* MapViewModel.swift */,
 				C51503E627D7C87D009F0DCD /* CloudKitViewModel.swift */,
 				C5552CC12826472800AF2683 /* PhoneViewModel.swift */,
+				C5552CD028298E6900AF2683 /* CloudSharingController.swift */,
 			);
 			path = ViewModels;
 			sourceTree = "<group>";
@@ -823,6 +826,7 @@
 				C501FC1827E3FAB7008FEFA1 /* ZoomableScrollView.swift in Sources */,
 				C51503FD27D7CA60009F0DCD /* DiscoverView.swift in Sources */,
 				C51503DD27D7C856009F0DCD /* UIImageTransformer.swift in Sources */,
+				C5552CD128298E6900AF2683 /* CloudSharingController.swift in Sources */,
 				C5552CC22826472900AF2683 /* PhoneViewModel.swift in Sources */,
 				C515040F27D7CA87009F0DCD /* AddSpotToPlaylistSheet.swift in Sources */,
 				C51503F327D7CA1D009F0DCD /* ViewSingleSpotOnMap.swift in Sources */,

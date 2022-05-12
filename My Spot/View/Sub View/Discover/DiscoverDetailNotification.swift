@@ -276,7 +276,7 @@ struct DiscoverDetailNotification: View {
                             spots.forEach { i in
                                 if i.dbid == spotID.recordName {
                                     i.isPublic = false
-                                    try? moc.save()
+                                    CoreDataStack.shared.save()
                                     return
                                 }
                             }
@@ -566,6 +566,8 @@ struct DiscoverDetailNotification: View {
         } else if images.count == 2 {
             newSpot.image2 = images[1]
         }
+        newSpot.isShared = false
+        newSpot.userId = cloudViewModel.userID
         newSpot.locationName = cloudViewModel.notificationSpots[index].locationName
         newSpot.name = (newName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? cloudViewModel.notificationSpots[index].name : newName)
         newSpot.x = cloudViewModel.notificationSpots[index].location.coordinate.latitude
@@ -585,16 +587,8 @@ struct DiscoverDetailNotification: View {
         }
         newSpot.id = UUID()
         newSpot.dbid = cloudViewModel.notificationSpots[index].record.recordID.recordName
-        do {
-            try moc.save()
-            isSaved = true
-        } catch {
-            isSaved = false
-            let generator = UINotificationFeedbackGenerator()
-            generator.notificationOccurred(.warning)
-            showingCannotSavePrivateAlert = true
-            return
-        }
+        CoreDataStack.shared.save()
+        isSaved = true
     }
     
     private func calculateDistance() {

@@ -133,7 +133,7 @@ struct PlaylistEditSheet: View {
     private func saveChanges() {
         playlist.name = name
         playlist.emoji = emoji
-        try? moc.save()
+        CoreDataStack.shared.save()
         presentationMode.wrappedValue.dismiss()
     }
 }

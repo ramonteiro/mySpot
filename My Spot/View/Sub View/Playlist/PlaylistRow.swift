@@ -14,7 +14,11 @@ import SwiftUI
 
 struct PlaylistRow: View {
     @ObservedObject var playlist: Playlist
+    @State private var filteredSpots: [Spot] = []
     @State private var exists = true
+    @EnvironmentObject var cloudViewModel: CloudKitViewModel
+    let isShared: Bool
+    let isSharing:Bool
     
     var body: some View {
         ZStack {
@@ -25,23 +29,28 @@ struct PlaylistRow: View {
                         .shadow(color: Color.black.opacity(0.3), radius: 5)
                     
                     VStack(alignment: .leading) {
-                        Text("\(playlist.name ?? "")")
-                            .font(.headline)
-                            .fontWeight(.bold)
-                            .lineLimit(2)
+                        HStack {
+                            Text("\(playlist.name ?? "")")
+                                .font(.headline)
+                                .fontWeight(.bold)
+                                .lineLimit(2)
+                            if (isShared) {
+                                Image(systemName: "person.crop.circle")
+                            }
+                        }
                         
-                        if (playlist.spotArr.count > 1) {
-                            Text("\(playlist.spotArr.count) spots").font(.subheadline).foregroundColor(.gray)
-                        } else if (playlist.spotArr.count == 1) {
-                            Text("\(playlist.spotArr.count) spot").font(.subheadline).foregroundColor(.gray)
+                        if (filteredSpots.count > 1) {
+                            Text("\(filteredSpots.count) spots").font(.subheadline).foregroundColor(.gray)
+                        } else if (filteredSpots.count == 1) {
+                            Text("\(filteredSpots.count) spot").font(.subheadline).foregroundColor(.gray)
                         } else {
                             Text("Empty Playlist".localized()).font(.subheadline).foregroundColor(.gray)
                         }
                         
-                        if !(playlist.spotArr.count == 0) {
+                        if !(filteredSpots.count == 0) {
                             ScrollView(.horizontal, showsIndicators: false) {
                                 HStack {
-                                    ForEach(playlist.spotArr, id: \.self) { spot in
+                                    ForEach(filteredSpots, id: \.self) { spot in
                                         Text(spot.name ?? "")
                                             .font(.system(size: 12, weight: .regular))
                                             .lineLimit(2)
@@ -55,6 +64,15 @@ struct PlaylistRow: View {
                         }
                     }
                     .padding(.leading, 5)
+                }
+                .onAppear {
+                    if isSharing {
+                        filteredSpots = playlist.spotArr.filter { spot in
+                            spot.isShared
+                        }
+                    } else {
+                        filteredSpots = playlist.spotArr
+                    }
                 }
             }
         }

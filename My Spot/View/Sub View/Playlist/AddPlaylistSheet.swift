@@ -17,6 +17,7 @@ struct AddPlaylistSheet: View {
     
     @Environment(\.presentationMode) var presentationMode
     @Environment(\.managedObjectContext) var moc
+    private var stack = CoreDataStack.shared
     
     @State private var showingAlert = false
     @State private var name = ""
@@ -107,7 +108,7 @@ struct AddPlaylistSheet: View {
         newPlaylist.id = UUID()
         newPlaylist.name = name
         newPlaylist.emoji = emoji
-        try? moc.save()
+        stack.save()
     }
     
     private var doneButton: some View {

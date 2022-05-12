@@ -12,7 +12,7 @@ import UIKit
 
 class PhoneViewModel : NSObject,  WCSessionDelegate, ObservableObject {
     
-    var dataController = CoreDataManager()
+    private var dataController = CoreDataStack.shared
     var listOfDownloadsInSession: [String] = []
     var session: WCSession
     var message = "Unknown"
@@ -51,8 +51,13 @@ class PhoneViewModel : NSObject,  WCSessionDelegate, ObservableObject {
     }
     
     func save(spot: SpotFromCloud) {
-        let newSpot = Spot(context: dataController.container.viewContext)
+        let newSpot = Spot(context: dataController.context)
         newSpot.founder = spot.founder
+        if let id = UserDefaults(suiteName: "group.com.isaacpaschall.My-Spot")?.string(forKey: "userid") {
+            newSpot.userId = id
+        } else {
+            newSpot.userId = ""
+        }
         newSpot.details = spot.description
         if let data = try? Data(contentsOf: spot.imageURL), let image1 = UIImage(data: data) {
             newSpot.image = image1
@@ -82,12 +87,9 @@ class PhoneViewModel : NSObject,  WCSessionDelegate, ObservableObject {
             newSpot.wasThere = true
         }
         newSpot.id = UUID()
+        newSpot.isShared = false
         newSpot.dbid = spot.record.recordID.recordName
-        do {
-            try dataController.container.viewContext.save()
-        } catch {
-            print("error saving: \(error)")
-        }
+        dataController.save()
     }
     
     func downloadSpot(id: String) async throws {
