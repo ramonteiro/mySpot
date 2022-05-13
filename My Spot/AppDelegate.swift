@@ -36,8 +36,9 @@ final class AppDelegate: NSObject, UIApplicationDelegate {
                 }
             }
         } else if notification?.notificationType == .database {
-            if let _ = notification as? CKDatabaseNotification {
+            if let n = notification as? CKDatabaseNotification {
                 print("recieved database noti from updating shares")
+                print(n)
             }
         }
         completionHandler(.noData)

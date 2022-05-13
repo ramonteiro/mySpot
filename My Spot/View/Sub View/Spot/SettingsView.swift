@@ -24,7 +24,6 @@ struct SettingsView: View {
     @State private var discoverNoti = false
     @State private var sharedNoti = false
     @State private var discoverProcess = false
-    @State private var sharedProcess = false
     @State private var unableToAddSpot = 0 // 0: ok, 1: no connection, 2: no permission
     @State private var showingErrorNoPermission = false
     @State private var showingErrorNoConnection = false
@@ -112,10 +111,10 @@ struct SettingsView: View {
                     Toggle(isOn: $sharedNoti) {
                         Text("Shared Playlists".localized())
                     }
-                    .disabled(sharedProcess)
+                    .disabled(discoverProcess)
                     .tint(cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex])
                 } footer: {
-                    Text("Alerts when a shared playlist is updated.".localized())
+                    Text("Alerts when a shared playlist is modified.".localized())
                 }
                 Section {
                     Slider(value: $limits, in: 1...30, step: 1) { didChange in
@@ -158,7 +157,7 @@ struct SettingsView: View {
             .onChange(of: sharedNoti) { newValue in
                 if newValue && !preventDoubleTriggerShared {
                     Task {
-                        sharedProcess = true
+                        discoverProcess = true
                         await cloudViewModel.checkNotificationPermission()
                         if cloudViewModel.notiPermission == 0 { // not determined
                             // ask
@@ -190,13 +189,13 @@ struct SettingsView: View {
                             generator.notificationOccurred(.warning)
                             showingErrorNoPermission = true
                         }
-                        sharedProcess = false
+                        discoverProcess = false
                     }
                 }
                 if !newValue && !preventDoubleTriggerShared {
                     // unsubscribe
                     Task {
-                        sharedProcess = true
+                        discoverProcess = true
                         do {
                             try await cloudViewModel.unsubscribeAllShared()
                             try await cloudViewModel.unsubscribeAllPrivate()
@@ -212,7 +211,7 @@ struct SettingsView: View {
                             generator.notificationOccurred(.warning)
                             showingErrorNoConnection = true
                         }
-                        sharedProcess = false
+                        discoverProcess = false
                     }
                 }
                 if preventDoubleTriggerShared {

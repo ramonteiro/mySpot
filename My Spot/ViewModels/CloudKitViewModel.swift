@@ -783,8 +783,10 @@ class CloudKitViewModel: ObservableObject {
         let predicate = NSPredicate(format: "distanceToLocation:fromLocation:(location, %@) < %f", fixedLocation, CGFloat(16093.4))
         let subscription = CKQuerySubscription(recordType: "Spots", predicate: predicate, options: .firesOnRecordCreation)
         let notification = CKSubscription.NotificationInfo()
+        notification.alertLocalizationKey = "%1$@ was added to your area!"
+        notification.alertLocalizationArgs = ["name"]
         notification.title = "My Spot"
-        notification.alertBody = "A new spot was added to your area!".localized()
+        notification.alertBody = "%1$@ was added to your area!"
         notification.soundName = "default"
         notification.shouldBadge = true
         notification.desiredKeys = ["id"]
@@ -800,7 +802,7 @@ class CloudKitViewModel: ObservableObject {
         let notification = CKSubscription.NotificationInfo()
         subscription.recordType = "cloudkit.share"
         notification.title = "My Spot"
-        notification.alertBody = "Your shared playlist has been updated.".localized()
+        notification.alertBody = "Your shared playlist has been modified.".localized()
         notification.soundName = "default"
         notification.shouldBadge = false
         notification.shouldSendContentAvailable = true
@@ -810,7 +812,7 @@ class CloudKitViewModel: ObservableObject {
         let notificationPrivate = CKSubscription.NotificationInfo()
         subscriptionPrivate.recordType = "cloudkit.share"
         notificationPrivate.title = "My Spot"
-        notificationPrivate.alertBody = "Your friend's playlist has been updated.".localized()
+        notificationPrivate.alertBody = "Your friend's playlist has been modified.".localized()
         notificationPrivate.soundName = "default"
         notificationPrivate.shouldBadge = false
         notificationPrivate.shouldSendContentAvailable = true
