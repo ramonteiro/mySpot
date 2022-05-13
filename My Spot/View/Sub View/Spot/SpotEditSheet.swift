@@ -379,6 +379,7 @@ struct SpotEditSheet: View {
                 }
             }
             .interactiveDismissDisabled()
+            .allowsHitTesting(!isSaving)
             if isSaving {
                 Color.black.opacity(0.5)
                     .ignoresSafeArea()
@@ -448,7 +449,14 @@ struct SpotEditSheet: View {
         spot.founder = founder
         spot.isPublic = isPublic
         spot.tags = tags
-        CoreDataStack.shared.save()
+        do {
+            try CoreDataStack.shared.context.save()
+        } catch {
+            showingCannotSavePrivateAlert = true
+            let generator = UINotificationFeedbackGenerator()
+            generator.notificationOccurred(.warning)
+            return
+        }
         didChange = true
         presentationMode.wrappedValue.dismiss()
     }
@@ -503,7 +511,14 @@ struct SpotEditSheet: View {
         spot.details = descript
         spot.founder = founder
         spot.tags = tags
-        CoreDataStack.shared.save()
+        do {
+            try CoreDataStack.shared.context.save()
+        } catch {
+            showingCannotSavePrivateAlert = true
+            let generator = UINotificationFeedbackGenerator()
+            generator.notificationOccurred(.warning)
+            return
+        }
         if !spot.isPublic {
             showingCannotSavePublicAlert = true
         }
@@ -541,7 +556,14 @@ struct SpotEditSheet: View {
             spot.details = descript
             spot.founder = founder
             spot.tags = tags
-            CoreDataStack.shared.save()
+            do {
+                try CoreDataStack.shared.context.save()
+            } catch {
+                showingCannotSavePrivateAlert = true
+                let generator = UINotificationFeedbackGenerator()
+                generator.notificationOccurred(.warning)
+                return
+            }
             didChange = true
             presentationMode.wrappedValue.dismiss()
         } catch {
@@ -610,7 +632,14 @@ struct SpotEditSheet: View {
         spot.details = descript
         spot.founder = founder
         spot.tags = tags
-        CoreDataStack.shared.save()
+        do {
+            try CoreDataStack.shared.context.save()
+        } catch {
+            showingCannotSavePrivateAlert = true
+            let generator = UINotificationFeedbackGenerator()
+            generator.notificationOccurred(.warning)
+            return
+        }
         didChange = true
         presentationMode.wrappedValue.dismiss()
     }

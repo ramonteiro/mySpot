@@ -17,6 +17,9 @@ enum CoreDataErrors: Error {
 final class CoreDataStack: ObservableObject {
     static let shared = CoreDataStack()
     
+    var recievedShare = false
+    var wasSuccessful = false
+    
     var ckContainer: CKContainer {
         let storeDescription = persistentContainer.persistentStoreDescriptions.first
         guard let identifier = storeDescription?.cloudKitContainerOptions?.containerIdentifier else {

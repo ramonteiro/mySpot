@@ -37,6 +37,10 @@ struct DetailPlaylistView: View {
     @State private var searchText = ""
     @State private var sortBy = "Name".localized()
     @State private var exists = false
+    @State private var showNoPermissionsAlert = false
+    @State private var showFailedShareAlert = false
+    @State private var errorSaving = false
+    @State private var showErrorSavingAlert = false
     
     private var searchResults: [Spot] {
         if searchText.isEmpty {
@@ -51,8 +55,10 @@ struct DetailPlaylistView: View {
             if (exists) {
                 ZStack {
                     displayDetailedView
+                        .allowsHitTesting(!loadingShare)
                     if loadingShare {
-                        Color.black.opacity(0.3)
+                        Color.black.opacity(0.5)
+                            .ignoresSafeArea()
                         ProgressView {
                             Text("Loading".localized())
                         }
@@ -94,7 +100,7 @@ struct DetailPlaylistView: View {
                     } else {
                         let generator = UINotificationFeedbackGenerator()
                         generator.notificationOccurred(.error)
-                        //TODO: show no permissions alert
+                        showNoPermissionsAlert = true
                     }
                 }
             }
@@ -147,8 +153,14 @@ struct DetailPlaylistView: View {
                         Image(systemName: "plus").imageScale(.large)
                     }
                     .disabled(!stack.canEdit(object: playlist))
-                    .sheet(isPresented: $showingAddSpotToPlaylistSheet, onDismiss: setFilteringType) {
-                        AddSpotToPlaylistSheet(currPlaylist: playlist, currentSpots: getCurrentSpotIds())
+                    .sheet(isPresented: $showingAddSpotToPlaylistSheet) {
+                        setFilteringType()
+                        if errorSaving {
+                            errorSaving = false
+                            showErrorSavingAlert = true
+                        }
+                    } content: {
+                        AddSpotToPlaylistSheet(currPlaylist: playlist, currentSpots: getCurrentSpotIds(), errorSaving: $errorSaving)
                     }
                     Button("Edit".localized()) {
                         showingEditSheet = true
@@ -192,7 +204,7 @@ struct DetailPlaylistView: View {
         .onChange(of: tabController.playlistPopToRoot) { _ in
             presentationMode.wrappedValue.dismiss()
         }
-        .onAppear() {
+        .onAppear {
             mapViewModel.checkLocationAuthorization()
             self.share = stack.getShare(playlist)
             if !stack.isShared(object: playlist) {
@@ -205,7 +217,16 @@ struct DetailPlaylistView: View {
                 CloudSharingView(share: share, container: stack.ckContainer, playlist: playlist)
             }
         }
-        
+        .alert("Unable To Share".localized(), isPresented: $showFailedShareAlert) {
+            Button("OK".localized(), role: .cancel) { }
+        } message: {
+            Text("Please check internet connection and try again.".localized())
+        }
+        .alert("Unable Add Spots".localized(), isPresented: $showErrorSavingAlert) {
+            Button("OK".localized(), role: .cancel) { }
+        } message: {
+            Text("Please check internet connection and try again.".localized())
+        }
     }
     
     private var displayLocationIcon: some View {
@@ -318,6 +339,11 @@ struct DetailPlaylistView: View {
                 .onDelete(perform: self.deleteFiltered)
             }
             .searchable(text: $searchText, prompt: "Search ".localized() + (playlist.name ?? "") + (playlist.emoji ?? ""))
+        }
+        .alert("Invalid Permission".localized(), isPresented: $showNoPermissionsAlert) {
+            Button("OK".localized(), role: .cancel) { }
+        } message: {
+            Text("The owner has not allowed you to removed spots.".localized())
         }
     }
     
@@ -435,8 +461,8 @@ extension DetailPlaylistView {
             loadingShare = false
         } catch {
             print("Failed to create share")
-            //TODO: failed to create share
             loadingShare = false
+            showFailedShareAlert = true
         }
     }
     

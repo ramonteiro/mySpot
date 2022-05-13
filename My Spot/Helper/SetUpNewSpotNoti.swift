@@ -26,6 +26,7 @@ struct SetUpNewSpotNoti: View {
         NavigationView {
             ZStack {
                 MapView(centerRegion: $centerRegion, annotations: locations, isForNotifications: true)
+                    .allowsHitTesting(!saving)
                 Cross()
                     .stroke(cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex])
                 if (saving) {

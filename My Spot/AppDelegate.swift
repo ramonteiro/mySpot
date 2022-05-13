@@ -50,10 +50,12 @@ final class SceneDelegate: NSObject, UIWindowSceneDelegate {
         let persistentContainer = CoreDataStack.shared.persistentContainer
         persistentContainer.acceptShareInvitations(from: [cloudKitShareMetadata], into: shareStore) { _, error in
             if let error = error {
-                // TODO: error accepting message
+                CoreDataStack.shared.wasSuccessful = false
+                CoreDataStack.shared.recievedShare.toggle()
                 print("acceptShareInvitation error :\(error)")
             } else {
-                //TODO: Accepted successfully message.....wait pls for spots to load
+                CoreDataStack.shared.wasSuccessful = true
+                CoreDataStack.shared.recievedShare.toggle()
             }
         }
     }

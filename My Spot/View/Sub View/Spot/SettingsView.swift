@@ -83,7 +83,7 @@ struct SettingsView: View {
                 }
                 Section {
                     Toggle(isOn: $discoverNoti) {
-                        Text("New Spots Notification".localized())
+                        Text("New Spots".localized())
                     }
                     .disabled(discoverProcess)
                     .tint(cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex])
@@ -97,15 +97,20 @@ struct SettingsView: View {
                         }
                     }
                 } header: {
-                    if (cloudViewModel.notiNewSpotOn && !placeName.isEmpty) {
-                        Text("Area Set To: ".localized() + (placeName))
+                    VStack(spacing: 0) {
+                        Text("Notifications".localized())
+                            .font(.headline)
+                        if (cloudViewModel.notiNewSpotOn && !placeName.isEmpty) {
+                            Text("Area Set To: ".localized() + (placeName))
+                                .padding(.top)
+                        }
                     }
                 } footer: {
                     Text("Alerts when new spots are added to your location, within a 10 mile radius. Tap 'Configure' to change the location where new spots should alert you.".localized())
                 }
                 Section {
                     Toggle(isOn: $sharedNoti) {
-                        Text("Shared Playlists Notification".localized())
+                        Text("Shared Playlists".localized())
                     }
                     .disabled(sharedProcess)
                     .tint(cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex])

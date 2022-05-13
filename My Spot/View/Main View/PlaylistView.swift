@@ -21,8 +21,10 @@ struct PlaylistView: View {
     private let stack = CoreDataStack.shared
     @EnvironmentObject var mapViewModel: MapViewModel
     @EnvironmentObject var cloudViewModel: CloudKitViewModel
-    
+    @State private var showingDeleteAlert = false
     @State private var showingAddPlaylistSheet = false
+    @State private var toBeDeleted: IndexSet?
+    @State private var showNoPermissionsAlert = false
     
     var body: some View {
         NavigationView {
@@ -31,9 +33,20 @@ struct PlaylistView: View {
                     ForEach(playlists) { playlist in
                         NavigationLink(destination: DetailPlaylistView(playlist: playlist)) {
                             PlaylistRow(playlist: playlist, isShared: hasOnePart(playlist: playlist), isSharing: isSharing(playlist: playlist))
+                                .alert(isPresented: self.$showingDeleteAlert) {
+                                    Alert(title: Text("Are you sure you want to delete?".localized()),
+                                          message: Text("If you are the owner of a shared playlist, all participants will no longer have access.".localized()),
+                                          primaryButton: .destructive(Text("Delete".localized())) {
+                                        self.delete(at: self.toBeDeleted!)
+                                        self.toBeDeleted = nil
+                                    }, secondaryButton: .cancel() {
+                                        self.toBeDeleted = nil
+                                    }
+                                    )
+                                }
                         }
                     }
-                    .onDelete(perform: self.delete)
+                    .onDelete(perform: deleteRow)
                 }
                 .navigationTitle("Playlists".localized())
                 .toolbar {
@@ -51,6 +64,11 @@ struct PlaylistView: View {
                 if playlists.count == 0 {
                     noPlaylistPrompt
                 }
+            }
+            .alert("Invalid Permission".localized(), isPresented: $showNoPermissionsAlert) {
+                Button("OK".localized(), role: .cancel) { }
+            } message: {
+                Text("Only the owner can delete. If you would like to leave the shared playlist, please tap the person icon and choose yourself.".localized())
             }
         }
         .navigationViewStyle(.automatic)
@@ -98,6 +116,13 @@ struct PlaylistView: View {
         }
     }
     
+    private func deleteRow(at indexSet: IndexSet) {
+        self.toBeDeleted = indexSet
+        self.showingDeleteAlert = true
+        let generator = UINotificationFeedbackGenerator()
+        generator.notificationOccurred(.warning)
+    }
+    
     private func delete(at offsets: IndexSet) {
         let generator = UINotificationFeedbackGenerator()
         generator.notificationOccurred(.warning)
@@ -109,8 +134,12 @@ struct PlaylistView: View {
                     }
                 }
                 stack.delete(playlists[i])
-            } else {
+            } else if stack.isOwner(object: playlists[i]) {
                 stack.delete(playlists[i])
+            } else {
+                let generator = UINotificationFeedbackGenerator()
+                generator.notificationOccurred(.error)
+                showNoPermissionsAlert = true
             }
             return
         }

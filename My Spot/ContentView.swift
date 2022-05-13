@@ -18,6 +18,9 @@ struct ContentView: View {
     @Environment(\.managedObjectContext) var moc
     @State private var showSharedSpotSheet = false
     @State private var errorAlert = false
+    //accepting share alerts
+    @State private var failedToAcceptShare = false
+    @State private var acceptedShare = false
     
     var body: some View {
         TabView(selection: $tabController.activeTab) {
@@ -96,6 +99,25 @@ struct ContentView: View {
             Text(cloudViewModel.isErrorMessageDetails)
         }
         .environmentObject(tabController)
+        .onChange(of: CoreDataStack.shared.recievedShare) { _ in
+            if CoreDataStack.shared.wasSuccessful {
+                UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                acceptedShare = true
+            } else {
+                UINotificationFeedbackGenerator().notificationOccurred(.warning)
+                failedToAcceptShare = true
+            }
+        }
+        .alert("Invite Accepted!".localized(), isPresented: $acceptedShare) {
+            Button("OK".localized(), role: .cancel) { }
+        } message: {
+            Text("It may take a few seconds for the playlist to appear.".localized())
+        }
+        .alert("Invalid Invite".localized(), isPresented: $failedToAcceptShare) {
+            Button("OK".localized(), role: .cancel) { }
+        } message: {
+            Text("Please ask for another invite or check internet connection.".localized())
+        }
         .onAppear {
             if colors.isEmpty {
                 let newColor = CustomColor(context: moc)
@@ -117,9 +139,6 @@ struct ContentView: View {
                 cloudViewModel.systemColorArray[cloudViewModel.systemColorArray.count - 1] = Color(uiColor: UIColor(red: colors[0].colorR, green: colors[0].colorG, blue: colors[0].colorB, alpha: colors[0].colorA))
                 cloudViewModel.systemColorIndex = Int(colors[0].colorIndex)
             }
-//            if UIApplication.shared.applicationIconBadgeNumber > 0 {
-//                UIApplication.shared.applicationIconBadgeNumber = 0
-//            }
         }
     }
 }

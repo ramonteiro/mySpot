@@ -25,16 +25,20 @@ struct AddSpotToPlaylistSheet: View {
     private let stack = CoreDataStack.shared
     @State private var isSaving = false
     let currentSpots: [String]
+    @Binding var errorSaving: Bool
     
     var body: some View {
         NavigationView {
             ZStack {
                 if (!spotsFiltered.isEmpty) {
                     availableSpots
+                        .allowsHitTesting(!isSaving)
                 } else {
                     messageNoSpotsAvailable
                 }
                 if (isSaving) {
+                    Color.black.opacity(0.5)
+                        .ignoresSafeArea()
                     ProgressView("Saving".localized())
                         .padding()
                         .background(
@@ -86,13 +90,13 @@ struct AddSpotToPlaylistSheet: View {
                                         isSaving = false
                                         close()
                                     case .failure(let error):
-                                        //TODO: Failed to save share
+                                        errorSaving = true
                                         print("failed: \(error)")
                                         close()
                                     }
                                 }
                             } else {
-                                //TODO: Failed to save share
+                                errorSaving = true
                                 close()
                             }
                         } else {

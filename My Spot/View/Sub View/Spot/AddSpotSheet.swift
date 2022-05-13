@@ -491,8 +491,15 @@ struct AddSpotSheet: View {
         newSpot.tags = tags
         newSpot.locationName = locationName
         newSpot.id = UUID()
-        CoreDataStack.shared.save()
-        askForReview()
+        do {
+            try CoreDataStack.shared.context.save()
+            askForReview()
+        } catch {
+            showingCannotSavePrivateAlert = true
+            let generator = UINotificationFeedbackGenerator()
+            generator.notificationOccurred(.warning)
+            return
+        }
         close()
     }
     
@@ -574,7 +581,14 @@ struct AddSpotSheet: View {
             newSpot.id = UUID()
             newSpot.isShared = false
             newSpot.userId = cloudViewModel.userID
-            CoreDataStack.shared.save()
+            do {
+                try CoreDataStack.shared.context.save()
+            } catch {
+                showingCannotSavePrivateAlert = true
+                let generator = UINotificationFeedbackGenerator()
+                generator.notificationOccurred(.warning)
+                return
+            }
             if newSpot.isPublic {
                 askForReview()
             } else {
