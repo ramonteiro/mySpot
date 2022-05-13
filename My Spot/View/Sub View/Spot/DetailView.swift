@@ -180,10 +180,12 @@ struct DetailView: View {
                     .offset(x: (expand ? -50 : 0), y: -30)
                     .opacity(expand ? 0 : 1)
                 Spacer()
-                editButton
-                    .padding()
-                    .rotationEffect(Angle(degrees: (expand ? 360 : 0)), anchor: UnitPoint(x: 0.5, y: 0.5))
-                    .offset(x: (expand ? 100 : 0))
+                if canEdit {
+                    editButton
+                        .padding()
+                        .rotationEffect(Angle(degrees: (expand ? 360 : 0)), anchor: UnitPoint(x: 0.5, y: 0.5))
+                        .offset(x: (expand ? 100 : 0))
+                }
             }
             .offset(y: -60)
             Spacer()
@@ -285,10 +287,9 @@ struct DetailView: View {
                 .padding(15)
                 .foregroundColor(.white)
         }
-        .disabled(!canEdit)
         .background(
             Circle()
-                .foregroundColor((!canEdit ? .gray : cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex]))
+                .foregroundColor(cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex])
                 .shadow(color: Color.black.opacity(0.3), radius: 5)
         )
         .sheet(isPresented: $showingEditSheet, onDismiss: {
@@ -421,32 +422,33 @@ struct DetailView: View {
     
     private var bottomHalf: some View {
         VStack {
-            if !didCopy {
-                Button {
-                    let generator = UIImpactFeedbackGenerator(style: .light)
-                    generator.impactOccurred()
-                    let pasteboard = UIPasteboard.general
-                    pasteboard.string = "myspot://" + (spot.dbid ?? "Error")
-                    didCopy = true
-                } label: {
-                    HStack {
-                        Image(systemName: "doc.on.doc.fill")
-                        Text("Share ID".localized())
+            if spot.isPublic && spot.dbid != nil {
+                if !didCopy {
+                    Button {
+                        let generator = UIImpactFeedbackGenerator(style: .light)
+                        generator.impactOccurred()
+                        let pasteboard = UIPasteboard.general
+                        pasteboard.string = "myspot://" + (spot.dbid ?? "Error")
+                        didCopy = true
+                    } label: {
+                        HStack {
+                            Image(systemName: "doc.on.doc.fill")
+                            Text("Share ID".localized())
+                        }
+                        .padding(.horizontal)
                     }
-                    .padding(.horizontal)
+                    .buttonStyle(.borderedProminent)
+                    .padding([.top, .bottom], 10)
+                    .padding([.leading, .trailing], 30)
+                } else {
+                    HStack {
+                        Text("Copied".localized())
+                        Image(systemName: "checkmark.square.fill")
+                    }
+                    .padding([.top, .bottom], 10)
+                    .padding([.leading, .trailing], 30)
                 }
-                .buttonStyle(.borderedProminent)
-                .padding([.top, .bottom], 10)
-                .padding([.leading, .trailing], 30)
-            } else {
-                HStack {
-                    Text("Copied".localized())
-                    Image(systemName: "checkmark.square.fill")
-                }
-                .padding([.top, .bottom], 10)
-                .padding([.leading, .trailing], 30)
             }
-            
             if (!distance.isEmpty) {
                 Text((distance) + " away".localized())
                     .foregroundColor(.gray)
