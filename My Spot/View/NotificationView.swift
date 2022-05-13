@@ -17,7 +17,6 @@ struct NotificationView: View {
     @State private var index: Int?
     @State private var hasError = false
     @State private var isFetching = false
-    @State private var showSettings = false
     @State private var showingAlert = false
     
     var body: some View {
@@ -52,9 +51,6 @@ struct NotificationView: View {
                     }
             }
         }
-        .sheet(isPresented: $showSettings) {
-            SettingsView()
-        }
         .alert("Are you sure you want to remove all notifications?".localized(), isPresented: $showingAlert) {
             Button("Remove All".localized(), role: .destructive) {
                 cloudViewModel.notificationSpots = []
@@ -84,7 +80,7 @@ struct NotificationView: View {
             HStack {
                 Spacer()
                 Button {
-                    showSettings.toggle()
+                    presentationMode.wrappedValue.dismiss()
                 } label: {
                     Text("Please go to settings to enable notifications".localized())
                         .font(.subheadline)
