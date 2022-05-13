@@ -16,6 +16,7 @@ enum Tab {
     case spots
     case discover
     case playlists
+    case settings
 }
 
 class TabController: ObservableObject {

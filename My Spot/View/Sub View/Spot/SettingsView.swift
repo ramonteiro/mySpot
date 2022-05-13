@@ -19,6 +19,8 @@ struct SettingsView: View {
     @State private var showingMailSheet = false
     @State private var showingConfigure = false
     @State private var placeName = ""
+    @State private var badgeNum = 0
+    @State private var showNotificationSheet = false
     @State private var newPlace = false
     @State private var message = "Message to My Spot developer: ".localized()
     @State private var discoverNoti = false
@@ -371,15 +373,24 @@ struct SettingsView: View {
             .toolbar {
                 ToolbarItemGroup(placement: .navigationBarTrailing) {
                     Button {
-                        presentationMode.wrappedValue.dismiss()
+                        showNotificationSheet.toggle()
                     } label: {
-                        Text("Done".localized())
-                            .foregroundColor(cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex])
+                        Image(systemName: "bell")
+                    }
+                    .if(badgeNum > 0) { view in
+                        view.overlay {
+                            Badge(count: $badgeNum, color: .red)
+                        }
                     }
                 }
             }
         }
         .onAppear {
+            if UserDefaults.standard.valueExists(forKey: "badge") {
+                badgeNum = UserDefaults.standard.integer(forKey: "badge")
+            } else {
+                UserDefaults.standard.set(0, forKey: "badge")
+            }
             if cloudViewModel.notiNewSpotOn ==  true {
                 preventDoubleTrigger = true
             }
@@ -388,6 +399,9 @@ struct SettingsView: View {
                 preventDoubleTriggerShared = true
             }
             sharedNoti = cloudViewModel.notiSharedOn
+        }
+        .sheet(isPresented: $showNotificationSheet) {
+            NotificationView(badgeNum: $badgeNum)
         }
     }
 }

@@ -42,6 +42,13 @@ struct ContentView: View {
                     Text("Playlists".localized())
                 }
                 .tag(Tab.playlists)
+            SettingsView()
+                .tabItem() {
+                    Image(systemName: "gear")
+                    Text("Settings".localized())
+                }
+                .tag(Tab.settings)
+                .badge(UIApplication.shared.applicationIconBadgeNumber)
         }
         .onChange(of: scenePhase, perform: { newValue in
             if newValue == .active {

@@ -37,6 +37,7 @@ struct DetailPlaylistView: View {
     @State private var searchText = ""
     @State private var sortBy = "Name".localized()
     @State private var exists = false
+    @State private var isSaving = false
     @State private var showNoPermissionsAlert = false
     @State private var showFailedShareAlert = false
     @State private var errorSaving = false
@@ -150,17 +151,17 @@ struct DetailPlaylistView: View {
                     Button{
                         showingAddSpotToPlaylistSheet = true
                     } label: {
-                        Image(systemName: "plus").imageScale(.large)
-                    }
-                    .disabled(!stack.canEdit(object: playlist))
-                    .sheet(isPresented: $showingAddSpotToPlaylistSheet) {
-                        setFilteringType()
-                        if errorSaving {
-                            errorSaving = false
-                            showErrorSavingAlert = true
+                        if !isSaving {
+                            Image(systemName: "plus").imageScale(.large)
+                        } else {
+                            ProgressView()
+                                .progressViewStyle(.circular)
+                                .padding(5)
                         }
-                    } content: {
-                        AddSpotToPlaylistSheet(currPlaylist: playlist, currentSpots: getCurrentSpotIds(), errorSaving: $errorSaving)
+                    }
+                    .disabled(!stack.canEdit(object: playlist) || isSaving)
+                    .sheet(isPresented: $showingAddSpotToPlaylistSheet) {
+                        AddSpotToPlaylistSheet(currPlaylist: playlist, isSaving: $isSaving, currentSpots: getCurrentSpotIds(), errorSaving: $errorSaving)
                     }
                     Button("Edit".localized()) {
                         showingEditSheet = true
@@ -168,6 +169,17 @@ struct DetailPlaylistView: View {
                     .disabled(!stack.canEdit(object: playlist))
                     .sheet(isPresented: $showingEditSheet) {
                         PlaylistEditSheet(playlist: playlist)
+                    }
+                }
+                .onChange(of: isSaving) { newValue in
+                    if !newValue {
+                        setFilteringType()
+                    }
+                }
+                .onChange(of: errorSaving) { newValue in
+                    if errorSaving {
+                        errorSaving = false
+                        showErrorSavingAlert = true
                     }
                 }
             }

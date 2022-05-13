@@ -23,7 +23,7 @@ struct AddSpotToPlaylistSheet: View {
     var currPlaylist: Playlist
     @State private var addedSpots: [NSManagedObject] = []
     private let stack = CoreDataStack.shared
-    @State private var isSaving = false
+    @Binding var isSaving: Bool
     let currentSpots: [String]
     @Binding var errorSaving: Bool
     
@@ -32,19 +32,8 @@ struct AddSpotToPlaylistSheet: View {
             ZStack {
                 if (!spotsFiltered.isEmpty) {
                     availableSpots
-                        .allowsHitTesting(!isSaving)
                 } else {
                     messageNoSpotsAvailable
-                }
-                if (isSaving) {
-                    Color.black.opacity(0.5)
-                        .ignoresSafeArea()
-                    ProgressView("Saving".localized())
-                        .padding()
-                        .background(
-                            RoundedRectangle(cornerRadius: 10)
-                                .fill(Color(UIColor.systemBackground))
-                        )
                 }
             }
             .onAppear {
@@ -79,6 +68,7 @@ struct AddSpotToPlaylistSheet: View {
                 Button("Save".localized()) {
                     if addedSpots.count > 0 {
                         isSaving = true
+                        close()
                         if stack.isShared(object: currPlaylist) {
                             if let share = stack.getShare(currPlaylist) {
                                 stack.addToParentShared(children: addedSpots, parent: currPlaylist, share: share, userid: cloudViewModel.userID) { (results) in
@@ -88,16 +78,15 @@ struct AddSpotToPlaylistSheet: View {
                                             stack.save()
                                         }
                                         isSaving = false
-                                        close()
                                     case .failure(let error):
                                         errorSaving = true
                                         print("failed: \(error)")
-                                        close()
+                                        isSaving = false
                                     }
                                 }
                             } else {
                                 errorSaving = true
-                                close()
+                                isSaving = false
                             }
                         } else {
                             for object in addedSpots {
@@ -108,7 +97,6 @@ struct AddSpotToPlaylistSheet: View {
                                 stack.save()
                             }
                             isSaving = false
-                            close()
                         }
                     } else {
                         close()

@@ -25,12 +25,9 @@ struct MySpotsView: View {
     @State private var showingAddSheet = false
     @State private var showingMapSheet = false
     @State private var showingDeleteAlert = false
-    @State private var showingSettings = false
-    @State private var badgeNum = 0
     @State private var toBeDeleted: IndexSet?
     @State private var filteredSpots: [Spot] = []
     @State private var searchText = ""
-    @State private var showNotificationSheet = false
     @State private var sortBy = "Name".localized()
     @State private var showingCannotSavePublicAlert = false
     @State private var pu = false
@@ -164,21 +161,9 @@ struct MySpotsView: View {
             }
         }
         .navigationTitle("My Spots")
-        .onAppear {
-            if UserDefaults.standard.valueExists(forKey: "badge") {
-                badgeNum = UserDefaults.standard.integer(forKey: "badge")
-            } else {
-                UserDefaults.standard.set(0, forKey: "badge")
-            }
-        }
         .toolbar {
             ToolbarItemGroup(placement: .navigationBarTrailing) {
                 HStack {
-                    Button {
-                        showingSettings.toggle()
-                    } label: {
-                        Image(systemName: "gearshape")
-                    }
                     Button{
                         showingMapSheet.toggle()
                     } label: {
@@ -214,26 +199,8 @@ struct MySpotsView: View {
             }
              
             ToolbarItemGroup(placement: .navigationBarLeading) {
-                HStack(spacing: 0) {
-                    Button {
-                        showNotificationSheet.toggle()
-                    } label: {
-                        Image(systemName: "bell")
-                    }
-                    .if(badgeNum > 0) { view in
-                        view.overlay {
-                            Badge(count: $badgeNum, color: .red)
-                        }
-                    }
-                    displayLocationIcon
-                }
+                displayLocationIcon
             }
-        }
-        .fullScreenCover(isPresented: $showingSettings) {
-            SettingsView()
-        }
-        .sheet(isPresented: $showNotificationSheet) {
-            NotificationView(badgeNum: $badgeNum)
         }
     }
                 
