@@ -54,17 +54,7 @@ struct DetailPlaylistView: View {
     var body: some View {
         ZStack {
             if (exists) {
-                ZStack {
-                    displayDetailedView
-                        .allowsHitTesting(!loadingShare)
-                    if loadingShare {
-                        Color.black.opacity(0.5)
-                            .ignoresSafeArea()
-                        ProgressView {
-                            Text("Loading".localized())
-                        }
-                    }
-                }
+                displayDetailedView
             }
         }
         .onAppear {
@@ -196,7 +186,13 @@ struct DetailPlaylistView: View {
                             showShareSheet = true
                         }
                     } label: {
-                        Image(systemName: shareIcon)
+                        if !loadingShare {
+                            Image(systemName: shareIcon)
+                        } else {
+                            ProgressView()
+                                .progressViewStyle(.circular)
+                                .padding()
+                        }
                     }
                     displayLocationIcon
                 }

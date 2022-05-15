@@ -90,6 +90,7 @@
 		C56011B52800E66A00C49597 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = C56011B72800E66A00C49597 /* Localizable.strings */; };
 		C56F499F27E05CE300BCBB8F /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = C56F499E27E05CE300BCBB8F /* Extensions.swift */; };
 		C587027427E27F1900DFB6C4 /* MailViewCallback.swift in Sources */ = {isa = PBXBuildFile; fileRef = C587027327E27F1900DFB6C4 /* MailViewCallback.swift */; };
+		C58F2BF62830AA42005FA88F /* WelcomeSheet in Frameworks */ = {isa = PBXBuildFile; productRef = C58F2BF52830AA42005FA88F /* WelcomeSheet */; };
 		C5D2954C2823719100FBA01E /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C5D2954B2823719100FBA01E /* WidgetKit.framework */; };
 		C5D2954E2823719100FBA01E /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C5D2954D2823719100FBA01E /* SwiftUI.framework */; };
 		C5D295512823719100FBA01E /* MySpotWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5D295502823719100FBA01E /* MySpotWidget.swift */; };
@@ -283,6 +284,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				C50CF4A627F122DB001A9698 /* Mantis in Frameworks */,
+				C58F2BF62830AA42005FA88F /* WelcomeSheet in Frameworks */,
 				C51503C027D7C531009F0DCD /* CloudKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -656,6 +658,7 @@
 			name = "My Spot";
 			packageProductDependencies = (
 				C50CF4A527F122DB001A9698 /* Mantis */,
+				C58F2BF52830AA42005FA88F /* WelcomeSheet */,
 			);
 			productName = "My Spot";
 			productReference = C51503AA27D7C347009F0DCD /* My Spot.app */;
@@ -724,6 +727,7 @@
 			mainGroup = C51503A127D7C347009F0DCD;
 			packageReferences = (
 				C50CF4A427F122DB001A9698 /* XCRemoteSwiftPackageReference "Mantis" */,
+				C58F2BF42830AA42005FA88F /* XCRemoteSwiftPackageReference "Welcome-Sheet" */,
 			);
 			productRefGroup = C51503AB27D7C347009F0DCD /* Products */;
 			projectDirPath = "";
@@ -1353,6 +1357,14 @@
 				kind = branch;
 			};
 		};
+		C58F2BF42830AA42005FA88F /* XCRemoteSwiftPackageReference "Welcome-Sheet" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/MAJKFL/Welcome-Sheet";
+			requirement = {
+				branch = main;
+				kind = branch;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -1360,6 +1372,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = C50CF4A427F122DB001A9698 /* XCRemoteSwiftPackageReference "Mantis" */;
 			productName = Mantis;
+		};
+		C58F2BF52830AA42005FA88F /* WelcomeSheet */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C58F2BF42830AA42005FA88F /* XCRemoteSwiftPackageReference "Welcome-Sheet" */;
+			productName = WelcomeSheet;
 		};
 /* End XCSwiftPackageProductDependency section */
 

@@ -8,6 +8,15 @@
         "branch" : "master",
         "revision" : "bb4b250aed6b001e4a6dad29399aaa3cc3c1f060"
       }
+    },
+    {
+      "identity" : "welcome-sheet",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/MAJKFL/Welcome-Sheet",
+      "state" : {
+        "branch" : "main",
+        "revision" : "33d2836eea920b19dba0f82581a1864552eed547"
+      }
     }
   ],
   "version" : 2

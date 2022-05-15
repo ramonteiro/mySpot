@@ -802,7 +802,7 @@ class CloudKitViewModel: ObservableObject {
         let notification = CKSubscription.NotificationInfo()
         subscription.recordType = "cloudkit.share"
         notification.title = "My Spot"
-        notification.alertBody = "Your shared playlist has been modified.".localized()
+        notification.alertBody = "Your friend's playlist has been modified.".localized()
         notification.soundName = "default"
         notification.shouldBadge = false
         notification.shouldSendContentAvailable = true
@@ -812,11 +812,11 @@ class CloudKitViewModel: ObservableObject {
         let notificationPrivate = CKSubscription.NotificationInfo()
         subscriptionPrivate.recordType = "cloudkit.share"
         notificationPrivate.title = "My Spot"
-        notificationPrivate.alertBody = "Your friend's playlist has been modified.".localized()
+        notificationPrivate.alertBody = "Your shared playlist has been modified.".localized()
         notificationPrivate.soundName = "default"
         notificationPrivate.shouldBadge = false
         notificationPrivate.shouldSendContentAvailable = true
-        subscriptionPrivate.notificationInfo = notification
+        subscriptionPrivate.notificationInfo = notificationPrivate
         try await CKContainer.default().privateCloudDatabase.save(subscriptionPrivate)
     }
 }

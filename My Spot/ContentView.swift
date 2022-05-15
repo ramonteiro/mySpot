@@ -5,6 +5,7 @@
 //  Created by Isaac Paschall on 3/8/22.
 //
 
+import WelcomeSheet
 import SwiftUI
 
 struct ContentView: View {
@@ -21,6 +22,8 @@ struct ContentView: View {
     //accepting share alerts
     @State private var failedToAcceptShare = false
     @State private var acceptedShare = false
+    //onboarding
+    @State private var whatsNew = false
     
     var body: some View {
         TabView(selection: $tabController.activeTab) {
@@ -146,6 +149,25 @@ struct ContentView: View {
                 cloudViewModel.systemColorArray[cloudViewModel.systemColorArray.count - 1] = Color(uiColor: UIColor(red: colors[0].colorR, green: colors[0].colorG, blue: colors[0].colorB, alpha: colors[0].colorA))
                 cloudViewModel.systemColorIndex = Int(colors[0].colorIndex)
             }
+            if !UserDefaults.standard.bool(forKey: "whatsnew") {
+                UserDefaults.standard.set(true, forKey: "whatsnew")
+                whatsNew.toggle()
+            }
+            
         }
+        .welcomeSheet(isPresented: $whatsNew, onDismiss: {
+            print("dismissed")
+        }, isSlideToDismissDisabled: true, pages: whatsNewPages)
     }
+    
+    // Onboard Screens:
+    
+    let whatsNewPages = [
+        WelcomeSheetPage(title: "What's New".localized(), rows: [
+            WelcomeSheetPageRow(imageSystemName: "applewatch.radiowaves.left.and.right", title: "Apple Watch Support".localized(), content: "Use the apple watch extension to quickly find spots near you.".localized()),
+            WelcomeSheetPageRow(imageSystemName: "square.text.square", title: "Widgets", content: "Add widgets to your home screen to find spots near you at a glance.".localized()),
+            WelcomeSheetPageRow(imageSystemName: "person.3", title: "Shared Playlists".localized(), content: "Build your playlists with friends! Tap the person icon in any playlist to add people.".localized()),
+            WelcomeSheetPageRow(imageSystemName: "bell", title: "Notifications".localized(), content: "Get notified when new spots are added near you, or when your shared playlists are modified. Go to settings to turn on notifications.".localized())
+        ], mainButtonTitle: "Continue".localized())
+    ]
 }
