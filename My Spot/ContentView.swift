@@ -150,14 +150,13 @@ struct ContentView: View {
                 cloudViewModel.systemColorIndex = Int(colors[0].colorIndex)
             }
             if !UserDefaults.standard.bool(forKey: "whatsnew") {
-                UserDefaults.standard.set(true, forKey: "whatsnew")
                 whatsNew.toggle()
             }
             
         }
         .welcomeSheet(isPresented: $whatsNew, onDismiss: {
-            print("dismissed")
-        }, isSlideToDismissDisabled: true, pages: whatsNewPages)
+            UserDefaults.standard.set(true, forKey: "whatsnew")
+        }, isSlideToDismissDisabled: false, pages: whatsNewPages)
     }
     
     // Onboard Screens:
