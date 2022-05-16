@@ -1175,8 +1175,8 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "My-Spot-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "My Spot";
-				INFOPLIST_KEY_NSCameraUsageDescription = "mySpot needs your camera to save a picture of your spot";
-				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "mySpot needs your location to save and view your spots";
+				INFOPLIST_KEY_NSCameraUsageDescription = "My Spot needs your camera to save a picture of your spot";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "My Spot needs your location to save and view your spots";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIRequiresFullScreen = YES;
@@ -1213,8 +1213,8 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "My-Spot-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "My Spot";
-				INFOPLIST_KEY_NSCameraUsageDescription = "mySpot needs your camera to save a picture of your spot";
-				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "mySpot needs your location to save and view your spots";
+				INFOPLIST_KEY_NSCameraUsageDescription = "My Spot needs your camera to save a picture of your spot";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "My Spot needs your location to save and view your spots";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIRequiresFullScreen = YES;

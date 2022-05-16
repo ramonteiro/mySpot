@@ -50,7 +50,7 @@ struct Provider: TimelineProvider {
     func getSnapshot(in context: Context, completion: @escaping (SpotEntry) -> Void) {
         if context.isPreview {
             completion(emptySpot)
-        } else if mapViewModel.locationManager!.isAuthorizedForWidgetUpdates {
+        } else {
             mapViewModel.fetchLocation { location in
                 getPlacmarkOfLocation(location: location) { locationName in
                     cloudViewModel.fetchSpotPublic(userLocation: location, resultLimit: 4) { (result) in
@@ -64,8 +64,6 @@ struct Provider: TimelineProvider {
                     }
                 }
             }
-        } else {
-            completion(noLocation)
         }
     }
     
@@ -88,7 +86,7 @@ struct Provider: TimelineProvider {
                 }
             }
         } else {
-            let timeline = Timeline(entries: [noLocation], policy: .never)
+            let timeline = Timeline(entries: [noLocation], policy: .after(Date().addingTimeInterval(10)))
             completion(timeline)
         }
     }
@@ -144,6 +142,10 @@ class WidgetLocationManager: NSObject, CLLocationManagerDelegate, ObservableObje
     
     func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
         print(error)
+    }
+    
+    func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
+        WidgetCenter.shared.reloadAllTimelines()
     }
 }
 
