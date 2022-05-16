@@ -152,7 +152,6 @@ struct ContentView: View {
             if !UserDefaults.standard.bool(forKey: "whatsnew") {
                 whatsNew.toggle()
             }
-            
         }
         .welcomeSheet(isPresented: $whatsNew, onDismiss: {
             UserDefaults.standard.set(true, forKey: "whatsnew")

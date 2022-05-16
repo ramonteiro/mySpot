@@ -223,7 +223,7 @@ struct WidgetEntryView: View {
             Text("Location Services Disabled".localized())
                 .font(.system(size: 12))
                 .fontWeight(.bold)
-                .lineLimit(1)
+                .lineLimit(2)
         }
     }
 }
