@@ -934,7 +934,6 @@
 				DEVELOPMENT_TEAM = 2HAP7LLHCJ;
 				GENERATE_INFOPLIST_FILE = YES;
 				IBSC_MODULE = MySpotWatch_WatchKit_Extension;
-				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "My Spot needs location to find spots close to you";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = "com.isaacpaschall.My-Spot";
 				MARKETING_VERSION = 1.4;
@@ -961,7 +960,6 @@
 				DEVELOPMENT_TEAM = 2HAP7LLHCJ;
 				GENERATE_INFOPLIST_FILE = YES;
 				IBSC_MODULE = MySpotWatch_WatchKit_Extension;
-				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "My Spot needs location to find spots close to you";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = "com.isaacpaschall.My-Spot";
 				MARKETING_VERSION = 1.4;
