@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Scheme
-   LastUpgradeVersion = "1330"
+   LastUpgradeVersion = "1340"
    wasCreatedForAppExtension = "YES"
    version = "2.0">
    <BuildAction
@@ -57,8 +57,18 @@
       debugServiceExtension = "internal"
       allowLocationSimulation = "YES"
       launchAutomaticallySubstyle = "2">
-      <BuildableProductRunnable
-         runnableDebuggingMode = "0">
+      <RemoteRunnable
+         runnableDebuggingMode = "2"
+         BundleIdentifier = "com.apple.springboard">
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "C5D295492823719100FBA01E"
+            BuildableName = "MySpotWidgetExtension.appex"
+            BlueprintName = "MySpotWidgetExtension"
+            ReferencedContainer = "container:My Spot.xcodeproj">
+         </BuildableReference>
+      </RemoteRunnable>
+      <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "C51503A927D7C347009F0DCD"
@@ -66,7 +76,7 @@
             BlueprintName = "My Spot"
             ReferencedContainer = "container:My Spot.xcodeproj">
          </BuildableReference>
-      </BuildableProductRunnable>
+      </MacroExpansion>
       <EnvironmentVariables>
          <EnvironmentVariable
             key = "_XCWidgetKind"

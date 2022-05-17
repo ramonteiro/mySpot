@@ -480,6 +480,7 @@ struct AddSpotSheet: View {
             newSpot.y = long
             newSpot.wasThere = true
         }
+        
         newSpot.isShared = false
         newSpot.userId = cloudViewModel.userID
         newSpot.founder = founder
@@ -546,7 +547,7 @@ struct AddSpotSheet: View {
                 }
             }
             do {
-                let id = try await cloudViewModel.addSpotToPublic(name: name, founder: founder, date: getDate(), locationName: locationName, x: (usingCustomLocation ? centerRegion.center.latitude : lat), y: (usingCustomLocation ? centerRegion.center.longitude : long), description: descript, type: tags, image: imageData, image2: imageData2, image3: imageData3, isMultipleImages: (images?.count ?? 1) - 1, customLocation: usingCustomLocation)
+                let id = try await cloudViewModel.addSpotToPublic(name: name, founder: founder, date: getDate(), locationName: locationName, x: (usingCustomLocation ? centerRegion.center.latitude : lat), y: (usingCustomLocation ? centerRegion.center.longitude : long), description: descript, type: tags, image: imageData, image2: imageData2, image3: imageData3, isMultipleImages: (images?.count ?? 1) - 1, customLocation: usingCustomLocation, dateObject: Date())
                 if !id.isEmpty {
                     newSpot.dbid = id
                     newSpot.isPublic = true

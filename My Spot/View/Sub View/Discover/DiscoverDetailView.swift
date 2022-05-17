@@ -47,6 +47,7 @@ struct DiscoverDetailView: View {
     @State private var noType = false
     @State private var expand = false
     @State private var spotInCD = false
+    @State private var dateToShow = ""
     @State private var attemptToReport = false
     @FocusState private var nameIsFocused: Bool
     @State private var hasReported: Bool = false
@@ -453,11 +454,20 @@ struct DiscoverDetailView: View {
                     .font(.system(size: 15, weight: .light))
                     .foregroundColor(Color.gray)
                 Spacer()
-                Text("\(cloudViewModel.spots[index].date.components(separatedBy: ";")[0])")
+                Text(dateToShow)
                     .font(.system(size: 15, weight: .light))
                     .foregroundColor(Color.gray)
             }
             .padding([.leading, .trailing], 30)
+            .onAppear {
+                if let date = cloudViewModel.spots[index].dateObject {
+                    let timeFormatter = DateFormatter()
+                    timeFormatter.dateFormat = "MMM d, yyyy"
+                    dateToShow = timeFormatter.string(from: date)
+                } else {
+                    dateToShow = cloudViewModel.spots[index].date.components(separatedBy: ";")[0]
+                }
+            }
             
             HStack {
                 Image(systemName: "icloud.and.arrow.down")
@@ -608,6 +618,11 @@ struct DiscoverDetailView: View {
         }
         newSpot.tags = cloudViewModel.spots[index].type
         newSpot.date = cloudViewModel.spots[index].date
+        if let dateObject = cloudViewModel.spots[index].dateObject {
+            newSpot.dateObject = dateObject
+        } else {
+            newSpot.dateObject = nil
+        }
         if cloudViewModel.spots[index].customLocation == 1 {
             newSpot.wasThere = false
         } else {

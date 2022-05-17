@@ -35,6 +35,7 @@ struct DiscoverSheetShared: View {
     @State private var selection = 0
     @State private var expand = false
     @State private var isSaving = false
+    @State private var dateToShow = ""
     @State private var showSaveAlert = false
     @State private var showingCannotSavePrivateAlert = false
     @State private var newName = ""
@@ -425,11 +426,20 @@ struct DiscoverSheetShared: View {
                     .font(.system(size: 15, weight: .light))
                     .foregroundColor(Color.gray)
                 Spacer()
-                Text("\(cloudViewModel.shared[0].date.components(separatedBy: ";")[0])")
+                Text(dateToShow)
                     .font(.system(size: 15, weight: .light))
                     .foregroundColor(Color.gray)
             }
             .padding([.leading, .trailing], 30)
+            .onAppear {
+                if let date = cloudViewModel.shared[0].dateObject {
+                    let timeFormatter = DateFormatter()
+                    timeFormatter.dateFormat = "MMM d, yyyy"
+                    dateToShow = timeFormatter.string(from: date)
+                } else {
+                    dateToShow = cloudViewModel.shared[0].date.components(separatedBy: ";")[0]
+                }
+            }
             
             HStack {
                 Image(systemName: "icloud.and.arrow.down")
@@ -580,6 +590,11 @@ struct DiscoverSheetShared: View {
         }
         newSpot.tags = cloudViewModel.shared[0].type
         newSpot.date = cloudViewModel.shared[0].date
+        if let dateObject = cloudViewModel.shared[0].dateObject {
+            newSpot.dateObject = dateObject
+        } else {
+            newSpot.dateObject = nil
+        }
         if cloudViewModel.shared[0].customLocation == 1 {
             newSpot.wasThere = false
         } else {

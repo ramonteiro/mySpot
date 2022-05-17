@@ -29,5 +29,6 @@ struct SpotFromCloud: Hashable, Identifiable {
     let customLocation: Int
     let locationName: String
     let userID: String
+    let dateObject: Date?
     let record: CKRecord
 }

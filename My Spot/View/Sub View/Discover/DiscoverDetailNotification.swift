@@ -34,6 +34,7 @@ struct DiscoverDetailNotification: View {
     @State private var isSaving = false
     @State private var newName = ""
     @State private var isSaved: Bool = false
+    @State private var dateToShow = ""
     @State private var imageOffset: CGFloat = -50
     @State private var tags: [String] = []
     @State private var images: [UIImage] = []
@@ -425,11 +426,20 @@ struct DiscoverDetailNotification: View {
                     .font(.system(size: 15, weight: .light))
                     .foregroundColor(Color.gray)
                 Spacer()
-                Text("\(cloudViewModel.notificationSpots[index].date.components(separatedBy: ";")[0])")
+                Text(dateToShow)
                     .font(.system(size: 15, weight: .light))
                     .foregroundColor(Color.gray)
             }
             .padding([.leading, .trailing], 30)
+            .onAppear {
+                if let date = cloudViewModel.notificationSpots[index].dateObject {
+                    let timeFormatter = DateFormatter()
+                    timeFormatter.dateFormat = "MMM d, yyyy"
+                    dateToShow = timeFormatter.string(from: date)
+                } else {
+                    dateToShow = cloudViewModel.notificationSpots[index].date.components(separatedBy: ";")[0]
+                }
+            }
             
             HStack {
                 Image(systemName: "icloud.and.arrow.down")
@@ -580,6 +590,11 @@ struct DiscoverDetailNotification: View {
         }
         newSpot.tags = cloudViewModel.notificationSpots[index].type
         newSpot.date = cloudViewModel.notificationSpots[index].date
+        if let dateObject = cloudViewModel.notificationSpots[index].dateObject {
+            newSpot.dateObject = dateObject
+        } else {
+            newSpot.dateObject = nil
+        }
         if cloudViewModel.notificationSpots[index].customLocation == 1 {
             newSpot.wasThere = false
         } else {

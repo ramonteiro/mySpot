@@ -33,6 +33,7 @@ struct DetailView: View {
     @State private var didChange = false
     @State private var showingImage = false
     @State private var expand = false
+    @State private var dateToShow = ""
     @State private var deleteAlert = false
     @State private var distance: String = ""
     @State private var exists = true
@@ -352,11 +353,20 @@ struct DetailView: View {
                         .font(.system(size: 15, weight: .light))
                         .foregroundColor(Color.gray)
                     Spacer()
-                    Text("\(spot.date?.components(separatedBy: ";")[0] ?? "")")
+                    Text(dateToShow)
                         .font(.system(size: 15, weight: .light))
                         .foregroundColor(Color.gray)
                 }
                 .padding([.leading, .trailing], 30)
+                .onAppear {
+                    if let date = spot.dateObject {
+                        let timeFormatter = DateFormatter()
+                        timeFormatter.dateFormat = "MMM d, yyyy"
+                        dateToShow = timeFormatter.string(from: date)
+                    } else {
+                        dateToShow = spot.date?.components(separatedBy: ";")[0] ?? ""
+                    }
+                }
                 
                 if (!(spot.tags?.isEmpty ?? true)) {
                     ScrollView(.horizontal, showsIndicators: false) {

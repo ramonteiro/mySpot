@@ -57,6 +57,7 @@ final class CloudSharingCoordinator: NSObject, UICloudSharingControllerDelegate 
     func cloudSharingControllerDidStopSharing(_ csc: UICloudSharingController) {
         if !stack.isOwner(object: playlist) {
             stack.delete(playlist)
+            print("I AM NOT OWNER")
         }
     }
 }

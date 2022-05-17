@@ -98,6 +98,12 @@ class PhoneViewModel : NSObject,  WCSessionDelegate, ObservableObject {
             guard let name = record["name"] as? String else { return }
             guard let founder = record["founder"] as? String else { return }
             guard let date = record["date"] as? String else { return }
+            var dateObject: Date?
+            if let dateObj = record["dateObject"] as? Date {
+                dateObject = dateObj
+            } else {
+                dateObject = nil
+            }
             guard let location = record["location"] as? CLLocation else { return }
             guard let customLocation = record["customLocation"] as? Int else { return }
             var types = ""
@@ -145,14 +151,14 @@ class PhoneViewModel : NSObject,  WCSessionDelegate, ObservableObject {
                 guard let data3 = try? Data(contentsOf: image3URL) else { return }
                 let image2 = UIImage(data: data2)
                 let image3 = UIImage(data: data3)
-                self.save(spot: SpotFromCloud(id: id, name: name, founder: founder, description: description, date: date, location: location, type: types, imageURL: imageURL ?? URL(fileURLWithPath: "none"),  image2URL: image2 , image3URL: image3, isMultipleImages: isMultipleImages , likes: likes, offensive: offensive, spam: spam, inappropriate: inappropriate, dangerous: dangerous, customLocation: customLocation, locationName: locationName, userID: user, record: record))
+                self.save(spot: SpotFromCloud(id: id, name: name, founder: founder, description: description, date: date, location: location, type: types, imageURL: imageURL ?? URL(fileURLWithPath: "none"),  image2URL: image2 , image3URL: image3, isMultipleImages: isMultipleImages , likes: likes, offensive: offensive, spam: spam, inappropriate: inappropriate, dangerous: dangerous, customLocation: customLocation, locationName: locationName, userID: user, dateObject: dateObject, record: record))
             } else if let image2Check = record["image2"] as? CKAsset {
                 let image2URL = image2Check.fileURL ?? URL(fileURLWithPath: "none")
                 guard let data2 = try? Data(contentsOf: image2URL) else { return }
                 let image2 = UIImage(data: data2)
-                self.save(spot: SpotFromCloud(id: id, name: name, founder: founder, description: description, date: date, location: location, type: types, imageURL: imageURL ?? URL(fileURLWithPath: "none"),  image2URL: image2 , image3URL: nil, isMultipleImages: isMultipleImages , likes: likes, offensive: offensive, spam: spam, inappropriate: inappropriate, dangerous: dangerous, customLocation: customLocation, locationName: locationName, userID: user, record: record))
+                self.save(spot: SpotFromCloud(id: id, name: name, founder: founder, description: description, date: date, location: location, type: types, imageURL: imageURL ?? URL(fileURLWithPath: "none"),  image2URL: image2 , image3URL: nil, isMultipleImages: isMultipleImages , likes: likes, offensive: offensive, spam: spam, inappropriate: inappropriate, dangerous: dangerous, customLocation: customLocation, locationName: locationName, userID: user, dateObject: dateObject, record: record))
             } else {
-                self.save(spot: SpotFromCloud(id: id, name: name, founder: founder, description: description, date: date, location: location, type: types, imageURL: imageURL ?? URL(fileURLWithPath: "none"),  image2URL: nil , image3URL: nil, isMultipleImages: isMultipleImages , likes: likes, offensive: offensive, spam: spam, inappropriate: inappropriate, dangerous: dangerous, customLocation: customLocation, locationName: locationName, userID: user, record: record))
+                self.save(spot: SpotFromCloud(id: id, name: name, founder: founder, description: description, date: date, location: location, type: types, imageURL: imageURL ?? URL(fileURLWithPath: "none"),  image2URL: nil , image3URL: nil, isMultipleImages: isMultipleImages , likes: likes, offensive: offensive, spam: spam, inappropriate: inappropriate, dangerous: dangerous, customLocation: customLocation, locationName: locationName, userID: user, dateObject: dateObject, record: record))
             }
         }
     }
