@@ -423,14 +423,22 @@ struct DetailPlaylistView: View {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "MMM d, yyyy; HH:mm:ss"
         filteredSpots = filteredSpots.sorted { (spot1, spot2) -> Bool in
-            guard let dateString1 = spot1.date else { return true }
-            guard let dateString2 = spot2.date else { return true }
-            guard let date1 = dateFormatter.date(from: dateString1) else { return true }
-            guard let date2 = dateFormatter.date(from: dateString2) else { return true }
-            if (date1 > date2) {
-                return true
+            if let date1 = spot1.dateObject, let date2 = spot2.dateObject {
+                if (date1 > date2) {
+                    return true
+                } else {
+                    return false
+                }
             } else {
-                return false
+                guard let dateString1 = spot1.date else { return true }
+                guard let dateString2 = spot2.date else { return true }
+                guard let date1 = dateFormatter.date(from: dateString1) else { return true }
+                guard let date2 = dateFormatter.date(from: dateString2) else { return true }
+                if (date1 > date2) {
+                    return true
+                } else {
+                    return false
+                }
             }
         }
         sortBy = "Newest".localized()
@@ -454,6 +462,7 @@ extension DetailPlaylistView {
                     newSpot.isShared = false
                     newSpot.userId = cloudViewModel.userID
                     newSpot.date = spot.date
+                    newSpot.dateObject = spot.dateObject
                     newSpot.dbid = spot.dbid
                     newSpot.details = spot.details
                     newSpot.founder = spot.founder

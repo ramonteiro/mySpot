@@ -30,6 +30,7 @@ struct DiscoverDetailNotification: View {
     @State private var showingReportAlert = false
     @State private var selection = 0
     @State private var showSaveAlert = false
+    @State private var didCopyDescription = false
     @State private var showingCannotSavePrivateAlert = false
     @State private var isSaving = false
     @State private var newName = ""
@@ -471,12 +472,43 @@ struct DiscoverDetailNotification: View {
                 .padding([.leading, .trailing], 30)
                 .offset(y: 5)
             }
-            HStack(spacing: 5) {
-                Text(cloudViewModel.notificationSpots[index].description)
-                Spacer()
+            ZStack {
+                HStack(spacing: 5) {
+                    Text(cloudViewModel.notificationSpots[index].description)
+                    Spacer()
+                }
+                if didCopyDescription {
+                    HStack {
+                        Spacer()
+                        Text("Copied".localized())
+                            .padding(10)
+                            .background(Capsule().foregroundColor(.gray))
+                        Spacer()
+                    }
+                }
             }
             .padding(.top, 10)
             .padding([.leading, .trailing], 30)
+            .onTapGesture {
+                if !cloudViewModel.notificationSpots[index].description.isEmpty {
+                    let generator = UIImpactFeedbackGenerator(style: .light)
+                    generator.impactOccurred()
+                    let pasteboard = UIPasteboard.general
+                    pasteboard.string = cloudViewModel.notificationSpots[index].description
+                    withAnimation {
+                        didCopyDescription = true
+                    }
+                }
+            }
+            .onChange(of: didCopyDescription) { newValue in
+                if newValue {
+                    let _ = Timer.scheduledTimer(withTimeInterval: 1.5, repeats: false) { timer in
+                        withAnimation {
+                            didCopyDescription = false
+                        }
+                    }
+                }
+            }
             
             ViewSingleSpotOnMap(singlePin: [SinglePin(name: cloudViewModel.notificationSpots[index].name, coordinate: cloudViewModel.notificationSpots[index].location.coordinate)])
                 .aspectRatio(contentMode: .fit)

@@ -30,6 +30,7 @@ struct DiscoverDetailView: View {
     @State private var backImage = "chevron.left"
     @State private var mySpot = false
     @State private var didCopy = false
+    @State private var didCopyDescription = false
     @State private var distance: String = ""
     @State private var deleteAlert = false
     @State private var showingReportAlert = false
@@ -499,12 +500,43 @@ struct DiscoverDetailView: View {
                 .padding([.leading, .trailing], 30)
                 .offset(y: 5)
             }
-            HStack(spacing: 5) {
-                Text(cloudViewModel.spots[index].description)
-                Spacer()
+            ZStack {
+                HStack(spacing: 5) {
+                    Text(cloudViewModel.spots[index].description)
+                    Spacer()
+                }
+                if didCopyDescription {
+                    HStack {
+                        Spacer()
+                        Text("Copied".localized())
+                            .padding(10)
+                            .background(Capsule().foregroundColor(.gray))
+                        Spacer()
+                    }
+                }
             }
             .padding(.top, 10)
             .padding([.leading, .trailing], 30)
+            .onTapGesture {
+                if !cloudViewModel.spots[index].description.isEmpty {
+                    let generator = UIImpactFeedbackGenerator(style: .light)
+                    generator.impactOccurred()
+                    let pasteboard = UIPasteboard.general
+                    pasteboard.string = cloudViewModel.spots[index].description
+                    withAnimation {
+                        didCopyDescription = true
+                    }
+                }
+            }
+            .onChange(of: didCopyDescription) { newValue in
+                if newValue {
+                    let _ = Timer.scheduledTimer(withTimeInterval: 1.5, repeats: false) { timer in
+                        withAnimation {
+                            didCopyDescription = false
+                        }
+                    }
+                }
+            }
             
             ViewSingleSpotOnMap(singlePin: [SinglePin(name: cloudViewModel.spots[index].name, coordinate: cloudViewModel.spots[index].location.coordinate)])
                 .aspectRatio(contentMode: .fit)

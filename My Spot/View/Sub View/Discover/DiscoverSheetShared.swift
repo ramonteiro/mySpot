@@ -32,6 +32,7 @@ struct DiscoverSheetShared: View {
     @State private var deleteAlert = false
     @State private var showingReportAlert = false
     @State private var hasReported = false
+    @State private var didCopyDescription = false
     @State private var selection = 0
     @State private var expand = false
     @State private var isSaving = false
@@ -471,12 +472,43 @@ struct DiscoverSheetShared: View {
                 .padding([.leading, .trailing], 30)
                 .offset(y: 5)
             }
-            HStack(spacing: 5) {
-                Text(cloudViewModel.shared[0].description)
-                Spacer()
+            ZStack {
+                HStack(spacing: 5) {
+                    Text(cloudViewModel.shared[0].description)
+                    Spacer()
+                }
+                if didCopyDescription {
+                    HStack {
+                        Spacer()
+                        Text("Copied".localized())
+                            .padding(10)
+                            .background(Capsule().foregroundColor(.gray))
+                        Spacer()
+                    }
+                }
             }
             .padding(.top, 10)
             .padding([.leading, .trailing], 30)
+            .onTapGesture {
+                if !cloudViewModel.shared[0].description.isEmpty {
+                    let generator = UIImpactFeedbackGenerator(style: .light)
+                    generator.impactOccurred()
+                    let pasteboard = UIPasteboard.general
+                    pasteboard.string = cloudViewModel.shared[0].description
+                    withAnimation {
+                        didCopyDescription = true
+                    }
+                }
+            }
+            .onChange(of: didCopyDescription) { newValue in
+                if newValue {
+                    let _ = Timer.scheduledTimer(withTimeInterval: 1.5, repeats: false) { timer in
+                        withAnimation {
+                            didCopyDescription = false
+                        }
+                    }
+                }
+            }
             
             ViewSingleSpotOnMap(singlePin: [SinglePin(name: cloudViewModel.shared[0].name, coordinate: cloudViewModel.shared[0].location.coordinate)])
                 .aspectRatio(contentMode: .fit)

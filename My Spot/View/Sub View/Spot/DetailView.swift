@@ -40,6 +40,7 @@ struct DetailView: View {
     @State private var imageOffset: CGFloat = -50
     @State private var selection = 0
     @State private var images: [UIImage] = []
+    @State private var didCopyDescription = false
     @State private var showingCannotSavePublicAlert = false
     @State private var pu = false
     @State var canEdit: Bool
@@ -385,12 +386,43 @@ struct DetailView: View {
                     .padding([.leading, .trailing], 30)
                     .offset(y: 5)
                 }
-                HStack(spacing: 5) {
-                    Text(spot.details ?? "")
-                    Spacer()
+                ZStack {
+                    HStack(spacing: 5) {
+                        Text(spot.details ?? "")
+                        Spacer()
+                    }
+                    if didCopyDescription {
+                        HStack {
+                            Spacer()
+                            Text("Copied".localized())
+                                .padding(10)
+                                .background(Capsule().foregroundColor(.gray))
+                            Spacer()
+                        }
+                    }
                 }
                 .padding(.top, 10)
                 .padding([.leading, .trailing], 30)
+                .onTapGesture {
+                    if let details = spot.details {
+                        let generator = UIImpactFeedbackGenerator(style: .light)
+                        generator.impactOccurred()
+                        let pasteboard = UIPasteboard.general
+                        pasteboard.string = details
+                        withAnimation {
+                            didCopyDescription = true
+                        }
+                    }
+                }
+                .onChange(of: didCopyDescription) { newValue in
+                    if newValue {
+                        let _ = Timer.scheduledTimer(withTimeInterval: 1.5, repeats: false) { timer in
+                            withAnimation {
+                                didCopyDescription = false
+                            }
+                        }
+                    }
+                }
                 
                 ViewSingleSpotOnMap(singlePin: [SinglePin(name: spot.name ?? "", coordinate: CLLocationCoordinate2D(latitude: spot.x, longitude: spot.y))])
                     .aspectRatio(contentMode: .fit)

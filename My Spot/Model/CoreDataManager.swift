@@ -165,6 +165,7 @@ extension CoreDataStack {
                 newSpot.id = UUID()
                 newSpot.isShared = true
                 newSpot.date = spot.date
+                newSpot.dateObject = spot.dateObject
                 newSpot.dbid = spot.dbid
                 newSpot.details = spot.details
                 newSpot.founder = spot.founder
