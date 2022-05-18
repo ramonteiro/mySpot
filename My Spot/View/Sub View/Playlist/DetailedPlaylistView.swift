@@ -30,7 +30,7 @@ struct DetailPlaylistView: View {
     @State private var showShareSheet = false
     @State private var toBeDeleted: IndexSet?
     @State private var showingDeleteAlert = false
-    @State private var deleteAlertText = "The spot will be removed from the playlist.".localized()
+    @State private var deleteAlertText = ""
     private let stack = CoreDataStack.shared
     @State private var showingEditSheet = false
     @State private var showingMapSheet = false
@@ -228,9 +228,9 @@ struct DetailPlaylistView: View {
             self.share = stack.getShare(playlist)
             if !stack.isShared(object: playlist) {
                 shareIcon = "person.crop.circle.badge.plus"
-                deleteAlertText += " The spot will still be saved in My Spots.".localized()
+                deleteAlertText = "The spot will be removed from the playlist.".localized() + " The spot will still be saved in My Spots.".localized()
             } else {
-                deleteAlertText += " If you are the owner of the spot, the spot will still be saved in My Spots.".localized()
+                deleteAlertText = "The spot will be removed from the playlist.".localized() + " If you are the owner of the spot, the spot will still be saved in My Spots.".localized()
             }
             setFilteringType()
         }
