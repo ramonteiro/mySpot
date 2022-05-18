@@ -199,3 +199,7 @@
 "Build your playlists with friends! Tap the person icon in any playlist to add people." = "与朋友建立您的播放列表！点击任何播放列表中的人图标以添加人员。";
 "Continue" = "继续";
 "Get notified when new spots are added near you, or when your shared playlists are modified. Go to settings to turn on notifications." = "当您附近添加新斑点或修改共享播放列表时，请通知通知。转到设置以打开通知。";
+"Added By: " = "添加者：";
+"The spot will be removed from the playlist." = "该点将从播放列表中删除。";
+" The spot will still be saved in My Spots." = " 该地点仍将保存在YMy Spots。";
+" If you are the owner of the spot, the spot will still be saved in My Spots." = " 如果您是该地点的所有者，那么该地点仍将保存在My Spots中。";

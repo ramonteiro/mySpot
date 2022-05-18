@@ -19,6 +19,8 @@ extension Spot {
 
     @NSManaged public var details: String?
     @NSManaged public var dateObject: Date?
+    @NSManaged public var dateAdded: Date?
+    @NSManaged public var addedBy: String?
     @NSManaged public var isShared: Bool
     @NSManaged public var id: UUID?
     @NSManaged public var image: UIImage?

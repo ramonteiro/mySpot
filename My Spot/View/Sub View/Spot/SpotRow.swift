@@ -64,10 +64,17 @@ struct SpotRow: View {
                     .fontWeight(.bold)
                     .lineLimit(1)
                 
-                Text("By: ".localized() + (spot.founder ?? ""))
-                    .font(.subheadline)
-                    .foregroundColor(Color.gray)
-                    .lineLimit(1)
+                if spot.addedBy == nil {
+                    Text("By: ".localized() + (spot.founder ?? ""))
+                        .font(.subheadline)
+                        .foregroundColor(Color.gray)
+                        .lineLimit(1)
+                } else {
+                    Text("Added By: ".localized() + (spot.addedBy ?? ""))
+                        .font(.subheadline)
+                        .foregroundColor(Color.gray)
+                        .lineLimit(1)
+                }
                 
                 HStack(alignment: .center) {
                     Image(systemName: "globe")

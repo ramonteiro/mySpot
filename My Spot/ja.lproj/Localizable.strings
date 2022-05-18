@@ -199,3 +199,7 @@
 "Build your playlists with friends! Tap the person icon in any playlist to add people." = "友達とプレイリストを構築してください！プレイリストの人のアイコンをタップして、人を追加します。";
 "Continue" = "継続する";
 "Get notified when new spots are added near you, or when your shared playlists are modified. Go to settings to turn on notifications." = "あなたの近くに新しいスポットが追加されたとき、または共有プレイリストが変更されたときに通知を受け取ります。設定に移動して通知をオンにします。";
+"Added By: " = "によって追加: ";
+"The spot will be removed from the playlist." = "スポットはプレイリストから削除されます。";
+" The spot will still be saved in My Spots." = " My Spotsではまだその場所が救われます。";
+" If you are the owner of the spot, the spot will still be saved in My Spots." = " あなたがスポットの所有者である場合、その場所はまだMy Spotsで救われます。";

@@ -199,3 +199,7 @@
 "Build your playlists with friends! Tap the person icon in any playlist to add people." = "친구와 함께 재생 목록을 구축하십시오! 재생 목록의 사람 아이콘을 탭하여 사람들을 추가하십시오.";
 "Continue" = "계속하다";
 "Get notified when new spots are added near you, or when your shared playlists are modified. Go to settings to turn on notifications." = "근처에 새 스팟이 추가되거나 공유 재생 목록이 수정 될 때 알림을 받으십시오. 알림을 켜려면 설정으로 이동하여 알림을 켭니다.";
+"Added By: " = "추가: ";
+"The spot will be removed from the playlist." = "스팟은 재생 목록에서 제거됩니다.";
+" The spot will still be saved in My Spots." = " 그 자리는 여전히 My Spots에서 구해질 것입니다.";
+" If you are the owner of the spot, the spot will still be saved in My Spots." = " 당신이 그 자리의 소유자라면, 그 자리는 여전히 My Spots에서 저장됩니다.";

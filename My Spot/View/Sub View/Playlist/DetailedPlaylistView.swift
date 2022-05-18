@@ -28,6 +28,9 @@ struct DetailPlaylistView: View {
     @State private var showingRemoveSpotToPlaylistSheet = false
     @State private var share: CKShare?
     @State private var showShareSheet = false
+    @State private var toBeDeleted: IndexSet?
+    @State private var showingDeleteAlert = false
+    @State private var deleteAlertText = "The spot will be removed from the playlist.".localized()
     private let stack = CoreDataStack.shared
     @State private var showingEditSheet = false
     @State private var showingMapSheet = false
@@ -96,6 +99,13 @@ struct DetailPlaylistView: View {
                 }
             }
         }
+    }
+    
+    private func deleteRow(at indexSet: IndexSet) {
+        self.toBeDeleted = indexSet
+        self.showingDeleteAlert = true
+        let generator = UINotificationFeedbackGenerator()
+        generator.notificationOccurred(.warning)
     }
     
     private func getCurrentSpotIds() -> [String] {
@@ -216,12 +226,11 @@ struct DetailPlaylistView: View {
         .onAppear {
             mapViewModel.checkLocationAuthorization()
             self.share = stack.getShare(playlist)
-            if let share = share {
-                print("SHARE STUFF:")
-                print("\(share)")
-            }
             if !stack.isShared(object: playlist) {
                 shareIcon = "person.crop.circle.badge.plus"
+                deleteAlertText += " The spot will still be saved in My Spots.".localized()
+            } else {
+                deleteAlertText += " If you are the owner of the spot, the spot will still be saved in My Spots.".localized()
             }
             setFilteringType()
         }
@@ -355,9 +364,20 @@ struct DetailPlaylistView: View {
                 ForEach(searchResults) { spot in
                     NavigationLink(destination: DetailView(canShare: true, fromPlaylist: true, spot: spot, canEdit: !stack.isShared(object: playlist))) {
                         SpotRow(spot: spot, isShared: false)
+                            .alert(isPresented: self.$showingDeleteAlert) {
+                                Alert(title: Text("Are you sure you want to delete?".localized()),
+                                      message: Text(deleteAlertText),
+                                      primaryButton: .destructive(Text("Delete".localized())) {
+                                    self.deleteFiltered(at: self.toBeDeleted!)
+                                    self.toBeDeleted = nil
+                                }, secondaryButton: .cancel() {
+                                    self.toBeDeleted = nil
+                                }
+                                )
+                            }
                     }
                 }
-                .onDelete(perform: self.deleteFiltered)
+                .onDelete(perform: self.deleteRow)
             }
             .searchable(text: $searchText, prompt: "Search ".localized() + (playlist.name ?? "") + (playlist.emoji ?? ""))
         }
@@ -462,6 +482,10 @@ extension DetailPlaylistView {
                     newSpot.isShared = false
                     newSpot.userId = cloudViewModel.userID
                     newSpot.date = spot.date
+                    if let identity = share.currentUserParticipant?.userIdentity.nameComponents {
+                        newSpot.addedBy = stack.checkName(user: identity)
+                    }
+                    newSpot.dateAdded = Date()
                     newSpot.dateObject = spot.dateObject
                     newSpot.dbid = spot.dbid
                     newSpot.details = spot.details

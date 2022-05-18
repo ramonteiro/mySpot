@@ -50,9 +50,15 @@ struct SpotMapPreview: View {
                         Spacer()
                     }
                     HStack {
-                        Text("By: ".localized() + (spot.founder ?? ""))
-                            .font(.subheadline)
-                            .foregroundColor(.white)
+                        if spot.addedBy == nil {
+                            Text("By: ".localized() + (spot.founder ?? ""))
+                                .font(.subheadline)
+                                .foregroundColor(.white)
+                        } else {
+                            Text("Added By: ".localized() + (spot.addedBy ?? ""))
+                                .font(.subheadline)
+                                .foregroundColor(.white)
+                        }
                         Spacer()
                         if (!distance.isEmpty) {
                             Text((distance) + " away".localized())

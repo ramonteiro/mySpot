@@ -200,3 +200,7 @@
 "Build your playlists with friends! Tap the person icon in any playlist to add people." = "Bauen Sie Ihre playlists mit Freunden auf! Tippen Sie auf das Person -Symbol in jeder playlist, um Personen hinzuzufügen.";
 "Continue" = "Fortsetzen";
 "Get notified when new spots are added near you, or when your shared playlists are modified. Go to settings to turn on notifications." = "Lassen Sie sich benachrichtigen, wenn neue Stellen in Ihrer Nähe hinzugefügt werden oder wenn Ihre gemeinsam genutzten playlists geändert werden. Gehen Sie zu Einstellungen, um Benachrichtigungen einzuschalten.";
+"Added By: " = "Hinzugefügt von: ";
+"The spot will be removed from the playlist." = "Der Spot wird aus der playlist entfernt.";
+" The spot will still be saved in My Spots." = " Der Spot wird in My Spots immer noch gerettet.";
+" If you are the owner of the spot, the spot will still be saved in My Spots." = "Wenn Sie der Besitzer des Spots sind, wird der Spot in My Spots weiterhin gespeichert.";

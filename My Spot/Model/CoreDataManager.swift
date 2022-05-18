@@ -155,6 +155,20 @@ extension CoreDataStack {
         }
     }
     
+    func checkName(user: PersonNameComponents) -> String? {
+        if let name = user.givenName {
+            return name
+        } else if let name = user.familyName {
+            return name
+        } else if let name = user.middleName {
+            return name
+        } else if let name = user.nickname {
+            return name
+        } else {
+            return nil
+        }
+    }
+    
     func addToParentShared(children: [NSManagedObject], parent: NSManagedObject, share: CKShare, userid: String, completion: @escaping (Result<Void, Error>) -> Void) {
         Task {
             var sharedObjects: [NSManagedObject] = []
@@ -167,6 +181,10 @@ extension CoreDataStack {
                 newSpot.date = spot.date
                 newSpot.dateObject = spot.dateObject
                 newSpot.dbid = spot.dbid
+                if let identity = share.currentUserParticipant?.userIdentity.nameComponents {
+                    newSpot.addedBy = checkName(user: identity)
+                }
+                newSpot.dateAdded = Date()
                 newSpot.details = spot.details
                 newSpot.founder = spot.founder
                 newSpot.fromDB = spot.fromDB

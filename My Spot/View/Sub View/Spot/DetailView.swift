@@ -34,6 +34,7 @@ struct DetailView: View {
     @State private var showingImage = false
     @State private var expand = false
     @State private var dateToShow = ""
+    @State private var dateToShowAdded = ""
     @State private var deleteAlert = false
     @State private var distance: String = ""
     @State private var exists = true
@@ -158,7 +159,7 @@ struct DetailView: View {
             HStack(spacing: 0) {
                 backButtonView
                 Spacer()
-                if (canDelete) {
+                if (canDelete && !fromPlaylist) {
                     deleteButton
                 }
                 if (canShare && spot.isPublic && UIDevice.current.userInterfaceIdiom != .pad) {
@@ -350,7 +351,7 @@ struct DetailView: View {
                 .padding(.trailing, 5)
                 
                 HStack {
-                    Text("By: \(spot.founder ?? "")")
+                    Text("By: ".localized() + (spot.founder ?? ""))
                         .font(.system(size: 15, weight: .light))
                         .foregroundColor(Color.gray)
                     Spacer()
@@ -366,6 +367,27 @@ struct DetailView: View {
                         dateToShow = timeFormatter.string(from: date)
                     } else {
                         dateToShow = spot.date?.components(separatedBy: ";")[0] ?? ""
+                    }
+                }
+                
+                if fromPlaylist && spot.addedBy != nil && spot.dateAdded != nil {
+                    HStack {
+                        Text("Added By: ".localized() + (spot.addedBy ?? ""))
+                            .font(.system(size: 15, weight: .light))
+                            .foregroundColor(Color.gray)
+                        Spacer()
+                        Text(dateToShowAdded)
+                            .font(.system(size: 15, weight: .light))
+                            .foregroundColor(Color.gray)
+                    }
+                    .padding([.leading, .trailing], 30)
+                    .padding(.top, 1)
+                    .onAppear {
+                        if let date = spot.dateAdded {
+                            let timeFormatter = DateFormatter()
+                            timeFormatter.dateFormat = "MMM d, yyyy"
+                            dateToShowAdded = timeFormatter.string(from: date)
+                        }
                     }
                 }
                 
