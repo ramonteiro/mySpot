@@ -26,6 +26,7 @@ struct SpotEntry: TimelineEntry {
     let locationName: String
     let userx: Double
     let usery: Double
+    let isNoLocation: Bool
     let spot: [Spot]
 }
 
@@ -33,7 +34,7 @@ struct Provider: TimelineProvider {
     
     var cloudViewModel: CloudKitViewModel
     var mapViewModel: WidgetLocationManager
-    let emptySpot = SpotEntry(locationName: "Coconino County",userx: 33.71447172967623, usery: -112.29073153451222, spot: [
+    let emptySpot = SpotEntry(locationName: "Coconino County",userx: 33.71447172967623, usery: -112.29073153451222, isNoLocation: false, spot: [
         Spot(spotid: "", name: "Antelope Canyon", customLocation: false, locationName: "Grand Canyon", image: (UIImage(named: "atelopeCanyon")?.jpegData(compressionQuality: 0.9))!, x: 36.8619, y: -111.3743),
         Spot(spotid: "", name: "South Rim Trail", customLocation: false, locationName: "Grand Canyon", image: (UIImage(named: "southRim")?.jpegData(compressionQuality: 0.9))!, x: 36.056198, y: -112.125198),
         Spot(spotid: "", name: "Havasu Falls", customLocation: false, locationName: "Grand Canyon", image: (UIImage(named: "havasuFalls")?.jpegData(compressionQuality: 0.9))!, x: 36.2552, y: -112.6979),
@@ -45,22 +46,28 @@ struct Provider: TimelineProvider {
         return entry
     }
     
+    let noLocationPlaceholder = SpotEntry(locationName: "", userx: 0.0, usery: 0.0, isNoLocation: true, spot: [])
+    
     func getSnapshot(in context: Context, completion: @escaping (SpotEntry) -> Void) {
         if context.isPreview {
             completion(emptySpot)
         } else {
-            mapViewModel.fetchLocation { location in
-                getPlacmarkOfLocation(location: location) { locationName in
-                    cloudViewModel.fetchSpotPublic(userLocation: location, resultLimit: 4) { (result) in
-                        switch result {
-                        case .success(let entry):
-                            completion(SpotEntry(locationName: locationName, userx: location.coordinate.latitude, usery: location.coordinate.longitude, spot: entry))
-                        case .failure(let error):
-                            print("snapshot Error: \(error)")
-                            completion(emptySpot)
+            if mapViewModel.locationManager!.isAuthorizedForWidgetUpdates {
+                mapViewModel.fetchLocation { location in
+                    getPlacmarkOfLocation(location: location) { locationName in
+                        cloudViewModel.fetchSpotPublic(userLocation: location, resultLimit: 4) { (result) in
+                            switch result {
+                            case .success(let entry):
+                                completion(SpotEntry(locationName: locationName, userx: location.coordinate.latitude, usery: location.coordinate.longitude, isNoLocation: false, spot: entry))
+                            case .failure(let error):
+                                print("snapshot Error: \(error)")
+                                completion(emptySpot)
+                            }
                         }
                     }
                 }
+            } else {
+                completion(noLocationPlaceholder)
             }
         }
     }
@@ -72,7 +79,7 @@ struct Provider: TimelineProvider {
                     cloudViewModel.fetchSpotPublic(userLocation: location, resultLimit: 4) { (result) in
                         switch result {
                         case .success(let entry):
-                            let entry = SpotEntry(locationName: locationName, userx: location.coordinate.latitude, usery: location.coordinate.longitude, spot: entry)
+                            let entry = SpotEntry(locationName: locationName, userx: location.coordinate.latitude, usery: location.coordinate.longitude, isNoLocation: false, spot: entry)
                             let timeline = Timeline(entries: [entry], policy: .never)
                             completion(timeline)
                         case .failure(let error):
@@ -83,6 +90,9 @@ struct Provider: TimelineProvider {
                     }
                 }
             }
+        } else {
+            let timeline = Timeline(entries: [noLocationPlaceholder], policy: .never)
+            completion(timeline)
         }
     }
     
@@ -207,13 +217,17 @@ struct WidgetEntryView: View {
     
     @ViewBuilder
     var body: some View {
-        switch family {
-        case .systemSmall:
-            SmallWidgetView(entry: entry)
-        case .systemMedium:
-            MediumWidgetView(entry: entry)
-        default:
-            LargeWidgetView(entry: entry)
+        if !entry.isNoLocation {
+            switch family {
+            case .systemSmall:
+                SmallWidgetView(entry: entry)
+            case .systemMedium:
+                MediumWidgetView(entry: entry)
+            default:
+                LargeWidgetView(entry: entry)
+            }
+        } else {
+            Text("Loading".localized() + "...")
         }
     }
 }
