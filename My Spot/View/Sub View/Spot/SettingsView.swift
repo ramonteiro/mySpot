@@ -153,7 +153,7 @@ struct SettingsView: View {
                             .foregroundColor(colorScheme == .dark ? .white : .black)
                     }
                 } footer: {
-                    Text("A link to my wordpress site with short detail about me and the current privacy policy in My Spot.".localized() + "\n\n\nMy Spot v 1.4.2")
+                    Text("A link to my wordpress site with short detail about me and the current privacy policy in My Spot.".localized() + "\n\n\nMy Spot v 1.4.3")
                 }
             }
             .onChange(of: sharedNoti) { newValue in
