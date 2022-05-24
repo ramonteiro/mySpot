@@ -1,6 +1,9 @@
 My Spot - Exporation
 
 Check it out on the AppStore: https://apps.apple.com/us/app/my-spot-exploration/id1613618373
+Tiktok 2-min summary: https://www.tiktok.com/@myspotexploration/video/7099636047973272874?is_copy_url=1&is_from_webapp=v1
+Youtube My Spot 1.4 Update (Widgets, apple watch, shared playlists, notifications): https://www.youtube.com/watch?v=OSmGs8Fs5_I&t=324s
+Youtube My Spot Demo up to 1.3.3: https://www.youtube.com/watch?v=UcQJhaeTPng&t=11s
 
 ---What is My Spot---
 
@@ -11,7 +14,11 @@ My Spot is a simple app that allows users to create spots that save photos, loca
 - create spots
 - search for other spots in area
 - create playlists to organize spots
+- share playlists to a group of friends to all collobarate by adding or removing spots in the same playlists
 - spots and playlists are backed up in iCloud and sync across devices
+- Widgets
+- Apple watch support, ipad support, ipod/iphone support
+- localized in 12 languages
 
 ---Who is My Spot For---
 
@@ -19,24 +26,15 @@ Everyone! Whether you are a skater, hiker, mountain biker, etc, or maybe you jus
 
 ---How to Use My Spot---
 
-Demo Video: My Spot - Exploration Full Demo
-https://youtu.be/UcQJhaeTPng
-
-When starting My Spot you are greeted with the my spots tab where you can start by adding a spot. These spots are stored locally in core data unless the public slider is checked in which case it is uploaded to a database hoted in cloudkit.
-
-Quick interaction:
-- press the map button to show the spots in the current tab on a map. In the map press the top left to exit, swipe through locations or tap on new locations to change, tap on the location preview to bring up a detailed description, press the top right arrow to focus on user location, press the top right line to get directions to selected spot.
-
-Discover tab:
-- to seacrh location from a specific point on a map, press the map button and select search here on the area you would like to search by. Now the spots listed are in order of the location you selected and the name of the city is displayed in the seacrh bar. Use the seacrh bar to further refine your seacrh by looking for specific names or tags.
+(See Youtube videos, timestamps are included)
 
 ---Important Requirements---
 
-My Spot needs the following:
-- an icloud account to upload, download, or browse spots hosted with cloudkit
-- location services to create a spot (Spots MUST be created in the location, cooridinates are taken from gps and connot be entered manually)
-- camera access to take a photo of spot (Spot photos cannot be taken from photo library)
-- (optional) notifications to alert users when new spots are added to their area.
+My Spot may request the following permissions:
+- (required) an icloud account to upload, download, or browse spots hosted with cloudkit
+- location services to create a spot
+- camera access to take a photo of spot
+- notifications to alert users when new spots are added to their area.
 
 ---libraries used---
 
