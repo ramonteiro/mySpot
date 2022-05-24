@@ -242,6 +242,10 @@ struct SettingsView: View {
                                 try await cloudViewModel.subscribeToNewSpot(fixedLocation: location)
                                 cloudViewModel.notiNewSpotOn = true
                                 UserDefaults.standard.set(true, forKey: "discovernot")
+                                mapViewModel.getPlacmarkOfLocationLessPrecise(location: CLLocation(latitude: mapViewModel.region.center.latitude, longitude: mapViewModel.region.center.longitude)) { place in
+                                    placeName = place
+                                    UserDefaults.standard.set(place, forKey: "discovernotiname")
+                                }
                             } catch {
                                 // alert error connecting
                                 cloudViewModel.notiNewSpotOn = false
@@ -311,10 +315,6 @@ struct SettingsView: View {
             .onAppear {
                 if UserDefaults.standard.valueExists(forKey: "discovernotiname") {
                     placeName = UserDefaults.standard.string(forKey: "discovernotiname") ?? ""
-                } else {
-                    mapViewModel.getPlacmarkOfLocationLessPrecise(location: CLLocation(latitude: mapViewModel.region.center.latitude, longitude: mapViewModel.region.center.longitude)) { place in
-                        placeName = place
-                    }
                 }
                 limits = Double(cloudViewModel.limit)
             }

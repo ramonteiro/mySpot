@@ -30,14 +30,14 @@
 "Anywhere In The World" = "세계 어디서나";
 "Any" = "어느";
 "Load More Spots" = "더 많은 반점을로드하십시오";
-"Sort By Likes" = "정렬 방법 :";
-"Sort By Closest" = "정렬 방법 :";
+"Sort By Likes" = "다운로드별로 정렬하십시오";
+"Sort By Closest" = "정렬 방법";
 "Sort By Newest" = "정렬 방법";
 "Sort By Name" = "이름으로 분류하다";
 "Closest" = "가장 가깝다";
 "Name" = "이름";
 "Newest" = "최신";
-"Likes" = "좋아요";
+"Likes" = "다운로드";
 "Search " = "검색 ";
 "Unable To Upload Spot" = "업로드 할 수 없습니다";
 "OK" = "확인";

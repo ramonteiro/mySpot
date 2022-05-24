@@ -30,14 +30,14 @@
 "Anywhere In The World" = "世界のどこでも";
 "Any" = "どれでも";
 "Load More Spots" = "より多くのスポットを読み込む";
-"Sort By Likes" = "likesで並べ替えます";
+"Sort By Likes" = "ダウンロードでソートします";
 "Sort By Closest" = "並べ替えます";
 "Sort By Newest" = "最新で並べ替えます";
 "Sort By Name" = "名前順";
 "Closest" = "在した";
 "Name" = "名前";
 "Newest" = "最新";
-"Likes" = "li";
+"Likes" = "ダウンロード";
 "Search " = "探す ";
 "Unable To Upload Spot" = "スポットをアップロードできません";
 "OK" = "わかった";
