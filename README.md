@@ -2,8 +2,11 @@
 
 ## Links
 [AppStore](https://apps.apple.com/us/app/my-spot-exploration/id1613618373), download and drop a review ;)
+
 [Tiktok](https://www.tiktok.com/@myspotexploration/video/7099636047973272874?is_copy_url=1&is_from_webapp=v1), short 2-min summary
+
 [Youtube My Spot 1.4 Demo](https://www.youtube.com/watch?v=OSmGs8Fs5_I&t=324s), this includes: Widgets, apple watch, shared playlists, notifications
+
 [Youtube My Spot Demo up to 1.3.3](https://www.youtube.com/watch?v=UcQJhaeTPng&t=11s), this includes everything else
 
 ## What is My Spot?
