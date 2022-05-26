@@ -1,0 +1,157 @@
+//
+//  MessagesViewController.swift
+//  mySpotiMsg
+//
+//  Created by Isaac Paschall on 5/25/22.
+//
+
+import UIKit
+import Messages
+
+class MessagesViewController: MSMessagesAppViewController, UITableViewDelegate, UITableViewDataSource {
+    
+    // Data model: These strings will be the data for the table view cells
+    var spots: [msgSpot] = []
+    
+    // cell reuse id (cells that scroll out of view can be reused)
+    let cellReuseIdentifier = "cell"
+    
+    // don't forget to hook this up from the storyboard
+    @IBOutlet var tableView: UITableView!
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        // Register the table view cell class and its reuse id
+        self.tableView.register(UITableViewCell.self, forCellReuseIdentifier: cellReuseIdentifier)
+        
+        // (optional) include this line if you want to remove the extra empty cell divider lines
+        // self.tableView.tableFooterView = UIView()
+        
+        // This view controller itself will provide the delegate methods and row data for the table view.
+        tableView.delegate = self
+        tableView.dataSource = self
+        
+        syncFromAppGroups()
+    }
+    
+    // MARK: - UI
+    
+    // number of rows in table view
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return self.spots.count
+    }
+    
+    // create a cell for each table view row
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        
+        // create a new cell if needed or reuse an old one
+        let cell:UITableViewCell = self.tableView.dequeueReusableCell(withIdentifier: cellReuseIdentifier)!
+        
+        // set the text from the data model
+        cell.textLabel?.text = self.spots[indexPath.row].name
+        
+        return cell
+    }
+    
+    // method to run when table view cell is tapped
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        print("You tapped cell number \(indexPath.row).")
+        let entry = spots[indexPath.row]
+        
+        let layout = MSMessageTemplateLayout()
+        layout.caption = entry.name
+        layout.subcaption = "My Spot"
+        layout.image = entry.image
+        
+        let message = MSMessage()
+        message.layout = layout
+        if (self.activeConversation != nil) {
+            self.activeConversation?.insert(message, completionHandler: nil)
+        } else {
+            print("No convo")
+        }
+    }
+    
+    // MARK: - Data Handling
+    func syncFromAppGroups() {
+        let userDefaults = UserDefaults(suiteName: "group.com.isaacpaschall.My-Spot")
+        if let spotCount = userDefaults?.integer(forKey: "spotCount") {
+            if spotCount != spots.count {
+                guard let xArr: [Double] = userDefaults?.object(forKey: "spotXs") as? [Double] else { return }
+                guard let yArr: [Double] = userDefaults?.object(forKey: "spotYs") as? [Double] else { return }
+                guard let nameArr: [String] = userDefaults?.object(forKey: "spotNames") as? [String] else { return }
+                guard let locationNameArr: [String] = userDefaults?.object(forKey: "spotLocationName") as? [String] else { return }
+                guard let imgArr: [Data] = userDefaults?.object(forKey: "spotImgs") as? [Data] else { return }
+                for i in imgArr.indices {
+                    let decoded = try! PropertyListDecoder().decode(Data.self, from: imgArr[i])
+                    let image = UIImage(data: decoded)!
+                    let x = xArr[i]
+                    let y = yArr[i]
+                    let name = nameArr[i]
+                    let newSpot = msgSpot(name: name, image: image, x: x, y: y, locationName: (locationNameArr[i].isEmpty ? "My Spot" : locationNameArr[i]))
+                    spots.append(newSpot)
+                }
+            }
+        }
+    }
+    
+    // MARK: - Conversation Handling
+    
+    override func willBecomeActive(with conversation: MSConversation) {
+        // Called when the extension is about to move from the inactive to active state.
+        // This will happen when the extension is about to present UI.
+        
+        // Use this method to configure the extension and restore previously stored state.
+    }
+    
+    override func didResignActive(with conversation: MSConversation) {
+        // Called when the extension is about to move from the active to inactive state.
+        // This will happen when the user dismisses the extension, changes to a different
+        // conversation or quits Messages.
+        
+        // Use this method to release shared resources, save user data, invalidate timers,
+        // and store enough state information to restore your extension to its current state
+        // in case it is terminated later.
+    }
+    
+    override func didReceive(_ message: MSMessage, conversation: MSConversation) {
+        // Called when a message arrives that was generated by another instance of this
+        // extension on a remote device.
+        
+        // Use this method to trigger UI updates in response to the message.
+    }
+    
+    override func didStartSending(_ message: MSMessage, conversation: MSConversation) {
+        // Called when the user taps the send button.
+    }
+    
+    override func didCancelSending(_ message: MSMessage, conversation: MSConversation) {
+        // Called when the user deletes the message without sending it.
+        
+        // Use this to clean up state related to the deleted message.
+    }
+    
+    override func willTransition(to presentationStyle: MSMessagesAppPresentationStyle) {
+        // Called before the extension transitions to a new presentation style.
+        
+        // Use this method to prepare for the change in presentation style.
+    }
+    
+    override func didTransition(to presentationStyle: MSMessagesAppPresentationStyle) {
+        // Called after the extension transitions to a new presentation style.
+        
+        // Use this method to finalize any behaviors associated with the change in presentation style.
+    }
+    
+}
+
+
+struct msgSpot: Identifiable {
+    let id = UUID()
+    let name: String
+    let image: UIImage
+    let x: Double
+    let y: Double
+    let locationName: String
+}

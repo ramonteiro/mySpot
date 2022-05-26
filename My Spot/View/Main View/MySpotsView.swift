@@ -312,6 +312,9 @@ struct MySpotsView: View {
         filteredSpots = filteredSpots.filter { spot in
             !spot.isShared && (spot.userId == UserDefaults(suiteName: "group.com.isaacpaschall.My-Spot")?.string(forKey: "userid") || spot.userId == "" || spot.userId == nil)
         }
+        Task {
+            await updateAppGroup()
+        }
     }
     
     private var displayLocationIcon: some View {
@@ -359,5 +362,36 @@ struct MySpotsView: View {
             }
         }
         filteredSpots.remove(atOffsets: offsets)
+    }
+    
+    private func updateAppGroup() async {
+        let userDefaults = UserDefaults(suiteName: "group.com.isaacpaschall.My-Spot")
+        var spotCount = 0
+        if let sc = userDefaults?.integer(forKey: "spotCount") {
+            spotCount = sc
+        }
+        
+        if spotCount != filteredSpots.count {
+            var xArr: [Double] = []
+            var yArr: [Double] = []
+            var nameArr: [String] = []
+            var imgArr: [Data] = []
+            var locationNameArr: [String] = []
+            filteredSpots.forEach { spot in
+                guard let data = spot.image?.jpegData(compressionQuality: 0.5) else { return }
+                let encoded = try! PropertyListEncoder().encode(data)
+                imgArr.append(encoded)
+                xArr.append(spot.x)
+                yArr.append(spot.y)
+                locationNameArr.append(spot.locationName ?? "")
+                nameArr.append(spot.name ?? "Spot")
+            }
+            userDefaults?.set(locationNameArr, forKey: "spotLocationName")
+            userDefaults?.set(xArr, forKey: "spotXs")
+            userDefaults?.set(yArr, forKey: "spotYs")
+            userDefaults?.set(nameArr, forKey: "spotNames")
+            userDefaults?.set(imgArr, forKey: "spotImgs")
+            userDefaults?.set(imgArr.count, forKey: "spotCount")
+        }
     }
 }

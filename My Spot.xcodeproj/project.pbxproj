@@ -79,6 +79,11 @@
 		C515042527D7CAC6009F0DCD /* UIEmojiTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = C515042227D7CAC6009F0DCD /* UIEmojiTextField.swift */; };
 		C515042927D8540A009F0DCD /* TabController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C515042827D8540A009F0DCD /* TabController.swift */; };
 		C515042C27D95225009F0DCD /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C515042B27D95225009F0DCD /* LaunchScreen.storyboard */; };
+		C5266ACD283EBF0000A923A1 /* Messages.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C5266ACC283EBF0000A923A1 /* Messages.framework */; };
+		C5266AD0283EBF0000A923A1 /* MessagesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5266ACF283EBF0000A923A1 /* MessagesViewController.swift */; };
+		C5266AD3283EBF0000A923A1 /* MainInterface.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C5266AD1283EBF0000A923A1 /* MainInterface.storyboard */; };
+		C5266AD5283EBF0100A923A1 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C5266AD4283EBF0100A923A1 /* Assets.xcassets */; };
+		C5266AD9283EBF0100A923A1 /* mySpotiMsg.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = C5266ACB283EBF0000A923A1 /* mySpotiMsg.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		C5552CC22826472900AF2683 /* PhoneViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5552CC12826472800AF2683 /* PhoneViewModel.swift */; };
 		C5552CC42826482A00AF2683 /* WatchViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5552CC32826482A00AF2683 /* WatchViewModel.swift */; };
 		C5552CC728266EB600AF2683 /* MapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5552CC628266EB600AF2683 /* MapView.swift */; };
@@ -116,6 +121,13 @@
 			proxyType = 1;
 			remoteGlobalIDString = C507156C282584AB000F344C;
 			remoteInfo = MySpotWatch;
+		};
+		C5266AD7283EBF0100A923A1 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = C51503A227D7C347009F0DCD /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = C5266ACA283EBF0000A923A1;
+			remoteInfo = mySpotiMsg;
 		};
 		C5D295582823719300FBA01E /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -155,6 +167,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 13;
 			files = (
+				C5266AD9283EBF0100A923A1 /* mySpotiMsg.appex in Embed App Extensions */,
 				C5D2955A2823719300FBA01E /* MySpotWidgetExtension.appex in Embed App Extensions */,
 			);
 			name = "Embed App Extensions";
@@ -238,6 +251,13 @@
 		C515042827D8540A009F0DCD /* TabController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabController.swift; sourceTree = "<group>"; };
 		C515042A27D95154009F0DCD /* My-Spot-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "My-Spot-Info.plist"; sourceTree = SOURCE_ROOT; };
 		C515042B27D95225009F0DCD /* LaunchScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
+		C5266ACB283EBF0000A923A1 /* mySpotiMsg.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = mySpotiMsg.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		C5266ACC283EBF0000A923A1 /* Messages.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Messages.framework; path = System/Library/Frameworks/Messages.framework; sourceTree = SDKROOT; };
+		C5266ACF283EBF0000A923A1 /* MessagesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessagesViewController.swift; sourceTree = "<group>"; };
+		C5266AD2283EBF0000A923A1 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/MainInterface.storyboard; sourceTree = "<group>"; };
+		C5266AD4283EBF0100A923A1 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		C5266AD6283EBF0100A923A1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		C5266ADD283ECDDD00A923A1 /* mySpotiMsg.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = mySpotiMsg.entitlements; sourceTree = "<group>"; };
 		C5552CC12826472800AF2683 /* PhoneViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhoneViewModel.swift; sourceTree = "<group>"; };
 		C5552CC32826482A00AF2683 /* WatchViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchViewModel.swift; sourceTree = "<group>"; };
 		C5552CC628266EB600AF2683 /* MapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapView.swift; sourceTree = "<group>"; };
@@ -286,6 +306,14 @@
 				C50CF4A627F122DB001A9698 /* Mantis in Frameworks */,
 				C58F2BF62830AA42005FA88F /* WelcomeSheet in Frameworks */,
 				C51503C027D7C531009F0DCD /* CloudKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C5266AC8283EBF0000A923A1 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C5266ACD283EBF0000A923A1 /* Messages.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -398,6 +426,7 @@
 				C5D2954F2823719100FBA01E /* MySpotWidget */,
 				C507156E282584AB000F344C /* MySpotWatch */,
 				C5071579282584AC000F344C /* MySpotWatch WatchKit Extension */,
+				C5266ACE283EBF0000A923A1 /* mySpotiMsg */,
 				C51503AB27D7C347009F0DCD /* Products */,
 				C51503BE27D7C531009F0DCD /* Frameworks */,
 			);
@@ -410,6 +439,7 @@
 				C5D2954A2823719100FBA01E /* MySpotWidgetExtension.appex */,
 				C507156D282584AB000F344C /* My Spot.app */,
 				C5071575282584AC000F344C /* MySpotWatch WatchKit Extension.appex */,
+				C5266ACB283EBF0000A923A1 /* mySpotiMsg.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -450,6 +480,7 @@
 				C51503BF27D7C531009F0DCD /* CloudKit.framework */,
 				C5D2954B2823719100FBA01E /* WidgetKit.framework */,
 				C5D2954D2823719100FBA01E /* SwiftUI.framework */,
+				C5266ACC283EBF0000A923A1 /* Messages.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -591,6 +622,18 @@
 			path = Helper;
 			sourceTree = "<group>";
 		};
+		C5266ACE283EBF0000A923A1 /* mySpotiMsg */ = {
+			isa = PBXGroup;
+			children = (
+				C5266ADD283ECDDD00A923A1 /* mySpotiMsg.entitlements */,
+				C5266ACF283EBF0000A923A1 /* MessagesViewController.swift */,
+				C5266AD1283EBF0000A923A1 /* MainInterface.storyboard */,
+				C5266AD4283EBF0100A923A1 /* Assets.xcassets */,
+				C5266AD6283EBF0100A923A1 /* Info.plist */,
+			);
+			path = mySpotiMsg;
+			sourceTree = "<group>";
+		};
 		C5D2954F2823719100FBA01E /* MySpotWidget */ = {
 			isa = PBXGroup;
 			children = (
@@ -654,6 +697,7 @@
 			dependencies = (
 				C5D295592823719300FBA01E /* PBXTargetDependency */,
 				C507158C282584AD000F344C /* PBXTargetDependency */,
+				C5266AD8283EBF0100A923A1 /* PBXTargetDependency */,
 			);
 			name = "My Spot";
 			packageProductDependencies = (
@@ -663,6 +707,23 @@
 			productName = "My Spot";
 			productReference = C51503AA27D7C347009F0DCD /* My Spot.app */;
 			productType = "com.apple.product-type.application";
+		};
+		C5266ACA283EBF0000A923A1 /* mySpotiMsg */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = C5266ADC283EBF0100A923A1 /* Build configuration list for PBXNativeTarget "mySpotiMsg" */;
+			buildPhases = (
+				C5266AC7283EBF0000A923A1 /* Sources */,
+				C5266AC8283EBF0000A923A1 /* Frameworks */,
+				C5266AC9283EBF0000A923A1 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = mySpotiMsg;
+			productName = mySpotiMsg;
+			productReference = C5266ACB283EBF0000A923A1 /* mySpotiMsg.appex */;
+			productType = "com.apple.product-type.app-extension.messages";
 		};
 		C5D295492823719100FBA01E /* MySpotWidgetExtension */ = {
 			isa = PBXNativeTarget;
@@ -688,7 +749,7 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastSwiftUpdateCheck = 1330;
+				LastSwiftUpdateCheck = 1340;
 				LastUpgradeCheck = 1340;
 				TargetAttributes = {
 					C507156C282584AB000F344C = {
@@ -699,6 +760,9 @@
 					};
 					C51503A927D7C347009F0DCD = {
 						CreatedOnToolsVersion = 13.2.1;
+					};
+					C5266ACA283EBF0000A923A1 = {
+						CreatedOnToolsVersion = 13.4;
 					};
 					C5D295492823719100FBA01E = {
 						CreatedOnToolsVersion = 13.3.1;
@@ -737,6 +801,7 @@
 				C5D295492823719100FBA01E /* MySpotWidgetExtension */,
 				C507156C282584AB000F344C /* MySpotWatch */,
 				C5071574282584AC000F344C /* MySpotWatch WatchKit Extension */,
+				C5266ACA283EBF0000A923A1 /* mySpotiMsg */,
 			);
 		};
 /* End PBXProject section */
@@ -770,6 +835,15 @@
 				C56011B52800E66A00C49597 /* Localizable.strings in Resources */,
 				C51503B527D7C349009F0DCD /* Preview Assets.xcassets in Resources */,
 				C51503B227D7C349009F0DCD /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C5266AC9283EBF0000A923A1 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C5266AD5283EBF0100A923A1 /* Assets.xcassets in Resources */,
+				C5266AD3283EBF0000A923A1 /* MainInterface.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -868,6 +942,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		C5266AC7283EBF0000A923A1 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C5266AD0283EBF0000A923A1 /* MessagesViewController.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		C5D295462823719100FBA01E /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -891,6 +973,11 @@
 			target = C507156C282584AB000F344C /* MySpotWatch */;
 			targetProxy = C507158B282584AD000F344C /* PBXContainerItemProxy */;
 		};
+		C5266AD8283EBF0100A923A1 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = C5266ACA283EBF0000A923A1 /* mySpotiMsg */;
+			targetProxy = C5266AD7283EBF0100A923A1 /* PBXContainerItemProxy */;
+		};
 		C5D295592823719300FBA01E /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			platformFilter = ios;
@@ -900,6 +987,14 @@
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
+		C5266AD1283EBF0000A923A1 /* MainInterface.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				C5266AD2283EBF0000A923A1 /* Base */,
+			);
+			name = MainInterface.storyboard;
+			sourceTree = "<group>";
+		};
 		C56011B72800E66A00C49597 /* Localizable.strings */ = {
 			isa = PBXVariantGroup;
 			children = (
@@ -930,7 +1025,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = MySpotWatch/MySpotWatch.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_TEAM = 2HAP7LLHCJ;
 				GENERATE_INFOPLIST_FILE = YES;
 				IBSC_MODULE = MySpotWatch_WatchKit_Extension;
@@ -956,7 +1051,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = MySpotWatch/MySpotWatch.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_TEAM = 2HAP7LLHCJ;
 				GENERATE_INFOPLIST_FILE = YES;
 				IBSC_MODULE = MySpotWatch_WatchKit_Extension;
@@ -980,7 +1075,7 @@
 				ASSETCATALOG_COMPILER_COMPLICATION_NAME = Complication;
 				CODE_SIGN_ENTITLEMENTS = "MySpotWatch WatchKit Extension/MySpotWatch WatchKit Extension.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_ASSET_PATHS = "\"MySpotWatch WatchKit Extension/Preview Content\"";
 				DEVELOPMENT_TEAM = 2HAP7LLHCJ;
 				ENABLE_PREVIEWS = YES;
@@ -1014,7 +1109,7 @@
 				ASSETCATALOG_COMPILER_COMPLICATION_NAME = Complication;
 				CODE_SIGN_ENTITLEMENTS = "MySpotWatch WatchKit Extension/MySpotWatch WatchKit Extension.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_ASSET_PATHS = "\"MySpotWatch WatchKit Extension/Preview Content\"";
 				DEVELOPMENT_TEAM = 2HAP7LLHCJ;
 				ENABLE_PREVIEWS = YES;
@@ -1168,7 +1263,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = "My Spot/My Spot.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_ASSET_PATHS = "\"My Spot/Preview Content\"";
 				DEVELOPMENT_TEAM = 2HAP7LLHCJ;
 				ENABLE_PREVIEWS = YES;
@@ -1206,7 +1301,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = "My Spot/My Spot.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_ASSET_PATHS = "\"My Spot/Preview Content\"";
 				DEVELOPMENT_TEAM = 2HAP7LLHCJ;
 				ENABLE_PREVIEWS = YES;
@@ -1236,6 +1331,62 @@
 			};
 			name = Release;
 		};
+		C5266ADA283EBF0100A923A1 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = "iMessage App Icon";
+				CODE_SIGN_ENTITLEMENTS = mySpotiMsg/mySpotiMsg.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 2;
+				DEVELOPMENT_TEAM = 2HAP7LLHCJ;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = mySpotiMsg/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "My Spot";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.5;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.4.4;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.isaacpaschall.My-Spot.mySpotiMsg";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		C5266ADB283EBF0100A923A1 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = "iMessage App Icon";
+				CODE_SIGN_ENTITLEMENTS = mySpotiMsg/mySpotiMsg.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 2;
+				DEVELOPMENT_TEAM = 2HAP7LLHCJ;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = mySpotiMsg/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "My Spot";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.5;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.4.4;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.isaacpaschall.My-Spot.mySpotiMsg";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
 		C5D2955C2823719300FBA01E /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -1243,7 +1394,7 @@
 				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
 				CODE_SIGN_ENTITLEMENTS = MySpotWidgetExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_TEAM = 2HAP7LLHCJ;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = MySpotWidget/Info.plist;
@@ -1274,7 +1425,7 @@
 				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
 				CODE_SIGN_ENTITLEMENTS = MySpotWidgetExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_TEAM = 2HAP7LLHCJ;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = MySpotWidget/Info.plist;
@@ -1333,6 +1484,15 @@
 			buildConfigurations = (
 				C51503B927D7C349009F0DCD /* Debug */,
 				C51503BA27D7C349009F0DCD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		C5266ADC283EBF0100A923A1 /* Build configuration list for PBXNativeTarget "mySpotiMsg" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C5266ADA283EBF0100A923A1 /* Debug */,
+				C5266ADB283EBF0100A923A1 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

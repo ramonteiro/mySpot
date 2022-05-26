@@ -444,6 +444,7 @@ struct SpotEditSheet: View {
                 spot.image3 = nil
             }
         }
+        let hashcode = spot.name ?? "" + "\(spot.x)\(spot.y)"
         spot.name = name
         spot.details = descript
         spot.founder = founder
@@ -459,6 +460,9 @@ struct SpotEditSheet: View {
         }
         didChange = true
         presentationMode.wrappedValue.dismiss()
+        Task {
+            await updateAppGroup(hashcode: hashcode, image: spot.image, x: spot.x, y: spot.y, name: spot.name ?? "", locatioName: spot.name ?? "")
+        }
     }
     
     private func savePublic() async {
@@ -506,6 +510,7 @@ struct SpotEditSheet: View {
         } else if images?.count == 2 {
             spot.image3 = nil
         }
+        let hashcode = spot.name ?? "" + "\(spot.x)\(spot.y)"
         spot.name = name
         spot.likes = 0
         spot.details = descript
@@ -524,6 +529,9 @@ struct SpotEditSheet: View {
         }
         didChange = true
         presentationMode.wrappedValue.dismiss()
+        Task {
+            await updateAppGroup(hashcode: hashcode, image: spot.image, x: spot.x, y: spot.y, name: spot.name ?? "", locatioName: spot.name ?? "")
+        }
     }
     
     private func removePublic() async {
@@ -552,6 +560,7 @@ struct SpotEditSheet: View {
                     spot.image3 = nil
                 }
             }
+            let hashcode = spot.name ?? "" + "\(spot.x)\(spot.y)"
             spot.name = name
             spot.details = descript
             spot.founder = founder
@@ -566,6 +575,9 @@ struct SpotEditSheet: View {
             }
             didChange = true
             presentationMode.wrappedValue.dismiss()
+            Task {
+                await updateAppGroup(hashcode: hashcode, image: spot.image, x: spot.x, y: spot.y, name: spot.name ?? "", locatioName: spot.name ?? "")
+            }
         } catch {
             spot.isPublic = true
             isPublic = true
@@ -580,7 +592,6 @@ struct SpotEditSheet: View {
         var imageData: Data? = nil
         var imageData2: Data? = nil
         var imageData3: Data? = nil
-        
         if let imageDataCheck = cloudViewModel.compressImage(image: images?[0] ?? defaultImages.errorImage!).pngData() {
             spot.image = UIImage(data: imageDataCheck)
             imageData = imageDataCheck
@@ -628,6 +639,7 @@ struct SpotEditSheet: View {
         } else if images?.count == 2 {
             spot.image3 = nil
         }
+        let hashcode = spot.name ?? "" + "\(spot.x)\(spot.y)"
         spot.name = name
         spot.details = descript
         spot.founder = founder
@@ -642,6 +654,9 @@ struct SpotEditSheet: View {
         }
         didChange = true
         presentationMode.wrappedValue.dismiss()
+        Task {
+            await updateAppGroup(hashcode: hashcode, image: spot.image, x: spot.x, y: spot.y, name: spot.name ?? "", locatioName: spot.name ?? "")
+        }
     }
     
     private var displayIsPublicPrompt: some View {
@@ -654,5 +669,38 @@ struct SpotEditSheet: View {
                 Text("You Must Be Signed In To iCloud To Disover And Share Spots".localized())
             }
         }
+    }
+    
+    private func updateAppGroup(hashcode: String, image: UIImage?, x: Double, y: Double, name: String, locatioName: String) async {
+        let userDefaults = UserDefaults(suiteName: "group.com.isaacpaschall.My-Spot")
+        guard var xArr: [Double] = userDefaults?.object(forKey: "spotXs") as? [Double] else { return }
+        guard var yArr: [Double] = userDefaults?.object(forKey: "spotYs") as? [Double] else { return }
+        guard var nameArr: [String] = userDefaults?.object(forKey: "spotNames") as? [String] else { return }
+        guard var locationNameArr: [String] = userDefaults?.object(forKey: "spotLocationName") as? [String] else { return }
+        guard var imgArr: [Data] = userDefaults?.object(forKey: "spotImgs") as? [Data] else { return }
+        var index = -1
+        
+        for i in imgArr.indices {
+            let tmp: String = nameArr[i] + "\(xArr[i])\(yArr[i])"
+            if tmp == hashcode {
+                index = i
+                break
+            }
+        }
+        
+        if index == -1 { return }
+        guard let data = image?.jpegData(compressionQuality: 0.5) else { return }
+        let encoded = try! PropertyListEncoder().encode(data)
+        locationNameArr[index] = locatioName
+        nameArr[index] = name
+        xArr[index] = x
+        yArr[index] = y
+        imgArr[index] = encoded
+        userDefaults?.set(locationNameArr, forKey: "spotLocationName")
+        userDefaults?.set(xArr, forKey: "spotXs")
+        userDefaults?.set(yArr, forKey: "spotYs")
+        userDefaults?.set(nameArr, forKey: "spotNames")
+        userDefaults?.set(imgArr, forKey: "spotImgs")
+        userDefaults?.set(imgArr.count, forKey: "spotCount")
     }
 }
