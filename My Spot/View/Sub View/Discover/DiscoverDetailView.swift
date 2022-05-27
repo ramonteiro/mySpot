@@ -663,6 +663,8 @@ struct DiscoverDetailView: View {
         newSpot.id = UUID()
         newSpot.dbid = cloudViewModel.spots[index].record.recordID.recordName
         CoreDataStack.shared.save()
+        let hashcode = newSpot.name ?? "" + "\(newSpot.x)\(newSpot.y)"
+        await updateAppGroup(hashcode: hashcode, image: newSpot.image, x: newSpot.x, y: newSpot.y, name: newSpot.name ?? "", locatioName: newSpot.name ?? "")
         isSaved = true
     }
     
@@ -681,5 +683,27 @@ struct DiscoverDetailView: View {
     
     private func isMetric() -> Bool {
         return ((Locale.current as NSLocale).object(forKey: NSLocale.Key.usesMetricSystem) as? Bool) ?? true
+    }
+    
+    private func updateAppGroup(hashcode: String, image: UIImage?, x: Double, y: Double, name: String, locatioName: String) async {
+        let userDefaults = UserDefaults(suiteName: "group.com.isaacpaschall.My-Spot")
+        guard var xArr: [Double] = userDefaults?.object(forKey: "spotXs") as? [Double] else { return }
+        guard var yArr: [Double] = userDefaults?.object(forKey: "spotYs") as? [Double] else { return }
+        guard var nameArr: [String] = userDefaults?.object(forKey: "spotNames") as? [String] else { return }
+        guard var locationNameArr: [String] = userDefaults?.object(forKey: "spotLocationName") as? [String] else { return }
+        guard var imgArr: [Data] = userDefaults?.object(forKey: "spotImgs") as? [Data] else { return }
+        guard let data = image?.jpegData(compressionQuality: 0.5) else { return }
+        let encoded = try! PropertyListEncoder().encode(data)
+        locationNameArr.append(locatioName)
+        nameArr.append(name)
+        xArr.append(x)
+        yArr.append(y)
+        imgArr.append(encoded)
+        userDefaults?.set(locationNameArr, forKey: "spotLocationName")
+        userDefaults?.set(xArr, forKey: "spotXs")
+        userDefaults?.set(yArr, forKey: "spotYs")
+        userDefaults?.set(nameArr, forKey: "spotNames")
+        userDefaults?.set(imgArr, forKey: "spotImgs")
+        userDefaults?.set(imgArr.count, forKey: "spotCount")
     }
 }

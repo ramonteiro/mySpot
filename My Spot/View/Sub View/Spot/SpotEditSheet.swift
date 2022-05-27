@@ -452,6 +452,7 @@ struct SpotEditSheet: View {
         spot.tags = tags
         do {
             try CoreDataStack.shared.context.save()
+            await updateAppGroup(hashcode: hashcode, image: spot.image, x: spot.x, y: spot.y, name: spot.name ?? "", locatioName: spot.name ?? "")
         } catch {
             showingCannotSavePrivateAlert = true
             let generator = UINotificationFeedbackGenerator()
@@ -460,9 +461,6 @@ struct SpotEditSheet: View {
         }
         didChange = true
         presentationMode.wrappedValue.dismiss()
-        Task {
-            await updateAppGroup(hashcode: hashcode, image: spot.image, x: spot.x, y: spot.y, name: spot.name ?? "", locatioName: spot.name ?? "")
-        }
     }
     
     private func savePublic() async {
@@ -518,6 +516,7 @@ struct SpotEditSheet: View {
         spot.tags = tags
         do {
             try CoreDataStack.shared.context.save()
+            await updateAppGroup(hashcode: hashcode, image: spot.image, x: spot.x, y: spot.y, name: spot.name ?? "", locatioName: spot.name ?? "")
         } catch {
             showingCannotSavePrivateAlert = true
             let generator = UINotificationFeedbackGenerator()
@@ -529,9 +528,6 @@ struct SpotEditSheet: View {
         }
         didChange = true
         presentationMode.wrappedValue.dismiss()
-        Task {
-            await updateAppGroup(hashcode: hashcode, image: spot.image, x: spot.x, y: spot.y, name: spot.name ?? "", locatioName: spot.name ?? "")
-        }
     }
     
     private func removePublic() async {
@@ -567,6 +563,7 @@ struct SpotEditSheet: View {
             spot.tags = tags
             do {
                 try CoreDataStack.shared.context.save()
+                await updateAppGroup(hashcode: hashcode, image: spot.image, x: spot.x, y: spot.y, name: spot.name ?? "", locatioName: spot.name ?? "")
             } catch {
                 showingCannotSavePrivateAlert = true
                 let generator = UINotificationFeedbackGenerator()
@@ -575,9 +572,6 @@ struct SpotEditSheet: View {
             }
             didChange = true
             presentationMode.wrappedValue.dismiss()
-            Task {
-                await updateAppGroup(hashcode: hashcode, image: spot.image, x: spot.x, y: spot.y, name: spot.name ?? "", locatioName: spot.name ?? "")
-            }
         } catch {
             spot.isPublic = true
             isPublic = true
@@ -646,6 +640,7 @@ struct SpotEditSheet: View {
         spot.tags = tags
         do {
             try CoreDataStack.shared.context.save()
+            await updateAppGroup(hashcode: hashcode, image: spot.image, x: spot.x, y: spot.y, name: spot.name ?? "", locatioName: spot.name ?? "")
         } catch {
             showingCannotSavePrivateAlert = true
             let generator = UINotificationFeedbackGenerator()
@@ -654,9 +649,6 @@ struct SpotEditSheet: View {
         }
         didChange = true
         presentationMode.wrappedValue.dismiss()
-        Task {
-            await updateAppGroup(hashcode: hashcode, image: spot.image, x: spot.x, y: spot.y, name: spot.name ?? "", locatioName: spot.name ?? "")
-        }
     }
     
     private var displayIsPublicPrompt: some View {

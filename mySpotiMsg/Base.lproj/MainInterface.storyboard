@@ -15,34 +15,11 @@
                     <view key="view" contentMode="scaleToFill" id="zMn-AG-sqS">
                         <rect key="frame" x="0.0" y="0.0" width="320" height="528"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <subviews>
-                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="My Spots (Tap to send location)" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="d1e-fi-ked">
-                                <rect key="frame" x="0.0" y="0.0" width="320" height="21"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                <nil key="highlightedColor"/>
-                            </label>
-                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="-1" estimatedSectionHeaderHeight="-1" sectionFooterHeight="-1" estimatedSectionFooterHeight="-1" translatesAutoresizingMaskIntoConstraints="NO" id="WQW-7t-axW">
-                                <rect key="frame" x="0.0" y="29" width="320" height="499"/>
-                                <color key="backgroundColor" systemColor="systemBackgroundColor"/>
-                            </tableView>
-                        </subviews>
                         <viewLayoutGuide key="safeArea" id="LDy-ih-0nr"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
-                        <constraints>
-                            <constraint firstAttribute="trailing" secondItem="d1e-fi-ked" secondAttribute="trailing" id="833-or-RRM"/>
-                            <constraint firstItem="d1e-fi-ked" firstAttribute="leading" secondItem="zMn-AG-sqS" secondAttribute="leading" id="8Yb-zQ-xNS"/>
-                            <constraint firstItem="WQW-7t-axW" firstAttribute="top" secondItem="d1e-fi-ked" secondAttribute="bottom" constant="8" id="Brm-3k-p8k"/>
-                            <constraint firstItem="WQW-7t-axW" firstAttribute="leading" secondItem="LDy-ih-0nr" secondAttribute="leading" id="E2B-4G-15x"/>
-                            <constraint firstItem="WQW-7t-axW" firstAttribute="bottom" secondItem="LDy-ih-0nr" secondAttribute="bottom" id="apH-CG-KzE"/>
-                            <constraint firstItem="WQW-7t-axW" firstAttribute="trailing" secondItem="LDy-ih-0nr" secondAttribute="trailing" id="ljS-VU-XP4"/>
-                            <constraint firstItem="d1e-fi-ked" firstAttribute="top" secondItem="zMn-AG-sqS" secondAttribute="top" id="oO2-w6-nkg"/>
-                        </constraints>
                     </view>
                     <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
                     <size key="freeformSize" width="320" height="528"/>
-                    <connections>
-                        <outlet property="tableView" destination="WQW-7t-axW" id="nAE-3M-x31"/>
-                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="X47-rx-isc" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>

@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import MapKit
 import Messages
 
 class MessagesViewController: MSMessagesAppViewController, UITableViewDelegate, UITableViewDataSource {
@@ -16,55 +17,50 @@ class MessagesViewController: MSMessagesAppViewController, UITableViewDelegate, 
     // cell reuse id (cells that scroll out of view can be reused)
     let cellReuseIdentifier = "cell"
     
-    // don't forget to hook this up from the storyboard
-    @IBOutlet var tableView: UITableView!
+    var tableView = UITableView()
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        // Register the table view cell class and its reuse id
-        self.tableView.register(UITableViewCell.self, forCellReuseIdentifier: cellReuseIdentifier)
-        
-        // (optional) include this line if you want to remove the extra empty cell divider lines
-        // self.tableView.tableFooterView = UIView()
-        
-        // This view controller itself will provide the delegate methods and row data for the table view.
-        tableView.delegate = self
-        tableView.dataSource = self
-        
+        configureTableView()
         syncFromAppGroups()
     }
     
     // MARK: - UI
     
+    func configureTableView() {
+        view.addSubview(tableView)
+        tableView.delegate = self
+        tableView.dataSource = self
+        tableView.rowHeight = 100
+        tableView.register(SpotCell.self, forCellReuseIdentifier: cellReuseIdentifier)
+        tableView.pin(to: view)
+    }
+    
     // number of rows in table view
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return self.spots.count
+        return spots.count
     }
     
     // create a cell for each table view row
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
-        // create a new cell if needed or reuse an old one
-        let cell:UITableViewCell = self.tableView.dequeueReusableCell(withIdentifier: cellReuseIdentifier)!
-        
-        // set the text from the data model
-        cell.textLabel?.text = self.spots[indexPath.row].name
-        
+        let cell: SpotCell = tableView.dequeueReusableCell(withIdentifier: cellReuseIdentifier) as! SpotCell
+        let spot = spots[indexPath.row]
+        cell.set(spot: spot)
+        cell.selectionStyle = .none
         return cell
     }
     
     // method to run when table view cell is tapped
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        print("You tapped cell number \(indexPath.row).")
         let entry = spots[indexPath.row]
         
         let layout = MSMessageTemplateLayout()
         layout.caption = entry.name
-        layout.subcaption = "My Spot"
+        layout.subcaption = (entry.locationName.isEmpty ? "My Spot" : entry.locationName)
         layout.image = entry.image
-        
         let message = MSMessage()
+        message.summaryText = "\(entry.x)+\(entry.y)+\(entry.name)"
         message.layout = layout
         if (self.activeConversation != nil) {
             self.activeConversation?.insert(message, completionHandler: nil)
@@ -105,6 +101,20 @@ class MessagesViewController: MSMessagesAppViewController, UITableViewDelegate, 
         // Use this method to configure the extension and restore previously stored state.
     }
     
+    override func willSelect(_ message: MSMessage, conversation: MSConversation) {
+        super.willSelect(message, conversation: conversation)
+        guard let locationArr: [String] = message.summaryText?.components(separatedBy: "+") else { return }
+        if locationArr.count > 1 {
+            let routeMeTo = MKMapItem(placemark: MKPlacemark(coordinate: CLLocationCoordinate2D(latitude: Double(locationArr[0]) ?? 128.0, longitude: Double(locationArr[1]) ?? 129.0)))
+            if locationArr.count == 3 {
+                routeMeTo.name = locationArr[2]
+            } else {
+                routeMeTo.name = "My Spot"
+            }
+            routeMeTo.openInMaps(launchOptions: nil)
+        }
+    }
+    
     override func didResignActive(with conversation: MSConversation) {
         // Called when the extension is about to move from the active to inactive state.
         // This will happen when the user dismisses the extension, changes to a different
@@ -132,10 +142,8 @@ class MessagesViewController: MSMessagesAppViewController, UITableViewDelegate, 
         // Use this to clean up state related to the deleted message.
     }
     
-    override func willTransition(to presentationStyle: MSMessagesAppPresentationStyle) {
-        // Called before the extension transitions to a new presentation style.
+    override func willTransition(to newPresentationStyle: MSMessagesAppPresentationStyle) {
         
-        // Use this method to prepare for the change in presentation style.
     }
     
     override func didTransition(to presentationStyle: MSMessagesAppPresentationStyle) {
@@ -146,6 +154,51 @@ class MessagesViewController: MSMessagesAppViewController, UITableViewDelegate, 
     
 }
 
+class SpotCell: UITableViewCell {
+    
+    var spotImageView = UIImageView()
+    var spotTitleLabel = UILabel()
+    
+    override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
+        super.init(style: style, reuseIdentifier: reuseIdentifier)
+        addSubview(spotImageView)
+        addSubview(spotTitleLabel)
+        configureImageView()
+        configureTitleView()
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    func set(spot: msgSpot) {
+        spotImageView.image = spot.image
+        spotTitleLabel.text = spot.name
+    }
+    
+    func configureImageView() {
+        spotImageView.layer.cornerRadius = 10
+        spotImageView.clipsToBounds = true
+        
+        spotImageView.translatesAutoresizingMaskIntoConstraints = false
+        spotImageView.centerYAnchor.constraint(equalTo: centerYAnchor).isActive = true
+        spotImageView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 12).isActive = true
+        spotImageView.heightAnchor.constraint(equalToConstant: 80).isActive = true
+        spotImageView.widthAnchor.constraint(equalTo: spotImageView.heightAnchor).isActive = true
+    }
+    
+    func configureTitleView() {
+        spotTitleLabel.numberOfLines = 0
+        spotTitleLabel.adjustsFontSizeToFitWidth = true
+        
+        spotTitleLabel.translatesAutoresizingMaskIntoConstraints = false
+        spotTitleLabel.centerYAnchor.constraint(equalTo: centerYAnchor).isActive = true
+        spotTitleLabel.leadingAnchor.constraint(equalTo: spotImageView.trailingAnchor, constant: 20).isActive = true
+        spotTitleLabel.heightAnchor.constraint(equalToConstant: 80).isActive = true
+        spotTitleLabel.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -12).isActive = true
+    }
+}
+
 
 struct msgSpot: Identifiable {
     let id = UUID()
@@ -154,4 +207,14 @@ struct msgSpot: Identifiable {
     let x: Double
     let y: Double
     let locationName: String
+}
+
+extension UIView {
+    func pin(to superView: UIView) {
+        translatesAutoresizingMaskIntoConstraints = false
+        topAnchor.constraint(equalTo: superview!.topAnchor).isActive = true
+        leadingAnchor.constraint(equalTo: superview!.leadingAnchor).isActive = true
+        trailingAnchor.constraint(equalTo: superview!.trailingAnchor).isActive = true
+        bottomAnchor.constraint(equalTo: superview!.bottomAnchor).isActive = true
+    }
 }
