@@ -362,6 +362,9 @@ struct AddSpotSheet: View {
             }
         }
         .onAppear {
+            if !cloudViewModel.isSignedInToiCloud {
+                isPublic = false
+            }
             if (UserDefaults.standard.valueExists(forKey: "isBanned") && UserDefaults.standard.bool(forKey: "isBanned")) {
                 isPublic = false
             }

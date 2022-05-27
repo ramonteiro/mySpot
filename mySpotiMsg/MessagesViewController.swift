@@ -18,11 +18,12 @@ class MessagesViewController: MSMessagesAppViewController, UITableViewDelegate, 
     let cellReuseIdentifier = "cell"
     
     var tableView = UITableView()
+    var noSpotsMessage = UILabel()
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        configureTableView()
         syncFromAppGroups()
+        configureTableView()
     }
     
     // MARK: - UI
@@ -34,6 +35,15 @@ class MessagesViewController: MSMessagesAppViewController, UITableViewDelegate, 
         tableView.rowHeight = 100
         tableView.register(SpotCell.self, forCellReuseIdentifier: cellReuseIdentifier)
         tableView.pin(to: view)
+        if spots.count == 0 {
+            view.addSubview(noSpotsMessage)
+            noSpotsMessage.text = "No Spots Here Yet!".localized()
+            noSpotsMessage.textAlignment = .center
+            noSpotsMessage.pin(to: tableView)
+            noSpotsMessage.layer.zPosition = 100
+            noSpotsMessage.center.x = view.center.x
+            noSpotsMessage.center.y = view.center.y
+        }
     }
     
     // number of rows in table view
@@ -216,5 +226,11 @@ extension UIView {
         leadingAnchor.constraint(equalTo: superview!.leadingAnchor).isActive = true
         trailingAnchor.constraint(equalTo: superview!.trailingAnchor).isActive = true
         bottomAnchor.constraint(equalTo: superview!.bottomAnchor).isActive = true
+    }
+}
+
+extension String {
+    func localized() -> String {
+        return NSLocalizedString(self, tableName: "Localizable", bundle: .main, value: self, comment: self)
     }
 }
