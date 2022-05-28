@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import SwiftUI
 import MapKit
 import Messages
 
@@ -107,7 +108,7 @@ class MessagesViewController: MSMessagesAppViewController, UITableViewDelegate, 
     
     func createPin() -> UIView {
         let pinImage = UIImageView(image: UIImage(systemName: "mappin"))
-        pinImage.tintColor = .red
+        pinImage.tintColor = UIColor(myColor())
         pinImage.layer.zPosition = 100
         pinImage.frame = CGRect(x: 217/2 - 15, y: 217/2 - 20, width: 30, height: 40)
         return pinImage
@@ -120,11 +121,17 @@ class MessagesViewController: MSMessagesAppViewController, UITableViewDelegate, 
         nameLabel.numberOfLines = 0
         nameLabel.adjustsFontSizeToFitWidth = true
         nameLabel.textColor = .white
-        nameLabel.backgroundColor = UIColor.systemRed
+        nameLabel.backgroundColor = UIColor(myColor())
         nameLabel.font = UIFont.systemFont(ofSize: 20, weight: .bold)
         nameLabel.frame = CGRect(x: 0, y: 217 - 40, width: 217, height: 25)
         nameLabel.layer.zPosition = 200
         return nameLabel
+    }
+    
+    func myColor() -> Color {
+        let systemColorArray: [Color] = [.red,.green,.pink,.blue,.indigo,.mint,.orange,.purple,.teal,.yellow, .gray]
+        return (!(UserDefaults(suiteName: "group.com.isaacpaschall.My-Spot")?.valueExists(forKey: "colora") ?? false) ? .red :
+                    ((UserDefaults(suiteName: "group.com.isaacpaschall.My-Spot")?.integer(forKey: "colorIndex") ?? 0) != systemColorArray.count - 1) ? systemColorArray[UserDefaults(suiteName: "group.com.isaacpaschall.My-Spot")?.integer(forKey: "colorIndex") ?? 0] : Color(uiColor: UIColor(red: (UserDefaults(suiteName: "group.com.isaacpaschall.My-Spot")?.double(forKey: "colorr") ?? 0), green: (UserDefaults(suiteName: "group.com.isaacpaschall.My-Spot")?.double(forKey: "colorg") ?? 0), blue: (UserDefaults(suiteName: "group.com.isaacpaschall.My-Spot")?.double(forKey: "colorb") ?? 0), alpha: (UserDefaults(suiteName: "group.com.isaacpaschall.My-Spot")?.double(forKey: "colora") ?? 0))))
     }
     
     func createSubBanner() -> UIView {
@@ -134,7 +141,7 @@ class MessagesViewController: MSMessagesAppViewController, UITableViewDelegate, 
         nameLabel.textColor = .white
         nameLabel.numberOfLines = 0
         nameLabel.adjustsFontSizeToFitWidth = true
-        nameLabel.backgroundColor = UIColor.systemRed
+        nameLabel.backgroundColor = UIColor(myColor())
         nameLabel.font = UIFont.systemFont(ofSize: 10, weight: .semibold)
         nameLabel.frame = CGRect(x: 0, y: 217 - 15, width: 217, height: 15)
         nameLabel.layer.zPosition = 300
@@ -351,5 +358,11 @@ extension URL {
     func valueOf(_ queryParameterName: String) -> String? {
         guard let url = URLComponents(string: self.absoluteString) else { return nil }
         return url.queryItems?.first(where: { $0.name == queryParameterName })?.value
+    }
+}
+
+extension UserDefaults {
+    func valueExists(forKey key: String) -> Bool {
+        return object(forKey: key) != nil
     }
 }
