@@ -91,7 +91,7 @@ struct Provider: TimelineProvider {
                 }
             }
         } else {
-            let timeline = Timeline(entries: [noLocationPlaceholder], policy: .never)
+            let timeline = Timeline(entries: [noLocationPlaceholder], policy: .after(Date().addingTimeInterval(10)))
             completion(timeline)
         }
     }
