@@ -83,7 +83,7 @@
 		C5266AD0283EBF0000A923A1 /* MessagesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5266ACF283EBF0000A923A1 /* MessagesViewController.swift */; };
 		C5266AD3283EBF0000A923A1 /* MainInterface.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C5266AD1283EBF0000A923A1 /* MainInterface.storyboard */; };
 		C5266AD5283EBF0100A923A1 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C5266AD4283EBF0100A923A1 /* Assets.xcassets */; };
-		C5266AD9283EBF0100A923A1 /* mySpotiMsg.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = C5266ACB283EBF0000A923A1 /* mySpotiMsg.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		C5266AD9283EBF0100A923A1 /* mySpotiMsg.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = C5266ACB283EBF0000A923A1 /* mySpotiMsg.appex */; platformFilter = ios; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		C54792DA2841795E005F1D2D /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = C56011B72800E66A00C49597 /* Localizable.strings */; };
 		C5552CC22826472900AF2683 /* PhoneViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5552CC12826472800AF2683 /* PhoneViewModel.swift */; };
 		C5552CC42826482A00AF2683 /* WatchViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5552CC32826482A00AF2683 /* WatchViewModel.swift */; };
@@ -977,6 +977,7 @@
 		};
 		C5266AD8283EBF0100A923A1 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
+			platformFilter = ios;
 			target = C5266ACA283EBF0000A923A1 /* mySpotiMsg */;
 			targetProxy = C5266AD7283EBF0100A923A1 /* PBXContainerItemProxy */;
 		};
@@ -1289,6 +1290,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "com.isaacpaschall.My-Spot";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -1327,6 +1329,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "com.isaacpaschall.My-Spot";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -1355,6 +1358,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "com.isaacpaschall.My-Spot.mySpotiMsg";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
+				SUPPORTS_MACCATALYST = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -1383,6 +1387,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "com.isaacpaschall.My-Spot.mySpotiMsg";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
+				SUPPORTS_MACCATALYST = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";

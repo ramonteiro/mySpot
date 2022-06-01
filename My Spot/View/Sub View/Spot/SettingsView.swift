@@ -153,7 +153,7 @@ struct SettingsView: View {
                             .foregroundColor(colorScheme == .dark ? .white : .black)
                     }
                 } footer: {
-                    Text("A link to my wordpress site with short detail about me and the current privacy policy in My Spot.".localized() + "\n\n\nMy Spot v 1.4.4")
+                    Text("A link to my wordpress site with short detail about me and the current privacy policy in My Spot.".localized() + "\n\n\nMy Spot v 1.4.5")
                 }
             }
             .onChange(of: sharedNoti) { newValue in
@@ -383,7 +383,7 @@ struct SettingsView: View {
                 }
             }
             .navigationTitle("Settings".localized())
-            .navigationViewStyle(.automatic)
+            .navigationViewStyle(.stack)
             .interactiveDismissDisabled(true)
             .toolbar {
                 ToolbarItemGroup(placement: .navigationBarTrailing) {
@@ -400,6 +400,7 @@ struct SettingsView: View {
                 }
             }
         }
+        .navigationViewStyle(.stack)
         .onAppear {
             if UserDefaults.standard.valueExists(forKey: "badge") {
                 badgeNum = UserDefaults.standard.integer(forKey: "badge")
