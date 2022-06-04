@@ -52,7 +52,7 @@ struct DetailView: View {
             if (exists) {
                 displaySpot
                     .alert("Unable To Save Spot".localized(), isPresented: $pu) {
-                        Button("OK", role: .cancel) { }
+                        Button("OK".localized(), role: .cancel) { }
                     } message: {
                         Text("Failed to upload spot. Spot is now set to private, please try again later and check internet connection.".localized())
                     }

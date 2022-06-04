@@ -191,7 +191,7 @@ struct AddSpotSheet: View {
                             }
                         }
                         .alert("Unable To Save Spot".localized(), isPresented: $showingCannotSavePrivateAlert) {
-                            Button("OK", role: .cancel) { }
+                            Button("OK".localized(), role: .cancel) { }
                         } message: {
                             Text("Failed to save spot. Please try again.".localized())
                         }
@@ -292,7 +292,7 @@ struct AddSpotSheet: View {
                                     }
                                     .disabled(focusState == .descript)
                                     Spacer()
-                                    Button("Done") {
+                                    Button("Done".localized()) {
                                         focusState = nil
                                     }
                                 }
@@ -396,7 +396,7 @@ struct AddSpotSheet: View {
             } else if (cloudViewModel.isSignedInToiCloud) {
                 Toggle("Public".localized(), isOn: $isPublic)
             } else if (!cloudViewModel.isSignedInToiCloud) {
-                Text("You Must Be Signed In To iCloud To Disover And Share Spots".localized())
+                Text("Sign in to iCloud to Share Spots".localized() + "(" + "Check discover tab for more help".localized() + ")")
             }
         }
     }

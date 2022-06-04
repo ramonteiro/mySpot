@@ -97,6 +97,7 @@
 		C56F499F27E05CE300BCBB8F /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = C56F499E27E05CE300BCBB8F /* Extensions.swift */; };
 		C587027427E27F1900DFB6C4 /* MailViewCallback.swift in Sources */ = {isa = PBXBuildFile; fileRef = C587027327E27F1900DFB6C4 /* MailViewCallback.swift */; };
 		C58F2BF62830AA42005FA88F /* WelcomeSheet in Frameworks */ = {isa = PBXBuildFile; productRef = C58F2BF52830AA42005FA88F /* WelcomeSheet */; };
+		C5B01354284AD15B00121163 /* CreateAccountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5B01353284AD15B00121163 /* CreateAccountView.swift */; };
 		C5D2954C2823719100FBA01E /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C5D2954B2823719100FBA01E /* WidgetKit.framework */; };
 		C5D2954E2823719100FBA01E /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C5D2954D2823719100FBA01E /* SwiftUI.framework */; };
 		C5D295512823719100FBA01E /* MySpotWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5D295502823719100FBA01E /* MySpotWidget.swift */; };
@@ -281,6 +282,7 @@
 		C56011C22800F64000C49597 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/Localizable.strings; sourceTree = "<group>"; };
 		C56F499E27E05CE300BCBB8F /* Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
 		C587027327E27F1900DFB6C4 /* MailViewCallback.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MailViewCallback.swift; sourceTree = "<group>"; };
+		C5B01353284AD15B00121163 /* CreateAccountView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateAccountView.swift; sourceTree = "<group>"; };
 		C5D2954A2823719100FBA01E /* MySpotWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = MySpotWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		C5D2954B2823719100FBA01E /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
 		C5D2954D2823719100FBA01E /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
@@ -619,6 +621,7 @@
 				C501FC1927E41FF1008FEFA1 /* ImagePopUp.swift */,
 				C501FC1B27E4419A008FEFA1 /* BottomPopupView.swift */,
 				C50CF4AF27F3CD4C001A9698 /* SetUpNewSpotNoti.swift */,
+				C5B01353284AD15B00121163 /* CreateAccountView.swift */,
 			);
 			path = Helper;
 			sourceTree = "<group>";
@@ -924,6 +927,7 @@
 				C50CF4B027F3CD4C001A9698 /* SetUpNewSpotNoti.swift in Sources */,
 				C515040427D7CA72009F0DCD /* DetailView.swift in Sources */,
 				C515041427D7CAA3009F0DCD /* ViewMapSpots.swift in Sources */,
+				C5B01354284AD15B00121163 /* CreateAccountView.swift in Sources */,
 				C51503E327D7C856009F0DCD /* CoreDataManager.swift in Sources */,
 				C5552CCF2828207500AF2683 /* DiscoverDetailNotification.swift in Sources */,
 				C515041527D7CAA3009F0DCD /* SpotMapPreview.swift in Sources */,
@@ -1034,7 +1038,7 @@
 				IBSC_MODULE = MySpotWatch_WatchKit_Extension;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = "com.isaacpaschall.My-Spot";
-				MARKETING_VERSION = 1.4.5;
+				MARKETING_VERSION = 2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.isaacpaschall.My-Spot.watchkitapp";
 				PRODUCT_NAME = "My Spot";
 				SDKROOT = watchos;
@@ -1060,7 +1064,7 @@
 				IBSC_MODULE = MySpotWatch_WatchKit_Extension;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = "com.isaacpaschall.My-Spot";
-				MARKETING_VERSION = 1.4.5;
+				MARKETING_VERSION = 2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.isaacpaschall.My-Spot.watchkitapp";
 				PRODUCT_NAME = "My Spot";
 				SDKROOT = watchos;
@@ -1094,7 +1098,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.4.5;
+				MARKETING_VERSION = 2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.isaacpaschall.My-Spot.watchkitapp.watchkitextension";
 				PRODUCT_NAME = "${TARGET_NAME}";
 				SDKROOT = watchos;
@@ -1128,7 +1132,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.4.5;
+				MARKETING_VERSION = 2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.isaacpaschall.My-Spot.watchkitapp.watchkitextension";
 				PRODUCT_NAME = "${TARGET_NAME}";
 				SDKROOT = watchos;
@@ -1286,7 +1290,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.4.5;
+				MARKETING_VERSION = 2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.isaacpaschall.My-Spot";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTS_MACCATALYST = NO;
@@ -1325,7 +1329,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.4.5;
+				MARKETING_VERSION = 2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.isaacpaschall.My-Spot";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTS_MACCATALYST = NO;
@@ -1354,7 +1358,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.4.5;
+				MARKETING_VERSION = 2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.isaacpaschall.My-Spot.mySpotiMsg";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -1383,7 +1387,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.4.5;
+				MARKETING_VERSION = 2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.isaacpaschall.My-Spot.mySpotiMsg";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -1414,7 +1418,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.4.5;
+				MARKETING_VERSION = 2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.isaacpaschall.My-Spot.w";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -1445,7 +1449,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.4.5;
+				MARKETING_VERSION = 2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.isaacpaschall.My-Spot.w";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;

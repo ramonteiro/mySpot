@@ -33,9 +33,43 @@ struct SettingsView: View {
     @State private var preventDoubleTriggerShared = false
     @State private var limits: Double = 10
     @State private var showNotiView = false
+    @State private var dateMemberSince = "?"
     var body: some View {
         NavigationView {
             Form {
+                if UserDefaults.standard.valueExists(forKey: Account.name) {
+                    Section {
+                        HStack(spacing: 20) {
+                            if let data = UserDefaults.standard.data(forKey: Account.image) {
+                                Image(uiImage: UIImage(data: data) ?? defaultImages.errorImage!)
+                                    .resizable()
+                                    .frame(width: 90, height: 90)
+                                    .clipShape(Circle())
+                            }
+                            VStack {
+                                HStack {
+                                    Text(UserDefaults.standard.string(forKey: Account.name) ?? "???")
+                                        .font(.system(size: 30))
+                                        .fontWeight(.bold)
+                                        .multilineTextAlignment(.leading)
+                                    Spacer()
+                                }
+                                if UserDefaults.standard.valueExists(forKey: Account.pronouns) {
+                                    HStack {
+                                        Text(UserDefaults.standard.string(forKey: Account.pronouns) ?? "???")
+                                            .font(.subheadline)
+                                            .multilineTextAlignment(.leading)
+                                        Spacer()
+                                    }
+                                }
+                                // display badges
+                            }
+                        }
+                    } header: {
+                        Text("Account".localized())
+                            .font(.headline)
+                    }
+                }
                 Section {
                     ScrollView(.horizontal, showsIndicators: false) {
                         HStack {
@@ -145,6 +179,18 @@ struct SettingsView: View {
                 }
                 Section {
                     Button {
+                        if let url = URL(string:"https://www.tiktok.com/@myspotexploration") {
+                            UIApplication.shared.open(url)
+                        }
+                    } label: {
+                        Text("Tiktok")
+                            .foregroundColor(colorScheme == .dark ? .white : .black)
+                    }
+                } footer: {
+                    Text("Follow me on".localized() + " Tiktok!")
+                }
+                Section {
+                    Button {
                         if let url = URL(string:"https://wp.me/PdMUcQ-7") {
                             UIApplication.shared.open(url)
                         }
@@ -153,7 +199,16 @@ struct SettingsView: View {
                             .foregroundColor(colorScheme == .dark ? .white : .black)
                     }
                 } footer: {
-                    Text("A link to my wordpress site with short detail about me and the current privacy policy in My Spot.".localized() + "\n\n\nMy Spot v 1.4.5")
+                    if let date = UserDefaults.standard.object(forKey: Account.membersince) as? Date {
+                        Text("A link to my wordpress site with short detail about me and the current privacy policy in My Spot.".localized() + "\n\n\nMy Spot v 2.0" + " - " + "Member Since".localized() + ": \(dateMemberSince)")
+                            .onAppear {
+                                let dateFormatter = DateFormatter()
+                                dateFormatter.dateFormat = "MMM d, yyyy"
+                                dateMemberSince = dateFormatter.string(from: date)
+                            }
+                    } else {
+                        Text("A link to my wordpress site with short detail about me and the current privacy policy in My Spot.".localized() + "\n\n\nMy Spot v 2.0")
+                    }
                 }
             }
             .onChange(of: sharedNoti) { newValue in

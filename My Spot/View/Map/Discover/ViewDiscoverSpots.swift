@@ -162,6 +162,7 @@ struct ViewDiscoverSpots: View {
         } label: {
             Text("Search Here".localized())
         }
+        .disabled(cloudViewModel.isFetching)
         .shadow(color: Color.black.opacity(0.3), radius: 5)
         .buttonStyle(.borderedProminent)
     }

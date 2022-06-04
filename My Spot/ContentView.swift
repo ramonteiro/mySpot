@@ -18,6 +18,7 @@ struct ContentView: View {
     @FetchRequest(sortDescriptors: []) var colors: FetchedResults<CustomColor>
     @Environment(\.managedObjectContext) var moc
     @State private var showSharedSpotSheet = false
+    @State private var presentAccountCreation = false
     @State private var errorAlert = false
     //accepting share alerts
     @State private var failedToAcceptShare = false
@@ -52,6 +53,38 @@ struct ContentView: View {
                 }
                 .tag(Tab.settings)
                 .badge(UIApplication.shared.applicationIconBadgeNumber)
+        }
+        .onChange(of: cloudViewModel.userID) { newValue in
+            if !newValue.isEmpty {
+                Task {
+                    let doesAccountExist = await cloudViewModel.doesAccountExist(for: newValue)
+                    if !doesAccountExist {
+                        presentAccountCreation.toggle()
+                    } else {
+                        Task {
+                            if !UserDefaults.standard.valueExists(forKey: Account.downloads) {
+                                do {
+                                    let totalDownloads = try await cloudViewModel.getTotalDownloads(fromid: newValue)
+                                    UserDefaults.standard.set(totalDownloads, forKey: Account.downloads)
+                                    let totalSpots = try await cloudViewModel.getTotalSpots(fromid: newValue)
+                                    UserDefaults.standard.set(totalSpots, forKey: Account.totalSpots)
+                                } catch {
+                                    print("error getting downloads update")
+                                }
+                            } else {
+                                do {
+                                    let totalDownloads = try await cloudViewModel.getDownloads(fromid: newValue)
+                                    UserDefaults.standard.set(totalDownloads, forKey: Account.downloads)
+                                    let totalSpots = try await cloudViewModel.getTotalSpots(fromid: newValue)
+                                    UserDefaults.standard.set(totalSpots, forKey: Account.totalSpots)
+                                } catch {
+                                    print("error getting downloads update")
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
         .onChange(of: scenePhase, perform: { newValue in
             if newValue == .active {
@@ -117,6 +150,9 @@ struct ContentView: View {
                 UINotificationFeedbackGenerator().notificationOccurred(.warning)
                 failedToAcceptShare = true
             }
+        }
+        .fullScreenCover(isPresented: $presentAccountCreation) {
+            CreateAccountView()
         }
         .alert("Invite Accepted!".localized(), isPresented: $acceptedShare) {
             Button("OK".localized(), role: .cancel) { }

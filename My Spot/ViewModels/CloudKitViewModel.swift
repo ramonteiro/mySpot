@@ -15,7 +15,7 @@ class CloudKitViewModel: ObservableObject {
     @Published var systemColorIndex = 0
     @Published var systemColorArray: [Color] = [.red,.green,.pink,.blue,.indigo,.mint,.orange,.purple,.teal,.yellow, .gray]
     @Published var isSignedInToiCloud: Bool = false
-    @Published var error: String = ""
+    @Published var accountStatus: CKAccountStatus?
     @Published var spots: [SpotFromCloud] = []
     @Published var shared: [SpotFromCloud] = []
     @Published var notificationSpots: [SpotFromCloud] = []
@@ -179,18 +179,23 @@ class CloudKitViewModel: ObservableObject {
             DispatchQueue.main.async {
                 switch returnedStatus {
                 case .couldNotDetermine:
-                    self?.error = CloudKitError.iCloudAccountNotDetermined.rawValue
+                    self?.accountStatus = .couldNotDetermine
+                    self?.isSignedInToiCloud = false
                 case .available:
                     self?.isSignedInToiCloud = true
                     self?.fetchUserID()
                 case .restricted:
-                    self?.error = CloudKitError.iCloudAccountRestricted.rawValue
+                    self?.accountStatus = .restricted
+                    self?.isSignedInToiCloud = false
                 case .noAccount:
-                    self?.error = CloudKitError.iCloudAccountNotFound.rawValue
+                    self?.accountStatus = .noAccount
+                    self?.isSignedInToiCloud = false
                 case .temporarilyUnavailable:
-                    self?.error = CloudKitError.iCloudAccountUnavailable.rawValue
+                    self?.accountStatus = .temporarilyUnavailable
+                    self?.isSignedInToiCloud = false
                 @unknown default:
-                    self?.error = CloudKitError.iCloudAccountUnknown.rawValue
+                    self?.accountStatus = nil
+                    self?.isSignedInToiCloud = false
                 }
             }
         }
@@ -222,6 +227,127 @@ class CloudKitViewModel: ObservableObject {
             UserDefaults.standard.set(true, forKey: "isBanned")
             return true
         }
+    }
+    
+    func addNewAccount(userid: String, name: String, pronoun: String, image: Data, bio: String, email: String, youtube: String, tiktok: String, insta: String) async throws {
+        let newAccount = CKRecord(recordType: "Accounts")
+        newAccount["userid"] = userid
+        newAccount["name"] = name
+        newAccount["bio"] = bio
+        newAccount["youtube"] = youtube
+        newAccount["tiktok"] = tiktok
+        newAccount["instagram"] = insta
+        newAccount["email"] = email
+        newAccount["downloads"] = 0
+        newAccount["isExplorer"] = false
+        newAccount["pronoun"] = pronoun
+        let path = NSTemporaryDirectory() + "imageTemp\(UUID().uuidString).png"
+        let url = URL(fileURLWithPath: path)
+        try image.write(to: url)
+        let asset = CKAsset(fileURL: url)
+        newAccount["image"] = asset
+        try await CKContainer.default().publicCloudDatabase.save(newAccount)
+    }
+    
+    func updateAccount(id: String, name: String, pronoun: String, image: Data?, bio: String, email: String, youtube: String, tiktok: String, insta: String) async throws {
+        let recordID = CKRecord.ID(recordName: id)
+        let record = try await CKContainer.default().publicCloudDatabase.record(for: recordID)
+        record["name"] = name
+        record["bio"] = bio
+        record["youtube"] = youtube
+        record["tiktok"] = tiktok
+        record["instagram"] = insta
+        record["email"] = email
+        record["pronoun"] = pronoun
+        if let image = image {
+            let path = NSTemporaryDirectory() + "imageTemp\(UUID().uuidString).png"
+            let url = URL(fileURLWithPath: path)
+            try image.write(to: url)
+            let asset = CKAsset(fileURL: url)
+            record["image"] = asset
+        }
+        try await CKContainer.default().publicCloudDatabase.save(record)
+    }
+    
+    func doesAccountExist(for userid: String) async -> Bool {
+        let predicate = NSPredicate(format: "userid == %@", userid)
+        let query = CKQuery(recordType: "Accounts", predicate: predicate)
+        do {
+            let results = try await CKContainer.default().publicCloudDatabase.records(matching: query, resultsLimit: 1)
+            if results.matchResults.isEmpty {
+                return false
+            } else {
+                return true
+            }
+        } catch {
+            return true
+        }
+    }
+    
+    func getTotalSpots(fromid userid: String) async throws -> Int {
+        let predicate = NSPredicate(format: "userID == %@", userid)
+        let query = CKQuery(recordType: "Spots", predicate: predicate)
+        let results = try await CKContainer.default().publicCloudDatabase.records(matching: query, desiredKeys: ["userID"])
+        return results.matchResults.count
+    }
+    
+    func getTotalDownloads(fromid userid: String) async throws -> Int {
+        let date = try await getMemberSince(fromid: userid)
+        if let date = date {
+            UserDefaults.standard.set(date, forKey: Account.membersince)
+        }
+        let predicate = NSPredicate(format: "userID == %@", userid)
+        let query = CKQuery(recordType: "Spots", predicate: predicate)
+        let results = try await CKContainer.default().publicCloudDatabase.records(matching: query, desiredKeys: ["userID", "likes"])
+        var downloads = 0
+        results.matchResults.forEach { (_,result) in
+            switch result {
+            case .success(let record):
+                guard let download = record["likes"] as? Int else { return }
+                downloads += download
+            case .failure(let error):
+                print(error)
+            }
+        }
+        return downloads
+    }
+    
+    func getDownloads(fromid userid: String) async throws -> Int {
+        let predicate = NSPredicate(format: "userid == %@", userid)
+        let query = CKQuery(recordType: "Accounts", predicate: predicate)
+        let results = try await CKContainer.default().publicCloudDatabase.records(matching: query, desiredKeys: ["userid", "downloads"], resultsLimit: 1)
+        var downloads = 0
+        results.matchResults.forEach { (_,result) in
+            switch result {
+            case .success(let record):
+                if let date = record.creationDate {
+                    UserDefaults.standard.set(date, forKey: Account.membersince)
+                }
+                guard let download = record["downloads"] as? Int else { return }
+                downloads += download
+            case .failure(let error):
+                print(error)
+            }
+        }
+        return downloads
+    }
+    
+    func getMemberSince(fromid userid: String) async throws -> Date? {
+        let predicate = NSPredicate(format: "userid == %@", userid)
+        let query = CKQuery(recordType: "Accounts", predicate: predicate)
+        let results = try await CKContainer.default().publicCloudDatabase.records(matching: query, desiredKeys: ["userid"])
+        var date: Date?
+        results.matchResults.forEach { (_,result) in
+            switch result {
+            case .success(let record):
+                if let dateFetched = record.creationDate {
+                    date = dateFetched
+                }
+            case .failure(let error):
+                print(error)
+            }
+        }
+        return date
     }
     
     func addSpotToPublic(name: String, founder: String, date: String, locationName: String, x: Double, y: Double, description: String, type: String, image: Data, image2: Data?, image3: Data?, isMultipleImages: Int, customLocation: Bool, dateObject: Date?) async throws -> String {

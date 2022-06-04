@@ -66,10 +66,47 @@ struct DiscoverView: View {
     }
     
     private var displaySignInToIcloudPrompt: some View {
+        ZStack {
+            if let accountStatus = cloudViewModel.accountStatus {
+                if accountStatus == .noAccount {
+                    notSignedIn
+                } else if accountStatus == .couldNotDetermine {
+                    checkInternet
+                } else if accountStatus == .restricted {
+                    restrictedAccount
+                } else if accountStatus == .temporarilyUnavailable {
+                    tempBroken
+                }
+            } else {
+                unknownError
+            }
+        }
+    }
+    
+    private var tempBroken: some View {
         VStack(spacing: 6) {
             HStack {
                 Spacer()
-                Text("You Must Be Signed In To iCloud To Disover And Share Spots".localized())
+                Text("iCloud account temporarily unavailable".localized())
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal)
+                Spacer()
+            }
+            HStack {
+                Spacer()
+                Text("Please try again later".localized()).font(.subheadline).foregroundColor(.gray)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal)
+                Spacer()
+            }
+        }
+    }
+    
+    private var restrictedAccount: some View {
+        VStack(spacing: 6) {
+            HStack {
+                Spacer()
+                Text("Restricted iCloud account".localized())
                     .multilineTextAlignment(.center)
                     .padding(.horizontal)
                 Spacer()
@@ -84,7 +121,112 @@ struct DiscoverView: View {
                         })
                     }
                 } label: {
-                    Text("Please Sign In Or Create An Account In Settings".localized()).font(.subheadline).foregroundColor(.gray)
+                    Text("Your iCloud account is restricted by parental controls or remote management".localized()).font(.subheadline).foregroundColor(.gray)
+                        .multilineTextAlignment(.center)
+                        .padding(.horizontal)
+                }
+                Spacer()
+            }
+        }
+    }
+    
+    private var checkInternet: some View {
+        VStack(spacing: 6) {
+            HStack {
+                Spacer()
+                Text("Could not verify iCloud account".localized())
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal)
+                Spacer()
+            }
+            HStack {
+                Spacer()
+                Button {
+                    guard let settingsUrl = URL(string: UIApplication.openSettingsURLString) else { return }
+                    if UIApplication.shared.canOpenURL(settingsUrl) {
+                        UIApplication.shared.open(settingsUrl, completionHandler: { (success) in
+                            print("Settings opened: \(success)")
+                        })
+                    }
+                } label: {
+                    Text("Please check internet and try again".localized()).font(.subheadline).foregroundColor(.gray)
+                        .multilineTextAlignment(.center)
+                        .padding(.horizontal)
+                }
+                Spacer()
+            }
+        }
+    }
+    
+    private var notSignedIn: some View {
+        VStack(spacing: 6) {
+            HStack {
+                Spacer()
+                Text("You Must Be Signed In To iCloud".localized())
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal)
+                Spacer()
+            }
+            HStack {
+                Spacer()
+                Button {
+                    guard let settingsUrl = URL(string: UIApplication.openSettingsURLString) else { return }
+                    if UIApplication.shared.canOpenURL(settingsUrl) {
+                        UIApplication.shared.open(settingsUrl, completionHandler: { (success) in
+                            print("Settings opened: \(success)")
+                        })
+                    }
+                } label: {
+                    Text("Please Sign In Or Create An Account In Settings and enable iCloud for My Spot".localized()).font(.subheadline).foregroundColor(.gray)
+                        .multilineTextAlignment(.center)
+                        .padding(.horizontal)
+                }
+                Spacer()
+            }
+            HStack {
+                Spacer()
+                Button {
+                    let youtubeId = "wsu8ZPWMMrw"
+                    if let youtubeURL = URL(string: "youtube://\(youtubeId)"),
+                       UIApplication.shared.canOpenURL(youtubeURL) {
+                        // redirect to app
+                        UIApplication.shared.open(youtubeURL, options: [:], completionHandler: nil)
+                    } else if let youtubeURL = URL(string: "https://www.youtube.com/watch?v=\(youtubeId)") {
+                        // redirect through safari
+                        UIApplication.shared.open(youtubeURL, options: [:], completionHandler: nil)
+                    }
+                } label: {
+                    Text("Help".localized())
+                        .font(.subheadline)
+                        .foregroundColor(.gray)
+                    Image(systemName: "questionmark.circle")
+                }
+                Spacer()
+            }
+            .padding(.top, 20)
+        }
+    }
+    
+    private var unknownError: some View {
+        VStack(spacing: 6) {
+            HStack {
+                Spacer()
+                Text("Unknown Error Occured".localized())
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal)
+                Spacer()
+            }
+            HStack {
+                Spacer()
+                Button {
+                    guard let settingsUrl = URL(string: UIApplication.openSettingsURLString) else { return }
+                    if UIApplication.shared.canOpenURL(settingsUrl) {
+                        UIApplication.shared.open(settingsUrl, completionHandler: { (success) in
+                            print("Settings opened: \(success)")
+                        })
+                    }
+                } label: {
+                    Text("Please make sure you are signed in to iCloud".localized()).font(.subheadline).foregroundColor(.gray)
                         .multilineTextAlignment(.center)
                         .padding(.horizontal)
                 }
@@ -94,6 +236,7 @@ struct DiscoverView: View {
     }
     
     private func loadSpotsFromDB(location: CLLocation, radiusInMeters: CGFloat, filteringBy: String) {
+        if cloudViewModel.isFetching { return }
         if isMetric {
             let radiusUnit = Measurement(value: radiusInMeters, unit: UnitLength.kilometers)
             let unitMeters = radiusUnit.converted(to: .meters)
@@ -335,6 +478,7 @@ struct DiscoverView: View {
             Spacer()
         }
         .onTapGesture {
+            if cloudViewModel.isFetching { return }
             if let cursor = cloudViewModel.cursorMain {
                 Task {
                     await cloudViewModel.fetchMoreSpotsPublic(cursor: cursor, desiredKeys: cloudViewModel.desiredKeys, resultLimit: cloudViewModel.limit)

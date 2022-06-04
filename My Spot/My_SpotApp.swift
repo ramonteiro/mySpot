@@ -23,6 +23,7 @@ struct My_SpotApp: App {
     
     init() {
         UIView.appearance(whenContainedInInstancesOf: [UIAlertController.self]).tintColor = .systemBlue
+        UITableView.appearance().showsVerticalScrollIndicator = false
     }
     
     var body: some Scene {

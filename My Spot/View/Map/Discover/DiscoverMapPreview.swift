@@ -31,7 +31,7 @@ struct DiscoverMapPreview: View {
                                 .foregroundColor(.white)
                         }
                         Spacer()
-                        Image(systemName: "heart.fill")
+                        Image(systemName: "icloud.and.arrow.down")
                             .font(.subheadline)
                             .foregroundColor(.white)
                         Text("\(spot.likes)")

@@ -658,7 +658,7 @@ struct SpotEditSheet: View {
             } else if (cloudViewModel.isSignedInToiCloud) {
                 Toggle("Public".localized(), isOn: $isPublic)
             } else if (!cloudViewModel.isSignedInToiCloud) {
-                Text("You Must Be Signed In To iCloud To Disover And Share Spots".localized())
+                Text("Sign in to iCloud to Share Spots".localized() + "(" + "Check discover tab for more help".localized() + ")")
             }
         }
     }
