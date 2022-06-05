@@ -361,54 +361,14 @@ struct CreateAccountView: View {
         guard let image = image else { return }
         guard let imageData = cloudViewModel.compressImage(image: image).pngData() else { return }
         isSaving = true
-        let totalDownloads = try? await cloudViewModel.getTotalDownloads(fromid: cloudViewModel.userID)
         do {
-            let totalSpots = try await cloudViewModel.getTotalSpots(fromid: cloudViewModel.userID)
             try await cloudViewModel.addNewAccount(userid: cloudViewModel.userID, name: name, pronoun: pronoun, image: imageData, bio: bio, email: email, youtube: youtube, tiktok: tiktok, insta: insta)
-            await saveToDefaults(imageData: imageData, totalSpots: totalSpots, totalDownloads: totalDownloads)
+            try? await cloudViewModel.getMemberSince(fromid: cloudViewModel.userID)
             isSaving = false
             presentationMode.wrappedValue.dismiss()
         } catch {
             isSaving = false
             saveAlert.toggle()
-        }
-    }
-    
-    private func saveToDefaults(imageData: Data, totalSpots: Int?, totalDownloads: Int?) async {
-        let def = UserDefaults.standard
-        def.set(name, forKey: Account.name)
-        def.set(imageData, forKey: Account.image)
-        def.set(totalSpots ?? 0, forKey: Account.totalSpots)
-        def.set(totalDownloads ?? 0, forKey: Account.downloads)
-        if pronoun.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-            def.removeObject(forKey: Account.pronouns)
-        } else {
-            def.set(pronoun, forKey: Account.pronouns)
-        }
-        if bio.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-            def.removeObject(forKey: Account.bio)
-        } else {
-            def.set(bio, forKey: Account.bio)
-        }
-        if email.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-            def.removeObject(forKey: Account.email)
-        } else {
-            def.set(email, forKey: Account.email)
-        }
-        if tiktok.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-            def.removeObject(forKey: Account.tiktok)
-        } else {
-            def.set(tiktok, forKey: Account.tiktok)
-        }
-        if insta.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-            def.removeObject(forKey: Account.insta)
-        } else {
-            def.set(insta, forKey: Account.insta)
-        }
-        if youtube.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-            def.removeObject(forKey: Account.youtube)
-        } else {
-            def.set(youtube, forKey: Account.youtube)
         }
     }
 }

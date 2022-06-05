@@ -19,7 +19,6 @@ struct SettingsView: View {
     @State private var showingMailSheet = false
     @State private var showingConfigure = false
     @State private var placeName = ""
-    @State private var badgeNum = 0
     @State private var showNotificationSheet = false
     @State private var newPlace = false
     @State private var message = "Message to My Spot developer: ".localized()
@@ -34,7 +33,6 @@ struct SettingsView: View {
     @State private var limits: Double = 10
     @State private var showNotiView = false
     @State private var dateMemberSince = "?"
-    @State private var openAccountDetail = false
     let def = UserDefaults.standard
     
     var body: some View {
@@ -76,19 +74,6 @@ struct SettingsView: View {
                     SetUpNewSpotNoti(newPlace: $newPlace, unableToAddSpot: $unableToAddSpot)
                         .accentColor(cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex])
                 }
-                .fullScreenCover(isPresented: $openAccountDetail) {
-                    AccountDetailView(userid: cloudViewModel.userID,
-                                      image: UIImage(data: def.data(forKey: Account.image) ?? Data()) ?? defaultImages.errorImage!,
-                                      name: def.string(forKey: Account.name) ?? "???",
-                                      downloads: def.integer(forKey: Account.downloads),
-                                      spotCount: def.integer(forKey: Account.totalSpots),
-                                      pronouns: def.string(forKey: Account.pronouns),
-                                      bio: def.string(forKey: Account.bio),
-                                      email: def.string(forKey: Account.email),
-                                      tiktok: def.string(forKey: Account.tiktok),
-                                      insta: def.string(forKey: Account.insta),
-                                      youtube: def.string(forKey: Account.youtube))
-                }
                 .sheet(isPresented: $showingMailSheet) {
                     MailView(message: $message) { returnedMail in
                         print(returnedMail)
@@ -110,14 +95,9 @@ struct SettingsView: View {
                 .toolbar {
                     ToolbarItemGroup(placement: .navigationBarTrailing) {
                         Button {
-                            showNotificationSheet.toggle()
+                            presentationMode.wrappedValue.dismiss()
                         } label: {
-                            Image(systemName: "bell")
-                        }
-                        .if(badgeNum > 0) { view in
-                            view.overlay {
-                                Badge(count: $badgeNum, color: .red)
-                            }
+                            Text("Done".localized())
                         }
                     }
                 }
@@ -126,21 +106,10 @@ struct SettingsView: View {
         .onAppear {
             initializeVars()
         }
-        .sheet(isPresented: $showNotificationSheet) {
-            NotificationView(badgeNum: $badgeNum)
-        }
     }
     
     private var formView: some View {
         Form {
-            if def.valueExists(forKey: Account.name) {
-                Section {
-                    accountButton
-                } header: {
-                    Text("Account".localized())
-                        .font(.headline)
-                }
-            }
             Section {
                 ScrollView(.horizontal, showsIndicators: false) {
                     colorWheel
@@ -237,7 +206,7 @@ struct SettingsView: View {
                         .foregroundColor(colorScheme == .dark ? .white : .black)
                 }
             } footer: {
-                if let date = UserDefaults.standard.object(forKey: Account.membersince) as? Date {
+                if let date = UserDefaults.standard.object(forKey: "accountdate") as? Date {
                     Text("A link to my wordpress site with short detail about me and the current privacy policy in My Spot.".localized() + "\n\n\nMy Spot v 2.0" + " - " + "Member Since".localized() + ": \(dateMemberSince)")
                         .onAppear {
                             let dateFormatter = DateFormatter()
@@ -283,41 +252,6 @@ struct SettingsView: View {
                         Image(systemName: "pencil")
                             .frame(width: 40, height: 40)
                     }
-                }
-            }
-        }
-    }
-    
-    private var accountButton: some View {
-        Button {
-            openAccountDetail.toggle()
-        } label: {
-            HStack(spacing: 20) {
-                if let data = UserDefaults.standard.data(forKey: Account.image) {
-                    Image(uiImage: UIImage(data: data) ?? defaultImages.errorImage!)
-                        .resizable()
-                        .frame(width: 90, height: 90)
-                        .clipShape(Circle())
-                }
-                VStack {
-                    HStack {
-                        Text(UserDefaults.standard.string(forKey: Account.name) ?? "???")
-                            .foregroundColor(colorScheme == .dark ? .white : .black)
-                            .font(.system(size: 30))
-                            .fontWeight(.bold)
-                            .multilineTextAlignment(.leading)
-                        Spacer()
-                    }
-                    if UserDefaults.standard.valueExists(forKey: Account.pronouns) {
-                        HStack {
-                            Text(UserDefaults.standard.string(forKey: Account.pronouns) ?? "???")
-                                .foregroundColor(colorScheme == .dark ? .white : .black)
-                                .font(.subheadline)
-                                .multilineTextAlignment(.leading)
-                            Spacer()
-                        }
-                    }
-                    // display badges
                 }
             }
         }
@@ -519,11 +453,6 @@ struct SettingsView: View {
     }
     
     private func initializeVars() {
-        if UserDefaults.standard.valueExists(forKey: "badge") {
-            badgeNum = UserDefaults.standard.integer(forKey: "badge")
-        } else {
-            UserDefaults.standard.set(0, forKey: "badge")
-        }
         if cloudViewModel.notiNewSpotOn ==  true {
             preventDoubleTrigger = true
         }

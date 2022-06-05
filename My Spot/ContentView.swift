@@ -46,41 +46,23 @@ struct ContentView: View {
                     Text("Playlists".localized())
                 }
                 .tag(Tab.playlists)
-            SettingsView()
+            AccountDetailView(userid: cloudViewModel.userID, myAccount: true)
                 .tabItem() {
-                    Image(systemName: "gear")
-                    Text("Settings".localized())
+                    Image(systemName: "person.fill")
+                    Text("Profile".localized())
                 }
                 .tag(Tab.settings)
                 .badge(UIApplication.shared.applicationIconBadgeNumber)
         }
-        .onChange(of: cloudViewModel.userID) { newValue in
-            if !newValue.isEmpty {
+        .onChange(of: cloudViewModel.isSignedInToiCloud) { newValue in
+            if newValue {
                 Task {
-                    let doesAccountExist = await cloudViewModel.doesAccountExist(for: newValue)
+                    let doesAccountExist = await cloudViewModel.doesAccountExist(for: cloudViewModel.userID)
                     if !doesAccountExist {
                         presentAccountCreation.toggle()
                     } else {
                         Task {
-                            if !UserDefaults.standard.valueExists(forKey: Account.downloads) {
-                                do {
-                                    let totalDownloads = try await cloudViewModel.getTotalDownloads(fromid: newValue)
-                                    UserDefaults.standard.set(totalDownloads, forKey: Account.downloads)
-                                    let totalSpots = try await cloudViewModel.getTotalSpots(fromid: newValue)
-                                    UserDefaults.standard.set(totalSpots, forKey: Account.totalSpots)
-                                } catch {
-                                    print("error getting downloads update")
-                                }
-                            } else {
-                                do {
-                                    let totalDownloads = try await cloudViewModel.getDownloads(fromid: newValue)
-                                    UserDefaults.standard.set(totalDownloads, forKey: Account.downloads)
-                                    let totalSpots = try await cloudViewModel.getTotalSpots(fromid: newValue)
-                                    UserDefaults.standard.set(totalSpots, forKey: Account.totalSpots)
-                                } catch {
-                                    print("error getting downloads update")
-                                }
-                            }
+                            try? await cloudViewModel.getMemberSince(fromid: cloudViewModel.userID)
                         }
                     }
                 }

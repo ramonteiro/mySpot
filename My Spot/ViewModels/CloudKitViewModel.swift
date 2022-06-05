@@ -39,6 +39,9 @@ class CloudKitViewModel: ObservableObject {
     }
     
     private func setUserDefaults() {
+        if let id = UserDefaults(suiteName: "group.com.isaacpaschall.My-Spot")?.string(forKey: "userid") {
+            userID = id
+        }
         if (UserDefaults.standard.valueExists(forKey: "limit")) {
             limit = UserDefaults.standard.integer(forKey: "limit")
         } else {
@@ -238,7 +241,6 @@ class CloudKitViewModel: ObservableObject {
         newAccount["tiktok"] = tiktok
         newAccount["instagram"] = insta
         newAccount["email"] = email
-        newAccount["downloads"] = 0
         newAccount["isExplorer"] = false
         newAccount["pronoun"] = pronoun
         let path = NSTemporaryDirectory() + "imageTemp\(UUID().uuidString).png"
@@ -284,18 +286,7 @@ class CloudKitViewModel: ObservableObject {
         }
     }
     
-    func getTotalSpots(fromid userid: String) async throws -> Int {
-        let predicate = NSPredicate(format: "userID == %@", userid)
-        let query = CKQuery(recordType: "Spots", predicate: predicate)
-        let results = try await CKContainer.default().publicCloudDatabase.records(matching: query, desiredKeys: ["userID"])
-        return results.matchResults.count
-    }
-    
-    func getTotalDownloads(fromid userid: String) async throws -> Int {
-        let date = try await getMemberSince(fromid: userid)
-        if let date = date {
-            UserDefaults.standard.set(date, forKey: Account.membersince)
-        }
+    func getDownloadsAndSpots(from userid: String) async throws -> [Int] {
         let predicate = NSPredicate(format: "userID == %@", userid)
         let query = CKQuery(recordType: "Spots", predicate: predicate)
         let results = try await CKContainer.default().publicCloudDatabase.records(matching: query, desiredKeys: ["userID", "likes"])
@@ -309,30 +300,10 @@ class CloudKitViewModel: ObservableObject {
                 print(error)
             }
         }
-        return downloads
+        return [downloads, results.matchResults.count]
     }
     
-    func getDownloads(fromid userid: String) async throws -> Int {
-        let predicate = NSPredicate(format: "userid == %@", userid)
-        let query = CKQuery(recordType: "Accounts", predicate: predicate)
-        let results = try await CKContainer.default().publicCloudDatabase.records(matching: query, desiredKeys: ["userid", "downloads"], resultsLimit: 1)
-        var downloads = 0
-        results.matchResults.forEach { (_,result) in
-            switch result {
-            case .success(let record):
-                if let date = record.creationDate {
-                    UserDefaults.standard.set(date, forKey: Account.membersince)
-                }
-                guard let download = record["downloads"] as? Int else { return }
-                downloads += download
-            case .failure(let error):
-                print(error)
-            }
-        }
-        return downloads
-    }
-    
-    func getMemberSince(fromid userid: String) async throws -> Date? {
+    func getMemberSince(fromid userid: String) async throws {
         let predicate = NSPredicate(format: "userid == %@", userid)
         let query = CKQuery(recordType: "Accounts", predicate: predicate)
         let results = try await CKContainer.default().publicCloudDatabase.records(matching: query, desiredKeys: ["userid"])
@@ -347,7 +318,7 @@ class CloudKitViewModel: ObservableObject {
                 print(error)
             }
         }
-        return date
+        UserDefaults.standard.set(date, forKey: "accountdate")
     }
     
     func addSpotToPublic(name: String, founder: String, date: String, locationName: String, x: Double, y: Double, description: String, type: String, image: Data, image2: Data?, image3: Data?, isMultipleImages: Int, customLocation: Bool, dateObject: Date?) async throws -> String {
@@ -438,6 +409,35 @@ class CloudKitViewModel: ObservableObject {
                 }
             }
         }
+    }
+    
+    func fetchAccount(userid: String) async throws -> AccountModel? {
+        let predicate = NSPredicate(format: "userid == %@", userid)
+        let query = CKQuery(recordType: "Accounts", predicate: predicate)
+        let results = try await CKContainer.default().publicCloudDatabase.records(matching: query)
+        var user: AccountModel?
+        results.matchResults.forEach { (_,result) in
+            switch result {
+            case .success(let record):
+                guard let id = record["userid"] as? String else { return }
+                guard let name = record["name"] as? String else { return }
+                guard let imageAsset = record["image"] as? CKAsset else { return }
+                guard let imageURL = imageAsset.fileURL else { return }
+                guard let imageData = NSData(contentsOf: imageURL) as? Data else { return }
+                guard let image = UIImage(data: imageData) else { return }
+                guard let isExplorerBinary = record["isExplorer"] as? Int else { return }
+                let pronouns = record["pronoun"] as? String
+                let bio = record["bio"] as? String
+                let tiktok = record["tiktok"] as? String
+                let youtube = record["youtube"] as? String
+                let insta = record["instagram"] as? String
+                let email = record["email"] as? String
+                user = AccountModel(id: id, name: name, image: image, pronouns: pronouns, isExplorer: (isExplorerBinary == 0 ? false : true), bio: bio, record: record, tiktok: tiktok, insta: insta, youtube: youtube, email: email)
+            case .failure(let error):
+                print(error)
+            }
+        }
+        return user
     }
     
     func fetchImages(id: String) async -> [UIImage?] {

@@ -18,6 +18,7 @@ struct NotificationView: View {
     @State private var hasError = false
     @State private var isFetching = false
     @State private var showingAlert = false
+    @Binding var goToSettings: Bool
     
     var body: some View {
         NavigationView {
@@ -80,6 +81,7 @@ struct NotificationView: View {
             HStack {
                 Spacer()
                 Button {
+                    goToSettings = true
                     presentationMode.wrappedValue.dismiss()
                 } label: {
                     Text("Please go to settings to enable notifications".localized())
