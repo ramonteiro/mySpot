@@ -156,7 +156,7 @@ struct NotificationView: View {
             .onAppear {
                 cloudViewModel.canRefresh = true
             }
-            NavigationLink(destination: DiscoverDetailNotification(index: index ?? 0, canShare: true), isActive: $showDetailView) {
+            NavigationLink(destination: DiscoverDetailNotification(index: index ?? 0), isActive: $showDetailView) {
                 EmptyView()
             }
             .isDetailLink(false)

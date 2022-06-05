@@ -51,6 +51,7 @@ struct DiscoverDetailView: View {
     @State private var dateToShow = ""
     @State private var attemptToReport = false
     @FocusState private var nameIsFocused: Bool
+    @State private var isShare = false
     @State private var hasReported: Bool = false
     
     var body: some View {
@@ -141,6 +142,13 @@ struct DiscoverDetailView: View {
                 backImage = "chevron.down"
             }
         }
+        .background(ShareViewController(isPresenting: $isShare) {
+            let av = getShareAC(id: cloudViewModel.spots[index].record.recordID.recordName, name: cloudViewModel.spots[index].name)
+            av.completionWithItemsHandler = { _, _, _, _ in
+                isShare = false
+            }
+            return av
+        })
     }
     
     private var middleButtonRow: some View {
@@ -173,7 +181,7 @@ struct DiscoverDetailView: View {
                 if (mySpot) {
                     deleteButton
                 }
-                if (canShare && UIDevice.current.userInterfaceIdiom != .pad) {
+                if (UIDevice.current.userInterfaceIdiom != .pad) {
                     canShareButton
                 }
             }
@@ -339,9 +347,9 @@ struct DiscoverDetailView: View {
         .disabled(spotInCD || isSaved)
     }
     
-    private var canShareButton: some View { // if canshare
+    private var canShareButton: some View {
         Button {
-            cloudViewModel.shareSheet(index: index)
+            isShare = true
         } label: {
             Image(systemName: "square.and.arrow.up")
                 .foregroundColor(.white)
@@ -349,6 +357,10 @@ struct DiscoverDetailView: View {
                 .padding(10)
                 .shadow(color: Color.black.opacity(0.5), radius: 5)
         }
+    }
+    
+    private func getShareAC(id: String, name: String) -> UIActivityViewController {
+        return UIActivityViewController(activityItems: ["Check out, \"".localized() + name + "\" on My Spot! ".localized(), URL(string: "myspot://" + (id)) ?? "", "\n\nIf you don't have My Spot, get it on the Appstore here: ".localized(), URL(string: "https://apps.apple.com/us/app/my-spot-exploration/id1613618373")!], applicationActivities: nil)
     }
     
     private var expandButton: some View {

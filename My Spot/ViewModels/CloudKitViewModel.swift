@@ -543,6 +543,77 @@ class CloudKitViewModel: ObservableObject {
         }
     }
     
+    func fetchAccountSpots(userid: String) async throws -> [SpotFromCloud] {
+        let predicate = NSPredicate(format: "userID == %@", userid)
+        let query = CKQuery(recordType: "Spots", predicate: predicate)
+        let creation = NSSortDescriptor(key: "creationDate", ascending: false)
+        var spots: [SpotFromCloud] = []
+        query.sortDescriptors = [creation]
+        let results = try await CKContainer.default().publicCloudDatabase.records(matching: query, desiredKeys: desiredKeys, resultsLimit: limit)
+        results.matchResults.forEach { (_,result) in
+            switch result {
+            case .success(let record):
+                guard let name = record["name"] as? String else { return }
+                guard let founder = record["founder"] as? String else { return }
+                guard let date = record["date"] as? String else { return }
+                var dateObject: Date?
+                if let dateObj = record["dateObject"] as? Date {
+                    dateObject = dateObj
+                } else {
+                    dateObject = nil
+                }
+                guard let location = record["location"] as? CLLocation else { return }
+                guard let likes = record["likes"] as? Int else { return }
+                guard let id = record["id"] as? String else { return }
+                guard let user = record["userID"] as? String else { return }
+                guard let image = record["image"] as? CKAsset else { return }
+                var customLocation = 0
+                if let customLocationChecked = record["customLocation"] as? Int {
+                    customLocation = customLocationChecked
+                }
+                var isMultipleImages = 0
+                if let m = record["isMultipleImages"] as? Int {
+                    isMultipleImages = m
+                }
+                var inappropriate = 0
+                var offensive = 0
+                var spam = 0
+                var dangerous = 0
+                if let inna = record["inappropriate"] as? Int {
+                    inappropriate = inna
+                }
+                if let offen = record["offensive"] as? Int {
+                    offensive = offen
+                }
+                if let sp = record["spam"] as? Int {
+                    spam = sp
+                }
+                if let dan = record["dangerous"] as? Int {
+                    dangerous = dan
+                }
+                var types = ""
+                var description = ""
+                var locationName = ""
+                if let typeCheck = record["type"] as? String {
+                    types = typeCheck
+                }
+                if let descriptionCheck = record["description"] as? String {
+                    description = descriptionCheck
+                }
+                if let locationNameCheck = record["locationName"] as? String {
+                    locationName = locationNameCheck
+                }
+                let imageURL = image.fileURL
+                spots.append(SpotFromCloud(id: id, name: name, founder: founder, description: description, date: date, location: location, type: types, imageURL: imageURL ?? URL(fileURLWithPath: "none"),  image2URL: nil , image3URL: nil, isMultipleImages: isMultipleImages , likes: likes, offensive: offensive, spam: spam, inappropriate: inappropriate, dangerous: dangerous, customLocation: customLocation, locationName: locationName, userID: user, dateObject: dateObject, record: record))
+                
+            case .failure(let error):
+                print("\(error)")
+                return
+            }
+        }
+        return spots
+    }
+    
     func fetchSpotPublic(userLocation: CLLocation, filteringBy: String, search: String) async throws {
         self.isFetching = true
         var predicate = NSPredicate()
@@ -551,10 +622,12 @@ class CloudKitViewModel: ObservableObject {
         } else {
             predicate = NSPredicate(format: "distanceToLocation:fromLocation:(location, %@) < %f", userLocation, CGFloat(radiusInMeters))
         }
-        var query = CKQuery(recordType: "Spots", predicate: predicate)
+        let secondPredicate = NSPredicate(format: "userID != %@", self.userID)
+        let compundPred = NSCompoundPredicate(andPredicateWithSubpredicates: [predicate, secondPredicate])
+        var query = CKQuery(recordType: "Spots", predicate: compundPred)
         if !search.isEmpty {
             let predicate2 = NSPredicate(format: "self contains %@", search)
-            let compoundPredicate = NSCompoundPredicate(andPredicateWithSubpredicates: [predicate, predicate2])
+            let compoundPredicate = NSCompoundPredicate(andPredicateWithSubpredicates: [predicate, predicate2, secondPredicate])
             query = CKQuery(recordType: "Spots", predicate: compoundPredicate)
         }
         if filteringBy == "Closest" {
@@ -831,25 +904,6 @@ class CloudKitViewModel: ObservableObject {
                 self.isErrorMessageDetails = "Check internet conection and try again."
                 self.isError.toggle()
             }
-        }
-    }
-    
-    
-    func shareSheet(index i: Int) {
-        let activityView = UIActivityViewController(activityItems: ["Check out, \"".localized(), spots[i].name, "\" on My Spot! ".localized(), URL(string: "myspot://" + (spots[i].record.recordID.recordName)) ?? "", "\n\nIf you don't have My Spot, get it on the Appstore here: ".localized(), URL(string: "https://apps.apple.com/us/app/my-spot-exploration/id1613618373")!], applicationActivities: nil)
-        let allScenes = UIApplication.shared.connectedScenes
-        let scene = allScenes.first { $0.activationState == .foregroundActive }
-        if let windowScene = scene as? UIWindowScene {
-            windowScene.keyWindow?.rootViewController?.present(activityView, animated: true, completion: nil)
-        }
-    }
-    
-    func shareSheetFromLocal(id: String, name: String) {
-        let activityView = UIActivityViewController(activityItems: ["Check out, \"".localized(), name, "\" on My Spot! ".localized(), URL(string: "myspot://" + (id)) ?? "", "\n\nIf you don't have My Spot, get it on the Appstore here: ".localized(), URL(string: "https://apps.apple.com/us/app/my-spot-exploration/id1613618373")!], applicationActivities: nil)
-        let allScenes = UIApplication.shared.connectedScenes
-        let scene = allScenes.first { $0.activationState == .foregroundActive }
-        if let windowScene = scene as? UIWindowScene {
-            windowScene.keyWindow?.rootViewController?.present(activityView, animated: true, completion: nil)
         }
     }
     

@@ -48,6 +48,7 @@ struct DiscoverSheetShared: View {
     @State private var showingSaveSheet = false
     @State private var noType = false
     @State private var spotInCD = false
+    @State private var isShare = false
     
     var body: some View {
         ZStack {
@@ -130,6 +131,13 @@ struct DiscoverSheetShared: View {
             noType = cloudViewModel.shared[0].type.isEmpty
             spotInCD = isSpotInCoreData()
         }
+        .background(ShareViewController(isPresenting: $isShare) {
+            let av = getShareAC(id: cloudViewModel.shared[0].record.recordID.recordName, name: cloudViewModel.shared[0].name)
+            av.completionWithItemsHandler = { _, _, _, _ in
+                isShare = false
+            }
+            return av
+        })
     }
     
     private var middleButtonRow: some View {
@@ -161,6 +169,9 @@ struct DiscoverSheetShared: View {
                 Spacer()
                 if (mySpot) {
                     deleteButton
+                }
+                if (UIDevice.current.userInterfaceIdiom != .pad) {
+                    shareButton
                 }
             }
             .padding(.top, 30)
@@ -222,6 +233,22 @@ struct DiscoverSheetShared: View {
             }
             Spacer()
         }
+    }
+    
+    private var shareButton: some View {
+        Button {
+            isShare = true
+        } label: {
+            Image(systemName: "square.and.arrow.up")
+                .foregroundColor(.white)
+                .font(.system(size: 30, weight: .regular))
+                .padding(10)
+                .shadow(color: Color.black.opacity(0.5), radius: 5)
+        }
+    }
+    
+    private func getShareAC(id: String, name: String) -> UIActivityViewController {
+        return UIActivityViewController(activityItems: ["Check out, \"".localized() + name + "\" on My Spot! ".localized(), URL(string: "myspot://" + (id)) ?? "", "\n\nIf you don't have My Spot, get it on the Appstore here: ".localized(), URL(string: "https://apps.apple.com/us/app/my-spot-exploration/id1613618373")!], applicationActivities: nil)
     }
     
     private var multipleImages: some View {

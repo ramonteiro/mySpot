@@ -44,6 +44,7 @@ struct DetailView: View {
     @State private var didCopyDescription = false
     @State private var showingCannotSavePublicAlert = false
     @State private var pu = false
+    @State private var isShare = false
     @State var canEdit: Bool
     @State private var canDelete = true
     
@@ -129,6 +130,13 @@ struct DetailView: View {
             }
         }
         .navigationBarHidden(true)
+        .background(ShareViewController(isPresenting: $isShare) {
+            let av = getShareAC(id: spot.dbid ?? "", name: spot.name ?? "???")
+            av.completionWithItemsHandler = { _, _, _, _ in
+                isShare = false
+            }
+            return av
+        })
     }
     
     private var displayImage: some View {
@@ -162,7 +170,7 @@ struct DetailView: View {
                 if (canDelete && !fromPlaylist) {
                     deleteButton
                 }
-                if (canShare && spot.isPublic && UIDevice.current.userInterfaceIdiom != .pad) {
+                if (spot.isPublic && UIDevice.current.userInterfaceIdiom != .pad) {
                     shareButton
                 }
             }
@@ -226,7 +234,7 @@ struct DetailView: View {
     
     private var shareButton: some View {
         Button {
-            cloudViewModel.shareSheetFromLocal(id: spot.dbid ?? "", name: spot.name ?? "")
+            isShare = true
         } label: {
             Image(systemName: "square.and.arrow.up")
                 .foregroundColor(.white)
@@ -234,6 +242,10 @@ struct DetailView: View {
                 .padding(15)
                 .shadow(color: Color.black.opacity(0.5), radius: 5)
         }
+    }
+    
+    private func getShareAC(id: String, name: String) -> UIActivityViewController {
+        return UIActivityViewController(activityItems: ["Check out, \"".localized() + name + "\" on My Spot! ".localized(), URL(string: "myspot://" + (id)) ?? "", "\n\nIf you don't have My Spot, get it on the Appstore here: ".localized(), URL(string: "https://apps.apple.com/us/app/my-spot-exploration/id1613618373")!], applicationActivities: nil)
     }
     
     private var deleteButton: some View {

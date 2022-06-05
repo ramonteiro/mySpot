@@ -14,11 +14,16 @@ class CloudKitViewModel: ObservableObject {
     init() { }
     
     func fetchSpotPublic(userLocation: CLLocation, resultLimit: Int, distance: Double, completion: @escaping (Result<[Spot], Error>) -> ()) {
-        var predicate = NSPredicate(value: true)
+        var compoundPredicate = NSCompoundPredicate(andPredicateWithSubpredicates: [NSPredicate(value: true)])
         if distance != 0 {
-            predicate = NSPredicate(format: "distanceToLocation:fromLocation:(location, %@) < %f", userLocation, CGFloat(distance))
+            let secondPredicate = NSPredicate(format: "distanceToLocation:fromLocation:(location, %@) < %f", userLocation, CGFloat(distance))
+            compoundPredicate = NSCompoundPredicate(andPredicateWithSubpredicates: [compoundPredicate, secondPredicate])
         }
-        let query = CKQuery(recordType: "Spots", predicate: predicate)
+        if let userid = UserDefaults(suiteName: "group.com.isaacpaschall.My-Spot")?.string(forKey: "userid") {
+            let secondPredicate = NSPredicate(format: "userID != %@", userid)
+            compoundPredicate = NSCompoundPredicate(andPredicateWithSubpredicates: [compoundPredicate, secondPredicate])
+        }
+        let query = CKQuery(recordType: "Spots", predicate: compoundPredicate)
         let distance = CKLocationSortDescriptor(key: "location", relativeLocation: userLocation)
         let creation = NSSortDescriptor(key: "creationDate", ascending: false)
         query.sortDescriptors = [distance, creation]
