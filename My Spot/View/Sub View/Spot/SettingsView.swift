@@ -207,7 +207,7 @@ struct SettingsView: View {
                 }
             } footer: {
                 if let date = UserDefaults.standard.object(forKey: "accountdate") as? Date {
-                    Text("A link to my wordpress site with short detail about me and the current privacy policy in My Spot.".localized() + "\n\n\nMy Spot v 2.0" + " - " + "Member Since".localized() + ": \(dateMemberSince)")
+                    Text("A link to my wordpress site with short detail about me and the current privacy policy in My Spot.".localized() + "\n\n\nMy Spot v 2.0.0" + "\n" + "Member Since".localized() + ": \(dateMemberSince)")
                         .onAppear {
                             let dateFormatter = DateFormatter()
                             dateFormatter.dateFormat = "MMM d, yyyy"

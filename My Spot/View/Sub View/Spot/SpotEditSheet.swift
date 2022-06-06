@@ -12,7 +12,6 @@ import CloudKit
 struct SpotEditSheet: View {
     
     @State private var nameChecked = false
-    @State private var founderChecked = false
     @State private var isPublicChecked = false
     @State private var initChecked = false
     
@@ -28,7 +27,6 @@ struct SpotEditSheet: View {
     @State private var isSaving = false
     @State private var isFromImagesUnedited = false
     @State private var indexFromUnedited = 0
-    @State private var founder = ""
     @State private var descript = ""
     @State private var nameInTitle = ""
     @State private var fromDB = false
@@ -47,7 +45,6 @@ struct SpotEditSheet: View {
     private enum Field {
         case name
         case descript
-        case founder
     }
     
     private enum ImageCount {
@@ -70,324 +67,108 @@ struct SpotEditSheet: View {
     @FocusState private var focusState: Field?
     
     private var keepDisabled: Bool {
-        name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ||
-        (!fromDB && founder.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty) ||
-        images?.isEmpty ?? true
+        name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || images?.isEmpty ?? true
     }
     
     var body: some View {
         ZStack {
             NavigationView {
-                Form {
-                    Section {
-                        TextField("Enter Spot Name".localized(), text: $name)
-                            .onReceive(Just(name)) { _ in
-                                if (name.count > MaxCharLength.names) {
-                                    name = String(name.prefix(MaxCharLength.names))
-                                }
-                            }
-                            .onAppear {
-                                if !nameChecked {
-                                    name = spot.name ?? ""
-                                    nameChecked = true
-                                }
-                            }
-                            .focused($focusState, equals: .name)
-                            .submitLabel(.next)
-                    } header: {
-                        Text("Spot Name*".localized())
-                    }
-                    if !fromDB {
-                        Section {
-                            TextField("Enter Founder's Name".localized(), text: $founder)
-                                .focused($focusState, equals: .founder)
-                                .submitLabel(.next)
-                                .textContentType(.givenName)
-                                .onAppear {
-                                    if !founderChecked {
-                                        founder = spot.founder ?? ""
-                                        founderChecked = true
-                                    }
-                                }
-                                .onReceive(Just(founder)) { _ in
-                                    if (founder.count > MaxCharLength.names) {
-                                        founder = String(founder.prefix(MaxCharLength.names))
-                                    }
-                                }
-                        } header: {
-                            Text("Founder's Name*".localized())
-                        }
-                    }
-                    if (!fromDB) {
-                        Section {
-                            displayIsPublicPrompt
-                                .onAppear {
-                                    if !isPublicChecked {
-                                        isPublic = wasPublic
-                                        isPublicChecked = true
-                                    }
-                                }
-                        } header: {
-                            Text("Share Spot".localized())
-                        } footer: {
-                            if wasPublic {
-                                Text("Setting a public spot to private will remove it from discover tab.".localized())
-                                    .font(.footnote)
-                                    .foregroundColor(.gray)
-                            } else {
-                                Text("Public spots are shown in discover tab to other users.".localized())
-                                    .font(.footnote)
-                                    .foregroundColor(.gray)
-                            }
-                        }
-                    }
-                    Section {
-                        ZStack {
-                            TextEditor(text: $descript)
-                            Text(descript).opacity(0).padding(.all, 8)
-                        }
-                        .focused($focusState, equals: .descript)
-                        .onReceive(Just(descript)) { _ in
-                            if (descript.count > MaxCharLength.description) {
-                                descript = String(descript.prefix(MaxCharLength.description))
-                            }
-                        }
-                    } header: {
-                        Text("Spot Description".localized())
-                    } footer: {
-                        Text("Use # to add tags. Example: #hiking #skating".localized())
-                            .font(.footnote)
-                            .foregroundColor(.gray)
-                    }
-                    Section {
-                        if (images?.count ?? 0 > 0) {
-                            List {
-                                ForEach(images!.indices, id: \.self) { i in
-                                    if let image = images?[i] {
-                                        HStack {
-                                            Spacer()
-                                            Image(uiImage: image)
-                                                .resizable()
-                                                .scaledToFit()
-                                                .frame(width: UIScreen.screenWidth / 2, alignment: .center)
-                                                .cornerRadius(10)
-                                                .onTapGesture {
-                                                    guard let imageTmp = imagesUnedited?[i] else { return }
-                                                    imageTemp = imageTmp
-                                                    if let _ = imageTemp {
-                                                        indexFromUnedited = i
-                                                        isFromImagesUnedited = true
-                                                        activeSheet = .cropperSheet
-                                                    }
-                                                }
-                                            Spacer()
-                                        }
-                                    }
-                                }
-                                .onMove { indexSet, offset in
-                                    images!.move(fromOffsets: indexSet, toOffset: offset)
-                                    imagesUnedited!.move(fromOffsets: indexSet, toOffset: offset)
-                                    imageChanged = true
-                                }
-                                .onDelete { indexSet in
-                                    images!.remove(atOffsets: indexSet)
-                                    imagesUnedited!.remove(atOffsets: indexSet)
-                                    imageChanged = true
-                                }
-                            }
-                        }
-                    } header: {
-                        Text("Photo of Spot".localized())
-                    } footer: {
-                        Text("Only 1 image is required (up to 3).".localized())
-                            .font(.footnote)
-                            .foregroundColor(.gray)
-                    }
-                }
-                .onSubmit {
-                    switch focusState {
-                    case .name:
-                        if (fromDB && wasPublic) {
+                form
+                    .onSubmit {
+                        switch focusState {
+                        case .name:
                             focusState = .descript
-                        } else {
-                            focusState = .founder
+                        default:
+                            focusState = nil
                         }
-                    case .founder:
-                        focusState = .descript
-                    default:
-                        focusState = nil
                     }
-                }
-                .alert("Unable To Save Spot".localized(), isPresented: $showingCannotSavePrivateAlert) {
-                    Button("OK".localized(), role: .cancel) { }
-                } message: {
-                    Text("Failed to save spot. Please try again.".localized())
-                }
-                .alert("Unable To Remove Public Spot".localized(), isPresented: $showingCannotDeleteAlert) {
-                    Button("OK".localized(), role: .cancel) { }
-                } message: {
-                    Text("Failed to remove spot from discover tab. Please check connection and try again.".localized())
-                }
-                .alert("Unable To Save Public Spot".localized(), isPresented: $showingCannotSavePrivateAlert) {
-                    Button("OK".localized(), role: .cancel) { }
-                } message: {
-                    Text("Failed to save public spot. Please check connection and try again.".localized())
-                }
-                .confirmationDialog("Choose Image From Photos or Camera".localized(), isPresented: $showingAddImageAlert) {
-                    Button("Camera".localized()) {
-                        activeSheet = .cameraSheet
+                    .alert("Unable To Save Spot".localized(), isPresented: $showingCannotSavePrivateAlert) {
+                        Button("OK".localized(), role: .cancel) { }
+                    } message: {
+                        Text("Failed to save spot. Please try again.".localized())
                     }
-                    Button("Photos".localized()) {
-                        activeSheet = .cameraRollSheet
+                    .alert("Unable To Remove Public Spot".localized(), isPresented: $showingCannotDeleteAlert) {
+                        Button("OK".localized(), role: .cancel) { }
+                    } message: {
+                        Text("Failed to remove spot from discover tab. Please check connection and try again.".localized())
                     }
-                    Button("Cancel".localized(), role: .cancel) { }
-                }
-                .fullScreenCover(item: $activeSheet) { item in
-                    switch item {
-                    case .cameraSheet:
-                        TakePhoto(selectedImage: $imageTemp)
-                            .onDisappear {
-                                if (imageTemp != nil) {
-                                    imagesUnedited?.append(imageTemp)
-                                    isFromImagesUnedited = false
-                                    activeSheet = .cropperSheet
-                                } else {
-                                    activeSheet = nil
-                                }
-                            }
-                            .ignoresSafeArea()
-                    case .cameraRollSheet:
-                        ChoosePhoto() { image in
-                            imageTemp = image
-                            imagesUnedited?.append(imageTemp)
-                            isFromImagesUnedited = false
-                            activeSheet = .cropperSheet
+                    .alert("Unable To Save Public Spot".localized(), isPresented: $showingCannotSavePrivateAlert) {
+                        Button("OK".localized(), role: .cancel) { }
+                    } message: {
+                        Text("Failed to save public spot. Please check connection and try again.".localized())
+                    }
+                    .confirmationDialog("Choose Image From Photos or Camera".localized(), isPresented: $showingAddImageAlert) {
+                        Button("Camera".localized()) {
+                            activeSheet = .cameraSheet
                         }
-                        .ignoresSafeArea()
-                    case .cropperSheet:
-                        MantisPhotoCropper(selectedImage: $imageTemp)
-                            .onDisappear {
-                                if let _ = imageTemp {
-                                    if isFromImagesUnedited {
-                                        images?[indexFromUnedited] = imageTemp ?? defaultImages.errorImage!
+                        Button("Photos".localized()) {
+                            activeSheet = .cameraRollSheet
+                        }
+                        Button("Cancel".localized(), role: .cancel) { }
+                    }
+                    .fullScreenCover(item: $activeSheet) { item in
+                        switch item {
+                        case .cameraSheet:
+                            TakePhoto(selectedImage: $imageTemp)
+                                .onDisappear {
+                                    if (imageTemp != nil) {
+                                        imagesUnedited?.append(imageTemp)
+                                        isFromImagesUnedited = false
+                                        activeSheet = .cropperSheet
                                     } else {
-                                        images?.append(imageTemp ?? defaultImages.errorImage!)
+                                        activeSheet = nil
                                     }
-                                    imageChanged = true
-                                } else {
-                                    imagesUnedited?.removeLast()
                                 }
-                                imageTemp = nil
+                                .ignoresSafeArea()
+                        case .cameraRollSheet:
+                            ChoosePhoto() { image in
+                                imageTemp = image
+                                imagesUnedited?.append(imageTemp)
                                 isFromImagesUnedited = false
+                                activeSheet = .cropperSheet
                             }
                             .ignoresSafeArea()
-                    }
-                }
-                .navigationTitle(name)
-                .navigationViewStyle(.automatic)
-                .toolbar {
-                    ToolbarItemGroup(placement: .bottomBar) {
-                        HStack {
-                            Spacer()
-                            Button {
-                                showingAddImageAlert = true
-                                focusState = nil
-                            } label: {
-                                Image(systemName: "plus")
-                            }
-                            .disabled(images?.count ?? 3 > 2)
-                            EditButton()
-                                .disabled(images?.isEmpty ?? true)
-                            
-                            Spacer()
-                        }
-                    }
-                    ToolbarItemGroup(placement: .navigationBarTrailing) {
-                        Button("Save".localized()) {
-                            tags = descript.findTags()
-                            if (isPublic && wasPublic) {
-                                Task {
-                                    isSaving = true
-                                    await updatePublic()
-                                    isSaving = false
-                                }
-                            } else if (!wasPublic && isPublic) {
-                                Task {
-                                    isSaving = true
-                                    await savePublic()
-                                    isSaving = false
-                                }
-                            } else if (wasPublic && !isPublic) {
-                                Task {
-                                    isSaving = true
-                                    await removePublic()
-                                    isSaving = false
-                                }
-                            } else {
-                                Task {
-                                    isSaving = true
-                                    await saveChanges()
-                                    isSaving = false
-                                }
-                            }
-                        }
-                        .padding(.trailing)
-                        .tint(.blue)
-                        .disabled(keepDisabled)
-                    }
-                    ToolbarItemGroup(placement: .navigationBarLeading) {
-                        Button("Cancel".localized()) {
-                            name = ""
-                            founder = ""
-                            descript = ""
-                            tags = ""
-                            presentationMode.wrappedValue.dismiss()
-                        }
-                        .padding(.leading)
-                    }
-                    ToolbarItemGroup(placement: .keyboard) {
-                        HStack {
-                            Button {
-                                switch focusState {
-                                case .descript:
-                                    if (fromDB && wasPublic) {
-                                        focusState = .name
+                        case .cropperSheet:
+                            MantisPhotoCropper(selectedImage: $imageTemp)
+                                .onDisappear {
+                                    if let _ = imageTemp {
+                                        if isFromImagesUnedited {
+                                            images?[indexFromUnedited] = imageTemp ?? defaultImages.errorImage!
+                                        } else {
+                                            images?.append(imageTemp ?? defaultImages.errorImage!)
+                                        }
+                                        imageChanged = true
                                     } else {
-                                        focusState = .founder
+                                        imagesUnedited?.removeLast()
                                     }
-                                case .founder:
-                                    focusState = .name
-                                default:
-                                    focusState = nil
+                                    imageTemp = nil
+                                    isFromImagesUnedited = false
                                 }
-                            } label: {
-                                Image(systemName: "chevron.up")
-                            }
-                            .disabled(focusState == .name)
-                            Button {
-                                switch focusState {
-                                case .name:
-                                    if (fromDB && wasPublic) {
-                                        focusState = .descript
-                                    } else {
-                                        focusState = .founder
-                                    }
-                                case .founder:
-                                    focusState = .descript
-                                default:
-                                    focusState = nil
-                                }
-                            } label: {
-                                Image(systemName: "chevron.down")
-                            }
-                            .disabled(focusState == .descript)
-                            Spacer()
-                            Button("Done".localized()) {
-                                focusState = nil
-                            }
+                                .ignoresSafeArea()
                         }
                     }
-                }
+                    .navigationTitle(name)
+                    .navigationViewStyle(.automatic)
+                    .toolbar {
+                        ToolbarItemGroup(placement: .bottomBar) {
+                            imageToolItems
+                        }
+                        ToolbarItemGroup(placement: .navigationBarTrailing) {
+                            saveButtonView
+                        }
+                        ToolbarItemGroup(placement: .navigationBarLeading) {
+                            Button("Cancel".localized()) {
+                                name = ""
+                                descript = ""
+                                tags = ""
+                                presentationMode.wrappedValue.dismiss()
+                            }
+                            .padding(.leading)
+                        }
+                        ToolbarItemGroup(placement: .keyboard) {
+                            keyBoardButtons
+                        }
+                    }
             }
             .interactiveDismissDisabled()
             .allowsHitTesting(!isSaving)
@@ -435,6 +216,196 @@ struct SpotEditSheet: View {
         }
     }
     
+    private var saveButtonView: some View {
+        Button("Save".localized()) {
+            tags = descript.findTags()
+            if (isPublic && wasPublic) {
+                Task {
+                    isSaving = true
+                    await updatePublic()
+                    isSaving = false
+                }
+            } else if (!wasPublic && isPublic) {
+                Task {
+                    isSaving = true
+                    await savePublic()
+                    isSaving = false
+                }
+            } else if (wasPublic && !isPublic) {
+                Task {
+                    isSaving = true
+                    await removePublic()
+                    isSaving = false
+                }
+            } else {
+                Task {
+                    isSaving = true
+                    await saveChanges()
+                    isSaving = false
+                }
+            }
+        }
+        .padding(.trailing)
+        .tint(.blue)
+        .disabled(keepDisabled)
+    }
+    
+    private var form: some View {
+        Form {
+            Section {
+                TextField("Enter Spot Name".localized(), text: $name)
+                    .onReceive(Just(name)) { _ in
+                        if (name.count > MaxCharLength.names) {
+                            name = String(name.prefix(MaxCharLength.names))
+                        }
+                    }
+                    .onAppear {
+                        if !nameChecked {
+                            name = spot.name ?? ""
+                            nameChecked = true
+                        }
+                    }
+                    .focused($focusState, equals: .name)
+                    .submitLabel(.next)
+            } header: {
+                Text("Spot Name*".localized())
+            }
+            if (!fromDB) {
+                Section {
+                    displayIsPublicPrompt
+                        .onAppear {
+                            if !isPublicChecked {
+                                isPublic = wasPublic
+                                isPublicChecked = true
+                            }
+                        }
+                } header: {
+                    Text("Share Spot".localized())
+                } footer: {
+                    if wasPublic {
+                        Text("Setting a public spot to private will remove it from discover tab.".localized())
+                            .font(.footnote)
+                            .foregroundColor(.gray)
+                    } else {
+                        Text("Public spots are shown in discover tab to other users.".localized())
+                            .font(.footnote)
+                            .foregroundColor(.gray)
+                    }
+                }
+            }
+            Section {
+                ZStack {
+                    TextEditor(text: $descript)
+                    Text(descript).opacity(0).padding(.all, 8)
+                }
+                .focused($focusState, equals: .descript)
+                .onReceive(Just(descript)) { _ in
+                    if (descript.count > MaxCharLength.description) {
+                        descript = String(descript.prefix(MaxCharLength.description))
+                    }
+                }
+            } header: {
+                Text("Spot Description".localized())
+            } footer: {
+                Text("Use # to add tags. Example: #hiking #skating".localized())
+                    .font(.footnote)
+                    .foregroundColor(.gray)
+            }
+            Section {
+                if (images?.count ?? 0 > 0) {
+                    List {
+                        ForEach(images!.indices, id: \.self) { i in
+                            if let image = images?[i] {
+                                HStack {
+                                    Spacer()
+                                    Image(uiImage: image)
+                                        .resizable()
+                                        .scaledToFit()
+                                        .frame(width: UIScreen.screenWidth / 2, alignment: .center)
+                                        .cornerRadius(10)
+                                        .onTapGesture {
+                                            guard let imageTmp = imagesUnedited?[i] else { return }
+                                            imageTemp = imageTmp
+                                            if let _ = imageTemp {
+                                                indexFromUnedited = i
+                                                isFromImagesUnedited = true
+                                                activeSheet = .cropperSheet
+                                            }
+                                        }
+                                    Spacer()
+                                }
+                            }
+                        }
+                        .onMove { indexSet, offset in
+                            images!.move(fromOffsets: indexSet, toOffset: offset)
+                            imagesUnedited!.move(fromOffsets: indexSet, toOffset: offset)
+                            imageChanged = true
+                        }
+                        .onDelete { indexSet in
+                            images!.remove(atOffsets: indexSet)
+                            imagesUnedited!.remove(atOffsets: indexSet)
+                            imageChanged = true
+                        }
+                    }
+                }
+            } header: {
+                Text("Photo of Spot".localized())
+            } footer: {
+                Text("Only 1 image is required (up to 3).".localized())
+                    .font(.footnote)
+                    .foregroundColor(.gray)
+            }
+        }
+    }
+    
+    private var keyBoardButtons: some View {
+        HStack {
+            Button {
+                switch focusState {
+                case .descript:
+                    focusState = .name
+                default:
+                    focusState = nil
+                }
+            } label: {
+                Image(systemName: "chevron.up")
+            }
+            .disabled(focusState == .name)
+            Button {
+                switch focusState {
+                case .name:
+                    focusState = .descript
+                default:
+                    focusState = nil
+                }
+            } label: {
+                Image(systemName: "chevron.down")
+            }
+            .disabled(focusState == .descript)
+            Spacer()
+            Button("Done".localized()) {
+                focusState = nil
+            }
+        }
+    }
+    
+    private var imageToolItems: some View {
+        HStack {
+            Spacer()
+            Button {
+                showingAddImageAlert = true
+                focusState = nil
+            } label: {
+                Image(systemName: "plus")
+            }
+            .disabled(images?.count ?? 3 > 2)
+            EditButton()
+                .disabled(images?.isEmpty ?? true)
+            
+            Spacer()
+        }
+    }
+    
     private func saveChanges() async {
         if (imageChanged) {
             if let imageData = cloudViewModel.compressImage(image: images?[0] ?? defaultImages.errorImage!).pngData() {
@@ -461,7 +432,9 @@ struct SpotEditSheet: View {
         let hashcode = spot.name ?? "" + "\(spot.x)\(spot.y)"
         spot.name = name
         spot.details = descript
-        spot.founder = founder
+        if !fromDB {
+            spot.founder = UserDefaults.standard.string(forKey: "founder") ?? spot.founder ?? "?"
+        }
         spot.isPublic = isPublic
         spot.tags = tags
         do {
@@ -498,7 +471,7 @@ struct SpotEditSheet: View {
                 }
             }
             do {
-                let id = try await cloudViewModel.addSpotToPublic(name: name, founder: founder, date: spot.date ?? "", locationName: spot.locationName ?? "", x: spot.x, y: spot.y, description: descript, type: tags, image: imageData, image2: imageData2, image3: imageData3, isMultipleImages: (images?.count ?? 1) - 1, customLocation: !spot.wasThere, dateObject: spot.dateObject)
+                let id = try await cloudViewModel.addSpotToPublic(name: name, founder: UserDefaults.standard.string(forKey: "founder") ?? spot.founder ?? "?", date: spot.date ?? "", locationName: spot.locationName ?? "", x: spot.x, y: spot.y, description: descript, type: tags, image: imageData, image2: imageData2, image3: imageData3, isMultipleImages: (images?.count ?? 1) - 1, customLocation: !spot.wasThere, dateObject: spot.dateObject)
                 if !id.isEmpty {
                     spot.dbid = id
                     spot.isPublic = true
@@ -526,7 +499,9 @@ struct SpotEditSheet: View {
         spot.name = name
         spot.likes = 0
         spot.details = descript
-        spot.founder = founder
+        if !fromDB {
+            spot.founder = UserDefaults.standard.string(forKey: "founder") ?? spot.founder ?? "?"
+        }
         spot.tags = tags
         do {
             try CoreDataStack.shared.context.save()
@@ -573,7 +548,9 @@ struct SpotEditSheet: View {
             let hashcode = spot.name ?? "" + "\(spot.x)\(spot.y)"
             spot.name = name
             spot.details = descript
-            spot.founder = founder
+            if !fromDB {
+                spot.founder = UserDefaults.standard.string(forKey: "founder") ?? spot.founder ?? "?"
+            }
             spot.tags = tags
             do {
                 try CoreDataStack.shared.context.save()
@@ -620,7 +597,7 @@ struct SpotEditSheet: View {
             }
             let id = spot.dbid ?? ""
             do {
-                let isSuccess = try await cloudViewModel.updateSpotPublic(id: id, newName: name, newDescription: descript, newFounder: founder, newType: tags, imageChanged: imageChanged, image: imageData, image2: imageData2, image3: imageData3, isMultipleImages: (images?.count ?? 1) - 1)
+                let isSuccess = try await cloudViewModel.updateSpotPublic(id: id, newName: name, newDescription: descript, newFounder: UserDefaults.standard.string(forKey: "founder") ?? spot.founder ?? "?", newType: tags, imageChanged: imageChanged, image: imageData, image2: imageData2, image3: imageData3, isMultipleImages: (images?.count ?? 1) - 1)
                 if isSuccess {
                     spot.isPublic = true
                 } else {
@@ -650,7 +627,9 @@ struct SpotEditSheet: View {
         let hashcode = spot.name ?? "" + "\(spot.x)\(spot.y)"
         spot.name = name
         spot.details = descript
-        spot.founder = founder
+        if !fromDB {
+            spot.founder = UserDefaults.standard.string(forKey: "founder") ?? spot.founder ?? "?"
+        }
         spot.tags = tags
         do {
             try CoreDataStack.shared.context.save()

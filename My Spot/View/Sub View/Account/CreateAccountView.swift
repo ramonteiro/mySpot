@@ -450,6 +450,7 @@ struct CreateAccountView: View {
     }
     
     private func save() async {
+        UserDefaults.standard.set(name, forKey: "founder")
         guard let image = image else { return }
         guard let imageData = cloudViewModel.compressImage(image: image).pngData() else { return }
         isSaving = true
@@ -474,6 +475,7 @@ struct CreateAccountView: View {
                 do {
                     try await cloudViewModel.updateAccount(id: accountModel.record.recordID, newName: name, newBio: bio, newPronouns: pronoun, newEmail: email, newTiktok: tiktok, image: imageData, newInsta: insta, newYoutube: youtube)
                     isSaving = false
+                    UserDefaults.standard.set(name, forKey: "founder")
                     presentationMode.wrappedValue.dismiss()
                 } catch {
                     isSaving = false
@@ -484,6 +486,7 @@ struct CreateAccountView: View {
                 do {
                     try await cloudViewModel.updateAccount(id: accountModel.record.recordID, newName: name, newBio: bio, newPronouns: pronoun, newEmail: email, newTiktok: tiktok, image: nil, newInsta: insta, newYoutube: youtube)
                     isSaving = false
+                    UserDefaults.standard.set(name, forKey: "founder")
                     presentationMode.wrappedValue.dismiss()
                 } catch {
                     isSaving = false

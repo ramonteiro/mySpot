@@ -33,7 +33,6 @@ struct AddSpotSheet: View {
     @Binding var isSaving: Bool
     
     @State private var name = ""
-    @State private var founder = ""
     @State private var descript = ""
     @State private var tags = ""
     @State private var locationName = ""
@@ -50,13 +49,12 @@ struct AddSpotSheet: View {
     
     
     private var disableSave: Bool {
-        name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || images?.isEmpty ?? true || founder.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || (isPublic && !cloudViewModel.isSignedInToiCloud) || (usingCustomLocation && !hasSet)
+        name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || images?.isEmpty ?? true || (isPublic && !cloudViewModel.isSignedInToiCloud) || (usingCustomLocation && !hasSet)
     }
     
     private enum Field {
         case name
         case descript
-        case founder
     }
     
     private enum ImageCount {
@@ -88,16 +86,6 @@ struct AddSpotSheet: View {
                                 displayNamePrompt
                             } header: {
                                 Text("Spot Name*".localized())
-                            }
-                            Section {
-                                displayFounderPrompt
-                                    .onAppear {
-                                        if (!colors.isEmpty && !(colors[0].name?.isEmpty ?? true) && founder.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty) {
-                                            founder = colors[0].name ?? ""
-                                        }
-                                    }
-                            } header: {
-                                Text("Founder's Name*".localized())
                             }
                             Section {
                                 displayIsPublicPrompt
@@ -184,8 +172,6 @@ struct AddSpotSheet: View {
                         .onSubmit {
                             switch focusState {
                             case .name:
-                                focusState = .founder
-                            case .founder:
                                 focusState = .descript
                             default:
                                 focusState = nil
@@ -268,10 +254,8 @@ struct AddSpotSheet: View {
                                 HStack {
                                     Button {
                                         switch focusState {
-                                        case .founder:
-                                            focusState = .name
                                         case .descript:
-                                            focusState = .founder
+                                            focusState = .name
                                         default:
                                             focusState = nil
                                         }
@@ -282,8 +266,6 @@ struct AddSpotSheet: View {
                                     Button {
                                         switch focusState {
                                         case .name:
-                                            focusState = .founder
-                                        case .founder:
                                             focusState = .descript
                                         default:
                                             focusState = nil
@@ -405,18 +387,6 @@ struct AddSpotSheet: View {
         }
     }
     
-    private var displayFounderPrompt: some View {
-        TextField("Enter Founder Name".localized(), text: $founder)
-            .focused($focusState, equals: .founder)
-            .submitLabel(.next)
-            .textContentType(.givenName)
-            .onReceive(Just(founder)) { _ in
-                if (founder.count > MaxCharLength.names) {
-                    founder = String(founder.prefix(MaxCharLength.names))
-                }
-            }
-    }
-    
     private var displayNamePrompt: some View {
         TextField("Enter Spot Name".localized(), text: $name)
             .focused($focusState, equals: .name)
@@ -477,7 +447,6 @@ struct AddSpotSheet: View {
                 return
             }
         }
-        UserDefaults.standard.set(founder, forKey: UserDefaultKeys.founder)
         if (usingCustomLocation) {
             newSpot.x = centerRegion.center.latitude
             newSpot.y = centerRegion.center.longitude
@@ -490,7 +459,11 @@ struct AddSpotSheet: View {
         
         newSpot.isShared = false
         newSpot.userId = cloudViewModel.userID
-        newSpot.founder = founder
+        if let founder = UserDefaults.standard.string(forKey: "founder") {
+            newSpot.founder = founder
+        } else {
+            newSpot.founder = "?"
+        }
         newSpot.details = descript
         newSpot.name = name
         newSpot.fromDB = false
@@ -554,6 +527,10 @@ struct AddSpotSheet: View {
                 }
             }
             do {
+                var founder = "?"
+                if let founderName = UserDefaults.standard.string(forKey: "founder") {
+                    founder = founderName
+                }
                 let id = try await cloudViewModel.addSpotToPublic(name: name, founder: founder, date: getDate(), locationName: locationName, x: (usingCustomLocation ? centerRegion.center.latitude : lat), y: (usingCustomLocation ? centerRegion.center.longitude : long), description: descript, type: tags, image: imageData, image2: imageData2, image3: imageData3, isMultipleImages: (images?.count ?? 1) - 1, customLocation: usingCustomLocation, dateObject: Date())
                 if !id.isEmpty {
                     newSpot.dbid = id
@@ -567,9 +544,13 @@ struct AddSpotSheet: View {
                 newSpot.isPublic = false
             }
             if (!colors.isEmpty) {
-                colors[0].name = founder
+                colors[0].name = UserDefaults.standard.string(forKey: "founder") ?? "?"
             }
-            newSpot.founder = founder
+            if let founderName = UserDefaults.standard.string(forKey: "founder") {
+                newSpot.founder = founderName
+            } else {
+                newSpot.founder = "?"
+            }
             newSpot.details = descript
             newSpot.name = name
             newSpot.likes = 0

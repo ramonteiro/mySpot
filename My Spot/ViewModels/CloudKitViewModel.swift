@@ -281,6 +281,16 @@ class CloudKitViewModel: ObservableObject {
             if results.matchResults.isEmpty {
                 return false
             } else {
+                results.matchResults.forEach { (_,result) in
+                    switch result {
+                    case .success(let record):
+                        if let name = record["name"] {
+                            UserDefaults.standard.set(name, forKey: "founder")
+                        }
+                    case .failure(let error):
+                        print(error)
+                    }
+                }
                 return true
             }
         } catch {

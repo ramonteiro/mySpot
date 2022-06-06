@@ -46,12 +46,7 @@ struct DiscoverRow: View {
                     .foregroundColor(colorScheme == .dark ? .white : .black)
                     .font(.headline)
                     .fontWeight(.bold)
-                    .lineLimit(1)
-                
-                Text("By: \(spot.founder)")
-                    .lineLimit(1)
-                    .font(.subheadline)
-                    .foregroundColor(Color.gray)
+                    .lineLimit(2)
                 
                 HStack(alignment: .center) {
                     Image(systemName: "icloud.and.arrow.down")

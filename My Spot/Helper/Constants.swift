@@ -25,7 +25,6 @@ enum MaxCharLength {
 
 // defines user default keys
 enum UserDefaultKeys {
-    static let founder = "Founder"
     static let isFilterByLocation = "isFilterByLocation"
     static let lastKnownUserLocationX = "lastKnownUserLocationX"
     static let lastKnownUserLocationY = "lastKnownUserLocationY"

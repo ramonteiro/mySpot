@@ -62,14 +62,9 @@ struct SpotRow: View {
                 Text("\(spot.name ?? "")")
                     .font(.headline)
                     .fontWeight(.bold)
-                    .lineLimit(1)
+                    .lineLimit(2)
                 
-                if spot.addedBy == nil {
-                    Text("By: ".localized() + (spot.founder ?? ""))
-                        .font(.subheadline)
-                        .foregroundColor(Color.gray)
-                        .lineLimit(1)
-                } else {
+                if spot.addedBy != nil {
                     Text("Added By: ".localized() + (spot.addedBy ?? ""))
                         .font(.subheadline)
                         .foregroundColor(Color.gray)
