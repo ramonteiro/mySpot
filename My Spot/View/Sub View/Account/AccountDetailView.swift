@@ -12,6 +12,7 @@ struct AccountDetailView: View {
     @State private var isFetching: Bool = false
     @State var userid: String
     @State var myAccount: Bool
+    @State private var accountModel: AccountModel?
     @State private var image: UIImage = defaultImages.errorImage!
     @State private var name: String = "Account".localized()
     @State private var downloads: Int = 0
@@ -140,7 +141,7 @@ struct AccountDetailView: View {
                                 Image(systemName: "square.and.arrow.up")
                             }
                         }
-                        if myAccount {
+                        if myAccount && accountModel != nil {
                             Button {
                                 editAlert.toggle()
                             } label: {
@@ -196,8 +197,8 @@ struct AccountDetailView: View {
                         print("failed to load spot count")
                     }
                     do {
-                        let account = try await cloudViewModel.fetchAccount(userid: userid)
-                        if let account = account {
+                        accountModel = try await cloudViewModel.fetchAccount(userid: userid)
+                        if let account = accountModel {
                             name = account.name
                             image = account.image
                             pronouns = account.pronouns
@@ -227,8 +228,14 @@ struct AccountDetailView: View {
                     }
                 }
             }
-            .fullScreenCover(isPresented: $editAlert) {
-                EmptyView()
+            .fullScreenCover(isPresented: $editAlert, onDismiss: {
+                Task {
+                    await refreshAccount()
+                }
+            }) {
+                if let accountModel = accountModel {
+                    CreateAccountView(accountModel: accountModel)
+                }
             }
         }
     }
@@ -360,6 +367,32 @@ struct AccountDetailView: View {
                     badges.append("heart")
                 }
             }
+        }
+    }
+    
+    private func refreshAccount() async {
+        do {
+            accountModel = try await cloudViewModel.fetchAccount(userid: userid)
+            if let account = accountModel {
+                name = account.name
+                image = account.image
+                pronouns = account.pronouns
+                tiktok = account.tiktok
+                youtube = account.youtube
+                insta = account.insta
+                bio = account.bio
+                if bio == "Unable to load account".localized() {
+                    bio = ""
+                }
+                isExplorer = account.isExplorer
+                if let date = account.record.creationDate {
+                    memberSince = date
+                }
+            }
+        } catch {
+            bio = "Unable to load account".localized()
+            print("failed to fetch account")
+            print(error)
         }
     }
     

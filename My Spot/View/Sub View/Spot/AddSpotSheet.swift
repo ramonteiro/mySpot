@@ -29,6 +29,7 @@ struct AddSpotSheet: View {
     @State private var hasSet = false
     @State private var isFromImagesUnedited = false
     @State private var indexFromUnedited = 0
+    @State private var initChecked = false
     @Binding var isSaving: Bool
     
     @State private var name = ""
@@ -370,8 +371,11 @@ struct AddSpotSheet: View {
             }
             lat = getLatitude()
             long = getLongitude()
-            images = []
-            imagesUnedited = []
+            if !initChecked {
+                images = []
+                imagesUnedited = []
+                initChecked = true
+            }
         }
         .disabled(isSaving)
     }

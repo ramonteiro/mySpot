@@ -11,6 +11,11 @@ import CloudKit
 
 struct SpotEditSheet: View {
     
+    @State private var nameChecked = false
+    @State private var founderChecked = false
+    @State private var isPublicChecked = false
+    @State private var initChecked = false
+    
     @EnvironmentObject var cloudViewModel: CloudKitViewModel
     @ObservedObject var spot:Spot
     @Environment(\.managedObjectContext) var moc
@@ -82,7 +87,10 @@ struct SpotEditSheet: View {
                                 }
                             }
                             .onAppear {
-                                name = spot.name ?? ""
+                                if !nameChecked {
+                                    name = spot.name ?? ""
+                                    nameChecked = true
+                                }
                             }
                             .focused($focusState, equals: .name)
                             .submitLabel(.next)
@@ -96,7 +104,10 @@ struct SpotEditSheet: View {
                                 .submitLabel(.next)
                                 .textContentType(.givenName)
                                 .onAppear {
-                                    founder = spot.founder ?? ""
+                                    if !founderChecked {
+                                        founder = spot.founder ?? ""
+                                        founderChecked = true
+                                    }
                                 }
                                 .onReceive(Just(founder)) { _ in
                                     if (founder.count > MaxCharLength.names) {
@@ -111,7 +122,10 @@ struct SpotEditSheet: View {
                         Section {
                             displayIsPublicPrompt
                                 .onAppear {
-                                    isPublic = wasPublic
+                                    if !isPublicChecked {
+                                        isPublic = wasPublic
+                                        isPublicChecked = true
+                                    }
                                 }
                         } header: {
                             Text("Share Spot".localized())
@@ -144,9 +158,6 @@ struct SpotEditSheet: View {
                         Text("Use # to add tags. Example: #hiking #skating".localized())
                             .font(.footnote)
                             .foregroundColor(.gray)
-                    }
-                    .onAppear {
-                        descript = spot.details ?? ""
                     }
                     Section {
                         if (images?.count ?? 0 > 0) {
@@ -392,23 +403,26 @@ struct SpotEditSheet: View {
             }
         }
         .onAppear {
-            if (UserDefaults.standard.valueExists(forKey: "isBanned") && UserDefaults.standard.bool(forKey: "isBanned")) {
-                isPublic = false
+            if !initChecked {
+                if (UserDefaults.standard.valueExists(forKey: "isBanned") && UserDefaults.standard.bool(forKey: "isBanned")) {
+                    isPublic = false
+                }
+                wasPublic = spot.isPublic
+                fromDB = isFromDB()
+                images = []
+                if let _ = spot.image3 {
+                    images?.append(spot.image ?? defaultImages.errorImage!)
+                    images?.append(spot.image2 ?? defaultImages.errorImage!)
+                    images?.append(spot.image3 ?? defaultImages.errorImage!)
+                } else if let _ = spot.image2 {
+                    images?.append(spot.image ?? defaultImages.errorImage!)
+                    images?.append(spot.image2 ?? defaultImages.errorImage!)
+                } else if let _ = spot.image {
+                    images?.append(spot.image ?? defaultImages.errorImage!)
+                }
+                imagesUnedited = images
+                initChecked = true
             }
-            wasPublic = spot.isPublic
-            fromDB = isFromDB()
-            images = []
-            if let _ = spot.image3 {
-                images?.append(spot.image ?? defaultImages.errorImage!)
-                images?.append(spot.image2 ?? defaultImages.errorImage!)
-                images?.append(spot.image3 ?? defaultImages.errorImage!)
-            } else if let _ = spot.image2 {
-                images?.append(spot.image ?? defaultImages.errorImage!)
-                images?.append(spot.image2 ?? defaultImages.errorImage!)
-            } else if let _ = spot.image {
-                images?.append(spot.image ?? defaultImages.errorImage!)
-            }
-            imagesUnedited = images
         }
         .disabled(isSaving)
     }

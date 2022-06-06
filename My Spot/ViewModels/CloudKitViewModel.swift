@@ -866,6 +866,37 @@ class CloudKitViewModel: ObservableObject {
         return true
     }
     
+    func updateAccount(id: CKRecord.ID, newName: String, newBio: String?, newPronouns: String?, newEmail: String?, newTiktok: String?, image: Data?, newInsta: String?, newYoutube: String?) async throws {
+        let record = try await CKContainer.default().publicCloudDatabase.record(for: id)
+        record["name"] = newName
+        if let newBio = newBio {
+            record["bio"] = newBio
+        }
+        if let newEmail = newEmail {
+            record["email"] = newEmail
+        }
+        if let newPronouns = newPronouns {
+            record["pronoun"] = newPronouns
+        }
+        if let newTiktok = newTiktok {
+            record["tiktok"] = newTiktok
+        }
+        if let newInsta = newInsta {
+            record["instagram"] = newInsta
+        }
+        if let newYoutube = newYoutube {
+            record["youtube"] = newYoutube
+        }
+        if let image = image {
+            let path = NSTemporaryDirectory() + "imageTemp\(UUID().uuidString).png"
+            let url = URL(fileURLWithPath: path)
+            try image.write(to: url)
+            let asset = CKAsset(fileURL: url)
+            record["image"] = asset
+        }
+        try await CKContainer.default().publicCloudDatabase.save(record)
+    }
+    
     func likeSpot(spot: SpotFromCloud) async -> Bool {
         guard let _ = spot.record["likes"] else { return false }
         let record = spot.record

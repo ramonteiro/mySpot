@@ -10,6 +10,9 @@ import Combine
 
 struct PlaylistEditSheet: View {
     
+    @State private var nameChecked = false
+    @State private var emojiChecked = false
+    
     @ObservedObject var playlist: Playlist
     @Environment(\.managedObjectContext) var moc
     @Environment(\.presentationMode) var presentationMode
@@ -37,7 +40,10 @@ struct PlaylistEditSheet: View {
                                     }
                                 }
                                 .onAppear {
-                                    name = playlist.name ?? ""
+                                    if !nameChecked {
+                                        name = playlist.name ?? ""
+                                        nameChecked = true
+                                    }
                                 }
                                 .focused($focusState, equals: .name)
                                 .submitLabel(.next)
@@ -50,7 +56,10 @@ struct PlaylistEditSheet: View {
                                     self.emoji = String(self.emoji.onlyEmoji().prefix(MaxCharLength.emojis))
                                 })
                                 .onAppear {
-                                    emoji = playlist.emoji ?? ""
+                                    if !emojiChecked {
+                                        emoji = playlist.emoji ?? ""
+                                        emojiChecked = true
+                                    }
                                 }
                                 .focused($focusState, equals: .emoji)
                                 .submitLabel(.done)

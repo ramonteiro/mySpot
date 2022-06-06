@@ -141,7 +141,7 @@ struct ContentView: View {
             }
         }
         .fullScreenCover(isPresented: $presentAccountCreation) {
-            CreateAccountView()
+            CreateAccountView(accountModel: nil)
         }
         .alert("Invite Accepted!".localized(), isPresented: $acceptedShare) {
             Button("OK".localized(), role: .cancel) { }

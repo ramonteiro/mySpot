@@ -10,6 +10,15 @@ import Combine
 
 struct CreateAccountView: View {
     
+    @State private var nameChecked = false
+    @State private var pronounChecked = false
+    @State private var instaChecked = false
+    @State private var youtubeChecked = false
+    @State private var tiktokChecked = false
+    @State private var emailChecked = false
+    @State private var imageWasChanged = false
+    
+    let accountModel: AccountModel?
     @State private var name: String = ""
     @State private var bio: String = ""
     @State private var youtube: String = ""
@@ -19,6 +28,7 @@ struct CreateAccountView: View {
     @State private var pronoun: String = ""
     @State private var image: UIImage?
     @State private var saveAlert: Bool = false
+    @State private var updateAlert = false
     @State private var isSaving: Bool = false
     @State private var showingAddImageAlert: Bool = false
     @FocusState private var focusState: Field?
@@ -64,19 +74,46 @@ struct CreateAccountView: View {
             }
             .navigationTitle("Create Account".localized())
             .navigationViewStyle(.stack)
+            .onAppear {
+                if let accountModel = accountModel {
+                    if image == nil {
+                        image = accountModel.image
+                        if let b = accountModel.bio {
+                            bio = b
+                        }
+                    }
+                }
+            }
             .toolbar {
                 ToolbarItemGroup(placement: .keyboard) {
                     keyboardView
                 }
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button {
-                        Task {
-                            await save()
+                        if accountModel == nil {
+                            Task {
+                                await save()
+                            }
+                        } else {
+                            Task {
+                                await update()
+                            }
                         }
                     } label: {
                         Text("Save".localized())
+                            .foregroundColor(.blue)
                     }
                     .disabled(disableSave)
+                }
+                ToolbarItemGroup(placement: .navigationBarLeading) {
+                    if accountModel != nil {
+                        Button {
+                            presentationMode.wrappedValue.dismiss()
+                        } label: {
+                            Text("Cancel".localized())
+                        }
+                        .disabled(isSaving)
+                    }
                 }
             }
             .onSubmit {
@@ -102,6 +139,11 @@ struct CreateAccountView: View {
             } message: {
                 Text("Failed to create account, you will be asked to create your account later.".localized())
             }
+            .alert("Failed To Update Account".localized(), isPresented: $updateAlert) {
+                Button("OK".localized(), role: .cancel) { presentationMode.wrappedValue.dismiss() }
+            } message: {
+                Text("Please check internet and try again".localized() + ".")
+            }
             .confirmationDialog("Choose Image From Photos or Camera".localized(), isPresented: $showingAddImageAlert) {
                 Button("Camera".localized()) {
                     activeSheet = .cameraSheet
@@ -118,6 +160,7 @@ struct CreateAccountView: View {
                         .onDisappear {
                             if (image != nil) {
                                 activeSheet = .cropperSheet
+                                imageWasChanged = true
                             } else {
                                 activeSheet = nil
                             }
@@ -127,6 +170,7 @@ struct CreateAccountView: View {
                     ChoosePhoto() { image in
                         self.image = image
                         activeSheet = .cropperSheet
+                        imageWasChanged = true
                     }
                     .ignoresSafeArea()
                 case .cropperSheet:
@@ -269,6 +313,14 @@ struct CreateAccountView: View {
     
     private var displayNamePrompt: some View {
         TextField("Enter Name".localized(), text: $name)
+            .onAppear {
+                if let accountModel = accountModel {
+                    if !nameChecked {
+                        name = accountModel.name
+                        nameChecked = true
+                    }
+                }
+            }
             .focused($focusState, equals: .name)
             .submitLabel(.next)
             .textContentType(.givenName)
@@ -281,6 +333,14 @@ struct CreateAccountView: View {
     
     private var displayPronounPrompt: some View {
         TextField("Optional".localized(), text: $pronoun)
+            .onAppear {
+                if let accountModel = accountModel {
+                    if !pronounChecked {
+                        pronoun = accountModel.pronouns ?? ""
+                        pronounChecked = true
+                    }
+                }
+            }
             .focused($focusState, equals: .pronoun)
             .submitLabel(.next)
             .onReceive(Just(pronoun)) { _ in
@@ -305,6 +365,14 @@ struct CreateAccountView: View {
     
     private var displayEmailPrompt: some View {
         TextField("Optional".localized(), text: $email)
+            .onAppear {
+                if let accountModel = accountModel {
+                    if !emailChecked {
+                        email = accountModel.email ?? ""
+                        emailChecked = true
+                    }
+                }
+            }
             .focused($focusState, equals: .email)
             .submitLabel(.next)
             .textContentType(.emailAddress)
@@ -320,6 +388,14 @@ struct CreateAccountView: View {
     
     private var displayTiktokPrompt: some View {
         TextField("Optional".localized(), text: $tiktok)
+            .onAppear {
+                if let accountModel = accountModel {
+                    if !tiktokChecked {
+                        tiktok = accountModel.tiktok ?? ""
+                        tiktokChecked = true
+                    }
+                }
+            }
             .focused($focusState, equals: .tiktok)
             .submitLabel(.next)
             .disableAutocorrection(true)
@@ -333,6 +409,14 @@ struct CreateAccountView: View {
     
     private var displayInstaPrompt: some View {
         TextField("Optional".localized(), text: $insta)
+            .onAppear {
+                if let accountModel = accountModel {
+                    if !instaChecked {
+                        insta = accountModel.insta ?? ""
+                        instaChecked = true
+                    }
+                }
+            }
             .focused($focusState, equals: .insta)
             .submitLabel(.next)
             .disableAutocorrection(true)
@@ -346,6 +430,14 @@ struct CreateAccountView: View {
     
     private var displayYoutubePrompt: some View {
         TextField("Optional".localized(), text: $youtube)
+            .onAppear {
+                if let accountModel = accountModel {
+                    if !youtubeChecked {
+                        youtube = accountModel.youtube ?? ""
+                        youtubeChecked = true
+                    }
+                }
+            }
             .focused($focusState, equals: .youtube)
             .submitLabel(.done)
             .disableAutocorrection(true)
@@ -369,6 +461,39 @@ struct CreateAccountView: View {
         } catch {
             isSaving = false
             saveAlert.toggle()
+        }
+    }
+    
+    private func update() async {
+        isSaving = true
+        if let accountModel = accountModel {
+            if imageWasChanged {
+                guard let image = image else { return }
+                guard let imageData = cloudViewModel.compressImage(image: image).pngData() else { return }
+                isSaving = true
+                do {
+                    try await cloudViewModel.updateAccount(id: accountModel.record.recordID, newName: name, newBio: bio, newPronouns: pronoun, newEmail: email, newTiktok: tiktok, image: imageData, newInsta: insta, newYoutube: youtube)
+                    isSaving = false
+                    presentationMode.wrappedValue.dismiss()
+                } catch {
+                    isSaving = false
+                    updateAlert.toggle()
+                }
+            } else {
+                isSaving = true
+                do {
+                    try await cloudViewModel.updateAccount(id: accountModel.record.recordID, newName: name, newBio: bio, newPronouns: pronoun, newEmail: email, newTiktok: tiktok, image: nil, newInsta: insta, newYoutube: youtube)
+                    isSaving = false
+                    presentationMode.wrappedValue.dismiss()
+                } catch {
+                    isSaving = false
+                    updateAlert.toggle()
+                }
+            }
+            isSaving = false
+        } else {
+            isSaving = false
+            updateAlert.toggle()
         }
     }
 }
