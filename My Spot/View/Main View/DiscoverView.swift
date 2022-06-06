@@ -348,6 +348,10 @@ struct DiscoverView: View {
                     withAnimation {
                         canLoad = true
                     }
+                } else {
+                    withAnimation {
+                        canLoad = false
+                    }
                 }
             }
             .onAppear {

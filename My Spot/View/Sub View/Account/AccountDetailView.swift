@@ -39,6 +39,7 @@ struct AccountDetailView: View {
     @State private var goToSettings = false
     @State private var isLoading = true
     @EnvironmentObject var cloudViewModel: CloudKitViewModel
+    @EnvironmentObject var tabController: TabController
     @Environment(\.presentationMode) private var presentationMode
     @Environment(\.colorScheme) private var colorScheme
     
@@ -71,14 +72,17 @@ struct AccountDetailView: View {
                         .padding(.top, 5)
                         .padding(.leading, 3)
                         ZStack {
-                            VStack(alignment: .leading, spacing: 0) {
+                            LazyVStack(alignment: .leading, spacing: 0) {
                                 ForEach(spots.indices, id: \.self) { i in
                                     NavigationLink {
-                                        DiscoverDetailAccountSpots(index: i, spotsFromCloud: $spots, canShare: true)
+                                        DiscoverDetailAccountSpots(index: i, spotsFromCloud: $spots, canShare: true, myAccount: myAccount)
                                     } label: {
                                         DiscoverRow(spot: spots[i])
-                                            .padding(3)
+                                            .padding(4)
                                     }
+                                }
+                                if cloudViewModel.cursorAccount != nil && !isFetching {
+                                    loadMoreSpots
                                 }
                             }
                             if isFetching {
@@ -200,6 +204,9 @@ struct AccountDetailView: View {
                             youtube = account.youtube
                             insta = account.insta
                             bio = account.bio
+                            if bio == "Unable to load account".localized() {
+                                bio = ""
+                            }
                             isExplorer = account.isExplorer
                             if let date = account.record.creationDate {
                                 memberSince = date
@@ -211,7 +218,9 @@ struct AccountDetailView: View {
                         print(error)
                     }
                     initializeBadgesAndLinks()
-                    isLoading = false
+                    withAnimation {
+                        isLoading = false
+                    }
                     if spots.isEmpty {
                         await fetchSpots()
                     }
@@ -273,6 +282,29 @@ struct AccountDetailView: View {
         return ""
     }
     
+    private var loadMoreSpots: some View {
+        HStack {
+            Spacer()
+            Text("Load More Spots".localized())
+                .foregroundColor(cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex])
+            Spacer()
+        }
+        .onTapGesture {
+            if isFetching { return }
+            if let cursor = cloudViewModel.cursorAccount {
+                Task {
+                    isFetching = true
+                    do {
+                        spots += try await cloudViewModel.fetchMoreAccountSpots(cursor: cursor)
+                    } catch {
+                        print("Failed to fetch more spots")
+                    }
+                    isFetching = false
+                }
+            }
+        }
+    }
+    
     private func initializeBadgesAndLinks() {
         if UserDefaults.standard.valueExists(forKey: "badge") {
             badgeNum = UserDefaults.standard.integer(forKey: "badge")
@@ -280,13 +312,19 @@ struct AccountDetailView: View {
             UserDefaults.standard.set(0, forKey: "badge")
         }
         if let insta = insta {
-            linkDictionary["insta"] = URL(string: "https://www.instagram.com/" + insta.replacingOccurrences(of: "@", with: "").trimmingCharacters(in: .whitespacesAndNewlines))
+            if !insta.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                linkDictionary["insta"] = URL(string: "https://www.instagram.com/" + insta.replacingOccurrences(of: "@", with: "").trimmingCharacters(in: .whitespacesAndNewlines))
+            }
         }
         if let youtube = youtube {
-            linkDictionary["youtube"] = URL(string: "https://www.youtube.com/" + youtube.replacingOccurrences(of: "@", with: "").trimmingCharacters(in: .whitespacesAndNewlines))
+            if !youtube.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                linkDictionary["youtube"] = URL(string: "https://www.youtube.com/" + youtube.replacingOccurrences(of: "@", with: "").trimmingCharacters(in: .whitespacesAndNewlines))
+            }
         }
         if let tiktok = tiktok {
-            linkDictionary["tiktok"] = URL(string: "https://www.tiktok.com/@" + tiktok.replacingOccurrences(of: "@", with: "").trimmingCharacters(in: .whitespacesAndNewlines))
+            if !tiktok.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                linkDictionary["tiktok"] = URL(string: "https://www.tiktok.com/@" + tiktok.replacingOccurrences(of: "@", with: "").trimmingCharacters(in: .whitespacesAndNewlines))
+            }
         }
         if badges.count > 0 { return }
         if isExplorer {

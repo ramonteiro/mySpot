@@ -28,9 +28,11 @@ class CloudKitViewModel: ObservableObject {
     @Published var isErrorMessageDetails = ""
     @Published var isPostError = false
     @Published var limit = 10
+    @Published var deepAccount: [AccountModel] = []
     @Published var radiusInMeters: Double = 0
     @Published var notiPermission = 0 // 0: not determined, 1: denied, 2: allowed, 3: provisional, 4: ephemeral, 5: unknown
     @Published var cursorMain: CKQueryOperation.Cursor?
+    @Published var cursorAccount: CKQueryOperation.Cursor?
     @Published var desiredKeys = ["name", "founder", "date", "location", "likes", "inappropriate", "offensive", "dangerous", "spam", "id", "userID", "image", "type", "isMultipleImages", "locationName", "description", "customLocation", "dateObject"]
     
     init() {
@@ -543,6 +545,76 @@ class CloudKitViewModel: ObservableObject {
         }
     }
     
+    func fetchMoreAccountSpots(cursor: CKQueryOperation.Cursor) async throws -> [SpotFromCloud] {
+        self.cursorAccount = nil
+        let results = try await CKContainer.default().publicCloudDatabase.records(continuingMatchFrom: cursor, desiredKeys: desiredKeys, resultsLimit: limit)
+        var spots: [SpotFromCloud] = []
+        results.matchResults.forEach { (_,result) in
+            switch result {
+            case .success(let record):
+                guard let name = record["name"] as? String else { return }
+                guard let founder = record["founder"] as? String else { return }
+                guard let date = record["date"] as? String else { return }
+                var dateObject: Date?
+                if let dateObj = record["dateObject"] as? Date {
+                    dateObject = dateObj
+                } else {
+                    dateObject = nil
+                }
+                guard let location = record["location"] as? CLLocation else { return }
+                guard let likes = record["likes"] as? Int else { return }
+                guard let id = record["id"] as? String else { return }
+                guard let user = record["userID"] as? String else { return }
+                guard let image = record["image"] as? CKAsset else { return }
+                var customLocation = 0
+                if let customLocationChecked = record["customLocation"] as? Int {
+                    customLocation = customLocationChecked
+                }
+                var isMultipleImages = 0
+                if let m = record["isMultipleImages"] as? Int {
+                    isMultipleImages = m
+                }
+                var inappropriate = 0
+                var offensive = 0
+                var spam = 0
+                var dangerous = 0
+                if let inna = record["inappropriate"] as? Int {
+                    inappropriate = inna
+                }
+                if let offen = record["offensive"] as? Int {
+                    offensive = offen
+                }
+                if let sp = record["spam"] as? Int {
+                    spam = sp
+                }
+                if let dan = record["dangerous"] as? Int {
+                    dangerous = dan
+                }
+                var types = ""
+                var description = ""
+                var locationName = ""
+                if let typeCheck = record["type"] as? String {
+                    types = typeCheck
+                }
+                if let descriptionCheck = record["description"] as? String {
+                    description = descriptionCheck
+                }
+                if let locationNameCheck = record["locationName"] as? String {
+                    locationName = locationNameCheck
+                }
+                let imageURL = image.fileURL
+                spots.append(SpotFromCloud(id: id, name: name, founder: founder, description: description, date: date, location: location, type: types, imageURL: imageURL ?? URL(fileURLWithPath: "none"),  image2URL: nil , image3URL: nil, isMultipleImages: isMultipleImages , likes: likes, offensive: offensive, spam: spam, inappropriate: inappropriate, dangerous: dangerous, customLocation: customLocation, locationName: locationName, userID: user, dateObject: dateObject, record: record))
+                
+            case .failure(let error):
+                print(error)
+            }
+        }
+        DispatchQueue.main.async {
+            self.cursorAccount = results.queryCursor
+        }
+        return spots
+    }
+
     func fetchAccountSpots(userid: String) async throws -> [SpotFromCloud] {
         let predicate = NSPredicate(format: "userID == %@", userid)
         let query = CKQuery(recordType: "Spots", predicate: predicate)
@@ -610,6 +682,9 @@ class CloudKitViewModel: ObservableObject {
                 print("\(error)")
                 return
             }
+        }
+        DispatchQueue.main.async {
+            self.cursorAccount = results.queryCursor
         }
         return spots
     }
@@ -725,10 +800,8 @@ class CloudKitViewModel: ObservableObject {
             self.isFetching = false
         }
         
-        if let cursor = results.queryCursor {
-            DispatchQueue.main.async {
-                self.cursorMain = cursor
-            }
+        DispatchQueue.main.async {
+            self.cursorMain = results.queryCursor
         }
     }
     
@@ -891,10 +964,8 @@ class CloudKitViewModel: ObservableObject {
                 self.isFetching = false
             }
             
-            if let cursor = results.queryCursor {
-                DispatchQueue.main.async {
-                    self.cursorMain = cursor
-                }
+            DispatchQueue.main.async {
+                self.cursorMain = results.queryCursor
             }
         } catch {
             DispatchQueue.main.async {

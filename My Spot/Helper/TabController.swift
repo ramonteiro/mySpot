@@ -16,7 +16,7 @@ enum Tab {
     case spots
     case discover
     case playlists
-    case settings
+    case profile
 }
 
 class TabController: ObservableObject {
@@ -24,5 +24,10 @@ class TabController: ObservableObject {
     @Published var discoverPopToRoot = false
     @Published var spotPopToRoot = false
     @Published var playlistPopToRoot = false
+    @Published var profilePopToRoot = false
     @Published var lastPressedTab = Tab.spots
+    
+    func open(_ tab: Tab) {
+        activeTab = tab
+    }
 }

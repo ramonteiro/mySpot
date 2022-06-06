@@ -21,6 +21,12 @@ struct My_SpotApp: App {
     // initialize iCloudViewModel
     @StateObject private var cloudViewModel = CloudKitViewModel()
     
+    // initialize tabController
+    @StateObject private var tabController = TabController()
+    
+    @State private var sharedAccount = ""
+    @State private var showSharedAccount = false
+    
     init() {
         UIView.appearance(whenContainedInInstancesOf: [UIAlertController.self]).tintColor = .systemBlue
         UITableView.appearance().showsVerticalScrollIndicator = false
@@ -33,13 +39,30 @@ struct My_SpotApp: App {
                 .environmentObject(mapViewModel)
                 .environmentObject(cloudViewModel)
                 .environmentObject(phoneViewModel)
+                .environmentObject(tabController)
                 .onOpenURL { url in
+                    guard let host = URLComponents(url: url, resolvingAgainstBaseURL: true)?.host else { return }
+                    if host[0] == "_" {
+                        if let id = UserDefaults(suiteName: "group.com.isaacpaschall.My-Spot")?.string(forKey: "userid") {
+                            if id == host {
+                                // go to profile
+                                tabController.open(Tab.profile)
+                                return
+                            }
+                        }
+                        sharedAccount = host
+                        showSharedAccount.toggle()
+                        return
+                    }
                     Task {
                         await cloudViewModel.checkDeepLink(url: url, isFromNoti: false)
                     }
                 }
                 .tint(cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex])
                 .accentColor(cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex])
+                .fullScreenCover(isPresented: $showSharedAccount) {
+                    AccountDetailView(userid: sharedAccount, myAccount: false)
+                }
                 .onAppear {
                     let color = UIColor(cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex])
                     var red: CGFloat = 0

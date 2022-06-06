@@ -14,7 +14,7 @@ struct ContentView: View {
     @EnvironmentObject var cloudViewModel: CloudKitViewModel
     @EnvironmentObject var mapViewModel: MapViewModel
     @EnvironmentObject var phoneViewModel: PhoneViewModel
-    @StateObject private var tabController = TabController()
+    @EnvironmentObject var tabController: TabController
     @FetchRequest(sortDescriptors: []) var colors: FetchedResults<CustomColor>
     @Environment(\.managedObjectContext) var moc
     @State private var showSharedSpotSheet = false
@@ -51,7 +51,7 @@ struct ContentView: View {
                     Image(systemName: "person.fill")
                     Text("Profile".localized())
                 }
-                .tag(Tab.settings)
+                .tag(Tab.profile)
                 .badge(UIApplication.shared.applicationIconBadgeNumber)
         }
         .onChange(of: cloudViewModel.isSignedInToiCloud) { newValue in
@@ -99,6 +99,14 @@ struct ContentView: View {
                     tabController.discoverPopToRoot.toggle()
                 }
             }
+            if (selection == Tab.profile) {
+                // discover pressed
+                
+                if (selection == tabController.lastPressedTab) {
+                    // discover pressed while in discover
+                    tabController.profilePopToRoot.toggle()
+                }
+            }
             
             // set last changed tab
             tabController.lastPressedTab = selection
@@ -123,7 +131,6 @@ struct ContentView: View {
         } message: {
             Text(cloudViewModel.isErrorMessageDetails)
         }
-        .environmentObject(tabController)
         .onChange(of: CoreDataStack.shared.recievedShare) { _ in
             if CoreDataStack.shared.wasSuccessful {
                 UIImpactFeedbackGenerator(style: .light).impactOccurred()

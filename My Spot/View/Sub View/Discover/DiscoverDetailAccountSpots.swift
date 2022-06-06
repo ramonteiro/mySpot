@@ -26,6 +26,7 @@ struct DiscoverDetailAccountSpots: View {
     @State private var backImage = "chevron.left"
     @State private var mySpot = false
     @State private var didCopy = false
+    let myAccount: Bool
     @State private var didCopyDescription = false
     @State private var distance: String = ""
     @State private var deleteAlert = false
@@ -69,8 +70,15 @@ struct DiscoverDetailAccountSpots: View {
                 }
             }
             .ignoresSafeArea(.all, edges: (canShare ? .top : [.top, .bottom]))
-            .onChange(of: tabController.discoverPopToRoot) { _ in
-                presentationMode.wrappedValue.dismiss()
+            .if(myAccount) { view in
+                view.onChange(of: tabController.profilePopToRoot) { _ in
+                    presentationMode.wrappedValue.dismiss()
+                }
+            }
+            .if(!myAccount) { view in
+                view.onChange(of: tabController.discoverPopToRoot) { _ in
+                    presentationMode.wrappedValue.dismiss()
+                }
             }
             .onChange(of: isSaving) { newValue in
                 if newValue {
