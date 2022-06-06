@@ -81,6 +81,7 @@ struct AccountDetailView: View {
                                             .padding(4)
                                     }
                                 }
+                                .padding(.horizontal, 15)
                                 if cloudViewModel.cursorAccount != nil && !isFetching {
                                     loadMoreSpots
                                 }
