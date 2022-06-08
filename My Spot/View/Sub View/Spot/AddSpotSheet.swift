@@ -106,11 +106,6 @@ struct AddSpotSheet: View {
                                     .foregroundColor(.gray)
                             }
                             Section {
-                                Text(getDate())
-                            } header: {
-                                Text("Date Found".localized())
-                            }
-                            Section {
                                 ViewOnlyUserOnMap(customLocation: $usingCustomLocation, hasSet: $hasSet, locationName: $locationName, centerRegion: $centerRegion)
                                     .frame(height: UIScreen.screenHeight * 0.6)
                                     .aspectRatio(contentMode: .fill)

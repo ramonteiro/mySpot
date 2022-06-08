@@ -37,6 +37,9 @@ struct DetailView: View {
     @State private var dateToShowAdded = ""
     @State private var deleteAlert = false
     @State private var distance: String = ""
+    @State private var loadingAccount = true
+    @State private var accountModel: AccountModel?
+    @State private var openAccountView = false
     @State private var exists = true
     @State private var imageOffset: CGFloat = -50
     @State private var selection = 0
@@ -73,10 +76,25 @@ struct DetailView: View {
                         }
                         canDelete = CoreDataStack.shared.canDelete(object: spot)
                     }
+                    .fullScreenCover(isPresented: $openAccountView) {
+                        AccountDetailView(userid: spot.userId ?? "", myAccount: false, accountModel: accountModel)
+                    }
             }
         }
         .onAppear {
             exists = checkExists()
+            if loadingAccount && exists {
+                Task {
+                    do {
+                        accountModel = try await cloudViewModel.fetchAccount(userid: spot.userId ?? "")
+                        withAnimation {
+                            loadingAccount = false
+                        }
+                    } catch {
+                        print("failed to load user account")
+                    }
+                }
+            }
         }
     }
     
@@ -109,6 +127,7 @@ struct DetailView: View {
         .ignoresSafeArea(.all, edges: (canShare ? .top : [.top, .bottom]))
         .onAppear {
             // check for images
+            if !images.isEmpty { return }
             images.append(spot.image ?? defaultImages.errorImage!)
             if let _ = spot.image3 {
                 images.append(spot.image2 ?? defaultImages.errorImage!)
@@ -326,158 +345,21 @@ struct DetailView: View {
     private var detailSheet: some View {
         ZStack {
             ScrollView(showsIndicators: false) {
-                Image(systemName: (expand ? "x.circle.fill" : "arrow.up.circle.fill"))
-                    .resizable()
-                    .frame(width: (expand ? 50 : 30), height: (expand ? 50 : 30))
-                    .foregroundColor(Color.secondary)
-                    .onTapGesture {
-                        let generator = UIImpactFeedbackGenerator(style: .light)
-                        generator.impactOccurred()
-                        withAnimation {
-                            expand.toggle()
-                        }
-                    }
-                    .padding(.top, 5)
-                
+                expandDetailsButton
                 if (!(spot.locationName?.isEmpty ?? true)) {
-                    HStack {
-                        Image(systemName: (!spot.wasThere ? "mappin" : "figure.wave"))
-                            .font(.system(size: 15, weight: .light))
-                            .foregroundColor(Color.gray)
-                        Text("\(spot.locationName ?? "")")
-                            .font(.system(size: 15, weight: .light))
-                            .foregroundColor(Color.gray)
-                            .padding(.leading, 1)
-                        Spacer()
-                    }
-                    .padding([.leading, .trailing], 30)
+                    locationNameView
                 }
-                
-                
-                HStack {
-                    Text("\(spot.name ?? "")")
-                        .font(.system(size: 45, weight: .heavy))
-                    Spacer()
-                }
-                .padding(.leading, 30)
-                .padding(.trailing, 5)
-                
-                HStack {
-                    Text("By: ".localized() + (spot.founder ?? ""))
-                        .font(.system(size: 15, weight: .light))
-                        .foregroundColor(Color.gray)
-                    Spacer()
-                    Text(dateToShow)
-                        .font(.system(size: 15, weight: .light))
-                        .foregroundColor(Color.gray)
-                }
-                .padding([.leading, .trailing], 30)
-                .onAppear {
-                    if let date = spot.dateObject {
-                        let timeFormatter = DateFormatter()
-                        timeFormatter.dateFormat = "MMM d, yyyy"
-                        dateToShow = timeFormatter.string(from: date)
-                    } else {
-                        dateToShow = spot.date?.components(separatedBy: ";")[0] ?? ""
-                    }
-                }
-                
-                if fromPlaylist && spot.addedBy != nil && spot.dateAdded != nil {
-                    HStack {
-                        Text("Added By: ".localized() + (spot.addedBy ?? ""))
-                            .font(.system(size: 15, weight: .light))
-                            .foregroundColor(Color.gray)
-                        Spacer()
-                        Text(dateToShowAdded)
-                            .font(.system(size: 15, weight: .light))
-                            .foregroundColor(Color.gray)
-                    }
-                    .padding([.leading, .trailing], 30)
-                    .padding(.top, 1)
-                    .onAppear {
-                        if let date = spot.dateAdded {
-                            let timeFormatter = DateFormatter()
-                            timeFormatter.dateFormat = "MMM d, yyyy"
-                            dateToShowAdded = timeFormatter.string(from: date)
-                        }
-                    }
-                }
-                
+                middlePart
                 if (!(spot.tags?.isEmpty ?? true)) {
-                    ScrollView(.horizontal, showsIndicators: false) {
-                        HStack {
-                            ForEach(tags, id: \.self) { tag in
-                                Text(tag)
-                                    .font(.system(size: 12, weight: .regular))
-                                    .lineLimit(2)
-                                    .foregroundColor(.white)
-                                    .padding(5)
-                                    .background(.tint)
-                                    .cornerRadius(5)
-                            }
-                        }
-                    }
-                    .padding([.leading, .trailing], 30)
-                    .offset(y: 5)
+                    tagView
                 }
-                ZStack {
-                    HStack(spacing: 5) {
-                        Text(spot.details ?? "")
-                        Spacer()
-                    }
-                    if didCopyDescription {
-                        HStack {
-                            Spacer()
-                            Text("Copied".localized())
-                                .padding(10)
-                                .background(Capsule().foregroundColor(.gray))
-                            Spacer()
-                        }
-                    }
-                }
-                .padding(.top, 10)
-                .padding([.leading, .trailing], 30)
-                .onTapGesture {
-                    if let details = spot.details {
-                        let generator = UIImpactFeedbackGenerator(style: .light)
-                        generator.impactOccurred()
-                        let pasteboard = UIPasteboard.general
-                        pasteboard.string = details
-                        withAnimation {
-                            didCopyDescription = true
-                        }
-                    }
-                }
-                .onChange(of: didCopyDescription) { newValue in
-                    if newValue {
-                        let _ = Timer.scheduledTimer(withTimeInterval: 1.5, repeats: false) { timer in
-                            withAnimation {
-                                didCopyDescription = false
-                            }
-                        }
-                    }
-                }
+                descriptionView
                 
                 ViewSingleSpotOnMap(singlePin: [SinglePin(name: spot.name ?? "", coordinate: CLLocationCoordinate2D(latitude: spot.x, longitude: spot.y))])
                     .aspectRatio(contentMode: .fit)
                     .cornerRadius(15)
                     .padding([.leading, .trailing], 30)
-                
-                Button {
-                    let routeMeTo = MKMapItem(placemark: MKPlacemark(coordinate: CLLocationCoordinate2D(latitude: spot.x, longitude: spot.y)))
-                    routeMeTo.name = spot.name ?? "Spot"
-                    routeMeTo.openInMaps(launchOptions: nil)
-                } label: {
-                    HStack {
-                        Image(systemName: "location.fill")
-                        Text(spot.name ?? "")
-                    }
-                    .padding(.horizontal)
-                }
-                .buttonStyle(.borderedProminent)
-                .padding(.top, 10)
-                .padding([.leading, .trailing], 30)
-                
+                routeMeToButton
                 bottomHalf
             }
         }
@@ -496,33 +378,231 @@ struct DetailView: View {
         }
     }
     
+    private var middlePart: some View {
+        VStack(spacing: 4) {
+            nameView
+            dateView
+            if fromPlaylist && spot.addedBy != nil && spot.dateAdded != nil {
+                addedByView
+            }
+        }
+    }
+    
+    private var descriptionView: some View {
+        ZStack {
+            HStack(spacing: 5) {
+                Text(spot.details ?? "")
+                Spacer()
+            }
+            if didCopyDescription {
+                HStack {
+                    Spacer()
+                    Text("Copied".localized())
+                        .padding(10)
+                        .background(Capsule().foregroundColor(.gray))
+                    Spacer()
+                }
+            }
+        }
+        .padding(.top, 10)
+        .padding([.leading, .trailing], 30)
+        .onTapGesture {
+            if let details = spot.details {
+                let generator = UIImpactFeedbackGenerator(style: .light)
+                generator.impactOccurred()
+                let pasteboard = UIPasteboard.general
+                pasteboard.string = details
+                withAnimation {
+                    didCopyDescription = true
+                }
+            }
+        }
+        .onChange(of: didCopyDescription) { newValue in
+            if newValue {
+                let _ = Timer.scheduledTimer(withTimeInterval: 1.5, repeats: false) { timer in
+                    withAnimation {
+                        didCopyDescription = false
+                    }
+                }
+            }
+        }
+    }
+    
+    private var nameView: some View {
+        HStack {
+            Text("\(spot.name ?? "")")
+                .font(.system(size: 45, weight: .heavy))
+            Spacer()
+        }
+        .padding(.leading, 30)
+        .padding(.trailing, 5)
+    }
+    
+    private var dateView: some View {
+        HStack {
+            if !loadingAccount {
+                if let accountModel = accountModel {
+                    Button {
+                        if cloudViewModel.userID == spot.userId ?? "" {
+                            tabController.open(.profile)
+                            if !canShare {
+                                if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene {
+                                    windowScene.keyWindow?.rootViewController?.dismiss(animated: true)
+                                }
+                            }
+                        } else {
+                            openAccountView.toggle()
+                        }
+                    } label: {
+                        HStack {
+                            Image(uiImage: accountModel.image)
+                                .resizable()
+                                .frame(width: 60, height: 60)
+                                .clipShape(Circle())
+                            Text(accountModel.name)
+                                .font(.headline)
+                                .foregroundColor(colorScheme == .dark ? .white : .black)
+                        }
+                    }
+                }
+            }
+            Spacer()
+            Text(dateToShow)
+                .font(.system(size: 15, weight: .light))
+                .foregroundColor(Color.gray)
+        }
+        .padding([.leading, .trailing], 30)
+        .onAppear {
+            if let date = spot.dateObject {
+                let timeFormatter = DateFormatter()
+                timeFormatter.dateFormat = "MMM d, yyyy"
+                dateToShow = timeFormatter.string(from: date)
+            } else {
+                dateToShow = spot.date?.components(separatedBy: ";")[0] ?? ""
+            }
+        }
+    }
+    
+    private var expandDetailsButton: some View {
+        Image(systemName: (expand ? "x.circle.fill" : "arrow.up.circle.fill"))
+            .resizable()
+            .frame(width: (expand ? 50 : 30), height: (expand ? 50 : 30))
+            .foregroundColor(Color.secondary)
+            .onTapGesture {
+                let generator = UIImpactFeedbackGenerator(style: .light)
+                generator.impactOccurred()
+                withAnimation {
+                    expand.toggle()
+                }
+            }
+            .padding(.top, 5)
+    }
+    
+    private var addedByView: some View {
+        HStack {
+            Text("Added By: ".localized() + (spot.addedBy ?? ""))
+                .font(.system(size: 15, weight: .light))
+                .foregroundColor(Color.gray)
+            Spacer()
+            Text(dateToShowAdded)
+                .font(.system(size: 15, weight: .light))
+                .foregroundColor(Color.gray)
+        }
+        .padding([.leading, .trailing], 30)
+        .padding(.top, 1)
+        .onAppear {
+            if let date = spot.dateAdded {
+                let timeFormatter = DateFormatter()
+                timeFormatter.dateFormat = "MMM d, yyyy"
+                dateToShowAdded = timeFormatter.string(from: date)
+            }
+        }
+    }
+    
+    private var locationNameView: some View {
+        HStack {
+            Image(systemName: (!spot.wasThere ? "mappin" : "figure.wave"))
+                .font(.system(size: 15, weight: .light))
+                .foregroundColor(Color.gray)
+            Text("\(spot.locationName ?? "")")
+                .font(.system(size: 15, weight: .light))
+                .foregroundColor(Color.gray)
+                .padding(.leading, 1)
+            Spacer()
+        }
+        .padding([.leading, .trailing], 30)
+    }
+    
+    private var tagView: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack {
+                ForEach(tags, id: \.self) { tag in
+                    Text(tag)
+                        .font(.system(size: 12, weight: .regular))
+                        .lineLimit(2)
+                        .foregroundColor(.white)
+                        .padding(5)
+                        .background(.tint)
+                        .cornerRadius(5)
+                }
+            }
+        }
+        .padding([.leading, .trailing], 30)
+        .offset(y: 5)
+    }
+    
+    private var routeMeToButton: some View {
+        Button {
+            let routeMeTo = MKMapItem(placemark: MKPlacemark(coordinate: CLLocationCoordinate2D(latitude: spot.x, longitude: spot.y)))
+            routeMeTo.name = spot.name ?? "Spot"
+            routeMeTo.openInMaps(launchOptions: nil)
+        } label: {
+            HStack {
+                Image(systemName: "location.fill")
+                Text(spot.name ?? "")
+            }
+            .padding(.horizontal)
+        }
+        .buttonStyle(.borderedProminent)
+        .padding(.top, 10)
+        .padding([.leading, .trailing], 30)
+    }
+    
+    private var copyIdButton: some View {
+        Button {
+            let generator = UIImpactFeedbackGenerator(style: .light)
+            generator.impactOccurred()
+            let pasteboard = UIPasteboard.general
+            pasteboard.string = "myspot://" + (spot.dbid ?? "Error")
+            didCopy = true
+        } label: {
+            HStack {
+                Image(systemName: "doc.on.doc.fill")
+                Text("Share ID".localized())
+            }
+            .padding(.horizontal)
+        }
+        .buttonStyle(.borderedProminent)
+        .padding([.top, .bottom], 10)
+        .padding([.leading, .trailing], 30)
+    }
+    
+    private var idCopiedView: some View {
+        HStack {
+            Text("Copied".localized())
+            Image(systemName: "checkmark.square.fill")
+        }
+        .padding([.top, .bottom], 10)
+        .padding([.leading, .trailing], 30)
+    }
+    
     private var bottomHalf: some View {
         VStack {
             if spot.isPublic && spot.dbid != nil {
                 if !didCopy {
-                    Button {
-                        let generator = UIImpactFeedbackGenerator(style: .light)
-                        generator.impactOccurred()
-                        let pasteboard = UIPasteboard.general
-                        pasteboard.string = "myspot://" + (spot.dbid ?? "Error")
-                        didCopy = true
-                    } label: {
-                        HStack {
-                            Image(systemName: "doc.on.doc.fill")
-                            Text("Share ID".localized())
-                        }
-                        .padding(.horizontal)
-                    }
-                    .buttonStyle(.borderedProminent)
-                    .padding([.top, .bottom], 10)
-                    .padding([.leading, .trailing], 30)
+                    copyIdButton
                 } else {
-                    HStack {
-                        Text("Copied".localized())
-                        Image(systemName: "checkmark.square.fill")
-                    }
-                    .padding([.top, .bottom], 10)
-                    .padding([.leading, .trailing], 30)
+                    idCopiedView
                 }
             }
             if (!distance.isEmpty) {
@@ -531,44 +611,47 @@ struct DetailView: View {
                     .font(.system(size: 15, weight: .light))
                     .padding(.bottom, 1)
             }
-            
-            HStack {
-                Image(systemName: "globe")
-                    .font(.system(size: 15, weight: .light))
-                    .foregroundColor(Color.gray)
-                Text("\(scope)")
-                    .font(.system(size: 15, weight: .light))
-                    .foregroundColor(Color.gray)
-                    .onChange(of: spot.isPublic) { newValue in
-                        if (newValue) {
-                            scope = "Public".localized()
-                        } else {
-                            scope = "Private".localized()
-                        }
+            isPublicView
+        }
+    }
+    
+    private var isPublicView: some View {
+        HStack {
+            Image(systemName: "globe")
+                .font(.system(size: 15, weight: .light))
+                .foregroundColor(Color.gray)
+            Text("\(scope)")
+                .font(.system(size: 15, weight: .light))
+                .foregroundColor(Color.gray)
+                .onChange(of: spot.isPublic) { newValue in
+                    if (newValue) {
+                        scope = "Public".localized()
+                    } else {
+                        scope = "Private".localized()
                     }
-                if (spot.isPublic && spot.likes >= 0) {
-                    Image(systemName: "icloud.and.arrow.down")
-                        .font(.system(size: 15, weight: .light))
-                        .foregroundColor(Color.gray)
-                    Text("\(Int(spot.likes))")
-                        .font(.system(size: 15, weight: .light))
-                        .foregroundColor(Color.gray)
                 }
+            if (spot.isPublic && spot.likes >= 0) {
+                Image(systemName: "icloud.and.arrow.down")
+                    .font(.system(size: 15, weight: .light))
+                    .foregroundColor(Color.gray)
+                Text("\(Int(spot.likes))")
+                    .font(.system(size: 15, weight: .light))
+                    .foregroundColor(Color.gray)
             }
-            .padding(.bottom, 20)
-            .onAppear {
-                if spot.isPublic {
-                    Task {
-                        do {
-                            let l = try await cloudViewModel.getLikes(idString: spot.dbid ?? "")
-                            if let l = l {
-                                spot.likes = Double(l)
-                            } else {
-                                spot.likes = -1
-                            }
-                        } catch {
+        }
+        .padding(.bottom, 20)
+        .onAppear {
+            if spot.isPublic {
+                Task {
+                    do {
+                        let l = try await cloudViewModel.getLikes(idString: spot.dbid ?? "")
+                        if let l = l {
+                            spot.likes = Double(l)
+                        } else {
                             spot.likes = -1
                         }
+                    } catch {
+                        spot.likes = -1
                     }
                 }
             }

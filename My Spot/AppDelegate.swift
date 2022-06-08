@@ -36,9 +36,10 @@ final class AppDelegate: NSObject, UIApplicationDelegate {
                 }
             }
         } else if notification?.notificationType == .database {
-            if let n = notification as? CKDatabaseNotification {
-                print("recieved database noti from updating shares")
-                print(n)
+            if UserDefaults.standard.valueExists(forKey: "badgeplaylists") {
+                UserDefaults.standard.set(UserDefaults.standard.integer(forKey: "badgeplaylists") + 1, forKey: "badgeplaylists")
+            } else {
+                UserDefaults.standard.set(1, forKey: "badgeplaylists")
             }
         }
         completionHandler(.noData)

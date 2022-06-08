@@ -402,8 +402,18 @@ class CloudKitViewModel: ObservableObject {
         }
     }
     
-    func resetBadge() {
-        let badgeResetOperation = CKModifyBadgeOperation(badgeValue: 0)
+    func resetBadgeNewSpots() {
+        let badgeResetOperation = CKModifyBadgeOperation(badgeValue: UserDefaults.standard.integer(forKey: "badgeplaylists"))
+        badgeResetOperation.modifyBadgeCompletionBlock = { (error) -> Void in
+            if error != nil {
+                print(error as Any)
+            }
+        }
+        CKContainer.default().add(badgeResetOperation)
+    }
+    
+    func resetBadgePlaylists() {
+        let badgeResetOperation = CKModifyBadgeOperation(badgeValue: UserDefaults.standard.integer(forKey: "badge"))
         badgeResetOperation.modifyBadgeCompletionBlock = { (error) -> Void in
             if error != nil {
                 print(error as Any)

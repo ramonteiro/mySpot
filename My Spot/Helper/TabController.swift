@@ -15,6 +15,7 @@ import Foundation
 enum Tab {
     case spots
     case discover
+    case addSpot
     case playlists
     case profile
 }

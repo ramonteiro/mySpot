@@ -22,16 +22,12 @@ struct MySpotsView: View {
     @EnvironmentObject var mapViewModel: MapViewModel
     @EnvironmentObject var cloudViewModel: CloudKitViewModel
     
-    @State private var showingAddSheet = false
     @State private var showingMapSheet = false
     @State private var showingDeleteAlert = false
     @State private var toBeDeleted: IndexSet?
     @State private var filteredSpots: [Spot] = []
     @State private var searchText = ""
     @State private var sortBy = "Name".localized()
-    @State private var showingCannotSavePublicAlert = false
-    @State private var pu = false
-    @State private var isSaving = false
     private var stack = CoreDataStack.shared
     
     private var searchResults: [Spot] {
@@ -53,11 +49,6 @@ struct MySpotsView: View {
                     } else if (sortType == "Closest".localized()) {
                         sortClosest()
                     }
-                }
-                .alert("Unable To Upload Spot".localized(), isPresented: $pu) {
-                    Button("OK".localized(), role: .cancel) { }
-                } message: {
-                    Text("Please check internet connection and try again.".localized())
                 }
         }
         .navigationViewStyle(.automatic)
@@ -181,28 +172,6 @@ struct MySpotsView: View {
                         ViewMapSpots()
                     }
                     .disabled(filteredSpots.isEmpty)
-                    if !isSaving {
-                        Button {
-                            UserDefaults.standard.set(Double(-1.0), forKey: "tempPinX")
-                            Task { try? await cloudViewModel.isBanned() }
-                            showingAddSheet.toggle()
-                        } label: {
-                            Image(systemName: "plus").imageScale(.large)
-                        }
-                        .sheet(isPresented: $showingAddSheet, onDismiss: {
-                            setFilteringType()
-                            if showingCannotSavePublicAlert {
-                                let generator = UINotificationFeedbackGenerator()
-                                generator.notificationOccurred(.warning)
-                                pu.toggle()
-                                showingCannotSavePublicAlert = false
-                            }
-                        }) {
-                            AddSpotSheet(isSaving: $isSaving, showingCannotSavePublicAlert: $showingCannotSavePublicAlert)
-                        }
-                    } else {
-                        ProgressView().progressViewStyle(.circular).padding()
-                    }
                 }
             }
              

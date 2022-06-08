@@ -12,7 +12,7 @@ struct AccountDetailView: View {
     @State private var isFetching: Bool = false
     @State var userid: String
     @State var myAccount: Bool
-    @State private var accountModel: AccountModel?
+    @State var accountModel: AccountModel?
     @State private var image: UIImage = defaultImages.errorImage!
     @State private var name: String = "Account".localized()
     @State private var downloads: Int = 0
@@ -72,28 +72,30 @@ struct AccountDetailView: View {
                         }
                         .padding(.top, 5)
                         .padding(.leading, 3)
-                        ZStack {
-                            LazyVStack(alignment: .leading, spacing: 0) {
-                                ForEach(spots.indices, id: \.self) { i in
-                                    NavigationLink {
-                                        DiscoverDetailAccountSpots(index: i, spotsFromCloud: $spots, canShare: true, myAccount: myAccount)
-                                    } label: {
-                                        DiscoverRow(spot: spots[i])
-                                            .padding(4)
+                        if let accountModel = accountModel {
+                            ZStack {
+                                LazyVStack(alignment: .leading, spacing: 0) {
+                                    ForEach(spots.indices, id: \.self) { i in
+                                        NavigationLink {
+                                            DiscoverDetailAccountSpots(index: i, spotsFromCloud: $spots, canShare: true, myAccount: myAccount, accountModel: accountModel)
+                                        } label: {
+                                            DiscoverRow(spot: spots[i])
+                                                .padding(4)
+                                        }
+                                    }
+                                    .padding(.horizontal, 15)
+                                    if cloudViewModel.cursorAccount != nil && !isFetching {
+                                        loadMoreSpots
                                     }
                                 }
-                                .padding(.horizontal, 15)
-                                if cloudViewModel.cursorAccount != nil && !isFetching {
-                                    loadMoreSpots
+                                if isFetching {
+                                    ProgressView("Loading Spots".localized())
+                                        .padding()
+                                        .background(
+                                            RoundedRectangle(cornerRadius: 10)
+                                                .fill(Color(UIColor.systemBackground))
+                                        )
                                 }
-                            }
-                            if isFetching {
-                                ProgressView("Loading Spots".localized())
-                                    .padding()
-                                    .background(
-                                        RoundedRectangle(cornerRadius: 10)
-                                            .fill(Color(UIColor.systemBackground))
-                                    )
                             }
                         }
                     }
@@ -120,6 +122,9 @@ struct AccountDetailView: View {
             })
             .fullScreenCover(isPresented: $openSettings) {
                 SettingsView()
+            }
+            .onChange(of: UserDefaults.standard.integer(forKey: "badge")) { newValue in
+                badgeNum = newValue
             }
             .navigationBarTitleDisplayMode(.inline)
             .navigationViewStyle(.stack)
@@ -189,43 +194,7 @@ struct AccountDetailView: View {
             }
             .onAppear {
                 Task {
-                    do {
-                        let fetchedArr = try await cloudViewModel.getDownloadsAndSpots(from: userid)
-                        downloads = fetchedArr[0]
-                        spotCount = fetchedArr[1]
-                    } catch {
-                        print("failed to load spot count")
-                    }
-                    do {
-                        accountModel = try await cloudViewModel.fetchAccount(userid: userid)
-                        if let account = accountModel {
-                            name = account.name
-                            image = account.image
-                            pronouns = account.pronouns
-                            tiktok = account.tiktok
-                            youtube = account.youtube
-                            insta = account.insta
-                            bio = account.bio
-                            if bio == "Unable to load account".localized() {
-                                bio = ""
-                            }
-                            isExplorer = account.isExplorer
-                            if let date = account.record.creationDate {
-                                memberSince = date
-                            }
-                        }
-                    } catch {
-                        bio = "Unable to load account".localized()
-                        print("failed to fetch account")
-                        print(error)
-                    }
-                    initializeBadgesAndLinks()
-                    withAnimation {
-                        isLoading = false
-                    }
-                    if spots.isEmpty {
-                        await fetchSpots()
-                    }
+                    await inititalize()
                 }
             }
             .fullScreenCover(isPresented: $editAlert, onDismiss: {
@@ -237,6 +206,65 @@ struct AccountDetailView: View {
                     CreateAccountView(accountModel: accountModel)
                 }
             }
+        }
+    }
+    
+    private func inititalize() async {
+        do {
+            let fetchedArr = try await cloudViewModel.getDownloadsAndSpots(from: userid)
+            downloads = fetchedArr[0]
+            spotCount = fetchedArr[1]
+        } catch {
+            print("failed to load spot count")
+        }
+        if accountModel == nil {
+            do {
+                accountModel = try await cloudViewModel.fetchAccount(userid: userid)
+                if let account = accountModel {
+                    name = account.name
+                    image = account.image
+                    pronouns = account.pronouns
+                    tiktok = account.tiktok
+                    youtube = account.youtube
+                    insta = account.insta
+                    bio = account.bio
+                    if bio == "Unable to load account".localized() {
+                        bio = ""
+                    }
+                    isExplorer = account.isExplorer
+                    if let date = account.record.creationDate {
+                        memberSince = date
+                    }
+                }
+            } catch {
+                bio = "Unable to load account".localized()
+                print("failed to fetch account")
+                print(error)
+            }
+        } else {
+            if let account = accountModel {
+                name = account.name
+                image = account.image
+                pronouns = account.pronouns
+                tiktok = account.tiktok
+                youtube = account.youtube
+                insta = account.insta
+                bio = account.bio
+                if bio == "Unable to load account".localized() {
+                    bio = ""
+                }
+                isExplorer = account.isExplorer
+                if let date = account.record.creationDate {
+                    memberSince = date
+                }
+            }
+        }
+        initializeBadgesAndLinks()
+        withAnimation {
+            isLoading = false
+        }
+        if spots.isEmpty {
+            await fetchSpots()
         }
     }
     

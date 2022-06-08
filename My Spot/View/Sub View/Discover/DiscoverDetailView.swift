@@ -44,6 +44,10 @@ struct DiscoverDetailView: View {
     @State private var tags: [String] = []
     @State private var images: [UIImage] = []
     @State private var showingImage = false
+    @State private var loadingAccount = true
+    @State private var accountModel: AccountModel?
+    @State private var openAccountView = false
+    @State private var initCheked = false
     @State private var showingSaveSheet = false
     @State private var noType = false
     @State private var expand = false
@@ -93,31 +97,37 @@ struct DiscoverDetailView: View {
                         }
                     }
                 }
+                .fullScreenCover(isPresented: $openAccountView) {
+                    AccountDetailView(userid: cloudViewModel.spots[index].userID, myAccount: false, accountModel: accountModel)
+                }
                 .onAppear {
-                    mySpot = cloudViewModel.isMySpot(user: cloudViewModel.spots[index].userID)
-                    tags = cloudViewModel.spots[index].type.components(separatedBy: ", ")
-                    
-                    // check for images
-                    let url = cloudViewModel.spots[index].imageURL
-                    if let data = try? Data(contentsOf: url), let image = UIImage(data: data) {
-                        self.images.append(image)
-                    }
-                    Task {
-                        let id = cloudViewModel.spots[index].record.recordID.recordName
-                        let fetchedImages: [UIImage?] = await cloudViewModel.fetchImages(id: id)
-                        if !fetchedImages.isEmpty {
-                            fetchedImages.forEach { image in
-                                if let image = image {
-                                    self.images.append(image)
+                    if !initCheked {
+                        mySpot = cloudViewModel.isMySpot(user: cloudViewModel.spots[index].userID)
+                        tags = cloudViewModel.spots[index].type.components(separatedBy: ", ")
+                        
+                        // check for images
+                        let url = cloudViewModel.spots[index].imageURL
+                        if let data = try? Data(contentsOf: url), let image = UIImage(data: data) {
+                            self.images.append(image)
+                        }
+                        Task {
+                            let id = cloudViewModel.spots[index].record.recordID.recordName
+                            let fetchedImages: [UIImage?] = await cloudViewModel.fetchImages(id: id)
+                            if !fetchedImages.isEmpty {
+                                fetchedImages.forEach { image in
+                                    if let image = image {
+                                        self.images.append(image)
+                                    }
                                 }
                             }
                         }
+                        
+                        
+                        isSaving = false
+                        newName = ""
+                        cloudViewModel.canRefresh = false
+                        initCheked = true
                     }
-                    
-                    
-                    isSaving = false
-                    newName = ""
-                    cloudViewModel.canRefresh = false
                 }
             }
         }
@@ -140,6 +150,19 @@ struct DiscoverDetailView: View {
                 backImage = "chevron.left"
             } else {
                 backImage = "chevron.down"
+            }
+            if loadingAccount {
+                let uid = cloudViewModel.spots[index].userID
+                Task {
+                    do {
+                        accountModel = try await cloudViewModel.fetchAccount(userid: uid)
+                        withAnimation {
+                            loadingAccount = false
+                        }
+                    } catch {
+                        print("failed to load user account")
+                    }
+                }
             }
         }
         .background(ShareViewController(isPresenting: $isShare) {
@@ -437,6 +460,61 @@ struct DiscoverDetailView: View {
         }
     }
     
+    private var nameAndAccountView: some View {
+        VStack(spacing: 4) {
+            HStack {
+                Text("\(cloudViewModel.spots[index].name)")
+                    .font(.system(size: 45, weight: .heavy))
+                Spacer()
+            }
+            .padding(.leading, 30)
+            .padding(.trailing, 5)
+            
+            HStack {
+                if !loadingAccount {
+                    if let accountModel = accountModel {
+                        Button {
+                            if cloudViewModel.userID == cloudViewModel.spots[index].userID {
+                                tabController.open(.profile)
+                                if !canShare {
+                                    if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene {
+                                        windowScene.keyWindow?.rootViewController?.dismiss(animated: true)
+                                    }
+                                }
+                            } else {
+                                openAccountView.toggle()
+                            }
+                        } label: {
+                            HStack {
+                                Image(uiImage: accountModel.image)
+                                    .resizable()
+                                    .frame(width: 60, height: 60)
+                                    .clipShape(Circle())
+                                Text(accountModel.name)
+                                    .font(.headline)
+                                    .foregroundColor(colorScheme == .dark ? .white : .black)
+                            }
+                        }
+                    }
+                }
+                Spacer()
+                Text(dateToShow)
+                    .font(.system(size: 15, weight: .light))
+                    .foregroundColor(Color.gray)
+            }
+            .padding([.leading, .trailing], 30)
+            .onAppear {
+                if let date = cloudViewModel.spots[index].dateObject {
+                    let timeFormatter = DateFormatter()
+                    timeFormatter.dateFormat = "MMM d, yyyy"
+                    dateToShow = timeFormatter.string(from: date)
+                } else {
+                    dateToShow = cloudViewModel.spots[index].date.components(separatedBy: ";")[0]
+                }
+            }
+        }
+    }
+    
     private var detailSheet: some View {
         ScrollView(showsIndicators: false) {
             expandButton
@@ -453,35 +531,7 @@ struct DiscoverDetailView: View {
                 }
                 .padding([.leading, .trailing], 30)
             }
-            
-            HStack {
-                Text("\(cloudViewModel.spots[index].name)")
-                    .font(.system(size: 45, weight: .heavy))
-                Spacer()
-            }
-            .padding(.leading, 30)
-            .padding(.trailing, 5)
-            
-            HStack {
-                Text("By: \(cloudViewModel.spots[index].founder)")
-                    .font(.system(size: 15, weight: .light))
-                    .foregroundColor(Color.gray)
-                Spacer()
-                Text(dateToShow)
-                    .font(.system(size: 15, weight: .light))
-                    .foregroundColor(Color.gray)
-            }
-            .padding([.leading, .trailing], 30)
-            .onAppear {
-                if let date = cloudViewModel.spots[index].dateObject {
-                    let timeFormatter = DateFormatter()
-                    timeFormatter.dateFormat = "MMM d, yyyy"
-                    dateToShow = timeFormatter.string(from: date)
-                } else {
-                    dateToShow = cloudViewModel.spots[index].date.components(separatedBy: ";")[0]
-                }
-            }
-            
+            nameAndAccountView
             HStack {
                 Image(systemName: "icloud.and.arrow.down")
                     .font(.system(size: 15, weight: .light))
@@ -649,7 +699,7 @@ struct DiscoverDetailView: View {
             newSpot.image2 = images[1]
         }
         newSpot.isShared = false
-        newSpot.userId = cloudViewModel.userID
+        newSpot.userId = cloudViewModel.spots[index].userID
         newSpot.locationName = cloudViewModel.spots[index].locationName
         newSpot.name = (newName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? cloudViewModel.spots[index].name : newName)
         newSpot.x = cloudViewModel.spots[index].location.coordinate.latitude

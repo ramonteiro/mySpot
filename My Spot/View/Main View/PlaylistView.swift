@@ -48,6 +48,10 @@ struct PlaylistView: View {
                     }
                     .onDelete(perform: deleteRow)
                 }
+                .onAppear {
+                    UserDefaults.standard.set(0, forKey: "badgeplaylists")
+                    cloudViewModel.resetBadgePlaylists()
+                }
                 .navigationTitle("Playlists".localized())
                 .toolbar {
                     ToolbarItemGroup(placement: .navigationBarTrailing) {

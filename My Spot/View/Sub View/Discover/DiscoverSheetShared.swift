@@ -35,6 +35,10 @@ struct DiscoverSheetShared: View {
     @State private var didCopyDescription = false
     @State private var selection = 0
     @State private var expand = false
+    @State private var loadingAccount = true
+    @State private var accountModel: AccountModel?
+    @State private var openAccountView = false
+    @State private var initCheked = false
     @State private var isSaving = false
     @State private var dateToShow = ""
     @State private var showSaveAlert = false
@@ -73,6 +77,9 @@ struct DiscoverSheetShared: View {
                 .onChange(of: tabController.discoverPopToRoot) { _ in
                     presentationMode.wrappedValue.dismiss()
                 }
+                .fullScreenCover(isPresented: $openAccountView) {
+                    AccountDetailView(userid: cloudViewModel.shared[0].userID, myAccount: false, accountModel: accountModel)
+                }
                 .onChange(of: isSaving) { newValue in
                     if newValue {
                         Task {
@@ -90,28 +97,31 @@ struct DiscoverSheetShared: View {
                     }
                 }
                 .onAppear {
-                    mySpot = cloudViewModel.isMySpot(user: cloudViewModel.shared[0].userID)
-                    tags = cloudViewModel.shared[0].type.components(separatedBy: ", ")
-                    
-                    // check for images
-                    let url = cloudViewModel.shared[0].imageURL
-                    if let data = try? Data(contentsOf: url), let image = UIImage(data: data) {
-                        self.images.append(image)
+                    if !initCheked {
+                        mySpot = cloudViewModel.isMySpot(user: cloudViewModel.shared[0].userID)
+                        tags = cloudViewModel.shared[0].type.components(separatedBy: ", ")
+                        
+                        // check for images
+                        let url = cloudViewModel.shared[0].imageURL
+                        if let data = try? Data(contentsOf: url), let image = UIImage(data: data) {
+                            self.images.append(image)
+                        }
+                        
+                        if let image2 = cloudViewModel.shared[0].image2URL {
+                            self.images.append(image2)
+                        }
+                        
+                        if let image3 = cloudViewModel.shared[0].image3URL {
+                            self.images.append(image3)
+                        }
+                        
+                        
+                        isSaving = false
+                        newName = ""
+                        
+                        cloudViewModel.canRefresh = false
+                        initCheked = true
                     }
-                    
-                    if let image2 = cloudViewModel.shared[0].image2URL {
-                        self.images.append(image2)
-                    }
-                    
-                    if let image3 = cloudViewModel.shared[0].image3URL {
-                        self.images.append(image3)
-                    }
-                    
-                    
-                    isSaving = false
-                    newName = ""
-                    
-                    cloudViewModel.canRefresh = false
                 }
             }
         }
@@ -130,6 +140,19 @@ struct DiscoverSheetShared: View {
         .onAppear {
             noType = cloudViewModel.shared[0].type.isEmpty
             spotInCD = isSpotInCoreData()
+            if loadingAccount {
+                let uid = cloudViewModel.shared[0].userID
+                Task {
+                    do {
+                        accountModel = try await cloudViewModel.fetchAccount(userid: uid)
+                        withAnimation {
+                            loadingAccount = false
+                        }
+                    } catch {
+                        print("failed to load user account")
+                    }
+                }
+            }
         }
         .background(ShareViewController(isPresenting: $isShare) {
             let av = getShareAC(id: cloudViewModel.shared[0].record.recordID.recordName, name: cloudViewModel.shared[0].name)
@@ -421,6 +444,59 @@ struct DiscoverSheetShared: View {
         }
     }
     
+    private var nameAndAccountView: some View {
+        VStack(spacing: 4) {
+            HStack {
+                Text("\(cloudViewModel.shared[0].name)")
+                    .font(.system(size: 45, weight: .heavy))
+                Spacer()
+            }
+            .padding(.leading, 30)
+            .padding(.trailing, 5)
+            
+            HStack {
+                if !loadingAccount {
+                    if let accountModel = accountModel {
+                        Button {
+                            if cloudViewModel.userID == cloudViewModel.shared[0].userID {
+                                tabController.open(.profile)
+                                if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene {
+                                    windowScene.keyWindow?.rootViewController?.dismiss(animated: true)
+                                }
+                            } else {
+                                openAccountView.toggle()
+                            }
+                        } label: {
+                            HStack {
+                                Image(uiImage: accountModel.image)
+                                    .resizable()
+                                    .frame(width: 60, height: 60)
+                                    .clipShape(Circle())
+                                Text(accountModel.name)
+                                    .font(.headline)
+                                    .foregroundColor(colorScheme == .dark ? .white : .black)
+                            }
+                        }
+                    }
+                }
+                Spacer()
+                Text(dateToShow)
+                    .font(.system(size: 15, weight: .light))
+                    .foregroundColor(Color.gray)
+            }
+            .padding([.leading, .trailing], 30)
+            .onAppear {
+                if let date = cloudViewModel.shared[0].dateObject {
+                    let timeFormatter = DateFormatter()
+                    timeFormatter.dateFormat = "MMM d, yyyy"
+                    dateToShow = timeFormatter.string(from: date)
+                } else {
+                    dateToShow = cloudViewModel.shared[0].date.components(separatedBy: ";")[0]
+                }
+            }
+        }
+    }
+    
     private var detailSheet: some View {
         ScrollView(showsIndicators: false) {
             
@@ -439,36 +515,7 @@ struct DiscoverSheetShared: View {
                 }
                 .padding([.leading, .trailing], 30)
             }
-            
-            
-            HStack {
-                Text("\(cloudViewModel.shared[0].name)")
-                    .font(.system(size: 45, weight: .heavy))
-                Spacer()
-            }
-            .padding(.leading, 30)
-            .padding(.trailing, 5)
-            
-            HStack {
-                Text("By: ".localized() + (cloudViewModel.shared[0].founder))
-                    .font(.system(size: 15, weight: .light))
-                    .foregroundColor(Color.gray)
-                Spacer()
-                Text(dateToShow)
-                    .font(.system(size: 15, weight: .light))
-                    .foregroundColor(Color.gray)
-            }
-            .padding([.leading, .trailing], 30)
-            .onAppear {
-                if let date = cloudViewModel.shared[0].dateObject {
-                    let timeFormatter = DateFormatter()
-                    timeFormatter.dateFormat = "MMM d, yyyy"
-                    dateToShow = timeFormatter.string(from: date)
-                } else {
-                    dateToShow = cloudViewModel.shared[0].date.components(separatedBy: ";")[0]
-                }
-            }
-            
+            nameAndAccountView
             HStack {
                 Image(systemName: "icloud.and.arrow.down")
                     .font(.system(size: 15, weight: .light))
@@ -636,7 +683,7 @@ struct DiscoverSheetShared: View {
             newSpot.image2 = images[1]
         }
         newSpot.isShared = false
-        newSpot.userId = cloudViewModel.userID
+        newSpot.userId = cloudViewModel.shared[0].userID
         newSpot.locationName = cloudViewModel.shared[0].locationName
         newSpot.name = (newName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? cloudViewModel.shared[0].name : newName)
         newSpot.x = cloudViewModel.shared[0].location.coordinate.latitude

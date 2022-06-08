@@ -33,6 +33,10 @@ struct DiscoverDetailNotification: View {
     @State private var showingCannotSavePrivateAlert = false
     @State private var isSaving = false
     @State private var newName = ""
+    @State private var loadingAccount = true
+    @State private var accountModel: AccountModel?
+    @State private var openAccountView = false
+    @State private var initCheked = false
     @State private var isSaved: Bool = false
     @State private var dateToShow = ""
     @State private var imageOffset: CGFloat = -50
@@ -67,6 +71,9 @@ struct DiscoverDetailNotification: View {
                             .transition(.scale)
                     }
                 }
+                .fullScreenCover(isPresented: $openAccountView) {
+                    AccountDetailView(userid: cloudViewModel.notificationSpots[index].userID, myAccount: false, accountModel: accountModel)
+                }
                 .ignoresSafeArea(.all, edges: [.top, .bottom])
                 .onChange(of: tabController.discoverPopToRoot) { _ in
                     presentationMode.wrappedValue.dismiss()
@@ -88,30 +95,33 @@ struct DiscoverDetailNotification: View {
                     }
                 }
                 .onAppear {
-                    mySpot = cloudViewModel.isMySpot(user: cloudViewModel.notificationSpots[index].userID)
-                    tags = cloudViewModel.notificationSpots[index].type.components(separatedBy: ", ")
-                    
-                    // check for images
-                    let url = cloudViewModel.notificationSpots[index].imageURL
-                    if let data = try? Data(contentsOf: url), let image = UIImage(data: data) {
-                        self.images.append(image)
-                    }
-                    Task {
-                        let id = cloudViewModel.notificationSpots[index].record.recordID.recordName
-                        let fetchedImages: [UIImage?] = await cloudViewModel.fetchImages(id: id)
-                        if !fetchedImages.isEmpty {
-                            fetchedImages.forEach { image in
-                                if let image = image {
-                                    self.images.append(image)
+                    if !initCheked {
+                        mySpot = cloudViewModel.isMySpot(user: cloudViewModel.notificationSpots[index].userID)
+                        tags = cloudViewModel.notificationSpots[index].type.components(separatedBy: ", ")
+                        
+                        // check for images
+                        let url = cloudViewModel.notificationSpots[index].imageURL
+                        if let data = try? Data(contentsOf: url), let image = UIImage(data: data) {
+                            self.images.append(image)
+                        }
+                        Task {
+                            let id = cloudViewModel.notificationSpots[index].record.recordID.recordName
+                            let fetchedImages: [UIImage?] = await cloudViewModel.fetchImages(id: id)
+                            if !fetchedImages.isEmpty {
+                                fetchedImages.forEach { image in
+                                    if let image = image {
+                                        self.images.append(image)
+                                    }
                                 }
                             }
                         }
+                        
+                        
+                        isSaving = false
+                        newName = ""
+                        cloudViewModel.canRefresh = false
+                        initCheked = true
                     }
-                    
-                    
-                    isSaving = false
-                    newName = ""
-                    cloudViewModel.canRefresh = false
                 }
             }
         }
@@ -131,6 +141,19 @@ struct DiscoverDetailNotification: View {
             noType = cloudViewModel.notificationSpots[index].type.isEmpty
             spotInCD = isSpotInCoreData()
             backImage = "chevron.left"
+            if loadingAccount {
+                let uid = cloudViewModel.notificationSpots[index].userID
+                Task {
+                    do {
+                        accountModel = try await cloudViewModel.fetchAccount(userid: uid)
+                        withAnimation {
+                            loadingAccount = false
+                        }
+                    } catch {
+                        print("failed to load user account")
+                    }
+                }
+            }
         }
         .background(ShareViewController(isPresenting: $isShare) {
             let av = getShareAC(id: cloudViewModel.notificationSpots[index].record.recordID.recordName, name: cloudViewModel.notificationSpots[index].name)
@@ -423,6 +446,59 @@ struct DiscoverDetailNotification: View {
         }
     }
     
+    private var nameAndAccountView: some View {
+        VStack(spacing: 4) {
+            HStack {
+                Text("\(cloudViewModel.notificationSpots[index].name)")
+                    .font(.system(size: 45, weight: .heavy))
+                Spacer()
+            }
+            .padding(.leading, 30)
+            .padding(.trailing, 5)
+            
+            HStack {
+                if !loadingAccount {
+                    if let accountModel = accountModel {
+                        Button {
+                            if cloudViewModel.userID == cloudViewModel.notificationSpots[index].userID {
+                                tabController.open(.profile)
+                                if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene {
+                                    windowScene.keyWindow?.rootViewController?.dismiss(animated: true)
+                                }
+                            } else {
+                                openAccountView.toggle()
+                            }
+                        } label: {
+                            HStack {
+                                Image(uiImage: accountModel.image)
+                                    .resizable()
+                                    .frame(width: 60, height: 60)
+                                    .clipShape(Circle())
+                                Text(accountModel.name)
+                                    .font(.headline)
+                                    .foregroundColor(colorScheme == .dark ? .white : .black)
+                            }
+                        }
+                    }
+                }
+                Spacer()
+                Text(dateToShow)
+                    .font(.system(size: 15, weight: .light))
+                    .foregroundColor(Color.gray)
+            }
+            .padding([.leading, .trailing], 30)
+            .onAppear {
+                if let date = cloudViewModel.notificationSpots[index].dateObject {
+                    let timeFormatter = DateFormatter()
+                    timeFormatter.dateFormat = "MMM d, yyyy"
+                    dateToShow = timeFormatter.string(from: date)
+                } else {
+                    dateToShow = cloudViewModel.notificationSpots[index].date.components(separatedBy: ";")[0]
+                }
+            }
+        }
+    }
+    
     private var detailSheet: some View {
         ScrollView(showsIndicators: false) {
             expandButton
@@ -439,35 +515,7 @@ struct DiscoverDetailNotification: View {
                 }
                 .padding([.leading, .trailing], 30)
             }
-            
-            HStack {
-                Text("\(cloudViewModel.notificationSpots[index].name)")
-                    .font(.system(size: 45, weight: .heavy))
-                Spacer()
-            }
-            .padding(.leading, 30)
-            .padding(.trailing, 5)
-            
-            HStack {
-                Text("By: \(cloudViewModel.notificationSpots[index].founder)")
-                    .font(.system(size: 15, weight: .light))
-                    .foregroundColor(Color.gray)
-                Spacer()
-                Text(dateToShow)
-                    .font(.system(size: 15, weight: .light))
-                    .foregroundColor(Color.gray)
-            }
-            .padding([.leading, .trailing], 30)
-            .onAppear {
-                if let date = cloudViewModel.notificationSpots[index].dateObject {
-                    let timeFormatter = DateFormatter()
-                    timeFormatter.dateFormat = "MMM d, yyyy"
-                    dateToShow = timeFormatter.string(from: date)
-                } else {
-                    dateToShow = cloudViewModel.notificationSpots[index].date.components(separatedBy: ";")[0]
-                }
-            }
-            
+            nameAndAccountView
             HStack {
                 Image(systemName: "icloud.and.arrow.down")
                     .font(.system(size: 15, weight: .light))
@@ -635,7 +683,7 @@ struct DiscoverDetailNotification: View {
             newSpot.image2 = images[1]
         }
         newSpot.isShared = false
-        newSpot.userId = cloudViewModel.userID
+        newSpot.userId = cloudViewModel.notificationSpots[index].userID
         newSpot.locationName = cloudViewModel.notificationSpots[index].locationName
         newSpot.name = (newName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? cloudViewModel.notificationSpots[index].name : newName)
         newSpot.x = cloudViewModel.notificationSpots[index].location.coordinate.latitude
