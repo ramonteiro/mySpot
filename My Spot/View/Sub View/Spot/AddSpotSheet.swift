@@ -37,6 +37,7 @@ struct AddSpotSheet: View {
     @State private var tags = ""
     @State private var locationName = ""
     @State private var isPublic = true
+    @State private var presentMapView = false
     
     @State private var long = 1.0
     @State private var centerRegion = MKCoordinateRegion()
@@ -84,13 +85,24 @@ struct AddSpotSheet: View {
                         Form {
                             Section {
                                 displayNamePrompt
-                            } header: {
-                                Text("Spot Name*".localized())
-                            }
-                            Section {
                                 displayIsPublicPrompt
                             } header: {
-                                Text("Share Spot".localized())
+                                VStack(spacing: 0) {
+                                    HStack {
+                                        Image(systemName: (usingCustomLocation ? "mappin" : "figure.wave"))
+                                            .font(.largeTitle)
+                                            .foregroundColor(.black)
+                                        Text(locationName.isEmpty ? "My Spot" : locationName)
+                                            .font(.largeTitle)
+                                            .foregroundColor(.black)
+                                        Spacer()
+                                    }
+                                    .padding(.bottom, 10)
+                                    HStack {
+                                        Text("Spot Name*".localized())
+                                        Spacer()
+                                    }
+                                }
                             } footer: {
                                 Text("Public spots are shown in discover tab to other users.".localized())
                                     .font(.footnote)
@@ -102,21 +114,6 @@ struct AddSpotSheet: View {
                                 Text("Spot Description".localized())
                             } footer: {
                                 Text("Use # to add tags. Example: #hiking #skating".localized())
-                                    .font(.footnote)
-                                    .foregroundColor(.gray)
-                            }
-                            Section {
-                                ViewOnlyUserOnMap(customLocation: $usingCustomLocation, hasSet: $hasSet, locationName: $locationName, centerRegion: $centerRegion)
-                                    .frame(height: UIScreen.screenHeight * 0.6)
-                                    .aspectRatio(contentMode: .fill)
-                                    .cornerRadius(15)
-                            } header: {
-                                HStack {
-                                    Image(systemName: (usingCustomLocation ? "mappin" : "figure.wave"))
-                                    Text("\(locationName)")
-                                }
-                            } footer: {
-                                Text("Location is permanent and cannot be changed after creating spot.".localized())
                                     .font(.footnote)
                                     .foregroundColor(.gray)
                             }
@@ -159,9 +156,23 @@ struct AddSpotSheet: View {
                             } header: {
                                 Text("Photo of Spot".localized())
                             } footer: {
-                                Text("Only 1 image is required (up to 3).".localized())
-                                    .font(.footnote)
-                                    .foregroundColor(.gray)
+                                VStack(spacing: 0) {
+                                    HStack {
+                                        Text("Only 1 image is required (up to 3).".localized())
+                                            .font(.footnote)
+                                            .foregroundColor(.gray)
+                                        Spacer()
+                                    }
+                                    HStack {
+                                        Text("Add Some With The".localized())
+                                            .font(.footnote)
+                                            .foregroundColor(.gray)
+                                        Image(systemName: "plus")
+                                            .font(.footnote)
+                                            .foregroundColor(.gray)
+                                        Spacer()
+                                    }
+                                }
                             }
                         }
                         .onSubmit {
@@ -185,6 +196,9 @@ struct AddSpotSheet: View {
                                 activeSheet = .cameraRollSheet
                             }
                             Button("Cancel".localized(), role: .cancel) { }
+                        }
+                        .fullScreenCover(isPresented: $presentMapView) {
+                            ViewOnlyUserOnMap(customLocation: $usingCustomLocation, hasSet: $hasSet, locationName: $locationName, centerRegion: $centerRegion)
                         }
                         .fullScreenCover(item: $activeSheet) { item in
                             switch item {
@@ -226,8 +240,9 @@ struct AddSpotSheet: View {
                                     .ignoresSafeArea()
                             }
                         }
-                        .navigationTitle("Create Spot".localized())
-                        .navigationViewStyle(.automatic)
+                        .navigationBarTitle("")
+                        .navigationBarTitleDisplayMode(.inline)
+                        .navigationViewStyle(.stack)
                         .toolbar {
                             ToolbarItemGroup(placement: .bottomBar) {
                                 HStack {
@@ -241,7 +256,11 @@ struct AddSpotSheet: View {
                                     .disabled(images?.count ?? 3 > 2)
                                     EditButton()
                                         .disabled(images?.isEmpty ?? true)
-                                    
+                                    Button {
+                                        presentMapView.toggle()
+                                    } label: {
+                                        Image(systemName: "map")
+                                    }
                                     Spacer()
                                 }
                             }

@@ -267,11 +267,7 @@ struct SpotEditSheet: View {
                     }
                     .focused($focusState, equals: .name)
                     .submitLabel(.next)
-            } header: {
-                Text("Spot Name*".localized())
-            }
-            if (!fromDB) {
-                Section {
+                if !fromDB {
                     displayIsPublicPrompt
                         .onAppear {
                             if !isPublicChecked {
@@ -279,18 +275,18 @@ struct SpotEditSheet: View {
                                 isPublicChecked = true
                             }
                         }
-                } header: {
-                    Text("Share Spot".localized())
-                } footer: {
-                    if wasPublic {
-                        Text("Setting a public spot to private will remove it from discover tab.".localized())
-                            .font(.footnote)
-                            .foregroundColor(.gray)
-                    } else {
-                        Text("Public spots are shown in discover tab to other users.".localized())
-                            .font(.footnote)
-                            .foregroundColor(.gray)
-                    }
+                }
+            } header: {
+                Text("Spot Name*".localized())
+            } footer: {
+                if wasPublic {
+                    Text("Setting a public spot to private will remove it from discover tab.".localized())
+                        .font(.footnote)
+                        .foregroundColor(.gray)
+                } else {
+                    Text("Public spots are shown in discover tab to other users.".localized())
+                        .font(.footnote)
+                        .foregroundColor(.gray)
                 }
             }
             Section {
@@ -351,9 +347,23 @@ struct SpotEditSheet: View {
             } header: {
                 Text("Photo of Spot".localized())
             } footer: {
-                Text("Only 1 image is required (up to 3).".localized())
-                    .font(.footnote)
-                    .foregroundColor(.gray)
+                VStack(spacing: 0) {
+                    HStack {
+                        Text("Only 1 image is required (up to 3).".localized())
+                            .font(.footnote)
+                            .foregroundColor(.gray)
+                        Spacer()
+                    }
+                    HStack {
+                        Text("Add Some With The".localized())
+                            .font(.footnote)
+                            .foregroundColor(.gray)
+                        Image(systemName: "plus")
+                            .font(.footnote)
+                            .foregroundColor(.gray)
+                        Spacer()
+                    }
+                }
             }
         }
     }
