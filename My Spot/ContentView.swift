@@ -223,8 +223,8 @@ struct ContentView: View {
                 if !addSpotIsSaving {
                     Image(systemName: "plus.app")
                         .resizable()
-                        .frame(width: geo.size.width / 7, height: geo.size.width / 7, alignment: .center)
-                        .offset(x: geo.size.width / 2 - ((geo.size.width / 7) / 2), y: geo.size.height - (geo.size.height * 0.025) - ((geo.size.width / 7) / 2))
+                        .frame(width: 40, height: 40, alignment: .center)
+                        .offset(x: geo.size.width / 2 - 20, y: geo.size.height - 40)
                         .foregroundColor(.gray)
                         .onTapGesture {
                             UserDefaults.standard.set(Double(-1.0), forKey: "tempPinX")

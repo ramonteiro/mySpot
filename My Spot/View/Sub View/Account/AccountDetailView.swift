@@ -99,6 +99,7 @@ struct AccountDetailView: View {
                             }
                         }
                     }
+                    .navigationViewStyle(.stack)
                 } else {
                     ProgressView("Loading Account".localized())
                         .padding()
@@ -207,6 +208,7 @@ struct AccountDetailView: View {
                 }
             }
         }
+        .navigationViewStyle(.stack)
     }
     
     private func inititalize() async {
