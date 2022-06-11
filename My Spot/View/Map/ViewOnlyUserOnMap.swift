@@ -32,6 +32,8 @@ struct ViewOnlyUserOnMap: View {
     @State private var searchText: String = ""
     @State private var didSet = false
     @State private var customCoordinates: CLLocationCoordinate2D = CLLocationCoordinate2D()
+    @State private var customLocationCache = false
+    @State private var didAppear = false
     
     var body: some View {
         ZStack {
@@ -56,6 +58,10 @@ struct ViewOnlyUserOnMap: View {
         }
         .onAppear {
             mapViewModel.checkLocationAuthorization()
+            if !didAppear {
+                customLocationCache = customLocation
+            }
+            didAppear = true
         }
     }
     
@@ -73,6 +79,7 @@ struct ViewOnlyUserOnMap: View {
         VStack(spacing: padding) {
             HStack {
                 Button("Cancel".localized()) {
+                    customLocation = customLocationCache
                     presentationMode.wrappedValue.dismiss()
                 }
                 .buttonStyle(.borderedProminent)
