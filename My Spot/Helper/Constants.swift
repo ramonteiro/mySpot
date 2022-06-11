@@ -15,7 +15,7 @@ import SwiftUI
 
 // defines max character length for each field
 enum MaxCharLength {
-    static let names = 20
+    static let names = 30
     static let emojis = 1
     static let description = 1200
     static let bio = 100

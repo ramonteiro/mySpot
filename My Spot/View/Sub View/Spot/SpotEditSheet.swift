@@ -147,9 +147,23 @@ struct SpotEditSheet: View {
                                 .ignoresSafeArea()
                         }
                     }
-                    .navigationTitle(name)
-                    .navigationViewStyle(.automatic)
+                    .navigationTitle("")
+                    .navigationViewStyle(.stack)
+                    .navigationBarTitleDisplayMode(.inline)
                     .toolbar {
+                        ToolbarItemGroup(placement: .principal) {
+                            VStack {
+                                HStack {
+                                    Image(systemName: (!spot.wasThere ? "mappin" : "figure.wave"))
+                                    Text(spot.locationName ?? "My Spot")
+                                }
+                                .font(.subheadline)
+                                Text(spot.dateObject?.format() ?? spot.date?.components(separatedBy: ";")[0] ?? "")
+                                    .font(.caption)
+                                    .foregroundColor(.gray)
+                            }
+                            .frame(width: UIScreen.screenWidth * 0.7)
+                        }
                         ToolbarItemGroup(placement: .bottomBar) {
                             imageToolItems
                         }

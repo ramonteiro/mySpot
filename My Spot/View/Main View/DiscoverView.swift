@@ -593,11 +593,11 @@ struct SearchBar: View {
         .padding(.horizontal)
         .onChange(of: searchText) { newValue in
             if !newValue.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-                withAnimation {
+                withAnimation(.easeInOut(duration: 0.2)) {
                     canCancel = true
                 }
             } else {
-                withAnimation {
+                withAnimation(.easeInOut(duration: 0.2)) {
                     canCancel = false
                 }
             }

@@ -25,10 +25,9 @@ struct SetUpNewSpotNoti: View {
     var body: some View {
         NavigationView {
             ZStack {
-                MapView(centerRegion: $centerRegion, annotations: locations, isForNotifications: true)
+                MapView(centerRegion: $centerRegion, annotations: locations)
                     .allowsHitTesting(!saving)
-                Cross()
-                    .stroke(cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex])
+                pinOverlayShape
                 if (saving) {
                     Color.black.opacity(0.5)
                         .ignoresSafeArea()
@@ -121,17 +120,18 @@ struct SetUpNewSpotNoti: View {
     private func getIsMetric() -> Bool {
         return ((Locale.current as NSLocale).object(forKey: NSLocale.Key.usesMetricSystem) as? Bool) ?? true
     }
-}
-
-struct Cross: Shape {
-    func path(in rect: CGRect) -> Path {
-        return Path { path in
-            path.move(to: CGPoint(x: rect.midX, y: 0))
-            path.addLine(to: CGPoint(x: rect.midX, y: rect.maxY))
-            path.move(to: CGPoint(x: 0, y: rect.midY))
-            path.addLine(to: CGPoint(x: rect.maxX, y: rect.midY))
-            path.move(to: CGPoint(x: rect.midX, y: rect.midY))
-            path.addArc(center: CGPoint(x: rect.midX, y: rect.midY), radius: 10, startAngle: Angle(degrees: 0), endAngle: Angle(degrees: 360), clockwise: false)
+    
+    private var pinOverlayShape: some View {
+        ZStack {
+            VStack {
+                MapPin()
+                    .frame(width: 40, height: 40)
+                    .foregroundColor(cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex])
+                Spacer()
+                    .frame(height: 50)
+            }
+            CustomMapCircle()
+                .stroke(cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex])
         }
     }
 }
@@ -141,24 +141,19 @@ struct MapView: UIViewRepresentable {
     @EnvironmentObject var mapViewModel: MapViewModel
     @Binding var centerRegion: MKCoordinateRegion
     var annotations: [MKPointAnnotation]
-    var isForNotifications: Bool
     
     func makeUIView(context: Context) -> some MKMapView {
         let mapView = MKMapView()
         mapView.showsCompass = false
         mapView.showsUserLocation = mapViewModel.isAuthorized
-        if (UserDefaults.standard.valueExists(forKey: "discovernotiy") && isForNotifications) {
+        if (UserDefaults.standard.valueExists(forKey: "discovernotiy")) {
             let y = UserDefaults.standard.double(forKey: "discovernotiy")
             let x = UserDefaults.standard.double(forKey: "discovernotix")
             let location = CLLocationCoordinate2D(latitude: x, longitude: y)
             let newRegion = MKCoordinateRegion(center: location, span: mapViewModel.region.span)
             mapView.setRegion(newRegion, animated: true)
         } else {
-            if (UserDefaults.standard.valueExists(forKey: "tempPinX") && UserDefaults.standard.double(forKey: "tempPinX") != -1.0) {
-                mapView.setRegion(MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: UserDefaults.standard.double(forKey: "tempPinX"), longitude: UserDefaults.standard.double(forKey: "tempPinY")), span: mapViewModel.region.span), animated: true)
-            } else {
-                mapView.setRegion(mapViewModel.region, animated: true)
-            }
+            mapView.setRegion(mapViewModel.region, animated: true)
         }
         mapView.delegate = context.coordinator
         return mapView

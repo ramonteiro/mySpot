@@ -95,7 +95,9 @@
 		C5552CD128298E6900AF2683 /* CloudSharingController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5552CD028298E6900AF2683 /* CloudSharingController.swift */; };
 		C56011B52800E66A00C49597 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = C56011B72800E66A00C49597 /* Localizable.strings */; };
 		C56F499F27E05CE300BCBB8F /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = C56F499E27E05CE300BCBB8F /* Extensions.swift */; };
+		C572D329285547B300C10421 /* LocationSearch.swift in Sources */ = {isa = PBXBuildFile; fileRef = C572D328285547B300C10421 /* LocationSearch.swift */; };
 		C587027427E27F1900DFB6C4 /* MailViewCallback.swift in Sources */ = {isa = PBXBuildFile; fileRef = C587027327E27F1900DFB6C4 /* MailViewCallback.swift */; };
+		C587B46B2854F472007C3263 /* DatePickerSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = C587B46A2854F472007C3263 /* DatePickerSheet.swift */; };
 		C58F2BF62830AA42005FA88F /* WelcomeSheet in Frameworks */ = {isa = PBXBuildFile; productRef = C58F2BF52830AA42005FA88F /* WelcomeSheet */; };
 		C594BB82284D37730012DA6C /* AccountModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C594BB81284D37730012DA6C /* AccountModel.swift */; };
 		C5B01354284AD15B00121163 /* CreateAccountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5B01353284AD15B00121163 /* CreateAccountView.swift */; };
@@ -285,7 +287,9 @@
 		C56011C12800F61300C49597 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/Localizable.strings; sourceTree = "<group>"; };
 		C56011C22800F64000C49597 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/Localizable.strings; sourceTree = "<group>"; };
 		C56F499E27E05CE300BCBB8F /* Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
+		C572D328285547B300C10421 /* LocationSearch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationSearch.swift; sourceTree = "<group>"; };
 		C587027327E27F1900DFB6C4 /* MailViewCallback.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MailViewCallback.swift; sourceTree = "<group>"; };
+		C587B46A2854F472007C3263 /* DatePickerSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DatePickerSheet.swift; sourceTree = "<group>"; };
 		C594BB81284D37730012DA6C /* AccountModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountModel.swift; sourceTree = "<group>"; };
 		C5B01353284AD15B00121163 /* CreateAccountView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateAccountView.swift; sourceTree = "<group>"; };
 		C5D2954A2823719100FBA01E /* MySpotWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = MySpotWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -531,6 +535,7 @@
 				C51503EF27D7CA10009F0DCD /* Discover */,
 				C51503EE27D7CA03009F0DCD /* Playlist */,
 				C51503EC27D7C9F6009F0DCD /* Spot */,
+				C572D328285547B300C10421 /* LocationSearch.swift */,
 			);
 			path = Map;
 			sourceTree = "<group>";
@@ -542,6 +547,7 @@
 				C51503F827D7CA49009F0DCD /* Playlist */,
 				C51503F727D7CA3F009F0DCD /* Discover */,
 				C51503F627D7CA31009F0DCD /* Spot */,
+				C587B46A2854F472007C3263 /* DatePickerSheet.swift */,
 			);
 			path = "Sub View";
 			sourceTree = "<group>";
@@ -915,6 +921,7 @@
 				C515040827D7CA7B009F0DCD /* DiscoverDetailView.swift in Sources */,
 				C515042327D7CAC6009F0DCD /* Constants.swift in Sources */,
 				C51503E127D7C856009F0DCD /* Spot+CoreDataClass.swift in Sources */,
+				C572D329285547B300C10421 /* LocationSearch.swift in Sources */,
 				C502D4FB27E1A6310057A65C /* SpotEditSheet.swift in Sources */,
 				C51503E427D7C856009F0DCD /* Spots.xcdatamodeld in Sources */,
 				C50CF4AA27F13915001A9698 /* ChoosePhoto.swift in Sources */,
@@ -925,6 +932,7 @@
 				C51503F427D7CA1D009F0DCD /* MapViewModel.swift in Sources */,
 				C51503FC27D7CA60009F0DCD /* MySpotsView.swift in Sources */,
 				C515041B27D7CAAA009F0DCD /* MapAnnotationDiscover.swift in Sources */,
+				C587B46B2854F472007C3263 /* DatePickerSheet.swift in Sources */,
 				C51503AE27D7C347009F0DCD /* My_SpotApp.swift in Sources */,
 				C5552CCD2827696500AF2683 /* NotificationView.swift in Sources */,
 				C501FC1827E3FAB7008FEFA1 /* ZoomableScrollView.swift in Sources */,

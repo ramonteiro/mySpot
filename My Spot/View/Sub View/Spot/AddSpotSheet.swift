@@ -38,6 +38,8 @@ struct AddSpotSheet: View {
     @State private var locationName = ""
     @State private var isPublic = true
     @State private var presentMapView = false
+    @State private var presentCalendar = false
+    @State private var dateFound = Date()
     
     @State private var long = 1.0
     @State private var centerRegion = MKCoordinateRegion()
@@ -87,22 +89,7 @@ struct AddSpotSheet: View {
                                 displayNamePrompt
                                 displayIsPublicPrompt
                             } header: {
-                                VStack(spacing: 0) {
-                                    HStack {
-                                        Image(systemName: (usingCustomLocation ? "mappin" : "figure.wave"))
-                                            .font(.largeTitle)
-                                            .foregroundColor(.black)
-                                        Text(locationName.isEmpty ? "My Spot" : locationName)
-                                            .font(.largeTitle)
-                                            .foregroundColor(.black)
-                                        Spacer()
-                                    }
-                                    .padding(.bottom, 10)
-                                    HStack {
-                                        Text("Spot Name*".localized())
-                                        Spacer()
-                                    }
-                                }
+                                Text("Spot Name*".localized())
                             } footer: {
                                 Text("Public spots are shown in discover tab to other users.".localized())
                                     .font(.footnote)
@@ -197,8 +184,11 @@ struct AddSpotSheet: View {
                             }
                             Button("Cancel".localized(), role: .cancel) { }
                         }
+                        .sheet(isPresented: $presentCalendar) {
+                            DatePickerSheet(dateFound: $dateFound)
+                        }
                         .fullScreenCover(isPresented: $presentMapView) {
-                            ViewOnlyUserOnMap(customLocation: $usingCustomLocation, hasSet: $hasSet, locationName: $locationName, centerRegion: $centerRegion)
+                            ViewOnlyUserOnMap(customLocation: $usingCustomLocation, locationName: $locationName, centerRegion: $centerRegion)
                         }
                         .fullScreenCover(item: $activeSheet) { item in
                             switch item {
@@ -244,6 +234,20 @@ struct AddSpotSheet: View {
                         .navigationBarTitleDisplayMode(.inline)
                         .navigationViewStyle(.stack)
                         .toolbar {
+                            ToolbarItemGroup(placement: .principal) {
+                                VStack {
+                                    HStack {
+                                        Image(systemName: (usingCustomLocation ? "mappin" : "figure.wave"))
+                                        Text(locationName.isEmpty ? "My Spot" : locationName)
+                                        
+                                    }
+                                    .font(.subheadline)
+                                    Text(dateFound.format())
+                                        .font(.caption)
+                                        .foregroundColor(.gray)
+                                }
+                                .frame(width: UIScreen.screenWidth * 0.7)
+                            }
                             ToolbarItemGroup(placement: .bottomBar) {
                                 HStack {
                                     Spacer()
@@ -254,12 +258,20 @@ struct AddSpotSheet: View {
                                         Image(systemName: "plus")
                                     }
                                     .disabled(images?.count ?? 3 > 2)
+                                    Spacer()
                                     EditButton()
                                         .disabled(images?.isEmpty ?? true)
+                                    Spacer()
                                     Button {
                                         presentMapView.toggle()
                                     } label: {
                                         Image(systemName: "map")
+                                    }
+                                    Spacer()
+                                    Button {
+                                        presentCalendar.toggle()
+                                    } label: {
+                                        Image(systemName: "calendar")
                                     }
                                     Spacer()
                                 }
@@ -417,11 +429,13 @@ struct AddSpotSheet: View {
     }
     
     private func getDate()->String{
-        let time = Date()
         let timeFormatter = DateFormatter()
-        timeFormatter.dateFormat = "MMM d, yyyy; HH:mm:ss"
-        let stringDate = timeFormatter.string(from: time)
-        return stringDate
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "MMM d, yyyy"
+        timeFormatter.dateFormat = "HH:mm:ss"
+        let stringTime = timeFormatter.string(from: Date())
+        let stringDate = dateFormatter.string(from: dateFound)
+        return stringDate + "; " + stringTime
     }
     
     private func save() async {
@@ -483,6 +497,7 @@ struct AddSpotSheet: View {
         newSpot.fromDB = false
         newSpot.isPublic = false
         newSpot.date = getDate()
+        newSpot.dateObject = dateFound
         newSpot.tags = tags
         newSpot.locationName = locationName
         newSpot.id = UUID()
@@ -545,7 +560,7 @@ struct AddSpotSheet: View {
                 if let founderName = UserDefaults.standard.string(forKey: "founder") {
                     founder = founderName
                 }
-                let id = try await cloudViewModel.addSpotToPublic(name: name, founder: founder, date: getDate(), locationName: locationName, x: (usingCustomLocation ? centerRegion.center.latitude : lat), y: (usingCustomLocation ? centerRegion.center.longitude : long), description: descript, type: tags, image: imageData, image2: imageData2, image3: imageData3, isMultipleImages: (images?.count ?? 1) - 1, customLocation: usingCustomLocation, dateObject: Date())
+                let id = try await cloudViewModel.addSpotToPublic(name: name, founder: founder, date: getDate(), locationName: locationName, x: (usingCustomLocation ? centerRegion.center.latitude : lat), y: (usingCustomLocation ? centerRegion.center.longitude : long), description: descript, type: tags, image: imageData, image2: imageData2, image3: imageData3, isMultipleImages: (images?.count ?? 1) - 1, customLocation: usingCustomLocation, dateObject: dateFound)
                 if !id.isEmpty {
                     newSpot.dbid = id
                     newSpot.isPublic = true
