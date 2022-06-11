@@ -17,10 +17,9 @@ struct ViewOnlyUserOnMap: View {
     
     @EnvironmentObject var mapViewModel: MapViewModel
     @EnvironmentObject var cloudViewModel: CloudKitViewModel
-    @Environment(\.colorScheme) var colorScheme
     @Environment(\.presentationMode) var presentationMode
     @Binding var customLocation: Bool
-    @Binding var locationName: String
+    @Binding var didSave: Bool
     @State private var locations = [MKPointAnnotation]()
     @Binding var centerRegion: MKCoordinateRegion
     @State private var map = MKMapView()
@@ -28,11 +27,11 @@ struct ViewOnlyUserOnMap: View {
     private let padding: CGFloat = 10
     
     @State private var presentCustomCoordinatesSheet = false
+    @State private var presentSearchSheet = false
+    @State private var landmarks: [Landmark] = [Landmark]()
+    @State private var searchText: String = ""
     @State private var didSet = false
     @State private var customCoordinates: CLLocationCoordinate2D = CLLocationCoordinate2D()
-    
-    @State private var searchText: String = ""
-    @State private var places: [Place] = []
     
     var body: some View {
         ZStack {
@@ -41,19 +40,8 @@ struct ViewOnlyUserOnMap: View {
             if customLocation {
                 pinOverlayShape
             }
-            if !searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && !places.isEmpty {
-                searchList
-            }
             buttonOverlays
-        }
-        .onChange(of: searchText) { text in
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                if text == searchText {
-                    Task {
-                        await self.searchQuery()
-                    }
-                }
-            }
+                .padding(.vertical, padding * 4)
         }
         .sheet(isPresented: $presentCustomCoordinatesSheet) {
             if didSet {
@@ -63,25 +51,11 @@ struct ViewOnlyUserOnMap: View {
         } content: {
             customCoordinatesSheet(customCoordinates: $customCoordinates, didSet: $didSet)
         }
+        .sheet(isPresented: $presentSearchSheet) {
+            SearchSheetMaps(map: $map, landmarks: $landmarks, searchText: $searchText)
+        }
         .onAppear {
             mapViewModel.checkLocationAuthorization()
-        }
-        .gesture(DragGesture()
-            .onChanged { _ in
-                UIApplication.shared.dismissKeyboard()
-            }
-        )
-    }
-    
-    private var searchList: some View {
-        ScrollView(showsIndicators: false) {
-            LazyVStack(spacing: 15) {
-                ForEach(places) { place in
-                    Text(place.place.name ?? "")
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                    Divider()
-                }
-            }
         }
     }
     
@@ -104,14 +78,11 @@ struct ViewOnlyUserOnMap: View {
                 .buttonStyle(.borderedProminent)
                 Spacer()
                 Button("Save".localized()) {
+                    didSave = true
                     presentationMode.wrappedValue.dismiss()
                 }
                 .buttonStyle(.borderedProminent)
             }
-            MapSearchBar(searchText: $searchText)
-                .frame(width: UIScreen.screenWidth - (padding * 2))
-                .shadow(radius: 20)
-                .offset(y: customLocation ? 0 : -200)
             Spacer()
         }
         .padding(.horizontal, padding)
@@ -121,6 +92,18 @@ struct ViewOnlyUserOnMap: View {
         HStack {
             VStack(spacing: padding * 1.5) {
                 Spacer()
+                Button {
+                    presentSearchSheet.toggle()
+                } label: {
+                    Image(systemName: "location.magnifyingglass")
+                        .font(.title2)
+                        .foregroundColor(.white)
+                        .padding(padding)
+                        .frame(width: 50, height: 50)
+                        .background(cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex])
+                        .clipShape(Circle())
+                        .offset(x: customLocation ? 0 : -100)
+                }
                 Button {
                     presentCustomCoordinatesSheet.toggle()
                 } label: {
@@ -180,7 +163,6 @@ struct ViewOnlyUserOnMap: View {
             }
         }
         .padding(.horizontal, padding)
-        .opacity(searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? 1 : 0)
     }
     
     private var pinOverlayShape: some View {
@@ -214,20 +196,62 @@ struct ViewOnlyUserOnMap: View {
     private func focusMap() {
         map.setRegion(mapViewModel.region, animated: true)
     }
+}
+
+struct SearchSheetMaps: View {
     
-    private func searchQuery() async {
+    @Binding var map: MKMapView
+    @Binding var landmarks: [Landmark]
+    @Environment(\.presentationMode) var presentationMode
+    @Binding var searchText: String
+    
+    var body: some View {
+        VStack(spacing: 0) {
+            MapSearchBar(searchText: $searchText)
+                .padding(.vertical, 20)
+            List {
+                ForEach(landmarks, id: \.id) { landmark in
+                    VStack(alignment: .leading) {
+                        Text(landmark.name)
+                            .fontWeight(.bold)
+                        Text(landmark.title)
+                    }
+                    .onTapGesture {
+                        if let location = landmark.placemark.location {
+                            withAnimation {
+                                presentationMode.wrappedValue.dismiss()
+                                map.setRegion(MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: location.coordinate.latitude, longitude: location.coordinate.longitude), span: MKCoordinateSpan(latitudeDelta: 0.005, longitudeDelta: 0.005)), animated: true)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        .gesture(DragGesture()
+            .onChanged { _ in
+                UIApplication.shared.dismissKeyboard()
+            }
+        )
+        .onChange(of: searchText) { text in
+            if !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                getNearByLandmarks()
+            }
+        }
+    }
+    
+    private func getNearByLandmarks() {
         
-        places.removeAll()
         let request = MKLocalSearch.Request()
         request.naturalLanguageQuery = searchText
         
-        do {
-            let response = try await MKLocalSearch(request: request).start()
-            self.places = response.mapItems.map { item in
-                return Place(place: item.placemark)
+        let search = MKLocalSearch(request: request)
+        search.start { (response, error) in
+            if let response = response {
+                let mapItems = response.mapItems
+                self.landmarks = mapItems.map {
+                    Landmark(placemark: $0.placemark)
+                }
             }
-        } catch {
-            print(error)
         }
     }
 }
@@ -375,8 +399,23 @@ struct MapSearchBar: View {
     }
 }
 
-struct Place: Identifiable {
+struct Landmark {
     
-    let id = UUID().uuidString
-    let place: CLPlacemark
+    let placemark: MKPlacemark
+    
+    var id: UUID {
+        return UUID()
+    }
+    
+    var name: String {
+        self.placemark.name ?? ""
+    }
+    
+    var title: String {
+        self.placemark.title ?? ""
+    }
+    
+    var coordinate: CLLocationCoordinate2D {
+        self.placemark.coordinate
+    }
 }

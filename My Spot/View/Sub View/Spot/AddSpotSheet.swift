@@ -40,6 +40,7 @@ struct AddSpotSheet: View {
     @State private var presentMapView = false
     @State private var presentCalendar = false
     @State private var dateFound = Date()
+    @State private var didSave = false
     
     @State private var long = 1.0
     @State private var centerRegion = MKCoordinateRegion()
@@ -188,7 +189,15 @@ struct AddSpotSheet: View {
                             DatePickerSheet(dateFound: $dateFound)
                         }
                         .fullScreenCover(isPresented: $presentMapView) {
-                            ViewOnlyUserOnMap(customLocation: $usingCustomLocation, locationName: $locationName, centerRegion: $centerRegion)
+                            if didSave && usingCustomLocation {
+                                mapViewModel.getPlacmarkOfLocation(location: CLLocation(latitude: centerRegion.center.latitude, longitude: centerRegion.center.longitude)) { name in
+                                    locationName = name
+                                }
+                            }
+                            didSave = false
+                        } content: {
+                            ViewOnlyUserOnMap(customLocation: $usingCustomLocation, didSave: $didSave, centerRegion: $centerRegion)
+                                .ignoresSafeArea()
                         }
                         .fullScreenCover(item: $activeSheet) { item in
                             switch item {

@@ -95,7 +95,6 @@
 		C5552CD128298E6900AF2683 /* CloudSharingController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5552CD028298E6900AF2683 /* CloudSharingController.swift */; };
 		C56011B52800E66A00C49597 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = C56011B72800E66A00C49597 /* Localizable.strings */; };
 		C56F499F27E05CE300BCBB8F /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = C56F499E27E05CE300BCBB8F /* Extensions.swift */; };
-		C572D329285547B300C10421 /* LocationSearch.swift in Sources */ = {isa = PBXBuildFile; fileRef = C572D328285547B300C10421 /* LocationSearch.swift */; };
 		C587027427E27F1900DFB6C4 /* MailViewCallback.swift in Sources */ = {isa = PBXBuildFile; fileRef = C587027327E27F1900DFB6C4 /* MailViewCallback.swift */; };
 		C587B46B2854F472007C3263 /* DatePickerSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = C587B46A2854F472007C3263 /* DatePickerSheet.swift */; };
 		C58F2BF62830AA42005FA88F /* WelcomeSheet in Frameworks */ = {isa = PBXBuildFile; productRef = C58F2BF52830AA42005FA88F /* WelcomeSheet */; };
@@ -287,7 +286,6 @@
 		C56011C12800F61300C49597 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/Localizable.strings; sourceTree = "<group>"; };
 		C56011C22800F64000C49597 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/Localizable.strings; sourceTree = "<group>"; };
 		C56F499E27E05CE300BCBB8F /* Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
-		C572D328285547B300C10421 /* LocationSearch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationSearch.swift; sourceTree = "<group>"; };
 		C587027327E27F1900DFB6C4 /* MailViewCallback.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MailViewCallback.swift; sourceTree = "<group>"; };
 		C587B46A2854F472007C3263 /* DatePickerSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DatePickerSheet.swift; sourceTree = "<group>"; };
 		C594BB81284D37730012DA6C /* AccountModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountModel.swift; sourceTree = "<group>"; };
@@ -535,7 +533,6 @@
 				C51503EF27D7CA10009F0DCD /* Discover */,
 				C51503EE27D7CA03009F0DCD /* Playlist */,
 				C51503EC27D7C9F6009F0DCD /* Spot */,
-				C572D328285547B300C10421 /* LocationSearch.swift */,
 			);
 			path = Map;
 			sourceTree = "<group>";
@@ -921,7 +918,6 @@
 				C515040827D7CA7B009F0DCD /* DiscoverDetailView.swift in Sources */,
 				C515042327D7CAC6009F0DCD /* Constants.swift in Sources */,
 				C51503E127D7C856009F0DCD /* Spot+CoreDataClass.swift in Sources */,
-				C572D329285547B300C10421 /* LocationSearch.swift in Sources */,
 				C502D4FB27E1A6310057A65C /* SpotEditSheet.swift in Sources */,
 				C51503E427D7C856009F0DCD /* Spots.xcdatamodeld in Sources */,
 				C50CF4AA27F13915001A9698 /* ChoosePhoto.swift in Sources */,
