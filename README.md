@@ -9,6 +9,8 @@
 
 [Youtube My Spot Demo up to 1.3.3](https://www.youtube.com/watch?v=UcQJhaeTPng&t=11s), this includes everything else
 
+[Youtube My Spot Demo up to 2.0.0](https://youtube.com/shorts/P-rfnfZ44XM?feature=share), this will include only changes made in 2.0.0
+
 ## What is My Spot?
 My Spot is a simple app that allows users to create spots that save photos, location, date, and description info to keep track of certain locations. It also alows for spots to be uploaded and shared to others.
 
