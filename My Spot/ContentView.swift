@@ -240,6 +240,7 @@ struct ContentView: View {
                 }
             }
         }
+        .ignoresSafeArea(.keyboard, edges: .bottom)
     }
     
     // Onboard Screens:

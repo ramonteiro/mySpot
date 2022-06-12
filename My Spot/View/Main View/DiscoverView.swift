@@ -28,7 +28,6 @@ struct DiscoverView: View {
     @State private var isMetric = false
     @State private var hasError = false
     @State private var searching = false
-    @State private var canLoad = false
     @State private var index: Int?
     @State private var showPlaceDetail = false
     
@@ -264,16 +263,6 @@ struct DiscoverView: View {
     private var displaySpotsFromDB: some View {
         ZStack {
             listSpots
-            if (cloudViewModel.isFetching) {
-                ZStack {
-                    ProgressView("Loading Spots".localized())
-                        .padding()
-                        .background(
-                            RoundedRectangle(cornerRadius: 10)
-                                .fill(Color(UIColor.systemBackground))
-                        )
-                }
-            }
             if hasError {
                 VStack {
                     HStack {
@@ -323,9 +312,28 @@ struct DiscoverView: View {
                         DiscoverRow(spot: cloudViewModel.spots[i])
                     }
                 }
-                if (canLoad) {
-                    loadMoreSpots
-                        .listRowBackground(Color.clear)
+                if cloudViewModel.isFetching {
+                    HStack {
+                        Spacer()
+                        ProgressView()
+                        Spacer()
+                    }
+                    .listRowBackground(Color.clear)
+                    .listRowSeparator(.hidden)
+                } else {
+                    GeometryReader { reader -> Color in
+                        let minY = reader.frame(in: .global).minY
+                        let height = UIScreen.screenHeight / 1.3
+                        if minY < height {
+                            if let cursor = cloudViewModel.cursorMain {
+                                Task {
+                                    await cloudViewModel.fetchMoreSpotsPublic(cursor: cursor, desiredKeys: cloudViewModel.desiredKeys, resultLimit: cloudViewModel.limit)
+                                }
+                            }
+                        }
+                        return Color.clear
+                    }
+                    .listRowBackground(Color.clear)
                 }
             }
             .if(cloudViewModel.canRefresh) { view in
@@ -339,21 +347,6 @@ struct DiscoverView: View {
                     UIApplication.shared.dismissKeyboard()
                 }
             )
-            .onChange(of: cloudViewModel.isFetching) { fetching in
-                if fetching {
-                    withAnimation {
-                        canLoad = false
-                    }
-                } else if let _ = cloudViewModel.cursorMain {
-                    withAnimation {
-                        canLoad = true
-                    }
-                } else {
-                    withAnimation {
-                        canLoad = false
-                    }
-                }
-            }
             .onAppear {
                 cloudViewModel.canRefresh = true
             }
@@ -470,23 +463,6 @@ struct DiscoverView: View {
             }
             ToolbarItemGroup(placement: .navigationBarLeading) {
                 displayLocationIcon
-            }
-        }
-    }
-    
-    private var loadMoreSpots: some View {
-        HStack {
-            Spacer()
-            Text("Load More Spots".localized())
-                .foregroundColor(cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex])
-            Spacer()
-        }
-        .onTapGesture {
-            if cloudViewModel.isFetching { return }
-            if let cursor = cloudViewModel.cursorMain {
-                Task {
-                    await cloudViewModel.fetchMoreSpotsPublic(cursor: cursor, desiredKeys: cloudViewModel.desiredKeys, resultLimit: cloudViewModel.limit)
-                }
             }
         }
     }

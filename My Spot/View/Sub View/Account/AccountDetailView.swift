@@ -83,18 +83,33 @@ struct AccountDetailView: View {
                                                 .padding(4)
                                         }
                                     }
-                                    .padding(.horizontal, 15)
-                                    if cloudViewModel.cursorAccount != nil && !isFetching {
-                                        loadMoreSpots
+                                    if isFetching {
+                                        HStack {
+                                            Spacer()
+                                            ProgressView()
+                                            Spacer()
+                                        }
+                                        .background(Color.clear)
+                                    } else {
+                                        GeometryReader { reader -> Color in
+                                            let minY = reader.frame(in: .global).minY
+                                            let height = UIScreen.screenHeight / 1.3
+                                            if minY < height {
+                                                if let cursor = cloudViewModel.cursorAccount {
+                                                    Task {
+                                                        isFetching = true
+                                                        do {
+                                                            spots += try await cloudViewModel.fetchMoreAccountSpots(cursor: cursor)
+                                                        } catch {
+                                                            print("Failed to fetch more spots")
+                                                        }
+                                                        isFetching = false
+                                                    }
+                                                }
+                                            }
+                                            return Color.clear
+                                        }
                                     }
-                                }
-                                if isFetching {
-                                    ProgressView("Loading Spots".localized())
-                                        .padding()
-                                        .background(
-                                            RoundedRectangle(cornerRadius: 10)
-                                                .fill(Color(UIColor.systemBackground))
-                                        )
                                 }
                             }
                         }
@@ -318,29 +333,6 @@ struct AccountDetailView: View {
            }
        }
         return ""
-    }
-    
-    private var loadMoreSpots: some View {
-        HStack {
-            Spacer()
-            Text("Load More Spots".localized())
-                .foregroundColor(cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex])
-            Spacer()
-        }
-        .onTapGesture {
-            if isFetching { return }
-            if let cursor = cloudViewModel.cursorAccount {
-                Task {
-                    isFetching = true
-                    do {
-                        spots += try await cloudViewModel.fetchMoreAccountSpots(cursor: cursor)
-                    } catch {
-                        print("Failed to fetch more spots")
-                    }
-                    isFetching = false
-                }
-            }
-        }
     }
     
     private func initializeBadgesAndLinks() {
