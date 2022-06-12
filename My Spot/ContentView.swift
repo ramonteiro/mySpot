@@ -178,7 +178,11 @@ struct ContentView: View {
                         failedToAcceptShare = true
                     }
                 }
-                .fullScreenCover(isPresented: $presentAccountCreation) {
+                .fullScreenCover(isPresented: $presentAccountCreation, onDismiss: {
+                    if !UserDefaults.standard.bool(forKey: "whatsnew") {
+                        whatsNew.toggle()
+                    }
+                }) {
                     CreateAccountView(accountModel: nil)
                 }
                 .alert("Invite Accepted!".localized(), isPresented: $acceptedShare) {
@@ -211,9 +215,6 @@ struct ContentView: View {
                     } else {
                         cloudViewModel.systemColorArray[cloudViewModel.systemColorArray.count - 1] = Color(uiColor: UIColor(red: colors[0].colorR, green: colors[0].colorG, blue: colors[0].colorB, alpha: colors[0].colorA))
                         cloudViewModel.systemColorIndex = Int(colors[0].colorIndex)
-                    }
-                    if !UserDefaults.standard.bool(forKey: "whatsnew") {
-                        whatsNew.toggle()
                     }
                 }
                 .welcomeSheet(isPresented: $whatsNew, onDismiss: {
