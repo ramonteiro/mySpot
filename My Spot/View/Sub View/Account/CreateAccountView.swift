@@ -74,7 +74,9 @@ struct CreateAccountView: View {
             }
             .gesture(DragGesture()
                 .onChanged { _ in
-                    focusState = nil
+                    if focusState != .bio {
+                        focusState = nil
+                    }
                 }
             )
             .navigationTitle("Create Account".localized())
