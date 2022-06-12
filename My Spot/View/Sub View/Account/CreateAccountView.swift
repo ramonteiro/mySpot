@@ -72,6 +72,11 @@ struct CreateAccountView: View {
                         .progressViewStyle(.circular)
                 }
             }
+            .gesture(DragGesture()
+                .onChanged { _ in
+                    focusState = nil
+                }
+            )
             .navigationTitle("Create Account".localized())
             .navigationViewStyle(.stack)
             .onAppear {

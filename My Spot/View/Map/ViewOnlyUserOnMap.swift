@@ -135,7 +135,7 @@ struct ViewOnlyUserOnMap: View {
                         .foregroundColor(.white)
                         .padding(padding)
                         .frame(width: 50, height: 50)
-                        .background(cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex])
+                        .background(mapViewModel.isAuthorized ? cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex] : .gray)
                         .clipShape(Circle())
                 }
                 .disabled(!mapViewModel.isAuthorized)
@@ -152,7 +152,7 @@ struct ViewOnlyUserOnMap: View {
                         .foregroundColor(.white)
                         .padding(padding)
                         .frame(width: 50, height: 50)
-                        .background(cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex])
+                        .background((mapViewModel.isAuthorized && customLocation) ? cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex] : .gray)
                         .clipShape(Circle())
                 }
                 .disabled(!mapViewModel.isAuthorized && customLocation)
@@ -316,6 +316,11 @@ struct customCoordinatesSheet: View {
                 Text("Search".localized())
             }
         }
+        .gesture(DragGesture()
+            .onChanged { _ in
+                UIApplication.shared.dismissKeyboard()
+            }
+        )
     }
 }
 

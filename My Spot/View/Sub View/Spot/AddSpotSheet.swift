@@ -26,7 +26,6 @@ struct AddSpotSheet: View {
     @State private var showingAlert = false
     @State private var showingAddImageAlert = false
     @State private var usingCustomLocation = false
-    @State private var hasSet = false
     @State private var isFromImagesUnedited = false
     @State private var indexFromUnedited = 0
     @State private var initChecked = false
@@ -53,7 +52,7 @@ struct AddSpotSheet: View {
     
     
     private var disableSave: Bool {
-        name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || images?.isEmpty ?? true || (isPublic && !cloudViewModel.isSignedInToiCloud) || (usingCustomLocation && !hasSet)
+        name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || images?.isEmpty ?? true || (isPublic && !cloudViewModel.isSignedInToiCloud)
     }
     
     private enum Field {
@@ -83,286 +82,286 @@ struct AddSpotSheet: View {
     var body: some View {
         ZStack {
             if (mapViewModel.isAuthorized || usingCustomLocation) {
-                if (lat != 1.0 || usingCustomLocation) {
-                    NavigationView {
-                        Form {
-                            Section {
-                                displayNamePrompt
-                                displayIsPublicPrompt
-                            } header: {
-                                Text("Spot Name*".localized())
-                            } footer: {
-                                Text("Public spots are shown in discover tab to other users.".localized())
-                                    .font(.footnote)
-                                    .foregroundColor(.gray)
-                            }
-                            Section {
-                                displayDescriptionPrompt
-                            } header: {
-                                Text("Spot Description".localized())
-                            } footer: {
-                                Text("Use # to add tags. Example: #hiking #skating".localized())
-                                    .font(.footnote)
-                                    .foregroundColor(.gray)
-                            }
-                            
-                            Section {
-                                if (images?.count ?? 0 > 0) {
-                                    List {
-                                        ForEach(images!.indices, id: \.self) { i in
-                                            if let image = images?[i] {
-                                                HStack {
-                                                    Spacer()
-                                                    Image(uiImage: image)
-                                                        .resizable()
-                                                        .scaledToFit()
-                                                        .frame(width: UIScreen.screenWidth / 2, alignment: .center)
-                                                        .cornerRadius(10)
-                                                        .onTapGesture {
-                                                            guard let imageTmp = imagesUnedited?[i] else { return }
-                                                            imageTemp = imageTmp
-                                                            if let _ = imageTemp {
-                                                                indexFromUnedited = i
-                                                                isFromImagesUnedited = true
-                                                                activeSheet = .cropperSheet
-                                                            }
+                NavigationView {
+                    Form {
+                        Section {
+                            displayNamePrompt
+                            displayIsPublicPrompt
+                        } header: {
+                            Text("Spot Name*".localized())
+                        } footer: {
+                            Text("Public spots are shown in discover tab to other users.".localized())
+                                .font(.footnote)
+                                .foregroundColor(.gray)
+                        }
+                        Section {
+                            displayDescriptionPrompt
+                        } header: {
+                            Text("Spot Description".localized())
+                        } footer: {
+                            Text("Use # to add tags. Example: #hiking #skating".localized())
+                                .font(.footnote)
+                                .foregroundColor(.gray)
+                        }
+                        
+                        Section {
+                            if (images?.count ?? 0 > 0) {
+                                List {
+                                    ForEach(images!.indices, id: \.self) { i in
+                                        if let image = images?[i] {
+                                            HStack {
+                                                Spacer()
+                                                Image(uiImage: image)
+                                                    .resizable()
+                                                    .scaledToFit()
+                                                    .frame(width: UIScreen.screenWidth / 2, alignment: .center)
+                                                    .cornerRadius(10)
+                                                    .onTapGesture {
+                                                        guard let imageTmp = imagesUnedited?[i] else { return }
+                                                        imageTemp = imageTmp
+                                                        if let _ = imageTemp {
+                                                            indexFromUnedited = i
+                                                            isFromImagesUnedited = true
+                                                            activeSheet = .cropperSheet
                                                         }
-                                                    Spacer()
-                                                }
+                                                    }
+                                                Spacer()
                                             }
                                         }
-                                        .onMove { indexSet, offset in
-                                            images!.move(fromOffsets: indexSet, toOffset: offset)
-                                            imagesUnedited!.move(fromOffsets: indexSet, toOffset: offset)
-                                        }
-                                        .onDelete { indexSet in
-                                            images!.remove(atOffsets: indexSet)
-                                            imagesUnedited!.remove(atOffsets: indexSet)
-                                        }
+                                    }
+                                    .onMove { indexSet, offset in
+                                        images!.move(fromOffsets: indexSet, toOffset: offset)
+                                        imagesUnedited!.move(fromOffsets: indexSet, toOffset: offset)
+                                    }
+                                    .onDelete { indexSet in
+                                        images!.remove(atOffsets: indexSet)
+                                        imagesUnedited!.remove(atOffsets: indexSet)
                                     }
                                 }
-                            } header: {
-                                Text("Photo of Spot".localized())
-                            } footer: {
-                                VStack(spacing: 0) {
-                                    HStack {
-                                        Text("Only 1 image is required (up to 3).".localized())
-                                            .font(.footnote)
-                                            .foregroundColor(.gray)
-                                        Spacer()
-                                    }
-                                    HStack {
-                                        Text("Add Some With The".localized())
-                                            .font(.footnote)
-                                            .foregroundColor(.gray)
-                                        Image(systemName: "plus")
-                                            .font(.footnote)
-                                            .foregroundColor(.gray)
-                                        Spacer()
-                                    }
+                            }
+                        } header: {
+                            Text("Photo of Spot".localized())
+                        } footer: {
+                            VStack(spacing: 0) {
+                                HStack {
+                                    Text("Only 1 image is required (up to 3).".localized())
+                                        .font(.footnote)
+                                        .foregroundColor(.gray)
+                                    Spacer()
+                                }
+                                HStack {
+                                    Text("Add Some With The".localized())
+                                        .font(.footnote)
+                                        .foregroundColor(.gray)
+                                    Image(systemName: "plus")
+                                        .font(.footnote)
+                                        .foregroundColor(.gray)
+                                    Spacer()
                                 }
                             }
                         }
-                        .onSubmit {
-                            switch focusState {
-                            case .name:
-                                focusState = .descript
-                            default:
+                    }
+                    .onSubmit {
+                        switch focusState {
+                        case .name:
+                            focusState = .descript
+                        default:
+                            focusState = nil
+                        }
+                    }
+                    .alert("Unable To Save Spot".localized(), isPresented: $showingCannotSavePrivateAlert) {
+                        Button("OK".localized(), role: .cancel) { }
+                    } message: {
+                        Text("Failed to save spot. Please try again.".localized())
+                    }
+                    .confirmationDialog("Choose Image From Photos or Camera".localized(), isPresented: $showingAddImageAlert) {
+                        Button("Camera".localized()) {
+                            activeSheet = .cameraSheet
+                        }
+                        Button("Photos".localized()) {
+                            activeSheet = .cameraRollSheet
+                        }
+                        Button("Cancel".localized(), role: .cancel) { }
+                    }
+                    .sheet(isPresented: $presentCalendar) {
+                        DatePickerSheet(dateFound: $dateFound)
+                    }
+                    .fullScreenCover(isPresented: $presentMapView) {
+                        if didSave && usingCustomLocation {
+                            mapViewModel.getPlacmarkOfLocation(location: CLLocation(latitude: centerRegion.center.latitude, longitude: centerRegion.center.longitude)) { name in
+                                locationName = name
+                            }
+                        }
+                        didSave = false
+                    } content: {
+                        ViewOnlyUserOnMap(customLocation: $usingCustomLocation, didSave: $didSave, centerRegion: $centerRegion)
+                            .ignoresSafeArea()
+                    }
+                    .fullScreenCover(item: $activeSheet) { item in
+                        switch item {
+                        case .cameraSheet:
+                            TakePhoto(selectedImage: $imageTemp)
+                                .onDisappear {
+                                    if (imageTemp != nil) {
+                                        imagesUnedited?.append(imageTemp)
+                                        isFromImagesUnedited = false
+                                        activeSheet = .cropperSheet
+                                    } else {
+                                        activeSheet = nil
+                                    }
+                                }
+                                .ignoresSafeArea()
+                        case .cameraRollSheet:
+                            ChoosePhoto() { image in
+                                imageTemp = image
+                                imagesUnedited?.append(imageTemp)
+                                isFromImagesUnedited = false
+                                activeSheet = .cropperSheet
+                            }
+                            .ignoresSafeArea()
+                        case .cropperSheet:
+                            MantisPhotoCropper(selectedImage: $imageTemp)
+                                .onDisappear {
+                                    if let _ = imageTemp {
+                                        if isFromImagesUnedited {
+                                            images?[indexFromUnedited] = imageTemp
+                                        } else {
+                                            images?.append(imageTemp)
+                                        }
+                                    } else {
+                                        imagesUnedited?.removeLast()
+                                    }
+                                    imageTemp = nil
+                                    isFromImagesUnedited = false
+                                }
+                                .ignoresSafeArea()
+                        }
+                    }
+                    .gesture(DragGesture()
+                        .onChanged { _ in
+                            if focusState != .descript {
                                 focusState = nil
                             }
                         }
-                        .alert("Unable To Save Spot".localized(), isPresented: $showingCannotSavePrivateAlert) {
-                            Button("OK".localized(), role: .cancel) { }
-                        } message: {
-                            Text("Failed to save spot. Please try again.".localized())
-                        }
-                        .confirmationDialog("Choose Image From Photos or Camera".localized(), isPresented: $showingAddImageAlert) {
-                            Button("Camera".localized()) {
-                                activeSheet = .cameraSheet
-                            }
-                            Button("Photos".localized()) {
-                                activeSheet = .cameraRollSheet
-                            }
-                            Button("Cancel".localized(), role: .cancel) { }
-                        }
-                        .sheet(isPresented: $presentCalendar) {
-                            DatePickerSheet(dateFound: $dateFound)
-                        }
-                        .fullScreenCover(isPresented: $presentMapView) {
-                            if didSave && usingCustomLocation {
-                                mapViewModel.getPlacmarkOfLocation(location: CLLocation(latitude: centerRegion.center.latitude, longitude: centerRegion.center.longitude)) { name in
-                                    locationName = name
-                                }
-                            }
-                            didSave = false
-                        } content: {
-                            ViewOnlyUserOnMap(customLocation: $usingCustomLocation, didSave: $didSave, centerRegion: $centerRegion)
-                                .ignoresSafeArea()
-                        }
-                        .fullScreenCover(item: $activeSheet) { item in
-                            switch item {
-                            case .cameraSheet:
-                                TakePhoto(selectedImage: $imageTemp)
-                                    .onDisappear {
-                                        if (imageTemp != nil) {
-                                            imagesUnedited?.append(imageTemp)
-                                            isFromImagesUnedited = false
-                                            activeSheet = .cropperSheet
-                                        } else {
-                                            activeSheet = nil
-                                        }
-                                    }
-                                    .ignoresSafeArea()
-                            case .cameraRollSheet:
-                                ChoosePhoto() { image in
-                                    imageTemp = image
-                                    imagesUnedited?.append(imageTemp)
-                                    isFromImagesUnedited = false
-                                    activeSheet = .cropperSheet
-                                }
-                                .ignoresSafeArea()
-                            case .cropperSheet:
-                                MantisPhotoCropper(selectedImage: $imageTemp)
-                                    .onDisappear {
-                                        if let _ = imageTemp {
-                                            if isFromImagesUnedited {
-                                                images?[indexFromUnedited] = imageTemp
-                                            } else {
-                                                images?.append(imageTemp)
-                                            }
-                                        } else {
-                                            imagesUnedited?.removeLast()
-                                        }
-                                        imageTemp = nil
-                                        isFromImagesUnedited = false
-                                    }
-                                    .ignoresSafeArea()
-                            }
-                        }
-                        .navigationBarTitle("")
-                        .navigationBarTitleDisplayMode(.inline)
-                        .navigationViewStyle(.stack)
-                        .toolbar {
-                            ToolbarItemGroup(placement: .principal) {
-                                VStack {
-                                    HStack {
-                                        Image(systemName: (usingCustomLocation ? "mappin" : "figure.wave"))
-                                        Text(locationName.isEmpty ? "My Spot" : locationName)
-                                        
-                                    }
-                                    .font(.subheadline)
-                                    Text(dateFound.format())
-                                        .font(.caption)
-                                        .foregroundColor(.gray)
-                                }
-                                .frame(width: UIScreen.screenWidth * 0.7)
-                            }
-                            ToolbarItemGroup(placement: .bottomBar) {
+                    )
+                    .navigationBarTitle("")
+                    .navigationBarTitleDisplayMode(.inline)
+                    .navigationViewStyle(.stack)
+                    .toolbar {
+                        ToolbarItemGroup(placement: .principal) {
+                            VStack {
                                 HStack {
-                                    Spacer()
-                                    Button {
-                                        showingAddImageAlert = true
-                                        focusState = nil
-                                    } label: {
-                                        Image(systemName: "plus")
-                                    }
-                                    .disabled(images?.count ?? 3 > 2)
-                                    Spacer()
-                                    EditButton()
-                                        .disabled(images?.isEmpty ?? true)
-                                    Spacer()
-                                    Button {
-                                        presentMapView.toggle()
-                                    } label: {
-                                        Image(systemName: "map")
-                                    }
-                                    Spacer()
-                                    Button {
-                                        presentCalendar.toggle()
-                                    } label: {
-                                        Image(systemName: "calendar")
-                                    }
-                                    Spacer()
+                                    Image(systemName: (usingCustomLocation ? "mappin" : "figure.wave"))
+                                    Text(locationName.isEmpty ? "My Spot" : locationName)
+                                    
                                 }
+                                .font(.subheadline)
+                                Text(dateFound.format())
+                                    .font(.caption)
+                                    .foregroundColor(.gray)
                             }
-                            ToolbarItemGroup(placement: .keyboard) {
-                                HStack {
-                                    Button {
-                                        switch focusState {
-                                        case .descript:
-                                            focusState = .name
-                                        default:
-                                            focusState = nil
-                                        }
-                                    } label: {
-                                        Image(systemName: "chevron.up")
-                                    }
-                                    .disabled(focusState == .name)
-                                    Button {
-                                        switch focusState {
-                                        case .name:
-                                            focusState = .descript
-                                        default:
-                                            focusState = nil
-                                        }
-                                    } label: {
-                                        Image(systemName: "chevron.down")
-                                    }
-                                    .disabled(focusState == .descript)
-                                    Spacer()
-                                    Button("Done".localized()) {
+                            .frame(width: UIScreen.screenWidth * 0.7)
+                        }
+                        ToolbarItemGroup(placement: .bottomBar) {
+                            HStack {
+                                Spacer()
+                                Button {
+                                    showingAddImageAlert = true
+                                    focusState = nil
+                                } label: {
+                                    Image(systemName: "plus")
+                                }
+                                .disabled(images?.count ?? 3 > 2)
+                                Spacer()
+                                EditButton()
+                                    .disabled(images?.isEmpty ?? true)
+                                Spacer()
+                                Button {
+                                    presentMapView.toggle()
+                                } label: {
+                                    Image(systemName: "map")
+                                }
+                                Spacer()
+                                Button {
+                                    presentCalendar.toggle()
+                                } label: {
+                                    Image(systemName: "calendar")
+                                }
+                                Spacer()
+                            }
+                        }
+                        ToolbarItemGroup(placement: .keyboard) {
+                            HStack {
+                                Button {
+                                    switch focusState {
+                                    case .descript:
+                                        focusState = .name
+                                    default:
                                         focusState = nil
                                     }
+                                } label: {
+                                    Image(systemName: "chevron.up")
                                 }
-                            }
-                            ToolbarItemGroup(placement: .navigationBarTrailing) {
-                                Button("Save".localized()) {
-                                    tags = descript.findTags()
-                                    if (isPublic) {
-                                        Task {
-                                            isSaving = true
-                                            await savePublic()
-                                            isSaving = false
-                                        }
-                                        close()
-                                    } else {
-                                        Task {
-                                            isSaving = true
-                                            await save()
-                                            isSaving = false
-                                        }
+                                .disabled(focusState == .name)
+                                Button {
+                                    switch focusState {
+                                    case .name:
+                                        focusState = .descript
+                                    default:
+                                        focusState = nil
                                     }
+                                } label: {
+                                    Image(systemName: "chevron.down")
                                 }
-                                .tint(.blue)
-                                .padding()
-                                .disabled(disableSave || isSaving)
-                            }
-                            ToolbarItemGroup(placement: .navigationBarLeading) {
-                                Button("Delete".localized()) {
-                                    showingAlert = true
+                                .disabled(focusState == .descript)
+                                Spacer()
+                                Button("Done".localized()) {
+                                    focusState = nil
                                 }
-                                .alert("Are you sure you want to delete spot?".localized(), isPresented: $showingAlert) {
-                                    Button("Delete".localized(), role: .destructive) { close() }
-                                }
-                                .padding()
                             }
                         }
-                    }
-                    .onAppear {
-                        mapViewModel.checkLocationAuthorization()
-                        lat = getLatitude()
-                        long = getLongitude()
-                        mapViewModel.getPlacmarkOfLocation(location: CLLocation(latitude: mapViewModel.region.center.latitude, longitude: mapViewModel.region.center.longitude), completionHandler: { location in
-                            locationName = location
-                        })
-                    }
-                    .interactiveDismissDisabled()
-                } else {
-                    VStack {
-                        Text("No Internet Connection Found.".localized())
-                        Text("Internet Is Required to Find Location.".localized()).font(.subheadline).foregroundColor(.gray)
+                        ToolbarItemGroup(placement: .navigationBarTrailing) {
+                            Button("Save".localized()) {
+                                tags = descript.findTags()
+                                if (isPublic) {
+                                    Task {
+                                        isSaving = true
+                                        await savePublic()
+                                        isSaving = false
+                                    }
+                                    close()
+                                } else {
+                                    Task {
+                                        isSaving = true
+                                        await save()
+                                        isSaving = false
+                                    }
+                                }
+                            }
+                            .tint(.blue)
+                            .padding()
+                            .disabled(disableSave || isSaving)
+                        }
+                        ToolbarItemGroup(placement: .navigationBarLeading) {
+                            Button("Delete".localized()) {
+                                showingAlert = true
+                            }
+                            .alert("Are you sure you want to delete spot?".localized(), isPresented: $showingAlert) {
+                                Button("Delete".localized(), role: .destructive) { close() }
+                            }
+                            .padding()
+                        }
                     }
                 }
+                .onAppear {
+                    mapViewModel.checkLocationAuthorization()
+                    lat = getLatitude()
+                    long = getLongitude()
+                    mapViewModel.getPlacmarkOfLocation(location: CLLocation(latitude: mapViewModel.region.center.latitude, longitude: mapViewModel.region.center.longitude), completionHandler: { location in
+                        locationName = location
+                    })
+                }
+                .interactiveDismissDisabled()
             } else {
                 VStack {
                     Text("Location services are not enabled for My Spot.".localized())
