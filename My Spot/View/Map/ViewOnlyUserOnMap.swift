@@ -152,7 +152,7 @@ struct ViewOnlyUserOnMap: View {
                         .foregroundColor(.white)
                         .padding(padding)
                         .frame(width: 50, height: 50)
-                        .background((mapViewModel.isAuthorized && customLocation) ? cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex] : .gray)
+                        .background(mapViewModel.isAuthorized ? cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex] : .gray)
                         .clipShape(Circle())
                 }
                 .disabled(!mapViewModel.isAuthorized && customLocation)
