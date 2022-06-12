@@ -39,6 +39,7 @@ struct AccountDetailView: View {
     @State private var badgeNum = 0
     @State private var goToSettings = false
     @State private var isLoading = true
+    @State private var presentAccountCreation =  false
     @EnvironmentObject var cloudViewModel: CloudKitViewModel
     @EnvironmentObject var tabController: TabController
     @Environment(\.presentationMode) private var presentationMode
@@ -123,6 +124,13 @@ struct AccountDetailView: View {
                                 .fill(Color(UIColor.systemBackground))
                         )
                 }
+            }
+            .fullScreenCover(isPresented: $presentAccountCreation, onDismiss: {
+                Task {
+                    await refreshAccount()
+                }
+            }) {
+                CreateAccountView(accountModel: nil)
             }
             .alert(badgeName().localized() + " " + "Badge".localized(), isPresented: $infoAlert) {
                 Button("OK".localized(), role: .cancel) { }
@@ -252,8 +260,14 @@ struct AccountDetailView: View {
                     if let date = account.record.creationDate {
                         memberSince = date
                     }
+                } else {
+                    enum account: Error {
+                        case error
+                    }
+                    throw account.error
                 }
             } catch {
+                await checkToCreateAccount()
                 bio = "Unable to load account".localized()
                 print("failed to fetch account")
                 print(error)
@@ -282,6 +296,17 @@ struct AccountDetailView: View {
         }
         if spots.isEmpty {
             await fetchSpots()
+        }
+    }
+    
+    private func checkToCreateAccount() async {
+        if cloudViewModel.isSignedInToiCloud {
+            let doesAccountExist = await cloudViewModel.doesAccountExist(for: cloudViewModel.userID)
+            if !doesAccountExist {
+                presentAccountCreation.toggle()
+            } else {
+                try? await cloudViewModel.getMemberSince(fromid: cloudViewModel.userID)
+            }
         }
     }
     
