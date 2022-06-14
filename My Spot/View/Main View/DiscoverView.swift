@@ -30,6 +30,7 @@ struct DiscoverView: View {
     @State private var searching = false
     @State private var index: Int?
     @State private var showPlaceDetail = false
+    @State private var scrollToTop = false
     
     var body: some View {
         NavigationView {
@@ -253,6 +254,7 @@ struct DiscoverView: View {
         Task {
             do {
                 try await cloudViewModel.fetchSpotPublic(userLocation: location, filteringBy: filteringBy, search: searchText)
+                scrollToTop.toggle()
             } catch {
                 cloudViewModel.isFetching = false
                 hasError = true
@@ -303,63 +305,73 @@ struct DiscoverView: View {
     private var listSpots: some View {
         VStack(spacing: 10) {
             SearchBar(searchText: $searchText, searching: $searching, searchName: $searchLocationName, hasSearched: $hasSearched)
-            List {
-                ForEach(cloudViewModel.spots.indices, id: \.self) { i in
-                    Button {
-                        index = i
-                        showPlaceDetail = true
-                    } label: {
-                        DiscoverRow(spot: cloudViewModel.spots[i])
+            ScrollViewReader { scroll in
+                List {
+                    ForEach(cloudViewModel.spots.indices, id: \.self) { i in
+                        Button {
+                            index = i
+                            showPlaceDetail = true
+                        } label: {
+                            DiscoverRow(spot: cloudViewModel.spots[i])
+                        }
+                        .id(i)
                     }
-                }
-                if cloudViewModel.isFetching {
-                    HStack {
-                        Spacer()
-                        ProgressView()
-                        Spacer()
-                    }
-                    .listRowBackground(Color.clear)
-                    .listRowSeparator(.hidden)
-                } else {
-                    GeometryReader { reader -> Color in
-                        let minY = reader.frame(in: .global).minY
-                        let height = UIScreen.screenHeight / 1.3
-                        if minY < height {
-                            if let cursor = cloudViewModel.cursorMain {
-                                Task {
-                                    await cloudViewModel.fetchMoreSpotsPublic(cursor: cursor, desiredKeys: cloudViewModel.desiredKeys, resultLimit: cloudViewModel.limit)
+                    if cloudViewModel.isFetching {
+                        HStack {
+                            Spacer()
+                            ProgressView()
+                            Spacer()
+                        }
+                        .listRowBackground(Color.clear)
+                        .listRowSeparator(.hidden)
+                    } else {
+                        GeometryReader { reader -> Color in
+                            let minY = reader.frame(in: .global).minY
+                            let height = UIScreen.screenHeight / 1.3
+                            if minY < height {
+                                if let cursor = cloudViewModel.cursorMain {
+                                    Task {
+                                        await cloudViewModel.fetchMoreSpotsPublic(cursor: cursor, desiredKeys: cloudViewModel.desiredKeys, resultLimit: cloudViewModel.limit)
+                                    }
                                 }
                             }
+                            return Color.clear
                         }
-                        return Color.clear
+                        .listRowBackground(Color.clear)
                     }
-                    .listRowBackground(Color.clear)
                 }
-            }
-            .if(cloudViewModel.canRefresh) { view in
-                view.refreshable {
-                    mapViewModel.checkLocationAuthorization()
+                .if(cloudViewModel.canRefresh) { view in
+                    view.refreshable {
+                        mapViewModel.checkLocationAuthorization()
+                        loadSpotsFromDB(location: CLLocation(latitude: mapViewModel.searchingHere.center.latitude, longitude: mapViewModel.searchingHere.center.longitude), radiusInMeters: CGFloat(distance), filteringBy: sortBy)
+                    }
+                }
+                .onAppear {
+                    cloudViewModel.canRefresh = true
+                }
+                .onChange(of: searching) { _ in
                     loadSpotsFromDB(location: CLLocation(latitude: mapViewModel.searchingHere.center.latitude, longitude: mapViewModel.searchingHere.center.longitude), radiusInMeters: CGFloat(distance), filteringBy: sortBy)
                 }
-            }
-            .gesture(DragGesture()
-                .onChanged { _ in
-                    UIApplication.shared.dismissKeyboard()
+                .animation(.default, value: cloudViewModel.spots)
+                .onChange(of: mapViewModel.searchingHere.center.longitude) { _ in
+                    mapViewModel.getPlacmarkOfLocation(location: CLLocation(latitude: mapViewModel.searchingHere.center.latitude, longitude: mapViewModel.searchingHere.center.longitude)) { location in
+                        searchLocationName = location
+                    }
                 }
-            )
-            .onAppear {
-                cloudViewModel.canRefresh = true
-            }
-            .onChange(of: searching) { _ in
-                loadSpotsFromDB(location: CLLocation(latitude: mapViewModel.searchingHere.center.latitude, longitude: mapViewModel.searchingHere.center.longitude), radiusInMeters: CGFloat(distance), filteringBy: sortBy)
-            }
-            .animation(.default, value: cloudViewModel.spots)
-            .onChange(of: mapViewModel.searchingHere.center.longitude) { _ in
-                mapViewModel.getPlacmarkOfLocation(location: CLLocation(latitude: mapViewModel.searchingHere.center.latitude, longitude: mapViewModel.searchingHere.center.longitude)) { location in
-                    searchLocationName = location
+                .gesture(DragGesture()
+                    .onChanged { _ in
+                        UIApplication.shared.dismissKeyboard()
+                    }
+                )
+                .onChange(of: scrollToTop) { _ in
+                    if cloudViewModel.spots.count > 0 {
+                        withAnimation(.easeInOut(duration: 0.5)) {
+                            scroll.scrollTo(0, anchor: .top)
+                        }
+                    }
                 }
+                NavigationLink(destination: DiscoverDetailView(index: index ?? 0, canShare: true), isActive: $showPlaceDetail) { EmptyView() }.isDetailLink(false)
             }
-            NavigationLink(destination: DiscoverDetailView(index: index ?? 0, canShare: true), isActive: $showPlaceDetail) { EmptyView() }.isDetailLink(false)
         }
         .navigationTitle("Discover".localized())
         .toolbar {

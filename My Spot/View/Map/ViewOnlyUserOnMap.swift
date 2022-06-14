@@ -397,6 +397,11 @@ struct MapSearchBar: View {
         .frame(height: 40)
         .cornerRadius(13)
         .padding(.horizontal)
+        .onAppear {
+            if !searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                canCancel = true
+            }
+        }
         .onChange(of: searchText) { newValue in
             if !newValue.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
                 withAnimation(.easeInOut(duration: 0.2)) {

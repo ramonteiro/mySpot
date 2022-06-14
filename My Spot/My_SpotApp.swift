@@ -24,12 +24,10 @@ struct My_SpotApp: App {
     // initialize tabController
     @StateObject private var tabController = TabController()
     
-    @State private var sharedAccount = ""
-    @State private var showSharedAccount = false
-    
     init() {
         UIView.appearance(whenContainedInInstancesOf: [UIAlertController.self]).tintColor = .systemBlue
         UITableView.appearance().showsVerticalScrollIndicator = false
+        UIScrollView.appearance().keyboardDismissMode = .interactive
     }
     
     var body: some Scene {
@@ -42,27 +40,25 @@ struct My_SpotApp: App {
                 .environmentObject(tabController)
                 .onOpenURL { url in
                     guard let host = URLComponents(url: url, resolvingAgainstBaseURL: true)?.host else { return }
+                    print("This is the deep link: \(host)")
                     if host[0] == "_" {
                         if let id = UserDefaults(suiteName: "group.com.isaacpaschall.My-Spot")?.string(forKey: "userid") {
                             if id == host {
-                                // go to profile
                                 tabController.open(Tab.profile)
-                                return
+                            } else {
+                                cloudViewModel.sharedAccount = host
                             }
+                        } else {
+                            cloudViewModel.sharedAccount = host
                         }
-                        sharedAccount = host
-                        showSharedAccount.toggle()
-                        return
-                    }
-                    Task {
-                        await cloudViewModel.checkDeepLink(url: url, isFromNoti: false)
+                    } else {
+                        Task {
+                            await cloudViewModel.checkDeepLink(url: url, isFromNoti: false)
+                        }
                     }
                 }
                 .tint(cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex])
                 .accentColor(cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex])
-                .fullScreenCover(isPresented: $showSharedAccount) {
-                    AccountDetailView(userid: sharedAccount, myAccount: false)
-                }
                 .onAppear {
                     let color = UIColor(cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex])
                     var red: CGFloat = 0

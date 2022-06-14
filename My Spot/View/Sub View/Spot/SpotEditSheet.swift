@@ -197,13 +197,6 @@ struct SpotEditSheet: View {
                     )
             }
         }
-        .gesture(DragGesture()
-            .onChanged { _ in
-                if focusState != .descript {
-                    focusState = nil
-                }
-            }
-        )
         .onAppear {
             if !initChecked {
                 if (UserDefaults.standard.valueExists(forKey: "isBanned") && UserDefaults.standard.bool(forKey: "isBanned")) {

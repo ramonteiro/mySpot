@@ -20,6 +20,7 @@ struct ContentView: View {
     @State private var showSharedSpotSheet = false
     @State private var presentAccountCreation = false
     @State private var errorAlert = false
+    @State private var showSharedAccount = false
     // addspot stuff
     @State private var addSpotSheet = false
     @State private var addSpotIsSaving = false
@@ -60,7 +61,7 @@ struct ContentView: View {
                         }
                         .tag(Tab.playlists)
                         .badge(UserDefaults.standard.integer(forKey: "badgeplaylists"))
-                    AccountDetailView(userid: cloudViewModel.userID, myAccount: true)
+                    AccountDetailView(userid: (cloudViewModel.userID.isEmpty ? UserDefaults(suiteName: "group.com.isaacpaschall.My-Spot")?.string(forKey: "userid") ?? cloudViewModel.userID : cloudViewModel.userID), myAccount: true)
                         .tabItem() {
                             Image(systemName: "person.fill")
                             Text("Profile".localized())
@@ -154,6 +155,14 @@ struct ContentView: View {
                 }, content: {
                     DiscoverSheetShared()
                 })
+                .fullScreenCover(isPresented: $showSharedAccount) {
+                    AccountDetailView(userid: cloudViewModel.sharedAccount, myAccount: false)
+                }
+                .onChange(of: cloudViewModel.sharedAccount) { newValue in
+                    if !newValue.isEmpty {
+                        showSharedAccount.toggle()
+                    }
+                }
                 .onChange(of: cloudViewModel.shared.count) { newValue in
                     if newValue == 1 {
                         showSharedSpotSheet = true

@@ -95,6 +95,7 @@ struct DiscoverDetailNotification: View {
                     }
                 }
                 .onAppear {
+                    cloudViewModel.canRefresh = false
                     if !initCheked {
                         mySpot = cloudViewModel.isMySpot(user: cloudViewModel.notificationSpots[index].userID)
                         tags = cloudViewModel.notificationSpots[index].type.components(separatedBy: ", ")
@@ -119,7 +120,6 @@ struct DiscoverDetailNotification: View {
                         
                         isSaving = false
                         newName = ""
-                        cloudViewModel.canRefresh = false
                         initCheked = true
                     }
                 }
@@ -207,7 +207,7 @@ struct DiscoverDetailNotification: View {
             HStack(spacing: 0) {
                 backButton
                 Spacer()
-                if (mySpot) {
+                if (mySpot || cloudViewModel.userID == UserDefaultKeys.admin) {
                     deleteButton
                 }
                 if (UIDevice.current.userInterfaceIdiom != .pad) {

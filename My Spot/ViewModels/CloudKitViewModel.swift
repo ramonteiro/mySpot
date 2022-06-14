@@ -28,6 +28,7 @@ class CloudKitViewModel: ObservableObject {
     @Published var isErrorMessageDetails = ""
     @Published var isPostError = false
     @Published var limit = 10
+    @Published var sharedAccount = ""
     @Published var deepAccount: [AccountModel] = []
     @Published var radiusInMeters: Double = 0
     @Published var notiPermission = 0 // 0: not determined, 1: denied, 2: allowed, 3: provisional, 4: ephemeral, 5: unknown

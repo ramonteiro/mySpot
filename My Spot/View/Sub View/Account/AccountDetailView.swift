@@ -49,6 +49,22 @@ struct AccountDetailView: View {
         NavigationView {
             ScrollView(showsIndicators: false) {
                 if !isLoading {
+                    PullToRefresh(coordinateSpaceName: "pullToRefresh") {
+                        let generator = UIImpactFeedbackGenerator(style: .light)
+                        generator.impactOccurred()
+                        Task {
+                            await refreshAccount()
+                            do {
+                                let fetchedArr = try await cloudViewModel.getDownloadsAndSpots(from: userid)
+                                downloads = fetchedArr[0]
+                                spotCount = fetchedArr[1]
+                            } catch {
+                                print("failed to load spot count")
+                            }
+                            initializeBadgesAndLinks()
+                            await fetchSpots()
+                        }
+                    }
                     VStack {
                         Image(uiImage: image)
                             .resizable()
@@ -124,112 +140,112 @@ struct AccountDetailView: View {
                                 .fill(Color(UIColor.systemBackground))
                         )
                 }
-            }
-            .fullScreenCover(isPresented: $presentAccountCreation, onDismiss: {
-                Task {
-                    await refreshAccount()
+            }.coordinateSpace(name: "pullToRefresh")
+                .fullScreenCover(isPresented: $presentAccountCreation, onDismiss: {
+                    Task {
+                        await refreshAccount()
+                    }
+                }) {
+                    CreateAccountView(accountModel: nil)
                 }
-            }) {
-                CreateAccountView(accountModel: nil)
-            }
-            .alert(badgeName().localized() + " " + "Badge".localized(), isPresented: $infoAlert) {
-                Button("OK".localized(), role: .cancel) { }
-            } message: {
-                Text(badgeMessage().localized())
-            }
-            .background(ShareViewController(isPresenting: $isShare) {
-                let av = shareSheetAccount(userid: cloudViewModel.userID, name: name)
-                av.completionWithItemsHandler = { _, _, _, _ in
-                    isShare = false
+                .alert(badgeName().localized() + " " + "Badge".localized(), isPresented: $infoAlert) {
+                    Button("OK".localized(), role: .cancel) { }
+                } message: {
+                    Text(badgeMessage().localized())
                 }
-                return av
-            })
-            .fullScreenCover(isPresented: $openSettings) {
-                SettingsView()
-            }
-            .onChange(of: UserDefaults.standard.integer(forKey: "badge")) { newValue in
-                badgeNum = newValue
-            }
-            .navigationBarTitleDisplayMode(.inline)
-            .navigationViewStyle(.stack)
-            .sheet(isPresented: $showNotificationSheet, onDismiss: {
-                if goToSettings == true {
-                    goToSettings = false
-                    openSettings = true
+                .background(ShareViewController(isPresenting: $isShare) {
+                    let av = shareSheetAccount(userid: cloudViewModel.userID, name: name)
+                    av.completionWithItemsHandler = { _, _, _, _ in
+                        isShare = false
+                    }
+                    return av
+                })
+                .fullScreenCover(isPresented: $openSettings) {
+                    SettingsView()
                 }
-            }) {
-                NotificationView(badgeNum: $badgeNum, goToSettings: $goToSettings)
-            }
-            .toolbar {
-                ToolbarItemGroup(placement: .navigationBarTrailing) {
-                    HStack {
-                        if UIDevice.current.userInterfaceIdiom != .pad {
+                .onChange(of: UserDefaults.standard.integer(forKey: "badge")) { newValue in
+                    badgeNum = newValue
+                }
+                .navigationBarTitleDisplayMode(.inline)
+                .navigationViewStyle(.stack)
+                .sheet(isPresented: $showNotificationSheet, onDismiss: {
+                    if goToSettings == true {
+                        goToSettings = false
+                        openSettings = true
+                    }
+                }) {
+                    NotificationView(badgeNum: $badgeNum, goToSettings: $goToSettings)
+                }
+                .toolbar {
+                    ToolbarItemGroup(placement: .navigationBarTrailing) {
+                        HStack {
+                            if UIDevice.current.userInterfaceIdiom != .pad {
+                                Button {
+                                    isShare = true
+                                } label: {
+                                    Image(systemName: "square.and.arrow.up")
+                                }
+                            }
+                            if myAccount && accountModel != nil {
+                                Button {
+                                    editAlert.toggle()
+                                } label: {
+                                    Text("Edit".localized())
+                                }
+                            }
+                        }
+                    }
+                    ToolbarItemGroup(placement: .navigationBarLeading) {
+                        if myAccount {
                             Button {
-                                isShare = true
+                                openSettings.toggle()
                             } label: {
-                                Image(systemName: "square.and.arrow.up")
+                                Image(systemName: "gear")
                             }
-                        }
-                        if myAccount && accountModel != nil {
                             Button {
-                                editAlert.toggle()
+                                showNotificationSheet.toggle()
                             } label: {
-                                Text("Edit".localized())
+                                Image(systemName: "bell")
+                            }
+                            .if(badgeNum > 0) { view in
+                                view.overlay {
+                                    Badge(count: $badgeNum, color: .red)
+                                }
+                            }
+                        } else {
+                            Button {
+                                presentationMode.wrappedValue.dismiss()
+                            } label: {
+                                Text("Done".localized())
+                            }
+                        }
+                    }
+                    ToolbarItem(placement: .principal) {
+                        VStack {
+                            Text(name)
+                                .font(.headline)
+                            if let pronouns = pronouns {
+                                Text(pronouns)
+                                    .foregroundColor(.gray)
+                                    .font(.caption)
                             }
                         }
                     }
                 }
-                ToolbarItemGroup(placement: .navigationBarLeading) {
-                    if myAccount {
-                        Button {
-                            openSettings.toggle()
-                        } label: {
-                            Image(systemName: "gear")
-                        }
-                        Button {
-                            showNotificationSheet.toggle()
-                        } label: {
-                            Image(systemName: "bell")
-                        }
-                        .if(badgeNum > 0) { view in
-                            view.overlay {
-                                Badge(count: $badgeNum, color: .red)
-                            }
-                        }
-                    } else {
-                        Button {
-                            presentationMode.wrappedValue.dismiss()
-                        } label: {
-                            Text("Done".localized())
-                        }
+                .onAppear {
+                    Task {
+                        await inititalize()
                     }
                 }
-                ToolbarItem(placement: .principal) {
-                    VStack {
-                        Text(name)
-                            .font(.headline)
-                        if let pronouns = pronouns {
-                            Text(pronouns)
-                                .foregroundColor(.gray)
-                                .font(.caption)
-                        }
+                .fullScreenCover(isPresented: $editAlert, onDismiss: {
+                    Task {
+                        await refreshAccount()
+                    }
+                }) {
+                    if let accountModel = accountModel {
+                        CreateAccountView(accountModel: accountModel)
                     }
                 }
-            }
-            .onAppear {
-                Task {
-                    await inititalize()
-                }
-            }
-            .fullScreenCover(isPresented: $editAlert, onDismiss: {
-                Task {
-                    await refreshAccount()
-                }
-            }) {
-                if let accountModel = accountModel {
-                    CreateAccountView(accountModel: accountModel)
-                }
-            }
         }
         .navigationViewStyle(.stack)
     }
@@ -341,22 +357,22 @@ struct AccountDetailView: View {
         } else if tappedBadge == "heart" {
             return "OG"
         } else if tappedBadge == "mappin.and.ellipse" {
-           if spotCount > 100 {
-               return "Diamond Spotter"
-           } else if spotCount > 50 {
-               return "Gold Spotter"
-           } else if spotCount > 10 {
-               return "Spotter"
-           }
-       } else if tappedBadge == "icloud.and.arrow.down" {
-           if downloads > 250 {
-               return "Diamond Downloads"
-           } else if downloads > 100 {
-               return "Gold Downloads"
-           } else if downloads > 50 {
-               return "Downloads"
-           }
-       }
+            if spotCount > 100 {
+                return "Diamond Spotter"
+            } else if spotCount > 50 {
+                return "Gold Spotter"
+            } else if spotCount > 10 {
+                return "Spotter"
+            }
+        } else if tappedBadge == "icloud.and.arrow.down" {
+            if downloads > 250 {
+                return "Diamond Downloads"
+            } else if downloads > 100 {
+                return "Gold Downloads"
+            } else if downloads > 50 {
+                return "Downloads"
+            }
+        }
         return ""
     }
     
@@ -520,5 +536,41 @@ struct AccountDetailView: View {
             print("failed to fetch")
         }
         isFetching = false
+    }
+}
+
+struct PullToRefresh: View {
+    
+    var coordinateSpaceName: String
+    var onRefresh: ()->Void
+    
+    @State var needRefresh: Bool = false
+    
+    var body: some View {
+        GeometryReader { geo in
+            if (geo.frame(in: .named(coordinateSpaceName)).midY > 50) {
+                Spacer()
+                    .onAppear {
+                        needRefresh = true
+                    }
+            } else if (geo.frame(in: .named(coordinateSpaceName)).maxY < 10) {
+                Spacer()
+                    .onAppear {
+                        if needRefresh {
+                            needRefresh = false
+                            onRefresh()
+                        }
+                    }
+            }
+            HStack {
+                Spacer()
+                if needRefresh {
+                    ProgressView()
+                } else {
+                    Text("⬇️")
+                }
+                Spacer()
+            }
+        }.padding(.top, -50)
     }
 }

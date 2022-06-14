@@ -55,76 +55,79 @@ struct DiscoverDetailAccountSpots: View {
     
     var body: some View {
         ZStack {
-            ZStack {
-                displayImage
-                    .offset(y: imageOffset)
-                VStack {
-                    Spacer()
-                        .frame(height: (expand ? 90 : UIScreen.screenWidth - 65))
-                    detailSheet
+            if !(spotsFromCloud.count - 1 < index) {
+                ZStack {
+                    displayImage
+                        .offset(y: imageOffset)
+                    VStack {
+                        Spacer()
+                            .frame(height: (expand ? 90 : UIScreen.screenWidth - 65))
+                        detailSheet
+                    }
+                    topButtonRow
+                    middleButtonRow
+                        .offset(y: -50)
+                    if (showingImage) {
+                        ImagePopUp(showingImage: $showingImage, image: images[selection])
+                            .transition(.scale)
+                    }
                 }
-                topButtonRow
-                middleButtonRow
-                    .offset(y: -50)
-                if (showingImage) {
-                    ImagePopUp(showingImage: $showingImage, image: images[selection])
-                        .transition(.scale)
+                .ignoresSafeArea(.all, edges: (canShare ? .top : [.top, .bottom]))
+                .if(myAccount) { view in
+                    view.onChange(of: tabController.profilePopToRoot) { _ in
+                        presentationMode.wrappedValue.dismiss()
+                    }
                 }
-            }
-            .ignoresSafeArea(.all, edges: (canShare ? .top : [.top, .bottom]))
-            .if(myAccount) { view in
-                view.onChange(of: tabController.profilePopToRoot) { _ in
-                    presentationMode.wrappedValue.dismiss()
+                .if(!myAccount) { view in
+                    view.onChange(of: tabController.discoverPopToRoot) { _ in
+                        presentationMode.wrappedValue.dismiss()
+                    }
                 }
-            }
-            .if(!myAccount) { view in
-                view.onChange(of: tabController.discoverPopToRoot) { _ in
-                    presentationMode.wrappedValue.dismiss()
-                }
-            }
-            .onChange(of: isSaving) { newValue in
-                if newValue {
-                    Task {
-                        showSaveAlert = true
-                        let spot = spotsFromCloud[index]
-                        let didLike = await cloudViewModel.likeSpot(spot: spot)
-                        if (didLike) {
-                            DispatchQueue.main.async {
-                                spotsFromCloud[index].likes += 1
+                .onChange(of: isSaving) { newValue in
+                    if newValue {
+                        Task {
+                            showSaveAlert = true
+                            let spot = spotsFromCloud[index]
+                            let didLike = await cloudViewModel.likeSpot(spot: spot)
+                            if (didLike) {
+                                DispatchQueue.main.async {
+                                    spotsFromCloud[index].likes += 1
+                                }
                             }
+                            await save()
+                            showSaveAlert = false
                         }
-                        await save()
-                        showSaveAlert = false
                     }
                 }
-            }
-            .onAppear {
-                if !initCheked {
-                    mySpot = cloudViewModel.isMySpot(user: spotsFromCloud[index].userID)
-                    tags = spotsFromCloud[index].type.components(separatedBy: ", ")
-                    
-                    // check for images
-                    let url = spotsFromCloud[index].imageURL
-                    if let data = try? Data(contentsOf: url), let image = UIImage(data: data) {
-                        self.images.append(image)
-                    }
-                    Task {
-                        let id = spotsFromCloud[index].record.recordID.recordName
-                        let fetchedImages: [UIImage?] = await cloudViewModel.fetchImages(id: id)
-                        if !fetchedImages.isEmpty {
-                            fetchedImages.forEach { image in
-                                if let image = image {
-                                    self.images.append(image)
+                .onAppear {
+                    cloudViewModel.canRefresh = false
+                    if !initCheked {
+                        mySpot = cloudViewModel.isMySpot(user: spotsFromCloud[index].userID)
+                        tags = spotsFromCloud[index].type.components(separatedBy: ", ")
+                        
+                        // check for images
+                        let url = spotsFromCloud[index].imageURL
+                        if let data = try? Data(contentsOf: url), let image = UIImage(data: data) {
+                            self.images.append(image)
+                        }
+                        Task {
+                            let id = spotsFromCloud[index].record.recordID.recordName
+                            let fetchedImages: [UIImage?] = await cloudViewModel.fetchImages(id: id)
+                            if !fetchedImages.isEmpty {
+                                fetchedImages.forEach { image in
+                                    if let image = image {
+                                        self.images.append(image)
+                                    }
                                 }
                             }
                         }
+                        
+                        
+                        isSaving = false
+                        newName = ""
+                        
+                        initCheked = true
                     }
-                    
-                    
-                    isSaving = false
-                    newName = ""
-                    cloudViewModel.canRefresh = false
-                    initCheked = true
                 }
             }
             
@@ -186,7 +189,7 @@ struct DiscoverDetailAccountSpots: View {
             HStack(spacing: 0) {
                 backButton
                 Spacer()
-                if (mySpot) {
+                if (mySpot || cloudViewModel.userID == UserDefaultKeys.admin) {
                     deleteButton
                 }
                 if (UIDevice.current.userInterfaceIdiom != .pad) {

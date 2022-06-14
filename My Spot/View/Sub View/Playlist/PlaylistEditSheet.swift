@@ -67,11 +67,6 @@ struct PlaylistEditSheet: View {
                             Text("Emoji*".localized())
                         }
                     }
-                    .gesture(DragGesture()
-                        .onChanged { _ in
-                            focusState = nil
-                        }
-                    )
                     .onSubmit {
                         switch focusState {
                         case .name:

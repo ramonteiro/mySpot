@@ -101,6 +101,7 @@ struct DiscoverDetailView: View {
                     AccountDetailView(userid: cloudViewModel.spots[index].userID, myAccount: false, accountModel: accountModel)
                 }
                 .onAppear {
+                    cloudViewModel.canRefresh = false
                     if !initCheked {
                         mySpot = cloudViewModel.isMySpot(user: cloudViewModel.spots[index].userID)
                         tags = cloudViewModel.spots[index].type.components(separatedBy: ", ")
@@ -125,7 +126,6 @@ struct DiscoverDetailView: View {
                         
                         isSaving = false
                         newName = ""
-                        cloudViewModel.canRefresh = false
                         initCheked = true
                     }
                 }
@@ -201,7 +201,7 @@ struct DiscoverDetailView: View {
             HStack(spacing: 0) {
                 backButton
                 Spacer()
-                if (mySpot) {
+                if (mySpot || cloudViewModel.userID == UserDefaultKeys.admin) {
                     deleteButton
                 }
                 if (UIDevice.current.userInterfaceIdiom != .pad) {

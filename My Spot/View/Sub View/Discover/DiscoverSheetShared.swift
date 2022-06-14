@@ -97,6 +97,7 @@ struct DiscoverSheetShared: View {
                     }
                 }
                 .onAppear {
+                    cloudViewModel.canRefresh = false
                     if !initCheked {
                         mySpot = cloudViewModel.isMySpot(user: cloudViewModel.shared[0].userID)
                         tags = cloudViewModel.shared[0].type.components(separatedBy: ", ")
@@ -119,7 +120,6 @@ struct DiscoverSheetShared: View {
                         isSaving = false
                         newName = ""
                         
-                        cloudViewModel.canRefresh = false
                         initCheked = true
                     }
                 }
@@ -190,7 +190,7 @@ struct DiscoverSheetShared: View {
             HStack(spacing: 0) {
                 backButton
                 Spacer()
-                if (mySpot) {
+                if (mySpot || cloudViewModel.userID == UserDefaultKeys.admin) {
                     deleteButton
                 }
                 if (UIDevice.current.userInterfaceIdiom != .pad) {

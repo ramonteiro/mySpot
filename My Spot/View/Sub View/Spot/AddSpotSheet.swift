@@ -237,13 +237,6 @@ struct AddSpotSheet: View {
                                 .ignoresSafeArea()
                         }
                     }
-                    .gesture(DragGesture()
-                        .onChanged { _ in
-                            if focusState != .descript {
-                                focusState = nil
-                            }
-                        }
-                    )
                     .navigationBarTitle("")
                     .navigationBarTitleDisplayMode(.inline)
                     .navigationViewStyle(.stack)
