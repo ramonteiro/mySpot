@@ -429,6 +429,17 @@ struct DiscoverDetailView: View {
                 .padding([.leading, .trailing], 30)
             }
             
+            if cloudViewModel.userID == UserDefaultKeys.admin {
+                Button {
+                    Task {
+                        let spot = cloudViewModel.spots[index]
+                        await cloudViewModel.addDownloads(spot: spot)
+                    }
+                } label: {
+                    Text("add random downloads")
+                }
+            }
+            
             if (!distance.isEmpty) {
                 Text((distance) + " away".localized())
                     .foregroundColor(.gray)

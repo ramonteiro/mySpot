@@ -40,7 +40,6 @@ struct My_SpotApp: App {
                 .environmentObject(tabController)
                 .onOpenURL { url in
                     guard let host = URLComponents(url: url, resolvingAgainstBaseURL: true)?.host else { return }
-                    print("This is the deep link: \(host)")
                     if host[0] == "_" {
                         if let id = UserDefaults(suiteName: "group.com.isaacpaschall.My-Spot")?.string(forKey: "userid") {
                             if id == host {

@@ -254,26 +254,6 @@ class CloudKitViewModel: ObservableObject {
         try await CKContainer.default().publicCloudDatabase.save(newAccount)
     }
     
-    func updateAccount(id: String, name: String, pronoun: String, image: Data?, bio: String, email: String, youtube: String, tiktok: String, insta: String) async throws {
-        let recordID = CKRecord.ID(recordName: id)
-        let record = try await CKContainer.default().publicCloudDatabase.record(for: recordID)
-        record["name"] = name
-        record["bio"] = bio
-        record["youtube"] = youtube
-        record["tiktok"] = tiktok
-        record["instagram"] = insta
-        record["email"] = email
-        record["pronoun"] = pronoun
-        if let image = image {
-            let path = NSTemporaryDirectory() + "imageTemp\(UUID().uuidString).png"
-            let url = URL(fileURLWithPath: path)
-            try image.write(to: url)
-            let asset = CKAsset(fileURL: url)
-            record["image"] = asset
-        }
-        try await CKContainer.default().publicCloudDatabase.save(record)
-    }
-    
     func doesAccountExist(for userid: String) async -> Bool {
         let predicate = NSPredicate(format: "userid == %@", userid)
         let query = CKQuery(recordType: "Accounts", predicate: predicate)
@@ -918,6 +898,12 @@ class CloudKitViewModel: ObservableObject {
         try await CKContainer.default().publicCloudDatabase.save(record)
     }
     
+    func makeExplorer(id: CKRecord.ID) async throws {
+        let record = try await CKContainer.default().publicCloudDatabase.record(for: id)
+        record["isExplorer"] = true
+        try await CKContainer.default().publicCloudDatabase.save(record)
+    }
+    
     func likeSpot(spot: SpotFromCloud) async -> Bool {
         guard let _ = spot.record["likes"] else { return false }
         let record = spot.record
@@ -927,6 +913,17 @@ class CloudKitViewModel: ObservableObject {
             return true
         } catch {
             return false
+        }
+    }
+    
+    func addDownloads(spot: SpotFromCloud) async {
+        guard let _ = spot.record["likes"] else { return }
+        let record = spot.record
+        record["likes"]! += Int.random(in: 8...24)
+        do {
+            try await CKContainer.default().publicCloudDatabase.save(record)
+        } catch {
+            print("error adding downloads")
         }
     }
     

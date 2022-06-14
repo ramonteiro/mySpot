@@ -154,7 +154,7 @@ struct AccountDetailView: View {
                     Text(badgeMessage().localized())
                 }
                 .background(ShareViewController(isPresenting: $isShare) {
-                    let av = shareSheetAccount(userid: cloudViewModel.userID, name: name)
+                    let av = shareSheetAccount(userid: userid, name: name)
                     av.completionWithItemsHandler = { _, _, _, _ in
                         isShare = false
                     }
@@ -213,6 +213,17 @@ struct AccountDetailView: View {
                                 }
                             }
                         } else {
+                            if cloudViewModel.userID == UserDefaultKeys.admin {
+                                Button {
+                                    if let accountModel = accountModel {
+                                        Task {
+                                            try? await cloudViewModel.makeExplorer(id: accountModel.record.recordID)
+                                        }
+                                    }
+                                } label: {
+                                    Text("Pro")
+                                }
+                            }
                             Button {
                                 presentationMode.wrappedValue.dismiss()
                             } label: {
