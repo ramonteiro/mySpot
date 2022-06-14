@@ -99,6 +99,7 @@ struct AccountDetailView: View {
                                             DiscoverRow(spot: spots[i])
                                                 .padding(4)
                                         }
+                                        .buttonStyle(PlainButtonStyle())
                                     }
                                     if isFetching {
                                         HStack {
