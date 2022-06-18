@@ -28,7 +28,7 @@ struct ViewSingleSpotOnMap: View {
     
     var body: some View {
         ZStack {
-            Map(coordinateRegion: $spotRegion, interactionModes: [.pan, .zoom], showsUserLocation: mapViewModel.getIsAuthorized(), annotationItems: singlePin) { location in
+            Map(coordinateRegion: $spotRegion, interactionModes: [.pan, .zoom], showsUserLocation: mapViewModel.isAuthorized, annotationItems: singlePin) { location in
                 MapMarker(coordinate: singlePin[0].coordinate, tint: cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex])
             }
             HStack {

@@ -61,7 +61,7 @@ struct SetUpNewSpotNoti: View {
                             let location = CLLocation(latitude: centerRegion.center.latitude, longitude: centerRegion.center.longitude)
                             saving = true
                             var placeName: String = ""
-                            mapViewModel.getPlacmarkOfLocationLessPrecise(location: location) { l in
+                            mapViewModel.getPlacmarkOfLocation(location: location, isPrecise: false) { l in
                                 placeName = l
                             }
                             

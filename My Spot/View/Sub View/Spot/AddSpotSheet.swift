@@ -187,7 +187,7 @@ struct AddSpotSheet: View {
                     }
                     .fullScreenCover(isPresented: $presentMapView) {
                         if didSave && usingCustomLocation {
-                            mapViewModel.getPlacmarkOfLocation(location: CLLocation(latitude: centerRegion.center.latitude, longitude: centerRegion.center.longitude)) { name in
+                            mapViewModel.getPlacmarkOfLocation(location: CLLocation(latitude: centerRegion.center.latitude, longitude: centerRegion.center.longitude), isPrecise: true) { name in
                                 locationName = name
                             }
                         }
@@ -349,7 +349,7 @@ struct AddSpotSheet: View {
                     mapViewModel.checkLocationAuthorization()
                     lat = getLatitude()
                     long = getLongitude()
-                    mapViewModel.getPlacmarkOfLocation(location: CLLocation(latitude: mapViewModel.region.center.latitude, longitude: mapViewModel.region.center.longitude), completionHandler: { location in
+                    mapViewModel.getPlacmarkOfLocation(location: CLLocation(latitude: mapViewModel.region.center.latitude, longitude: mapViewModel.region.center.longitude), isPrecise: true, completionHandler: { location in
                         locationName = location
                     })
                 }

@@ -72,7 +72,7 @@ struct ViewMapSpots: View {
     
     private var displayMap: some View {
         ZStack {
-            Map(coordinateRegion: $spotRegion, interactionModes: [.pan, .zoom], showsUserLocation: mapViewModel.getIsAuthorized(), annotationItems: spotsFiltered, annotationContent: { location in
+            Map(coordinateRegion: $spotRegion, interactionModes: [.pan, .zoom], showsUserLocation: mapViewModel.isAuthorized, annotationItems: spotsFiltered, annotationContent: { location in
                 MapAnnotation(coordinate: CLLocationCoordinate2D(latitude: location.x, longitude: location.y)) {
                     MapAnnotationView(color: cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex], spot: location, isSelected: spotsFiltered[selection] == location)
                         .scaleEffect(spotsFiltered[selection] == location ? 1.2 : 0.9)

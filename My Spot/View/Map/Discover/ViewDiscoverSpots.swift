@@ -82,7 +82,7 @@ struct ViewDiscoverSpots: View {
     
     private var displayMap: some View {
         ZStack {
-            Map(coordinateRegion: $spotRegion, interactionModes: [.pan, .zoom], showsUserLocation: mapViewModel.getIsAuthorized(), annotationItems: cloudViewModel.spots, annotationContent: { location in
+            Map(coordinateRegion: $spotRegion, interactionModes: [.pan, .zoom], showsUserLocation: mapViewModel.isAuthorized, annotationItems: cloudViewModel.spots, annotationContent: { location in
                 MapAnnotation(coordinate: location.location.coordinate) {
                     if (cloudViewModel.spots.count > 0 && cloudViewModel.spots.count >= selection + 1) {
                         MapAnnotationDiscover(spot: location, isSelected: cloudViewModel.spots[selection] == location, color: cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex])

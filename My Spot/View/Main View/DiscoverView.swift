@@ -54,7 +54,7 @@ struct DiscoverView: View {
                 let dis = CGFloat(cloudViewModel.radiusInMeters)
                 loadSpotsFromDB(location: CLLocation(latitude: mapViewModel.searchingHere.center.latitude, longitude: mapViewModel.searchingHere.center.longitude), radiusInMeters: dis, filteringBy: sortBy)
             }
-            mapViewModel.getPlacmarkOfLocation(location: CLLocation(latitude: mapViewModel.searchingHere.center.latitude, longitude: mapViewModel.searchingHere.center.longitude)) { location in
+            mapViewModel.getPlacmarkOfLocation(location: CLLocation(latitude: mapViewModel.searchingHere.center.latitude, longitude: mapViewModel.searchingHere.center.longitude), isPrecise: true) { location in
                 searchLocationName = location
             }
             isMetric = getIsMetric()
@@ -354,7 +354,7 @@ struct DiscoverView: View {
                 }
                 .animation(.default, value: cloudViewModel.spots)
                 .onChange(of: mapViewModel.searchingHere.center.longitude) { _ in
-                    mapViewModel.getPlacmarkOfLocation(location: CLLocation(latitude: mapViewModel.searchingHere.center.latitude, longitude: mapViewModel.searchingHere.center.longitude)) { location in
+                    mapViewModel.getPlacmarkOfLocation(location: CLLocation(latitude: mapViewModel.searchingHere.center.latitude, longitude: mapViewModel.searchingHere.center.longitude), isPrecise: true) { location in
                         searchLocationName = location
                     }
                 }

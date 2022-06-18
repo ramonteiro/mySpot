@@ -22,10 +22,7 @@ final class MapViewModel: NSObject, ObservableObject, CLLocationManagerDelegate 
     
     override init() {
         super.init()
-        if (UserDefaults.standard.valueExists(forKey: UserDefaultKeys.lastKnownUserLocationX)) {
-            searchingHere.center.longitude = UserDefaults.standard.double(forKey: UserDefaultKeys.lastKnownUserLocationY)
-            searchingHere.center.latitude = UserDefaults.standard.double(forKey: UserDefaultKeys.lastKnownUserLocationX)
-        }
+        self.setLastKnownLocation()
         self.checkIfLocationServicesIsEnabled()
     }
     
@@ -39,31 +36,28 @@ final class MapViewModel: NSObject, ObservableObject, CLLocationManagerDelegate 
     
     func checkLocationAuthorization() {
         guard let locationManager = locationManager else { return }
-        
         switch locationManager.authorizationStatus {
-            
         case .notDetermined:
             isAuthorized = false
             locationManager.requestWhenInUseAuthorization()
         case .restricted:
             isAuthorized = false
-            setPreviousLocation()
+            setLastKnownLocation()
         case .denied:
             isAuthorized = false
-            setPreviousLocation()
+            setLastKnownLocation()
         case .authorizedAlways, .authorizedWhenInUse:
             if let center = locationManager.location?.coordinate {
                 isAuthorized = true
                 region = MKCoordinateRegion(center: center, span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01))
-                UserDefaults.standard.set(region.center.latitude, forKey: UserDefaultKeys.lastKnownUserLocationX)
-                UserDefaults.standard.set(region.center.longitude, forKey: UserDefaultKeys.lastKnownUserLocationY)
+                setLastKnownLocation()
             } else {
                 isAuthorized = false
-                setPreviousLocation()
+                setLastKnownLocation()
             }
         @unknown default:
             isAuthorized = false
-            setPreviousLocation()
+            setLastKnownLocation()
         }
     }
     
@@ -71,47 +65,24 @@ final class MapViewModel: NSObject, ObservableObject, CLLocationManagerDelegate 
         checkLocationAuthorization()
     }
     
-    func getIsAuthorized() -> Bool {
-        return isAuthorized
-    }
-    
-    private func setPreviousLocation() {
+    private func setLastKnownLocation() {
         if (UserDefaults.standard.valueExists(forKey: UserDefaultKeys.lastKnownUserLocationX)) {
-            region.center.latitude = UserDefaults.standard.double(forKey: UserDefaultKeys.lastKnownUserLocationX)
-            region.center.longitude = UserDefaults.standard.double(forKey: UserDefaultKeys.lastKnownUserLocationY)
+            searchingHere.center.longitude = UserDefaults.standard.double(forKey: UserDefaultKeys.lastKnownUserLocationY)
+            searchingHere.center.latitude = UserDefaults.standard.double(forKey: UserDefaultKeys.lastKnownUserLocationX)
+        } else {
+            UserDefaults.standard.set(region.center.latitude, forKey: UserDefaultKeys.lastKnownUserLocationX)
+            UserDefaults.standard.set(region.center.longitude, forKey: UserDefaultKeys.lastKnownUserLocationY)
         }
     }
     
-    func getPlacmarkOfLocation(location: CLLocation, completionHandler: @escaping (String) -> Void) {
+    func getPlacmarkOfLocation(location: CLLocation, isPrecise: Bool, completionHandler: @escaping (String) -> Void) {
         let geo = CLGeocoder()
         geo.reverseGeocodeLocation(location) { (placemarker, error) in
             if error == nil {
                 let place = placemarker?[0]
-                if let sublocal = place?.subLocality {
+                if let sublocal = place?.subLocality, isPrecise {
                     completionHandler(sublocal)
                 } else if let local = place?.locality {
-                    completionHandler(local)
-                } else if let state = place?.administrativeArea {
-                    completionHandler(state)
-                } else if let country = place?.country {
-                    completionHandler(country)
-                } else if let ocean = place?.ocean {
-                    completionHandler(ocean)
-                } else {
-                    completionHandler("")
-                }
-            } else {
-                completionHandler("")
-            }
-        }
-    }
-    
-    func getPlacmarkOfLocationLessPrecise(location: CLLocation, completionHandler: @escaping (String) -> Void) {
-        let geo = CLGeocoder()
-        geo.reverseGeocodeLocation(location) { (placemarker, error) in
-            if error == nil {
-                let place = placemarker?[0]
-                if let local = place?.locality {
                     completionHandler(local)
                 } else if let state = place?.administrativeArea {
                     completionHandler(state)

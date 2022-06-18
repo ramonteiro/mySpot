@@ -82,7 +82,7 @@ struct ViewPlaylistMap: View {
     
     private var displayMap: some View {
         ZStack {
-            Map(coordinateRegion: $spotRegion, interactionModes: [.pan, .zoom], showsUserLocation: mapViewModel.getIsAuthorized(), annotationItems: filteredSpots, annotationContent: { location in
+            Map(coordinateRegion: $spotRegion, interactionModes: [.pan, .zoom], showsUserLocation: mapViewModel.isAuthorized, annotationItems: filteredSpots, annotationContent: { location in
                 MapAnnotation(coordinate: CLLocationCoordinate2D(latitude: location.x, longitude: location.y)) {
                     MapAnnotationView(color: cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex], spot: location, isSelected: filteredSpots[selection] == location)
                         .scaleEffect(filteredSpots[selection] == location ? 1.2 : 0.9)
