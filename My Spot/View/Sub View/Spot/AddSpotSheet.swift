@@ -19,7 +19,6 @@ struct AddSpotSheet: View {
     
     @Environment(\.presentationMode) var presentationMode
     @EnvironmentObject var mapViewModel: MapViewModel
-    @FetchRequest(sortDescriptors: []) var colors: FetchedResults<CustomColor>
     @EnvironmentObject var cloudViewModel: CloudKitViewModel
     
     @State private var showingAlert = false
@@ -571,9 +570,6 @@ struct AddSpotSheet: View {
             } catch {
                 newSpot.dbid = ""
                 newSpot.isPublic = false
-            }
-            if (!colors.isEmpty) {
-                colors[0].name = UserDefaults.standard.string(forKey: "founder") ?? "?"
             }
             if let founderName = UserDefaults.standard.string(forKey: "founder") {
                 newSpot.founder = founderName

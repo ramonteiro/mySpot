@@ -20,11 +20,13 @@ struct My_SpotApp: App {
         UIView.appearance(whenContainedInInstancesOf: [UIAlertController.self]).tintColor = .systemBlue
         UITableView.appearance().showsVerticalScrollIndicator = false
         UIScrollView.appearance().keyboardDismissMode = .interactive
+        UserDefaults.standard.set(false, forKey: "_UIConstraintBasedLayoutLogUnsatisfiable")
     }
     
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .environment(\.managedObjectContext, CoreDataStack.shared.context)
                 .environmentObject(mapViewModel)
                 .environmentObject(cloudViewModel)
                 .environmentObject(phoneViewModel)

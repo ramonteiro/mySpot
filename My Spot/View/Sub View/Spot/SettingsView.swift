@@ -11,7 +11,6 @@ import CoreLocation
 struct SettingsView: View {
     
     @Environment(\.presentationMode) var presentationMode
-    @FetchRequest(sortDescriptors: []) var colors: FetchedResults<CustomColor>
     @EnvironmentObject var cloudViewModel: CloudKitViewModel
     @EnvironmentObject var mapViewModel: MapViewModel
     @Environment(\.colorScheme) var colorScheme
@@ -229,10 +228,6 @@ struct SettingsView: View {
                         .background(Circle().foregroundColor(cloudViewModel.systemColorArray[i]))
                         .onTapGesture {
                             cloudViewModel.systemColorIndex = i
-                            if (!colors.isEmpty) {
-                                colors[0].colorIndex = Double(i)
-                                CoreDataStack.shared.save()
-                            }
                         }
                 } else {
                     ZStack {
@@ -242,11 +237,7 @@ struct SettingsView: View {
                             .background(Circle().foregroundColor(cloudViewModel.systemColorArray[i]))
                             .onTapGesture {
                                 cloudViewModel.systemColorIndex = i
-                                if (!colors.isEmpty) {
-                                    colors[0].colorIndex = Double(i)
-                                    CoreDataStack.shared.save()
-                                    UserDefaults(suiteName: "group.com.isaacpaschall.My-Spot")?.set(i, forKey: "colorIndex")
-                                }
+                                UserDefaults(suiteName: "group.com.isaacpaschall.My-Spot")?.set(i, forKey: "colorIndex")
                             }
                         Image(systemName: "pencil")
                             .frame(width: 40, height: 40)
@@ -422,17 +413,10 @@ struct SettingsView: View {
         var alpha: CGFloat = 0
         
         color.getRed(&red, green: &green, blue: &blue, alpha: &alpha)
-        if (!colors.isEmpty) {
-            colors[0].colorG = green
-            colors[0].colorB = blue
-            colors[0].colorR = red
-            colors[0].colorA = alpha
-            CoreDataStack.shared.save()
-            UserDefaults(suiteName: "group.com.isaacpaschall.My-Spot")?.set(Double(green), forKey: "colorg")
-            UserDefaults(suiteName: "group.com.isaacpaschall.My-Spot")?.set(Double(blue), forKey: "colorb")
-            UserDefaults(suiteName: "group.com.isaacpaschall.My-Spot")?.set(Double(red), forKey: "colorr")
-            UserDefaults(suiteName: "group.com.isaacpaschall.My-Spot")?.set(Double(alpha), forKey: "colora")
-        }
+        UserDefaults(suiteName: "group.com.isaacpaschall.My-Spot")?.set(Double(green), forKey: "colorg")
+        UserDefaults(suiteName: "group.com.isaacpaschall.My-Spot")?.set(Double(blue), forKey: "colorb")
+        UserDefaults(suiteName: "group.com.isaacpaschall.My-Spot")?.set(Double(red), forKey: "colorr")
+        UserDefaults(suiteName: "group.com.isaacpaschall.My-Spot")?.set(Double(alpha), forKey: "colora")
     }
     
     private func setNewColorFromIndex(index: Int) {
@@ -443,12 +427,10 @@ struct SettingsView: View {
         var alpha: CGFloat = 0
         
         color.getRed(&red, green: &green, blue: &blue, alpha: &alpha)
-        if (!colors.isEmpty) {
-            UserDefaults(suiteName: "group.com.isaacpaschall.My-Spot")?.set(Double(green), forKey: "colorg")
-            UserDefaults(suiteName: "group.com.isaacpaschall.My-Spot")?.set(Double(blue), forKey: "colorb")
-            UserDefaults(suiteName: "group.com.isaacpaschall.My-Spot")?.set(Double(red), forKey: "colorr")
-            UserDefaults(suiteName: "group.com.isaacpaschall.My-Spot")?.set(Double(alpha), forKey: "colora")
-        }
+        UserDefaults(suiteName: "group.com.isaacpaschall.My-Spot")?.set(Double(green), forKey: "colorg")
+        UserDefaults(suiteName: "group.com.isaacpaschall.My-Spot")?.set(Double(blue), forKey: "colorb")
+        UserDefaults(suiteName: "group.com.isaacpaschall.My-Spot")?.set(Double(red), forKey: "colorr")
+        UserDefaults(suiteName: "group.com.isaacpaschall.My-Spot")?.set(Double(alpha), forKey: "colora")
     }
     
     private func initializeVars() {

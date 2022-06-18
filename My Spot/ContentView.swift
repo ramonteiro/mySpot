@@ -23,7 +23,6 @@ struct ContentView: View {
     @EnvironmentObject var mapViewModel: MapViewModel
     @EnvironmentObject var phoneViewModel: PhoneViewModel
     @EnvironmentObject var tabController: TabController
-    @FetchRequest(sortDescriptors: []) var colors: FetchedResults<CustomColor>
     @State private var presentSharedSpotSheet = false
     @State private var presentAccountCreation = false
     @State private var presentErrorAlert = false
@@ -45,9 +44,6 @@ struct ContentView: View {
             }
         }
         .ignoresSafeArea(.keyboard, edges: .bottom)
-        .onAppear {
-            checkForNewAccentColors()
-        }
     }
     
     // MARK: - Sub Views
@@ -292,24 +288,6 @@ struct ContentView: View {
         } else {
             UINotificationFeedbackGenerator().notificationOccurred(.warning)
             presentFailedToAcceptShareInviteAlert = true
-        }
-    }
-    
-    private func checkForNewAccentColors() {
-        if colors.isEmpty {
-            let newColor = CustomColor(context: CoreDataStack.shared.context)
-            newColor.colorIndex = 0
-            newColor.colorR = 128
-            newColor.colorA = 128
-            newColor.colorB = 128
-            newColor.colorG = 128
-            CoreDataStack.shared.save()
-            cloudViewModel.systemColorArray[cloudViewModel.systemColorArray.count - 1] = Color(uiColor: UIColor(red: colors[0].colorR, green: colors[0].colorG, blue: colors[0].colorB, alpha: colors[0].colorA))
-            cloudViewModel.systemColorIndex = Int(colors[0].colorIndex)
-            cloudViewModel.savedName = colors[0].name ?? ""
-        } else {
-            cloudViewModel.systemColorArray[cloudViewModel.systemColorArray.count - 1] = Color(uiColor: UIColor(red: colors[0].colorR, green: colors[0].colorG, blue: colors[0].colorB, alpha: colors[0].colorA))
-            cloudViewModel.systemColorIndex = Int(colors[0].colorIndex)
         }
     }
 }

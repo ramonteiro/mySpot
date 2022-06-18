@@ -40,6 +40,10 @@ final class MapViewModel: NSObject, ObservableObject, CLLocationManagerDelegate 
         }
     }
     
+    func distanceBetween(x1: Double, x2: Double, y1: Double, y2: Double) -> Double {
+        return (((x2 - x1) * (x2 - x1))+((y2 - y1) * (y2 - y1))).squareRoot()
+    }
+    
     func checkLocationAuthorization() {
         guard let locationManager = locationManager else { return }
         switch locationManager.authorizationStatus {
