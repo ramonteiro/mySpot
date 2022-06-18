@@ -19,11 +19,17 @@ final class MapViewModel: NSObject, ObservableObject, CLLocationManagerDelegate 
     var locationManager: CLLocationManager?
     @Published var isAuthorized: Bool = false
     @Published var searchingHere = MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: 33.714712646421, longitude: -112.29072718706581), span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01))
+    @Published var isMetric = false
     
     override init() {
         super.init()
+        self.getIsMetric()
         self.setLastKnownLocation()
         self.checkIfLocationServicesIsEnabled()
+    }
+    
+    private func getIsMetric() {
+        isMetric = ((Locale.current as NSLocale).object(forKey: NSLocale.Key.usesMetricSystem) as? Bool) ?? false
     }
     
     private func checkIfLocationServicesIsEnabled() {

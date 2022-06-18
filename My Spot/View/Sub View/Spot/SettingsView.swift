@@ -70,7 +70,7 @@ struct SettingsView: View {
                 .fullScreenCover(isPresented: $showingConfigure, onDismiss: {
                     checkForErrors()
                 }) {
-                    SetUpNewSpotNoti(newPlace: $newPlace, unableToAddSpot: $unableToAddSpot)
+                    SetUpNewSpotNotification(newPlace: $newPlace, unableToAddSpot: $unableToAddSpot)
                         .accentColor(cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex])
                 }
                 .sheet(isPresented: $showingMailSheet) {

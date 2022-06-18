@@ -10,21 +10,20 @@ import SwiftUI
 struct NotificationView: View {
     
     @Binding var badgeNum: Int
+    @Binding var goToSettings: Bool
     @Environment(\.presentationMode) var presentationMode
     @EnvironmentObject var cloudViewModel: CloudKitViewModel
-    @State private var showDetailView = false
-    @State private var canLoad = false
+    @State private var presentDetailView = false
+    @State private var presentRemoveAllAlert = false
     @State private var index: Int?
     @State private var hasError = false
     @State private var isFetching = false
-    @State private var showingAlert = false
-    @Binding var goToSettings: Bool
     
     var body: some View {
         NavigationView {
             notificationMainView
         }
-        .alert("Are you sure you want to remove all notifications?".localized(), isPresented: $showingAlert) {
+        .alert("Are you sure you want to remove all notifications?".localized(), isPresented: $presentRemoveAllAlert) {
             Button("Remove All".localized(), role: .destructive) {
                 removeNotificationSpots()
             }
@@ -74,7 +73,7 @@ struct NotificationView: View {
         Button {
             let generator = UINotificationFeedbackGenerator()
             generator.notificationOccurred(.warning)
-            showingAlert.toggle()
+            presentRemoveAllAlert.toggle()
         } label: {
             Text("Remove All".localized())
                 .foregroundColor(.red)
@@ -205,7 +204,7 @@ struct NotificationView: View {
                 ForEach(cloudViewModel.notificationSpots.indices, id: \.self) { i in
                     Button {
                         index = i
-                        showDetailView = true
+                        presentDetailView = true
                     } label: {
                         DiscoverRow(spot: cloudViewModel.notificationSpots[i])
                     }
@@ -221,7 +220,7 @@ struct NotificationView: View {
             .onAppear {
                 cloudViewModel.canRefresh = true
             }
-            NavigationLink(destination: DiscoverDetailNotification(index: index ?? 0), isActive: $showDetailView) {
+            NavigationLink(destination: DiscoverDetailNotification(index: index ?? 0), isActive: $presentDetailView) {
                 EmptyView()
             }
             .isDetailLink(false)
