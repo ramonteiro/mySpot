@@ -19,7 +19,6 @@ struct AddSpotToPlaylistSheet: View {
     @Environment(\.presentationMode) var presentationMode
     @State private var spotsFiltered: [Spot] = []
     @EnvironmentObject var cloudViewModel: CloudKitViewModel
-    @Environment(\.managedObjectContext) var moc
     var currPlaylist: Playlist
     @State private var addedSpots: [NSManagedObject] = []
     private let stack = CoreDataStack.shared

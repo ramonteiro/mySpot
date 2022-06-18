@@ -14,7 +14,6 @@ struct PlaylistEditSheet: View {
     @State private var emojiChecked = false
     
     @ObservedObject var playlist: Playlist
-    @Environment(\.managedObjectContext) var moc
     @Environment(\.presentationMode) var presentationMode
     @State private var name = ""
     @State private var emoji = ""

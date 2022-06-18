@@ -18,7 +18,6 @@ import WidgetKit
 struct MySpotsView: View {
     
     @FetchRequest(sortDescriptors: [], animation: .default) var spots: FetchedResults<Spot>
-    @Environment(\.managedObjectContext) var moc
     @EnvironmentObject var mapViewModel: MapViewModel
     @EnvironmentObject var cloudViewModel: CloudKitViewModel
     

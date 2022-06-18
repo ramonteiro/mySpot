@@ -20,7 +20,6 @@ struct DetailView: View {
     @EnvironmentObject var cloudViewModel: CloudKitViewModel
     @EnvironmentObject var mapViewModel: MapViewModel
     @FetchRequest(sortDescriptors: [], animation: .default) var spots: FetchedResults<Spot>
-    @Environment(\.managedObjectContext) var moc
     @ObservedObject var spot:Spot
     @Environment(\.presentationMode) var presentationMode
     @Environment(\.colorScheme) var colorScheme
@@ -282,7 +281,7 @@ struct DetailView: View {
         .alert("Are you sure you want to delete ".localized() + (spot.name ?? "") + "?".localized(), isPresented: $deleteAlert) {
             Button("Delete".localized(), role: .destructive) {
                 if let i = spots.firstIndex(of: spot) {
-                    moc.delete(spots[i])
+                    CoreDataStack.shared.deleteSpot(spots[i])
                     CoreDataStack.shared.save()
                     if !canShare {
                         imageOffset = 0

@@ -18,7 +18,6 @@ import Combine
 struct AddSpotSheet: View {
     
     @Environment(\.presentationMode) var presentationMode
-    @Environment(\.managedObjectContext) var moc
     @EnvironmentObject var mapViewModel: MapViewModel
     @FetchRequest(sortDescriptors: []) var colors: FetchedResults<CustomColor>
     @EnvironmentObject var cloudViewModel: CloudKitViewModel
@@ -440,7 +439,7 @@ struct AddSpotSheet: View {
     }
     
     private func save() async {
-        let newSpot = Spot(context: moc)
+        let newSpot = Spot(context: CoreDataStack.shared.context)
         if let imageData = cloudViewModel.compressImage(image: images?[0] ?? defaultImages.errorImage!).pngData() {
             newSpot.image = UIImage(data: imageData)
         } else {
@@ -536,7 +535,7 @@ struct AddSpotSheet: View {
     }
     
     private func savePublic() async {
-        let newSpot = Spot(context: moc)
+        let newSpot = Spot(context: CoreDataStack.shared.context)
         if let imageData = cloudViewModel.compressImage(image: images?[0] ?? defaultImages.errorImage!).pngData() {
             newSpot.image = UIImage(data: imageData)
             var imageData2: Data? = nil

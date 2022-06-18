@@ -17,7 +17,6 @@ struct SpotEditSheet: View {
     
     @EnvironmentObject var cloudViewModel: CloudKitViewModel
     @ObservedObject var spot:Spot
-    @Environment(\.managedObjectContext) var moc
     @Environment(\.presentationMode) var presentationMode
     
     @State private var name = ""

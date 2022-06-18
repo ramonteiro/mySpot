@@ -15,7 +15,6 @@ struct DiscoverDetailAccountSpots: View {
     var index: Int
     @Binding var spotsFromCloud: [SpotFromCloud]
     @FetchRequest(sortDescriptors: []) var spots: FetchedResults<Spot>
-    @Environment(\.managedObjectContext) var moc
     @Environment(\.presentationMode) var presentationMode
     @EnvironmentObject var tabController: TabController
     @EnvironmentObject var mapViewModel: MapViewModel
@@ -663,7 +662,7 @@ struct DiscoverDetailAccountSpots: View {
     }
     
     private func save() async {
-        let newSpot = Spot(context: moc)
+        let newSpot = Spot(context: CoreDataStack.shared.context)
         newSpot.founder = spotsFromCloud[index].founder
         newSpot.details = spotsFromCloud[index].description
         newSpot.image = images[0]

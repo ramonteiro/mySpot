@@ -14,7 +14,6 @@ struct SettingsView: View {
     @FetchRequest(sortDescriptors: []) var colors: FetchedResults<CustomColor>
     @EnvironmentObject var cloudViewModel: CloudKitViewModel
     @EnvironmentObject var mapViewModel: MapViewModel
-    @Environment(\.managedObjectContext) var moc
     @Environment(\.colorScheme) var colorScheme
     @State private var showingMailSheet = false
     @State private var showingConfigure = false

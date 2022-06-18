@@ -14,7 +14,6 @@ struct DiscoverDetailNotification: View {
     
     var index: Int
     @FetchRequest(sortDescriptors: []) var spots: FetchedResults<Spot>
-    @Environment(\.managedObjectContext) var moc
     @Environment(\.presentationMode) var presentationMode
     @EnvironmentObject var tabController: TabController
     @EnvironmentObject var mapViewModel: MapViewModel
@@ -672,7 +671,7 @@ struct DiscoverDetailNotification: View {
     }
     
     private func save() async {
-        let newSpot = Spot(context: moc)
+        let newSpot = Spot(context: CoreDataStack.shared.context)
         newSpot.founder = cloudViewModel.notificationSpots[index].founder
         newSpot.details = cloudViewModel.notificationSpots[index].description
         newSpot.image = images[0]

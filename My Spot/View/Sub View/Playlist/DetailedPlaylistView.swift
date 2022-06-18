@@ -19,7 +19,6 @@ struct DetailPlaylistView: View {
     
     @ObservedObject var playlist: Playlist
     @EnvironmentObject var mapViewModel: MapViewModel
-    @Environment(\.managedObjectContext) var moc
     @Environment(\.presentationMode) var presentationMode
     @EnvironmentObject var tabController: TabController
     @EnvironmentObject var cloudViewModel: CloudKitViewModel

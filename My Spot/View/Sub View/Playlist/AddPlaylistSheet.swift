@@ -16,7 +16,6 @@ import Combine
 struct AddPlaylistSheet: View {
     
     @Environment(\.presentationMode) var presentationMode
-    @Environment(\.managedObjectContext) var moc
     private var stack = CoreDataStack.shared
     
     @State private var showingAlert = false
@@ -104,7 +103,7 @@ struct AddPlaylistSheet: View {
     }
     
     func save() {
-        let newPlaylist = Playlist(context: moc)
+        let newPlaylist = Playlist(context: CoreDataStack.shared.context)
         newPlaylist.id = UUID()
         newPlaylist.name = name
         newPlaylist.emoji = emoji

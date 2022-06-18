@@ -17,7 +17,6 @@ struct PlaylistView: View {
     @FetchRequest(sortDescriptors: [
         SortDescriptor(\.name)
     ]) var playlists: FetchedResults<Playlist>
-    @Environment(\.managedObjectContext) var moc
     private let stack = CoreDataStack.shared
     @EnvironmentObject var mapViewModel: MapViewModel
     @EnvironmentObject var cloudViewModel: CloudKitViewModel

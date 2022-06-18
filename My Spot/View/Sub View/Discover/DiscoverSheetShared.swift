@@ -18,7 +18,6 @@ import CoreData
 struct DiscoverSheetShared: View {
     
     @FetchRequest(sortDescriptors: []) var spots: FetchedResults<Spot>
-    @Environment(\.managedObjectContext) var moc
     @Environment(\.presentationMode) var presentationMode
     @EnvironmentObject var tabController: TabController
     @EnvironmentObject var mapViewModel: MapViewModel
@@ -672,7 +671,7 @@ struct DiscoverSheetShared: View {
     }
     
     private func save() async {
-        let newSpot = Spot(context: moc)
+        let newSpot = Spot(context: CoreDataStack.shared.context)
         newSpot.founder = cloudViewModel.shared[0].founder
         newSpot.details = cloudViewModel.shared[0].description
         newSpot.image = images[0]
