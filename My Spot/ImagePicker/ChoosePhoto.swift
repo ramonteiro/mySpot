@@ -50,7 +50,6 @@ struct ChoosePhoto: UIViewControllerRepresentable {
                     self.parent.completion(uiImage)
                 }
             }
-            
             parent.presentationMode.wrappedValue.dismiss()
         }
     }

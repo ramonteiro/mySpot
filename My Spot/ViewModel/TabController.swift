@@ -20,7 +20,7 @@ enum Tab {
     case profile
 }
 
-class TabController: ObservableObject {
+final class TabController: ObservableObject {
     @Published var activeTab = Tab.spots
     @Published var discoverPopToRoot = false
     @Published var spotPopToRoot = false

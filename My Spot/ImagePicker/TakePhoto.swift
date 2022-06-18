@@ -29,7 +29,6 @@ struct TakePhoto: UIViewControllerRepresentable {
     }
     
     func updateUIViewController(_ uiViewController: UIImagePickerController, context: Context) {
-        //unused but needs to conform to UIViewControllerRepresentable
     }
     
     final class Coordinator: NSObject, UIImagePickerControllerDelegate, UINavigationControllerDelegate {

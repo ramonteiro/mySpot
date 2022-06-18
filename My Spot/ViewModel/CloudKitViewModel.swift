@@ -8,7 +8,7 @@
 import SwiftUI
 import CloudKit
 
-class CloudKitViewModel: ObservableObject {
+final class CloudKitViewModel: ObservableObject {
     
     @Published var notiNewSpotOn = false
     @Published var notiSharedOn = false

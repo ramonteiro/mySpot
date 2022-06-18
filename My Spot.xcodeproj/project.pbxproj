@@ -94,10 +94,20 @@
 		C5552CCF2828207500AF2683 /* DiscoverDetailNotification.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5552CCE2828207500AF2683 /* DiscoverDetailNotification.swift */; };
 		C5552CD128298E6900AF2683 /* CloudSharingController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5552CD028298E6900AF2683 /* CloudSharingController.swift */; };
 		C56011B52800E66A00C49597 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = C56011B72800E66A00C49597 /* Localizable.strings */; };
-		C56F499F27E05CE300BCBB8F /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = C56F499E27E05CE300BCBB8F /* Extensions.swift */; };
 		C587027427E27F1900DFB6C4 /* MailViewCallback.swift in Sources */ = {isa = PBXBuildFile; fileRef = C587027327E27F1900DFB6C4 /* MailViewCallback.swift */; };
 		C587B46B2854F472007C3263 /* DatePickerSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = C587B46A2854F472007C3263 /* DatePickerSheet.swift */; };
 		C58F2BF62830AA42005FA88F /* WelcomeSheet in Frameworks */ = {isa = PBXBuildFile; productRef = C58F2BF52830AA42005FA88F /* WelcomeSheet */; };
+		C5942834285E5DFA003CF5AA /* ImageCompression.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5942833285E5DFA003CF5AA /* ImageCompression.swift */; };
+		C5942836285E5E3C003CF5AA /* CheckUserDefaultsValue.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5942835285E5E3C003CF5AA /* CheckUserDefaultsValue.swift */; };
+		C5942838285E5E73003CF5AA /* GetTags.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5942837285E5E73003CF5AA /* GetTags.swift */; };
+		C594283A285E5E98003CF5AA /* ScreenSize.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5942839285E5E98003CF5AA /* ScreenSize.swift */; };
+		C594283C285E5EBE003CF5AA /* ConditionalViewModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = C594283B285E5EBE003CF5AA /* ConditionalViewModifier.swift */; };
+		C594283E285E5EF8003CF5AA /* SetNavigationSwipeToPop.swift in Sources */ = {isa = PBXBuildFile; fileRef = C594283D285E5EF8003CF5AA /* SetNavigationSwipeToPop.swift */; };
+		C5942840285E5F79003CF5AA /* KeyboardDismissal.swift in Sources */ = {isa = PBXBuildFile; fileRef = C594283F285E5F79003CF5AA /* KeyboardDismissal.swift */; };
+		C5942842285E5FAE003CF5AA /* ColorRGBA.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5942841285E5FAE003CF5AA /* ColorRGBA.swift */; };
+		C5942844285E5FCB003CF5AA /* LocalizeStrings.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5942843285E5FCB003CF5AA /* LocalizeStrings.swift */; };
+		C5942846285E5FE7003CF5AA /* BadgeViewOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5942845285E5FE7003CF5AA /* BadgeViewOverlay.swift */; };
+		C5942848285E6008003CF5AA /* EmojiToImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5942847285E6008003CF5AA /* EmojiToImage.swift */; };
 		C594BB82284D37730012DA6C /* AccountModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C594BB81284D37730012DA6C /* AccountModel.swift */; };
 		C5B01354284AD15B00121163 /* CreateAccountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5B01353284AD15B00121163 /* CreateAccountView.swift */; };
 		C5D2954C2823719100FBA01E /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C5D2954B2823719100FBA01E /* WidgetKit.framework */; };
@@ -285,9 +295,19 @@
 		C56011C02800F61100C49597 /* ko */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ko; path = ko.lproj/Localizable.strings; sourceTree = "<group>"; };
 		C56011C12800F61300C49597 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/Localizable.strings; sourceTree = "<group>"; };
 		C56011C22800F64000C49597 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/Localizable.strings; sourceTree = "<group>"; };
-		C56F499E27E05CE300BCBB8F /* Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
 		C587027327E27F1900DFB6C4 /* MailViewCallback.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MailViewCallback.swift; sourceTree = "<group>"; };
 		C587B46A2854F472007C3263 /* DatePickerSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DatePickerSheet.swift; sourceTree = "<group>"; };
+		C5942833285E5DFA003CF5AA /* ImageCompression.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageCompression.swift; sourceTree = "<group>"; };
+		C5942835285E5E3C003CF5AA /* CheckUserDefaultsValue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckUserDefaultsValue.swift; sourceTree = "<group>"; };
+		C5942837285E5E73003CF5AA /* GetTags.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GetTags.swift; sourceTree = "<group>"; };
+		C5942839285E5E98003CF5AA /* ScreenSize.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenSize.swift; sourceTree = "<group>"; };
+		C594283B285E5EBE003CF5AA /* ConditionalViewModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConditionalViewModifier.swift; sourceTree = "<group>"; };
+		C594283D285E5EF8003CF5AA /* SetNavigationSwipeToPop.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetNavigationSwipeToPop.swift; sourceTree = "<group>"; };
+		C594283F285E5F79003CF5AA /* KeyboardDismissal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardDismissal.swift; sourceTree = "<group>"; };
+		C5942841285E5FAE003CF5AA /* ColorRGBA.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorRGBA.swift; sourceTree = "<group>"; };
+		C5942843285E5FCB003CF5AA /* LocalizeStrings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalizeStrings.swift; sourceTree = "<group>"; };
+		C5942845285E5FE7003CF5AA /* BadgeViewOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BadgeViewOverlay.swift; sourceTree = "<group>"; };
+		C5942847285E6008003CF5AA /* EmojiToImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmojiToImage.swift; sourceTree = "<group>"; };
 		C594BB81284D37730012DA6C /* AccountModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountModel.swift; sourceTree = "<group>"; };
 		C5B01353284AD15B00121163 /* CreateAccountView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateAccountView.swift; sourceTree = "<group>"; };
 		C5D2954A2823719100FBA01E /* MySpotWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = MySpotWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -410,25 +430,26 @@
 			path = View;
 			sourceTree = "<group>";
 		};
-		C50CF4AB27F13949001A9698 /* ImageControl */ = {
+		C50CF4AB27F13949001A9698 /* ImagePicker */ = {
 			isa = PBXGroup;
 			children = (
 				C515042127D7CAC6009F0DCD /* TakePhoto.swift */,
 				C50CF4A727F12328001A9698 /* MantisPhotoCropper.swift */,
 				C50CF4A927F13915001A9698 /* ChoosePhoto.swift */,
 			);
-			path = ImageControl;
+			path = ImagePicker;
 			sourceTree = "<group>";
 		};
-		C50CF4AC27F13971001A9698 /* ViewModels */ = {
+		C50CF4AC27F13971001A9698 /* ViewModel */ = {
 			isa = PBXGroup;
 			children = (
+				C515042827D8540A009F0DCD /* TabController.swift */,
 				C51503F127D7CA1D009F0DCD /* MapViewModel.swift */,
 				C51503E627D7C87D009F0DCD /* CloudKitViewModel.swift */,
 				C5552CC12826472800AF2683 /* PhoneViewModel.swift */,
 				C5552CD028298E6900AF2683 /* CloudSharingController.swift */,
 			);
-			path = ViewModels;
+			path = ViewModel;
 			sourceTree = "<group>";
 		};
 		C51503A127D7C347009F0DCD = {
@@ -461,13 +482,14 @@
 		C51503AC27D7C347009F0DCD /* My Spot */ = {
 			isa = PBXGroup;
 			children = (
-				C515042A27D95154009F0DCD /* My-Spot-Info.plist */,
-				C515042B27D95225009F0DCD /* LaunchScreen.storyboard */,
-				C51503BD27D7C52C009F0DCD /* My Spot.entitlements */,
 				C51503B127D7C349009F0DCD /* Assets.xcassets */,
-				C50CF4AC27F13971001A9698 /* ViewModels */,
-				C50CF4AB27F13949001A9698 /* ImageControl */,
-				C515041F27D7CABD009F0DCD /* Helper */,
+				C51503BD27D7C52C009F0DCD /* My Spot.entitlements */,
+				C515042B27D95225009F0DCD /* LaunchScreen.storyboard */,
+				C515042A27D95154009F0DCD /* My-Spot-Info.plist */,
+				C5942830285E5C9F003CF5AA /* Constant */,
+				C50CF4AC27F13971001A9698 /* ViewModel */,
+				C50CF4AB27F13949001A9698 /* ImagePicker */,
+				C515041F27D7CABD009F0DCD /* Utility */,
 				C51503E827D7C9B1009F0DCD /* View */,
 				C51503D327D7C848009F0DCD /* Model */,
 				C51503B327D7C349009F0DCD /* Preview Content */,
@@ -517,10 +539,11 @@
 		C51503E827D7C9B1009F0DCD /* View */ = {
 			isa = PBXGroup;
 			children = (
+				C5552CCC2827696500AF2683 /* NotificationView.swift */,
+				C50CF4AF27F3CD4C001A9698 /* SetUpNewSpotNoti.swift */,
 				C51503EB27D7C9E2009F0DCD /* Main View */,
 				C51503EA27D7C9DB009F0DCD /* Sub View */,
 				C51503E927D7C9CE009F0DCD /* Map */,
-				C5552CCC2827696500AF2683 /* NotificationView.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -623,21 +646,22 @@
 			path = Playlist;
 			sourceTree = "<group>";
 		};
-		C515041F27D7CABD009F0DCD /* Helper */ = {
+		C515041F27D7CABD009F0DCD /* Utility */ = {
 			isa = PBXGroup;
 			children = (
-				C515042027D7CAC6009F0DCD /* Constants.swift */,
+				C5942832285E5D82003CF5AA /* View */,
 				C515042227D7CAC6009F0DCD /* UIEmojiTextField.swift */,
-				C515042827D8540A009F0DCD /* TabController.swift */,
-				C56F499E27E05CE300BCBB8F /* Extensions.swift */,
-				C587027327E27F1900DFB6C4 /* MailViewCallback.swift */,
-				C501FC1727E3FAB7008FEFA1 /* ZoomableScrollView.swift */,
-				C501FC1927E41FF1008FEFA1 /* ImagePopUp.swift */,
-				C501FC1B27E4419A008FEFA1 /* BottomPopupView.swift */,
-				C50CF4AF27F3CD4C001A9698 /* SetUpNewSpotNoti.swift */,
 				C5F10913284C49DD00B71CBC /* ShareViewController.swift */,
+				C5942833285E5DFA003CF5AA /* ImageCompression.swift */,
+				C5942835285E5E3C003CF5AA /* CheckUserDefaultsValue.swift */,
+				C5942837285E5E73003CF5AA /* GetTags.swift */,
+				C594283B285E5EBE003CF5AA /* ConditionalViewModifier.swift */,
+				C594283F285E5F79003CF5AA /* KeyboardDismissal.swift */,
+				C5942841285E5FAE003CF5AA /* ColorRGBA.swift */,
+				C5942843285E5FCB003CF5AA /* LocalizeStrings.swift */,
+				C5942847285E6008003CF5AA /* EmojiToImage.swift */,
 			);
-			path = Helper;
+			path = Utility;
 			sourceTree = "<group>";
 		};
 		C5266ACE283EBF0000A923A1 /* mySpotiMsg */ = {
@@ -658,6 +682,28 @@
 				C56011B72800E66A00C49597 /* Localizable.strings */,
 			);
 			path = Shared;
+			sourceTree = "<group>";
+		};
+		C5942830285E5C9F003CF5AA /* Constant */ = {
+			isa = PBXGroup;
+			children = (
+				C515042027D7CAC6009F0DCD /* Constants.swift */,
+				C5942839285E5E98003CF5AA /* ScreenSize.swift */,
+				C594283D285E5EF8003CF5AA /* SetNavigationSwipeToPop.swift */,
+			);
+			path = Constant;
+			sourceTree = "<group>";
+		};
+		C5942832285E5D82003CF5AA /* View */ = {
+			isa = PBXGroup;
+			children = (
+				C501FC1B27E4419A008FEFA1 /* BottomPopupView.swift */,
+				C501FC1727E3FAB7008FEFA1 /* ZoomableScrollView.swift */,
+				C501FC1927E41FF1008FEFA1 /* ImagePopUp.swift */,
+				C587027327E27F1900DFB6C4 /* MailViewCallback.swift */,
+				C5942845285E5FE7003CF5AA /* BadgeViewOverlay.swift */,
+			);
+			path = View;
 			sourceTree = "<group>";
 		};
 		C5D2954F2823719100FBA01E /* MySpotWidget */ = {
@@ -920,6 +966,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C5942840285E5F79003CF5AA /* KeyboardDismissal.swift in Sources */,
+				C5942844285E5FCB003CF5AA /* LocalizeStrings.swift in Sources */,
+				C594283A285E5E98003CF5AA /* ScreenSize.swift in Sources */,
 				C5F10910284BEE7E00B71CBC /* AccountDetailView.swift in Sources */,
 				C515042927D8540A009F0DCD /* TabController.swift in Sources */,
 				C501FC1A27E41FF1008FEFA1 /* ImagePopUp.swift in Sources */,
@@ -927,7 +976,9 @@
 				C515042327D7CAC6009F0DCD /* Constants.swift in Sources */,
 				C51503E127D7C856009F0DCD /* Spot+CoreDataClass.swift in Sources */,
 				C502D4FB27E1A6310057A65C /* SpotEditSheet.swift in Sources */,
+				C5942842285E5FAE003CF5AA /* ColorRGBA.swift in Sources */,
 				C51503E427D7C856009F0DCD /* Spots.xcdatamodeld in Sources */,
+				C5942834285E5DFA003CF5AA /* ImageCompression.swift in Sources */,
 				C50CF4AA27F13915001A9698 /* ChoosePhoto.swift in Sources */,
 				C5552CCB2827616600AF2683 /* AppDelegate.swift in Sources */,
 				C51503E227D7C856009F0DCD /* Spot+CoreDataProperties.swift in Sources */,
@@ -936,22 +987,27 @@
 				C51503F427D7CA1D009F0DCD /* MapViewModel.swift in Sources */,
 				C51503FC27D7CA60009F0DCD /* MySpotsView.swift in Sources */,
 				C515041B27D7CAAA009F0DCD /* MapAnnotationDiscover.swift in Sources */,
+				C5942836285E5E3C003CF5AA /* CheckUserDefaultsValue.swift in Sources */,
 				C587B46B2854F472007C3263 /* DatePickerSheet.swift in Sources */,
+				C5942848285E6008003CF5AA /* EmojiToImage.swift in Sources */,
 				C51503AE27D7C347009F0DCD /* My_SpotApp.swift in Sources */,
 				C5552CCD2827696500AF2683 /* NotificationView.swift in Sources */,
 				C501FC1827E3FAB7008FEFA1 /* ZoomableScrollView.swift in Sources */,
 				C5F10914284C49DD00B71CBC /* ShareViewController.swift in Sources */,
+				C5942838285E5E73003CF5AA /* GetTags.swift in Sources */,
 				C51503FD27D7CA60009F0DCD /* DiscoverView.swift in Sources */,
 				C51503DD27D7C856009F0DCD /* UIImageTransformer.swift in Sources */,
 				C5552CD128298E6900AF2683 /* CloudSharingController.swift in Sources */,
 				C5552CC22826472900AF2683 /* PhoneViewModel.swift in Sources */,
 				C515040F27D7CA87009F0DCD /* AddSpotToPlaylistSheet.swift in Sources */,
+				C5942846285E5FE7003CF5AA /* BadgeViewOverlay.swift in Sources */,
 				C51503F327D7CA1D009F0DCD /* ViewSingleSpotOnMap.swift in Sources */,
 				C51503E027D7C856009F0DCD /* Playlist+CoreDataProperties.swift in Sources */,
 				C51503F527D7CA1D009F0DCD /* ViewOnlyUserOnMap.swift in Sources */,
 				C515041A27D7CAAA009F0DCD /* DiscoverMapPreview.swift in Sources */,
 				C515042427D7CAC6009F0DCD /* TakePhoto.swift in Sources */,
 				C587027427E27F1900DFB6C4 /* MailViewCallback.swift in Sources */,
+				C594283E285E5EF8003CF5AA /* SetNavigationSwipeToPop.swift in Sources */,
 				C5F10912284BFBCD00B71CBC /* DiscoverDetailAccountSpots.swift in Sources */,
 				C515040727D7CA7B009F0DCD /* DiscoverRow.swift in Sources */,
 				C515042527D7CAC6009F0DCD /* UIEmojiTextField.swift in Sources */,
@@ -968,12 +1024,12 @@
 				C515041527D7CAA3009F0DCD /* SpotMapPreview.swift in Sources */,
 				C515040327D7CA72009F0DCD /* AddSpotSheet.swift in Sources */,
 				C50CF4A827F12328001A9698 /* MantisPhotoCropper.swift in Sources */,
+				C594283C285E5EBE003CF5AA /* ConditionalViewModifier.swift in Sources */,
 				C501FC1C27E4419A008FEFA1 /* BottomPopupView.swift in Sources */,
 				C50CF4AE27F395E2001A9698 /* SettingsView.swift in Sources */,
 				C515041627D7CAA3009F0DCD /* MapAnnotationView.swift in Sources */,
 				C515041027D7CA87009F0DCD /* AddPlaylistSheet.swift in Sources */,
 				C5D295572823719300FBA01E /* MySpotWidget.intentdefinition in Sources */,
-				C56F499F27E05CE300BCBB8F /* Extensions.swift in Sources */,
 				C51503DE27D7C856009F0DCD /* SpotFromCloud.swift in Sources */,
 				C502D4FD27E1B63D0057A65C /* DiscoverSheetShared.swift in Sources */,
 				C594BB82284D37730012DA6C /* AccountModel.swift in Sources */,

@@ -70,6 +70,4 @@ class MantisPhotoCropperCoordinator: NSObject, CropViewControllerDelegate {
     func cropViewControllerDidEndResize(_ cropViewController: CropViewController, original: UIImage, cropInfo: CropInfo) {
         
     }
-    
-    
 }

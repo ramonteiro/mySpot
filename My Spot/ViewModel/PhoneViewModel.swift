@@ -10,7 +10,7 @@ import WatchConnectivity
 import CloudKit
 import UIKit
 
-class PhoneViewModel : NSObject,  WCSessionDelegate, ObservableObject {
+final class PhoneViewModel : NSObject,  WCSessionDelegate, ObservableObject {
     
     private var dataController = CoreDataStack.shared
     var listOfDownloadsInSession: [String] = []
