@@ -18,14 +18,14 @@ struct ViewPlaylistMap: View {
     @Environment(\.presentationMode) var presentationMode
     @EnvironmentObject var cloudViewModel: CloudKitViewModel
     @EnvironmentObject var mapViewModel: MapViewModel
-    @ObservedObject var playlist: Playlist
+    let playlist: Playlist
+    let isShared: Bool
     @State private var selection = 0
     @State private var transIn: Edge = .leading
     @State private var transOut: Edge = .bottom
-    @State private var showingDetailsSheet = false
+    @State private var presentDetailsSheet = false
     @State private var filteredSpots: [Spot] = []
     @State private var spotRegion: MKCoordinateRegion = MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: 33.714712646421, longitude: -112.29072718706581), span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01))
-    let isShared: Bool
     
     var body: some View {
         ZStack {
@@ -84,7 +84,7 @@ struct ViewPlaylistMap: View {
         ZStack {
             Map(coordinateRegion: $spotRegion, interactionModes: [.pan, .zoom], showsUserLocation: mapViewModel.isAuthorized, annotationItems: filteredSpots, annotationContent: { location in
                 MapAnnotation(coordinate: CLLocationCoordinate2D(latitude: location.x, longitude: location.y)) {
-                    MapAnnotationView(color: cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex], spot: location, isSelected: filteredSpots[selection] == location)
+                    MapAnnotationView(spot: location, isSelected: filteredSpots[selection] == location, color: cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex])
                         .scaleEffect(filteredSpots[selection] == location ? 1.2 : 0.9)
                         .shadow(color: Color.black.opacity(0.3), radius: 5)
                         .onTapGesture {
@@ -118,7 +118,7 @@ struct ViewPlaylistMap: View {
                             SpotMapPreview(spot: filteredSpots[index])
                                 .tag(index)
                                 .onTapGesture {
-                                    showingDetailsSheet.toggle()
+                                    presentDetailsSheet.toggle()
                                 }
                         }
                     }
@@ -132,7 +132,7 @@ struct ViewPlaylistMap: View {
                 }
             }
         }
-        .fullScreenCover(isPresented: $showingDetailsSheet) {
+        .fullScreenCover(isPresented: $presentDetailsSheet) {
             DetailView(canShare: false, fromPlaylist: true, spot: filteredSpots[selection], canEdit: true)
         }
     }

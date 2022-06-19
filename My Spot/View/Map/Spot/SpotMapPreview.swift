@@ -11,9 +11,9 @@ import CoreLocation
 struct SpotMapPreview: View {
     
     let spot: Spot
+    @State private var padding: CGFloat = 20
     @State private var scope:String = "Private".localized()
     @State private var tags: [String] = []
-    @State private var pad:CGFloat = 20
     @State private var distance: String = ""
     @EnvironmentObject var mapViewModel: MapViewModel
     
@@ -22,88 +22,123 @@ struct SpotMapPreview: View {
             Spacer()
             ZStack {
                 displayImage
-                VStack {
-                    HStack {
-                        if (!(spot.locationName?.isEmpty ?? true)) {
-                            Image(systemName: (!spot.wasThere ? "mappin" : "figure.wave"))
-                                .font(.subheadline)
-                                .foregroundColor(.white)
-                            Text(spot.locationName ?? "")
-                                .font(.subheadline)
-                                .foregroundColor(.white)
-                        }
-                        Spacer()
-                        Image(systemName: "globe")
-                            .font(.subheadline)
-                            .foregroundColor(.white)
-                        Text(scope)
-                            .font(.subheadline)
-                            .foregroundColor(.white)
-                    }
-                    .padding(.top)
-                    Spacer()
-                    HStack {
-                        Text(spot.name ?? "")
-                            .foregroundColor(.white)
-                            .font(.largeTitle)
-                            .fontWeight(.bold)
-                        Spacer()
-                    }
-                    HStack {
-                        if spot.addedBy == nil {
-                            Text("By: ".localized() + (spot.founder ?? ""))
-                                .font(.subheadline)
-                                .foregroundColor(.white)
-                        } else {
-                            Text("Added By: ".localized() + (spot.addedBy ?? ""))
-                                .font(.subheadline)
-                                .foregroundColor(.white)
-                        }
-                        Spacer()
-                        if (!distance.isEmpty) {
-                            Text((distance) + " away".localized())
-                                .foregroundColor(.white)
-                                .font(.subheadline)
-                        } else {
-                            Text(spot.date?.components(separatedBy: ";")[0] ?? "")
-                                .font(.subheadline)
-                                .foregroundColor(.white)
-                        }
-                    }
-                    .padding(.bottom, pad)
-                    if (!(spot.tags?.isEmpty ?? true)) {
-                        ScrollView(.horizontal, showsIndicators: false) {
-                            HStack {
-                                ForEach(tags, id: \.self) { tag in
-                                    Text(tag)
-                                        .font(.system(size: 12, weight: .regular))
-                                        .lineLimit(2)
-                                        .foregroundColor(.white)
-                                        .padding(5)
-                                        .background(.tint)
-                                        .cornerRadius(5)
-                                }
-                            }
-                        }
-                        .padding(.bottom, 20)
-                        .onAppear {
-                            pad = 2
-                        }
-                    }
-                }
-                .padding(.horizontal)
+                content
             }
         }
         .onAppear {
-            tags = spot.tags?.components(separatedBy: ", ") ?? []
-            if (spot.isPublic) {
-                scope = "Public".localized()
-            } else {
-                scope = "Private".localized()
+            initializeValues()
+        }
+    }
+    
+    // MARK: - Sub Views
+    
+    private var content: some View {
+        VStack {
+            topRow
+            Spacer()
+            spotName
+            bottomRow
+            if (!(spot.tags?.isEmpty ?? true)) {
+                tagsView
             }
-            if (mapViewModel.isAuthorized) {
-                calculateDistance()
+        }
+        .padding(.horizontal)
+    }
+    
+    private var tagsView: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack {
+                ForEach(tags, id: \.self) { tag in
+                    Text(tag)
+                        .font(.system(size: 12, weight: .regular))
+                        .lineLimit(2)
+                        .foregroundColor(.white)
+                        .padding(5)
+                        .background(.tint)
+                        .cornerRadius(5)
+                }
             }
+        }
+        .padding(.bottom, 20)
+        .onAppear {
+            padding = 2
+        }
+    }
+    
+    private var bottomRow: some View {
+        HStack {
+            founder
+            Spacer()
+            distanceAway
+        }
+        .padding(.bottom, padding)
+    }
+    
+    @ViewBuilder
+    private var distanceAway: some View {
+        if (!distance.isEmpty) {
+            Text((distance) + " away".localized())
+                .foregroundColor(.white)
+                .font(.subheadline)
+        } else {
+            Text(spot.date?.components(separatedBy: ";")[0] ?? "")
+                .font(.subheadline)
+                .foregroundColor(.white)
+        }
+    }
+    
+    @ViewBuilder
+    private var founder: some View {
+        if spot.addedBy == nil {
+            Text("By: ".localized() + (spot.founder ?? ""))
+                .font(.subheadline)
+                .foregroundColor(.white)
+        } else {
+            Text("Added By: ".localized() + (spot.addedBy ?? ""))
+                .font(.subheadline)
+                .foregroundColor(.white)
+        }
+    }
+    
+    private var spotName: some View {
+        HStack {
+            Text(spot.name ?? "")
+                .foregroundColor(.white)
+                .font(.largeTitle)
+                .fontWeight(.bold)
+            Spacer()
+        }
+    }
+    
+    private var topRow: some View {
+        HStack {
+            locationName
+            Spacer()
+            spotScope
+        }
+        .padding(.top)
+    }
+    
+    private var spotScope: some View {
+        HStack {
+            Image(systemName: "globe")
+                .font(.subheadline)
+                .foregroundColor(.white)
+            Text(scope)
+                .font(.subheadline)
+                .foregroundColor(.white)
+        }
+    }
+    
+    @ViewBuilder
+    private var locationName: some View {
+        if (!(spot.locationName?.isEmpty ?? true)) {
+            Image(systemName: (!spot.wasThere ? "mappin" : "figure.wave"))
+                .font(.subheadline)
+                .foregroundColor(.white)
+            Text(spot.locationName ?? "")
+                .font(.subheadline)
+                .foregroundColor(.white)
         }
     }
     
@@ -120,20 +155,17 @@ struct SpotMapPreview: View {
         }
     }
     
-    private func calculateDistance() {
-        let userLocation = CLLocation(latitude: mapViewModel.region.center.latitude, longitude: mapViewModel.region.center.longitude)
-        let spotLocation = CLLocation(latitude: spot.x, longitude: spot.y)
-        let distanceInMeters = userLocation.distance(from: spotLocation)
-        if isMetric() {
-            let distanceDouble = distanceInMeters / 1000
-            distance = String(format: "%.1f", distanceDouble) + " km"
+    // MARK: - Functions
+    
+    private func initializeValues() {
+        tags = spot.tags?.components(separatedBy: ", ") ?? []
+        if (spot.isPublic) {
+            scope = "Public".localized()
         } else {
-            let distanceDouble = distanceInMeters / 1609.344
-            distance = String(format: "%.1f", distanceDouble) + " mi"
+            scope = "Private".localized()
         }
-        
-    }
-    private func isMetric() -> Bool {
-        return ((Locale.current as NSLocale).object(forKey: NSLocale.Key.usesMetricSystem) as? Bool) ?? true
+        if (mapViewModel.isAuthorized) {
+            distance = mapViewModel.calculateDistance(from: CLLocation(latitude: spot.x, longitude: spot.y))
+        }
     }
 }
