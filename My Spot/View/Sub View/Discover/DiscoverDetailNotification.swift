@@ -71,7 +71,7 @@ struct DiscoverDetailNotification: View {
                     }
                 }
                 .fullScreenCover(isPresented: $openAccountView) {
-                    AccountDetailView(userid: cloudViewModel.notificationSpots[index].userID, myAccount: false, accountModel: accountModel)
+                    AccountDetailView(userid: cloudViewModel.notificationSpots[index].userID, accountModel: accountModel)
                 }
                 .ignoresSafeArea(.all, edges: [.top, .bottom])
                 .onChange(of: tabController.discoverPopToRoot) { _ in

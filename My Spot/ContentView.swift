@@ -100,7 +100,7 @@ struct ContentView: View {
             DiscoverSheetShared()
         }
         .fullScreenCover(isPresented: $presentSharedAccount) {
-            AccountDetailView(userid: cloudViewModel.sharedAccount, myAccount: false)
+            AccountDetailView(userid: cloudViewModel.sharedAccount)
         }
         .fullScreenCover(isPresented: $presentAccountCreation) {
             dismissAccountCreation()
@@ -164,7 +164,7 @@ struct ContentView: View {
     }
     
     private var profileTab: some View {
-        AccountDetailView(userid: (cloudViewModel.userID.isEmpty ? UserDefaults(suiteName: "group.com.isaacpaschall.My-Spot")?.string(forKey: "userid") ?? cloudViewModel.userID : cloudViewModel.userID), myAccount: true)
+        AccountDetailView(userid: (cloudViewModel.userID.isEmpty ? UserDefaults(suiteName: "group.com.isaacpaschall.My-Spot")?.string(forKey: "userid") ?? cloudViewModel.userID : cloudViewModel.userID))
             .tabItem() {
                 Image(systemName: "person.fill")
                 Text("Profile".localized())

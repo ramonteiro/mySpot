@@ -76,7 +76,7 @@ struct DetailView: View {
                         canDelete = CoreDataStack.shared.canDelete(object: spot)
                     }
                     .fullScreenCover(isPresented: $openAccountView) {
-                        AccountDetailView(userid: spot.userId ?? "", myAccount: false, accountModel: accountModel)
+                        AccountDetailView(userid: spot.userId ?? "", accountModel: accountModel)
                     }
             }
         }

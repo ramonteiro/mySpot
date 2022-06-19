@@ -77,7 +77,7 @@ struct DiscoverSheetShared: View {
                     presentationMode.wrappedValue.dismiss()
                 }
                 .fullScreenCover(isPresented: $openAccountView) {
-                    AccountDetailView(userid: cloudViewModel.shared[0].userID, myAccount: false, accountModel: accountModel)
+                    AccountDetailView(userid: cloudViewModel.shared[0].userID, accountModel: accountModel)
                 }
                 .onChange(of: isSaving) { newValue in
                     if newValue {

@@ -126,6 +126,7 @@
 		C5C2C4E4285EEAD800E585C9 /* DefaultRegion.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5C2C4E2285EEA2000E585C9 /* DefaultRegion.swift */; };
 		C5C2C4E7285EEAED00E585C9 /* DefaultRegion.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5C2C4E2285EEA2000E585C9 /* DefaultRegion.swift */; };
 		C5C2C4E8285EEC1B00E585C9 /* DefaultRegion.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5C2C4E2285EEA2000E585C9 /* DefaultRegion.swift */; };
+		C5C2C4EA285EF51400E585C9 /* PullToRefresh.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5C2C4E9285EF51400E585C9 /* PullToRefresh.swift */; };
 		C5D2954C2823719100FBA01E /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C5D2954B2823719100FBA01E /* WidgetKit.framework */; };
 		C5D2954E2823719100FBA01E /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C5D2954D2823719100FBA01E /* SwiftUI.framework */; };
 		C5D295512823719100FBA01E /* MySpotWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5D295502823719100FBA01E /* MySpotWidget.swift */; };
@@ -339,6 +340,7 @@
 		C5C2C4DE285EDDD400E585C9 /* DefaultImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultImage.swift; sourceTree = "<group>"; };
 		C5C2C4E0285EE16900E585C9 /* DateToString.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateToString.swift; sourceTree = "<group>"; };
 		C5C2C4E2285EEA2000E585C9 /* DefaultRegion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultRegion.swift; sourceTree = "<group>"; };
+		C5C2C4E9285EF51400E585C9 /* PullToRefresh.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PullToRefresh.swift; sourceTree = "<group>"; };
 		C5D2954A2823719100FBA01E /* MySpotWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = MySpotWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		C5D2954B2823719100FBA01E /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
 		C5D2954D2823719100FBA01E /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
@@ -764,6 +766,7 @@
 			children = (
 				C5B01353284AD15B00121163 /* CreateAccountView.swift */,
 				C5F1090F284BEE7E00B71CBC /* AccountDetailView.swift */,
+				C5C2C4E9285EF51400E585C9 /* PullToRefresh.swift */,
 			);
 			path = Account;
 			sourceTree = "<group>";
@@ -1057,6 +1060,7 @@
 				C515041A27D7CAAA009F0DCD /* DiscoverMapPreview.swift in Sources */,
 				C515042427D7CAC6009F0DCD /* TakePhoto.swift in Sources */,
 				C5942853285EA791003CF5AA /* MapPinShape.swift in Sources */,
+				C5C2C4EA285EF51400E585C9 /* PullToRefresh.swift in Sources */,
 				C587027427E27F1900DFB6C4 /* MailViewCallback.swift in Sources */,
 				C594283E285E5EF8003CF5AA /* SetNavigationSwipeToPop.swift in Sources */,
 				C5F10912284BFBCD00B71CBC /* DiscoverDetailAccountSpots.swift in Sources */,

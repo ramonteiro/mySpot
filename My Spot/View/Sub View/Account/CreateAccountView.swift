@@ -27,10 +27,10 @@ struct CreateAccountView: View {
     @State private var email: String = ""
     @State private var pronoun: String = ""
     @State private var image: UIImage?
-    @State private var saveAlert: Bool = false
-    @State private var updateAlert = false
+    @State private var presentSaveAlert: Bool = false
+    @State private var presentUpdateAlert: Bool = false
+    @State private var presentAddImageAlert: Bool = false
     @State private var isSaving: Bool = false
-    @State private var showingAddImageAlert: Bool = false
     @FocusState private var focusState: Field?
     @State private var activeSheet: ActiveSheet?
     @Environment(\.colorScheme) var colorScheme
@@ -87,17 +87,17 @@ struct CreateAccountView: View {
             .onSubmit {
                 moveDown()
             }
-            .alert("Unable To Create Account".localized(), isPresented: $saveAlert) {
+            .alert("Unable To Create Account".localized(), isPresented: $presentSaveAlert) {
                 Button("OK".localized(), role: .cancel) { presentationMode.wrappedValue.dismiss() }
             } message: {
                 Text("Failed to create account, you will be asked to create your account later.".localized())
             }
-            .alert("Failed To Update Account".localized(), isPresented: $updateAlert) {
+            .alert("Failed To Update Account".localized(), isPresented: $presentUpdateAlert) {
                 Button("OK".localized(), role: .cancel) { presentationMode.wrappedValue.dismiss() }
             } message: {
                 Text("Please check internet and try again".localized() + ".")
             }
-            .confirmationDialog("Choose Image From Photos or Camera".localized(), isPresented: $showingAddImageAlert) {
+            .confirmationDialog("Choose Image From Photos or Camera".localized(), isPresented: $presentAddImageAlert) {
                 Button("Camera".localized()) {
                     activeSheet = .cameraSheet
                 }
@@ -234,7 +234,7 @@ struct CreateAccountView: View {
         HStack {
             Spacer()
             Button {
-                showingAddImageAlert = true
+                presentAddImageAlert = true
             } label: {
                 imageView
             }
@@ -508,7 +508,7 @@ struct CreateAccountView: View {
             presentationMode.wrappedValue.dismiss()
         } catch {
             isSaving = false
-            saveAlert.toggle()
+            presentSaveAlert.toggle()
         }
     }
     
@@ -526,7 +526,7 @@ struct CreateAccountView: View {
                     presentationMode.wrappedValue.dismiss()
                 } catch {
                     isSaving = false
-                    updateAlert.toggle()
+                    presentUpdateAlert.toggle()
                 }
             } else {
                 isSaving = true
@@ -537,13 +537,13 @@ struct CreateAccountView: View {
                     presentationMode.wrappedValue.dismiss()
                 } catch {
                     isSaving = false
-                    updateAlert.toggle()
+                    presentUpdateAlert.toggle()
                 }
             }
             isSaving = false
         } else {
             isSaving = false
-            updateAlert.toggle()
+            presentUpdateAlert.toggle()
         }
     }
     

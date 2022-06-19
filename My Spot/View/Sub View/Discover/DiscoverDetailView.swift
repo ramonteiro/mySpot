@@ -97,7 +97,7 @@ struct DiscoverDetailView: View {
                     }
                 }
                 .fullScreenCover(isPresented: $openAccountView) {
-                    AccountDetailView(userid: cloudViewModel.spots[index].userID, myAccount: false, accountModel: accountModel)
+                    AccountDetailView(userid: cloudViewModel.spots[index].userID, accountModel: accountModel)
                 }
                 .onAppear {
                     cloudViewModel.canRefresh = false
