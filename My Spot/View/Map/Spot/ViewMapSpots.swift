@@ -144,7 +144,7 @@ struct ViewMapSpots: View {
         ZStack {
             TabView(selection: $selection) {
                 ForEach(spots.indices, id: \.self) { index in
-                    SpotMapPreview(spot: spots[index])
+                    MapSpotPreview(spot: spots[index])
                         .tag(index)
                         .onTapGesture {
                             presentDetailsSheet.toggle()

@@ -23,7 +23,7 @@ struct SpotMapAnnotation<T: SpotPreviewType>: View {
     }
     
     private var spotName: some View {
-        Text(spot.namePreview ?? "")
+        Text(spot.namePreview)
             .padding(5)
             .background(
                 RoundedRectangle(cornerRadius: 30)

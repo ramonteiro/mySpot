@@ -52,7 +52,7 @@ extension Spot: Identifiable { }
 
 extension Spot: SpotPreviewType {
     
-    var descriptionPreview: String? {
+    var descriptionPreview: String {
         description
     }
     
@@ -68,8 +68,8 @@ extension Spot: SpotPreviewType {
         dateAdded
     }
     
-    var userIDPreview: String? {
-        userId
+    var userIDPreview: String {
+        userId ?? ""
     }
     
     var playlistEmojiPreview: String? {
@@ -80,16 +80,16 @@ extension Spot: SpotPreviewType {
         false
     }
     
-    var namePreview: String? {
-        name
+    var namePreview: String {
+        name ?? ""
     }
     
-    var founderPreview: String? {
-        founder
+    var founderPreview: String {
+        founder ?? ""
     }
     
-    var datePreview: String? {
-        date
+    var datePreview: String {
+        date ?? ""
     }
     
     var dateObjectPreview: Date? {
@@ -100,23 +100,23 @@ extension Spot: SpotPreviewType {
         image
     }
     
-    var locationNamePreview: String? {
-        locationName
+    var locationNamePreview: String {
+        locationName ?? ""
     }
     
-    var customLocationPreview: Bool? {
+    var customLocationPreview: Bool {
         !wasThere
     }
     
-    var tagsPreview: String? {
-        tags
+    var tagsPreview: String {
+        tags ?? ""
     }
     
-    var isPublicPreview: Bool? {
+    var isPublicPreview: Bool {
         isPublic
     }
     
-    var downloadsPreview: Int? {
+    var downloadsPreview: Int {
         Int(likes)
     }
 }

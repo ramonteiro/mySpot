@@ -35,7 +35,7 @@ struct SpotFromCloud: Hashable, Identifiable {
 
 extension SpotFromCloud: SpotPreviewType {
     
-    var descriptionPreview: String? {
+    var descriptionPreview: String {
         description
     }
     
@@ -51,7 +51,7 @@ extension SpotFromCloud: SpotPreviewType {
         nil
     }
     
-    var userIDPreview: String? {
+    var userIDPreview: String {
         userID
     }
     
@@ -63,15 +63,15 @@ extension SpotFromCloud: SpotPreviewType {
         true
     }
     
-    var namePreview: String? {
+    var namePreview: String {
         name
     }
     
-    var founderPreview: String? {
+    var founderPreview: String {
         founder
     }
     
-    var datePreview: String? {
+    var datePreview: String {
         date
     }
     
@@ -84,23 +84,23 @@ extension SpotFromCloud: SpotPreviewType {
         return UIImage(data: data ?? Data())
     }
     
-    var locationNamePreview: String? {
+    var locationNamePreview: String {
         locationName
     }
     
-    var customLocationPreview: Bool? {
+    var customLocationPreview: Bool {
         customLocation != 0
     }
     
-    var tagsPreview: String? {
+    var tagsPreview: String {
         type
     }
     
-    var isPublicPreview: Bool? {
+    var isPublicPreview: Bool {
         true
     }
     
-    var downloadsPreview: Int? {
+    var downloadsPreview: Int {
         likes
     }
 }

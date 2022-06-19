@@ -68,8 +68,7 @@
 		C515040F27D7CA87009F0DCD /* AddSpotToPlaylistSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = C515040B27D7CA87009F0DCD /* AddSpotToPlaylistSheet.swift */; };
 		C515041027D7CA87009F0DCD /* AddPlaylistSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = C515040C27D7CA87009F0DCD /* AddPlaylistSheet.swift */; };
 		C515041427D7CAA3009F0DCD /* ViewMapSpots.swift in Sources */ = {isa = PBXBuildFile; fileRef = C515041127D7CAA3009F0DCD /* ViewMapSpots.swift */; };
-		C515041527D7CAA3009F0DCD /* SpotMapPreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = C515041227D7CAA3009F0DCD /* SpotMapPreview.swift */; };
-		C515041A27D7CAAA009F0DCD /* DiscoverMapPreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = C515041727D7CAAA009F0DCD /* DiscoverMapPreview.swift */; };
+		C515041A27D7CAAA009F0DCD /* MapSpotPreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = C515041727D7CAAA009F0DCD /* MapSpotPreview.swift */; };
 		C515041B27D7CAAA009F0DCD /* SpotMapAnnotation.swift in Sources */ = {isa = PBXBuildFile; fileRef = C515041827D7CAAA009F0DCD /* SpotMapAnnotation.swift */; };
 		C515041C27D7CAAA009F0DCD /* ViewDiscoverSpots.swift in Sources */ = {isa = PBXBuildFile; fileRef = C515041927D7CAAA009F0DCD /* ViewDiscoverSpots.swift */; };
 		C515042427D7CAC6009F0DCD /* TakePhoto.swift in Sources */ = {isa = PBXBuildFile; fileRef = C515042127D7CAC6009F0DCD /* TakePhoto.swift */; };
@@ -273,8 +272,7 @@
 		C515040B27D7CA87009F0DCD /* AddSpotToPlaylistSheet.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AddSpotToPlaylistSheet.swift; sourceTree = "<group>"; };
 		C515040C27D7CA87009F0DCD /* AddPlaylistSheet.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AddPlaylistSheet.swift; sourceTree = "<group>"; };
 		C515041127D7CAA3009F0DCD /* ViewMapSpots.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ViewMapSpots.swift; sourceTree = "<group>"; };
-		C515041227D7CAA3009F0DCD /* SpotMapPreview.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SpotMapPreview.swift; sourceTree = "<group>"; };
-		C515041727D7CAAA009F0DCD /* DiscoverMapPreview.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DiscoverMapPreview.swift; sourceTree = "<group>"; };
+		C515041727D7CAAA009F0DCD /* MapSpotPreview.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MapSpotPreview.swift; sourceTree = "<group>"; };
 		C515041827D7CAAA009F0DCD /* SpotMapAnnotation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SpotMapAnnotation.swift; sourceTree = "<group>"; };
 		C515041927D7CAAA009F0DCD /* ViewDiscoverSpots.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ViewDiscoverSpots.swift; sourceTree = "<group>"; };
 		C515042127D7CAC6009F0DCD /* TakePhoto.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TakePhoto.swift; sourceTree = "<group>"; };
@@ -620,7 +618,6 @@
 		C51503EC27D7C9F6009F0DCD /* Spot */ = {
 			isa = PBXGroup;
 			children = (
-				C515041227D7CAA3009F0DCD /* SpotMapPreview.swift */,
 				C515041127D7CAA3009F0DCD /* ViewMapSpots.swift */,
 			);
 			path = Spot;
@@ -629,7 +626,7 @@
 		C51503EF27D7CA10009F0DCD /* Discover */ = {
 			isa = PBXGroup;
 			children = (
-				C515041727D7CAAA009F0DCD /* DiscoverMapPreview.swift */,
+				C515041727D7CAAA009F0DCD /* MapSpotPreview.swift */,
 				C515041827D7CAAA009F0DCD /* SpotMapAnnotation.swift */,
 				C515041927D7CAAA009F0DCD /* ViewDiscoverSpots.swift */,
 			);
@@ -1058,7 +1055,7 @@
 				C51503F327D7CA1D009F0DCD /* ViewSingleSpotOnMap.swift in Sources */,
 				C51503E027D7C856009F0DCD /* Playlist+CoreDataProperties.swift in Sources */,
 				C51503F527D7CA1D009F0DCD /* AddSpotMap.swift in Sources */,
-				C515041A27D7CAAA009F0DCD /* DiscoverMapPreview.swift in Sources */,
+				C515041A27D7CAAA009F0DCD /* MapSpotPreview.swift in Sources */,
 				C515042427D7CAC6009F0DCD /* TakePhoto.swift in Sources */,
 				C5942853285EA791003CF5AA /* MapPinShape.swift in Sources */,
 				C5C2C4EA285EF51400E585C9 /* PullToRefresh.swift in Sources */,
@@ -1079,7 +1076,6 @@
 				C51503E327D7C856009F0DCD /* CoreDataManager.swift in Sources */,
 				C5942851285EA641003CF5AA /* SearchSheet.swift in Sources */,
 				C5552CCF2828207500AF2683 /* DiscoverDetailNotification.swift in Sources */,
-				C515041527D7CAA3009F0DCD /* SpotMapPreview.swift in Sources */,
 				C515040327D7CA72009F0DCD /* AddSpotSheet.swift in Sources */,
 				C50CF4A827F12328001A9698 /* MantisPhotoCropper.swift in Sources */,
 				C594283C285E5EBE003CF5AA /* ConditionalViewModifier.swift in Sources */,

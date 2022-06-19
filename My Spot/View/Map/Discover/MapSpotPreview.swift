@@ -1,5 +1,5 @@
 //
-//  DiscoverMapPreview.swift
+//  MapSpotPreview.swift
 //  mySpot
 //
 //  Created by Isaac Paschall on 3/2/22.
@@ -8,11 +8,12 @@
 import SwiftUI
 import CoreLocation
 
-struct DiscoverMapPreview: View {
+struct MapSpotPreview<T: SpotPreviewType>: View {
     
-    let spot: SpotFromCloud
+    let spot: T
     @State private var tags: [String] = []
     @State private var padding: CGFloat = 20
+    @State private var scope:String = "Private".localized()
     @State private var distance: String = ""
     @EnvironmentObject var mapViewModel: MapViewModel
     
@@ -24,14 +25,19 @@ struct DiscoverMapPreview: View {
                 content
             }
         }
+        .onAppear {
+            initializeValues()
+        }
     }
+    
+    // MARK: - Sub Views
     
     private var locationName: some View {
         HStack {
-            Image(systemName: (spot.customLocation != 0 ? "mappin" : "figure.wave"))
+            Image(systemName: (spot.customLocationPreview ? "mappin" : "figure.wave"))
                 .font(.subheadline)
                 .foregroundColor(.white)
-            Text(spot.locationName)
+            Text(spot.locationNamePreview)
                 .font(.subheadline)
                 .foregroundColor(.white)
         }
@@ -42,7 +48,7 @@ struct DiscoverMapPreview: View {
             Image(systemName: "icloud.and.arrow.down")
                 .font(.subheadline)
                 .foregroundColor(.white)
-            Text("\(spot.likes)")
+            Text("\(spot.downloadsPreview)")
                 .font(.subheadline)
                 .foregroundColor(.white)
         }
@@ -50,18 +56,33 @@ struct DiscoverMapPreview: View {
     
     private var topRow: some View {
         HStack {
-            if (!spot.locationName.isEmpty) {
+            if !spot.locationNamePreview.isEmpty {
                 locationName
             }
             Spacer()
-            spotDownloads
+            if spot.isFromDiscover {
+                spotDownloads
+            } else {
+                spotScope
+            }
         }
         .padding(.top)
     }
     
+    private var spotScope: some View {
+        HStack {
+            Image(systemName: "globe")
+                .font(.subheadline)
+                .foregroundColor(.white)
+            Text(scope)
+                .font(.subheadline)
+                .foregroundColor(.white)
+        }
+    }
+    
     private var spotName: some View {
         HStack {
-            Text(spot.name)
+            Text(spot.namePreview)
                 .foregroundColor(.white)
                 .font(.largeTitle)
                 .fontWeight(.bold)
@@ -70,7 +91,7 @@ struct DiscoverMapPreview: View {
     }
     
     private var date: some View {
-        Text(spot.dateObject?.toString() ?? ("By: \(spot.founder)"))
+        Text(spot.dateObjectPreview?.toString() ?? ("By: \(spot.founderPreview)"))
             .font(.subheadline)
             .foregroundColor(.white)
     }
@@ -80,7 +101,7 @@ struct DiscoverMapPreview: View {
             .foregroundColor(.white)
             .font(.subheadline)
             .onAppear {
-                distance = mapViewModel.calculateDistance(from: spot.location)
+                distance = mapViewModel.calculateDistance(from: spot.locationPreview)
             }
     }
     
@@ -96,7 +117,7 @@ struct DiscoverMapPreview: View {
     private var tagsView: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack {
-                ForEach(spot.type.components(separatedBy: ", "), id: \.self) { tag in
+                ForEach(tags, id: \.self) { tag in
                     Text(tag)
                         .font(.system(size: 12, weight: .regular))
                         .lineLimit(2)
@@ -119,7 +140,7 @@ struct DiscoverMapPreview: View {
             Spacer()
             spotName
             bottomRow
-            if (!(spot.type.isEmpty)) {
+            if !spot.tagsPreview.isEmpty {
                 tagsView
             }
         }
@@ -128,7 +149,7 @@ struct DiscoverMapPreview: View {
     
     private var image: some View {
         ZStack {
-            if let url = spot.imageURL, let data = try? Data(contentsOf: url), let image = UIImage(data: data) {
+            if let image = spot.imagePreview {
                 Image(uiImage: image)
                     .resizable()
                     .scaledToFill()
@@ -144,6 +165,22 @@ struct DiscoverMapPreview: View {
             Color.black.opacity(0.4)
                 .frame(width: UIScreen.screenWidth - 20, height: UIScreen.screenHeight * 0.25)
                 .cornerRadius(40)
+        }
+    }
+    
+    // MARK: - Functions
+    
+    private func initializeValues() {
+        if !spot.tagsPreview.isEmpty {
+            tags = spot.tagsPreview.components(separatedBy: ", ")
+        }
+        if (spot.isPublicPreview) {
+            scope = "Public".localized()
+        } else {
+            scope = "Private".localized()
+        }
+        if (mapViewModel.isAuthorized) {
+            distance = mapViewModel.calculateDistance(from: spot.locationPreview)
         }
     }
 }

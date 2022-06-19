@@ -145,7 +145,7 @@ struct ViewDiscoverSpots: View {
     private var spotPreview: some View {
         TabView(selection: $selection) {
             ForEach(cloudViewModel.spots.indices, id: \.self) { index in
-                DiscoverMapPreview(spot: cloudViewModel.spots[index])
+                MapSpotPreview(spot: cloudViewModel.spots[index])
                     .tag(index)
                     .onTapGesture {
                         presentDetailsSheet.toggle()
