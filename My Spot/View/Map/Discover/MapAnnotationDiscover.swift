@@ -15,34 +15,44 @@ struct MapAnnotationDiscover: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            Image(systemName: "map.circle.fill")
-                .resizable()
-                .scaledToFit()
-                .frame(width: UIScreen.main.bounds.width * 0.08, height: UIScreen.main.bounds.height * (30/812))
-                .font(.headline)
-                .foregroundColor(Color(UIColor.systemBackground))
-                .padding(6)
-                .background(color)
-                .cornerRadius(36)
-            
-            Image(systemName: "triangle.fill")
-                .resizable()
-                .scaledToFit()
-                .foregroundColor(color)
-                .frame(width: UIScreen.main.bounds.width * (10/375), height: UIScreen.main.bounds.height * (10/812))
-                .rotationEffect(Angle(degrees: 180))
-                .offset(y: -1)
-                .padding(.bottom , UIScreen.main.bounds.height * (40/812))
+            annotationImage
+            upsideDownTriangleImage
             if (isSelected) {
-                Text(spot.name)
-                    .padding(5)
-                    .background(
-                        RoundedRectangle(cornerRadius: 30)
-                            .foregroundColor(Color(UIColor.secondarySystemBackground))
-                    )
-                    .offset(y: -30)
-                    .lineLimit(1)
+                spotName
             }
         }
+    }
+    
+    private var spotName: some View {
+        Text(spot.name)
+            .padding(5)
+            .background(
+                RoundedRectangle(cornerRadius: 30)
+                    .foregroundColor(Color(UIColor.secondarySystemBackground))
+            )
+            .offset(y: -30)
+    }
+    
+    private var upsideDownTriangleImage: some View {
+        Image(systemName: "triangle.fill")
+            .resizable()
+            .scaledToFit()
+            .foregroundColor(color)
+            .frame(width: UIScreen.main.bounds.width * (10/375), height: UIScreen.main.bounds.height * (10/812))
+            .rotationEffect(Angle(degrees: 180))
+            .offset(y: -1)
+            .padding(.bottom , UIScreen.main.bounds.height * (40/812))
+    }
+    
+    private var annotationImage: some View {
+        Image(systemName: "map.circle.fill")
+            .resizable()
+            .scaledToFit()
+            .frame(width: UIScreen.main.bounds.width * 0.08, height: UIScreen.main.bounds.height * (30/812))
+            .font(.headline)
+            .foregroundColor(Color(UIColor.systemBackground))
+            .padding(6)
+            .background(color)
+            .cornerRadius(36)
     }
 }
