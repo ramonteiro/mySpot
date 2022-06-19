@@ -69,9 +69,8 @@
 		C515041027D7CA87009F0DCD /* AddPlaylistSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = C515040C27D7CA87009F0DCD /* AddPlaylistSheet.swift */; };
 		C515041427D7CAA3009F0DCD /* ViewMapSpots.swift in Sources */ = {isa = PBXBuildFile; fileRef = C515041127D7CAA3009F0DCD /* ViewMapSpots.swift */; };
 		C515041527D7CAA3009F0DCD /* SpotMapPreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = C515041227D7CAA3009F0DCD /* SpotMapPreview.swift */; };
-		C515041627D7CAA3009F0DCD /* MapAnnotationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C515041327D7CAA3009F0DCD /* MapAnnotationView.swift */; };
 		C515041A27D7CAAA009F0DCD /* DiscoverMapPreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = C515041727D7CAAA009F0DCD /* DiscoverMapPreview.swift */; };
-		C515041B27D7CAAA009F0DCD /* MapAnnotationDiscover.swift in Sources */ = {isa = PBXBuildFile; fileRef = C515041827D7CAAA009F0DCD /* MapAnnotationDiscover.swift */; };
+		C515041B27D7CAAA009F0DCD /* SpotMapAnnotation.swift in Sources */ = {isa = PBXBuildFile; fileRef = C515041827D7CAAA009F0DCD /* SpotMapAnnotation.swift */; };
 		C515041C27D7CAAA009F0DCD /* ViewDiscoverSpots.swift in Sources */ = {isa = PBXBuildFile; fileRef = C515041927D7CAAA009F0DCD /* ViewDiscoverSpots.swift */; };
 		C515042427D7CAC6009F0DCD /* TakePhoto.swift in Sources */ = {isa = PBXBuildFile; fileRef = C515042127D7CAC6009F0DCD /* TakePhoto.swift */; };
 		C515042527D7CAC6009F0DCD /* UIEmojiTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = C515042227D7CAC6009F0DCD /* UIEmojiTextField.swift */; };
@@ -92,6 +91,7 @@
 		C5552CCF2828207500AF2683 /* DiscoverDetailNotification.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5552CCE2828207500AF2683 /* DiscoverDetailNotification.swift */; };
 		C5552CD128298E6900AF2683 /* CloudSharingController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5552CD028298E6900AF2683 /* CloudSharingController.swift */; };
 		C56011B52800E66A00C49597 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = C56011B72800E66A00C49597 /* Localizable.strings */; };
+		C5850D01285F853C0067EE7F /* SpotPreviewType.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5850D00285F853C0067EE7F /* SpotPreviewType.swift */; };
 		C587027427E27F1900DFB6C4 /* MailViewCallback.swift in Sources */ = {isa = PBXBuildFile; fileRef = C587027327E27F1900DFB6C4 /* MailViewCallback.swift */; };
 		C587B46B2854F472007C3263 /* DatePickerSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = C587B46A2854F472007C3263 /* DatePickerSheet.swift */; };
 		C58F2BF62830AA42005FA88F /* WelcomeSheet in Frameworks */ = {isa = PBXBuildFile; productRef = C58F2BF52830AA42005FA88F /* WelcomeSheet */; };
@@ -274,9 +274,8 @@
 		C515040C27D7CA87009F0DCD /* AddPlaylistSheet.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AddPlaylistSheet.swift; sourceTree = "<group>"; };
 		C515041127D7CAA3009F0DCD /* ViewMapSpots.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ViewMapSpots.swift; sourceTree = "<group>"; };
 		C515041227D7CAA3009F0DCD /* SpotMapPreview.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SpotMapPreview.swift; sourceTree = "<group>"; };
-		C515041327D7CAA3009F0DCD /* MapAnnotationView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MapAnnotationView.swift; sourceTree = "<group>"; };
 		C515041727D7CAAA009F0DCD /* DiscoverMapPreview.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DiscoverMapPreview.swift; sourceTree = "<group>"; };
-		C515041827D7CAAA009F0DCD /* MapAnnotationDiscover.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MapAnnotationDiscover.swift; sourceTree = "<group>"; };
+		C515041827D7CAAA009F0DCD /* SpotMapAnnotation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SpotMapAnnotation.swift; sourceTree = "<group>"; };
 		C515041927D7CAAA009F0DCD /* ViewDiscoverSpots.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ViewDiscoverSpots.swift; sourceTree = "<group>"; };
 		C515042127D7CAC6009F0DCD /* TakePhoto.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TakePhoto.swift; sourceTree = "<group>"; };
 		C515042227D7CAC6009F0DCD /* UIEmojiTextField.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UIEmojiTextField.swift; sourceTree = "<group>"; };
@@ -310,6 +309,7 @@
 		C56011C02800F61100C49597 /* ko */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ko; path = ko.lproj/Localizable.strings; sourceTree = "<group>"; };
 		C56011C12800F61300C49597 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/Localizable.strings; sourceTree = "<group>"; };
 		C56011C22800F64000C49597 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/Localizable.strings; sourceTree = "<group>"; };
+		C5850D00285F853C0067EE7F /* SpotPreviewType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpotPreviewType.swift; sourceTree = "<group>"; };
 		C587027327E27F1900DFB6C4 /* MailViewCallback.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MailViewCallback.swift; sourceTree = "<group>"; };
 		C587B46A2854F472007C3263 /* DatePickerSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DatePickerSheet.swift; sourceTree = "<group>"; };
 		C5942833285E5DFA003CF5AA /* ImageCompression.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageCompression.swift; sourceTree = "<group>"; };
@@ -564,6 +564,7 @@
 				C51503D427D7C856009F0DCD /* UIImageTransformer.swift */,
 				C594BB81284D37730012DA6C /* AccountModel.swift */,
 				C594285C285EA9D3003CF5AA /* Landmark.swift */,
+				C5850D00285F853C0067EE7F /* SpotPreviewType.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -619,7 +620,6 @@
 		C51503EC27D7C9F6009F0DCD /* Spot */ = {
 			isa = PBXGroup;
 			children = (
-				C515041327D7CAA3009F0DCD /* MapAnnotationView.swift */,
 				C515041227D7CAA3009F0DCD /* SpotMapPreview.swift */,
 				C515041127D7CAA3009F0DCD /* ViewMapSpots.swift */,
 			);
@@ -630,7 +630,7 @@
 			isa = PBXGroup;
 			children = (
 				C515041727D7CAAA009F0DCD /* DiscoverMapPreview.swift */,
-				C515041827D7CAAA009F0DCD /* MapAnnotationDiscover.swift */,
+				C515041827D7CAAA009F0DCD /* SpotMapAnnotation.swift */,
 				C515041927D7CAAA009F0DCD /* ViewDiscoverSpots.swift */,
 			);
 			path = Discover;
@@ -1018,6 +1018,7 @@
 				C5C2C4DD285EDDBF00E585C9 /* UserDefaults.swift in Sources */,
 				C5F10910284BEE7E00B71CBC /* AccountDetailView.swift in Sources */,
 				C515042927D8540A009F0DCD /* TabController.swift in Sources */,
+				C5850D01285F853C0067EE7F /* SpotPreviewType.swift in Sources */,
 				C501FC1A27E41FF1008FEFA1 /* ImagePopUp.swift in Sources */,
 				C515040827D7CA7B009F0DCD /* DiscoverDetailView.swift in Sources */,
 				C51503E127D7C856009F0DCD /* Spot+CoreDataClass.swift in Sources */,
@@ -1036,7 +1037,7 @@
 				C51503F427D7CA1D009F0DCD /* MapViewModel.swift in Sources */,
 				C51503FC27D7CA60009F0DCD /* MySpotsView.swift in Sources */,
 				C594285B285EA90D003CF5AA /* MapSearchBar.swift in Sources */,
-				C515041B27D7CAAA009F0DCD /* MapAnnotationDiscover.swift in Sources */,
+				C515041B27D7CAAA009F0DCD /* SpotMapAnnotation.swift in Sources */,
 				C5942836285E5E3C003CF5AA /* CheckUserDefaultsValue.swift in Sources */,
 				C587B46B2854F472007C3263 /* DatePickerSheet.swift in Sources */,
 				C5942848285E6008003CF5AA /* EmojiToImage.swift in Sources */,
@@ -1084,7 +1085,6 @@
 				C594283C285E5EBE003CF5AA /* ConditionalViewModifier.swift in Sources */,
 				C501FC1C27E4419A008FEFA1 /* BottomPopupView.swift in Sources */,
 				C50CF4AE27F395E2001A9698 /* SettingsView.swift in Sources */,
-				C515041627D7CAA3009F0DCD /* MapAnnotationView.swift in Sources */,
 				C515041027D7CA87009F0DCD /* AddPlaylistSheet.swift in Sources */,
 				C5D295572823719300FBA01E /* MySpotWidget.intentdefinition in Sources */,
 				C51503DE27D7C856009F0DCD /* SpotFromCloud.swift in Sources */,

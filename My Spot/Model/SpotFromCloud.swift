@@ -32,3 +32,75 @@ struct SpotFromCloud: Hashable, Identifiable {
     let dateObject: Date?
     let record: CKRecord
 }
+
+extension SpotFromCloud: SpotPreviewType {
+    
+    var descriptionPreview: String? {
+        description
+    }
+    
+    var locationPreview: CLLocation {
+        location
+    }
+    
+    var isMultipleImagesPreview: Bool {
+        isMultipleImages != 0
+    }
+    
+    var dateAddedToPlaylistPreview: Date? {
+        nil
+    }
+    
+    var userIDPreview: String? {
+        userID
+    }
+    
+    var playlistEmojiPreview: String? {
+        nil
+    }
+    
+    var isFromDiscover: Bool {
+        true
+    }
+    
+    var namePreview: String? {
+        name
+    }
+    
+    var founderPreview: String? {
+        founder
+    }
+    
+    var datePreview: String? {
+        date
+    }
+    
+    var dateObjectPreview: Date? {
+        dateObject
+    }
+    
+    var imagePreview: UIImage? {
+        let data = try? Data(contentsOf: imageURL)
+        return UIImage(data: data ?? Data())
+    }
+    
+    var locationNamePreview: String? {
+        locationName
+    }
+    
+    var customLocationPreview: Bool? {
+        customLocation != 0
+    }
+    
+    var tagsPreview: String? {
+        type
+    }
+    
+    var isPublicPreview: Bool? {
+        true
+    }
+    
+    var downloadsPreview: Int? {
+        likes
+    }
+}

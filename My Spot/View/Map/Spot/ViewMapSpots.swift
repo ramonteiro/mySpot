@@ -69,7 +69,7 @@ struct ViewMapSpots: View {
     }
     
     private func mapAnnotation(spot: Spot) -> some View {
-        MapAnnotationView(spot: spot,
+        SpotMapAnnotation(spot: spot,
                           isSelected: spots[selection] == spot,
                           color: cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex])
         .scaleEffect(spots[selection] == spot ? 1.2 : 0.9)

@@ -89,7 +89,7 @@ struct ViewDiscoverSpots: View {
             Map(coordinateRegion: $spotRegion, interactionModes: [.pan, .zoom], showsUserLocation: mapViewModel.isAuthorized, annotationItems: cloudViewModel.spots, annotationContent: { location in
                 MapAnnotation(coordinate: location.location.coordinate) {
                     if (cloudViewModel.spots.count > 0 && cloudViewModel.spots.count >= selection + 1) {
-                        MapAnnotationDiscover(spot: location, isSelected: cloudViewModel.spots[selection] == location, color: cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex])
+                        SpotMapAnnotation(spot: location, isSelected: cloudViewModel.spots[selection] == location, color: cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex])
                             .scaleEffect(cloudViewModel.spots[selection] == location ? 1.2 : 0.9)
                             .shadow(color: Color.black.opacity(0.3), radius: 5)
                             .onTapGesture {

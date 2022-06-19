@@ -9,6 +9,7 @@
 import Foundation
 import CoreData
 import UIKit
+import CoreLocation
 
 
 extension Spot {
@@ -47,6 +48,75 @@ extension Spot {
 
 }
 
-extension Spot : Identifiable {
+extension Spot: Identifiable { }
 
+extension Spot: SpotPreviewType {
+    
+    var descriptionPreview: String? {
+        description
+    }
+    
+    var locationPreview: CLLocation {
+        CLLocation(latitude: x, longitude: y)
+    }
+    
+    var isMultipleImagesPreview: Bool {
+        image2 != nil
+    }
+    
+    var dateAddedToPlaylistPreview: Date? {
+        dateAdded
+    }
+    
+    var userIDPreview: String? {
+        userId
+    }
+    
+    var playlistEmojiPreview: String? {
+        playlist?.emoji
+    }
+    
+    var isFromDiscover: Bool {
+        false
+    }
+    
+    var namePreview: String? {
+        name
+    }
+    
+    var founderPreview: String? {
+        founder
+    }
+    
+    var datePreview: String? {
+        date
+    }
+    
+    var dateObjectPreview: Date? {
+        dateObject
+    }
+    
+    var imagePreview: UIImage? {
+        image
+    }
+    
+    var locationNamePreview: String? {
+        locationName
+    }
+    
+    var customLocationPreview: Bool? {
+        !wasThere
+    }
+    
+    var tagsPreview: String? {
+        tags
+    }
+    
+    var isPublicPreview: Bool? {
+        isPublic
+    }
+    
+    var downloadsPreview: Int? {
+        Int(likes)
+    }
 }

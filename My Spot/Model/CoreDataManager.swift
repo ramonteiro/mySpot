@@ -106,6 +106,7 @@ final class CoreDataStack: ObservableObject {
 }
 
 // MARK: Save or delete from Core Data
+
 extension CoreDataStack {
     func save() {
         if context.hasChanges {
@@ -209,10 +210,6 @@ extension CoreDataStack {
                 completion(.failure(CoreDataErrors.two))
             }
         }
-    }
-    
-    func removeFromParent() {
-        
     }
     
     func isShared(object: NSManagedObject) -> Bool {
