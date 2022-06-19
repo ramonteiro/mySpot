@@ -192,7 +192,7 @@ struct AddSpotSheet: View {
                         }
                         didSave = false
                     } content: {
-                        ViewOnlyUserOnMap(customLocation: $usingCustomLocation, didSave: $didSave, centerRegion: $centerRegion)
+                        AddSpotMap(customLocation: $usingCustomLocation, didSave: $didSave, centerRegion: $centerRegion)
                             .ignoresSafeArea()
                     }
                     .fullScreenCover(item: $activeSheet) { item in

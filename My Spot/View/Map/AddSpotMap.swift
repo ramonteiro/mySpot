@@ -6,14 +6,14 @@
 //
 
 /*
- ViewOnlyUserOnMap:
+ AddSpotMap:
  displays map centered on user location and only displays user location
  */
 
 import SwiftUI
 import MapKit
 
-struct ViewOnlyUserOnMap: View {
+struct AddSpotMap: View {
     
     @EnvironmentObject var mapViewModel: MapViewModel
     @EnvironmentObject var cloudViewModel: CloudKitViewModel
@@ -25,7 +25,6 @@ struct ViewOnlyUserOnMap: View {
     @State private var map = MKMapView()
     @State private var mapImageToggle = "square.2.stack.3d.top.filled"
     private let padding: CGFloat = 10
-    
     @State private var presentCustomCoordinatesSheet = false
     @State private var presentSearchSheet = false
     @State private var landmarks: [Landmark] = [Landmark]()
