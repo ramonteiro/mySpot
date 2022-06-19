@@ -65,74 +65,27 @@ struct CreateAccountView: View {
             ZStack {
                 textForm
                 if isSaving {
-                    Color.black
-                        .ignoresSafeArea()
-                        .opacity(0.5)
-                    ProgressView("Saving".localized())
-                        .progressViewStyle(.circular)
+                    savingView
                 }
             }
             .navigationTitle("Create Account".localized())
             .navigationViewStyle(.stack)
             .onAppear {
-                if let accountModel = accountModel {
-                    if image == nil {
-                        image = accountModel.image
-                        if let b = accountModel.bio {
-                            bio = b
-                        }
-                    }
-                }
+                checkForExistingAccountModel()
             }
             .toolbar {
                 ToolbarItemGroup(placement: .keyboard) {
                     keyboardView
                 }
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button {
-                        if accountModel == nil {
-                            Task {
-                                await save()
-                            }
-                        } else {
-                            Task {
-                                await update()
-                            }
-                        }
-                    } label: {
-                        Text("Save".localized())
-                            .foregroundColor(.blue)
-                    }
-                    .disabled(disableSave)
+                   saveButton
                 }
                 ToolbarItemGroup(placement: .navigationBarLeading) {
-                    if accountModel != nil {
-                        Button {
-                            presentationMode.wrappedValue.dismiss()
-                        } label: {
-                            Text("Cancel".localized())
-                        }
-                        .disabled(isSaving)
-                    }
+                    cancelButton
                 }
             }
             .onSubmit {
-                switch focusState {
-                case .name:
-                    focusState = .pronoun
-                case .pronoun:
-                    focusState = .bio
-                case .bio:
-                    focusState = .email
-                case .email:
-                    focusState = .tiktok
-                case .tiktok:
-                    focusState = .insta
-                case .insta:
-                    focusState = .youtube
-                default:
-                    focusState = nil
-                }
+                moveDown()
             }
             .alert("Unable To Create Account".localized(), isPresented: $saveAlert) {
                 Button("OK".localized(), role: .cancel) { presentationMode.wrappedValue.dismiss() }
@@ -154,81 +107,126 @@ struct CreateAccountView: View {
                 Button("Cancel".localized(), role: .cancel) { }
             }
             .fullScreenCover(item: $activeSheet) { item in
-                switch item {
-                case .cameraSheet:
-                    TakePhoto(selectedImage: $image)
-                        .onDisappear {
-                            if (image != nil) {
-                                activeSheet = .cropperSheet
-                                imageWasChanged = true
-                            } else {
-                                activeSheet = nil
-                            }
-                        }
-                        .ignoresSafeArea()
-                case .cameraRollSheet:
-                    ChoosePhoto() { image in
-                        self.image = image
-                        activeSheet = .cropperSheet
-                        imageWasChanged = true
-                    }
-                    .ignoresSafeArea()
-                case .cropperSheet:
-                    MantisPhotoCropper(selectedImage: $image)
-                        .ignoresSafeArea()
-                }
+                open(item: item)
             }
         }
     }
     
+    // MARK: - Sub Views
+    
+    @ViewBuilder
+    private var cancelButton: some View {
+        if accountModel != nil {
+            Button {
+                presentationMode.wrappedValue.dismiss()
+            } label: {
+                Text("Cancel".localized())
+            }
+            .disabled(isSaving)
+        }
+    }
+    
+    private var saveButton: some View {
+        Button {
+            if accountModel == nil {
+                Task {
+                    await save()
+                }
+            } else {
+                Task {
+                    await update()
+                }
+            }
+        } label: {
+            Text("Save".localized())
+                .foregroundColor(.blue)
+        }
+        .disabled(disableSave)
+    }
+    
+    @ViewBuilder
+    private func open(item: ActiveSheet) -> some View {
+        switch item {
+        case .cameraSheet:
+            TakePhoto(selectedImage: $image)
+                .onDisappear {
+                    if (image != nil) {
+                        activeSheet = .cropperSheet
+                        imageWasChanged = true
+                    } else {
+                        activeSheet = nil
+                    }
+                }
+                .ignoresSafeArea()
+        case .cameraRollSheet:
+            ChoosePhoto() { image in
+                self.image = image
+                activeSheet = .cropperSheet
+                imageWasChanged = true
+            }
+            .ignoresSafeArea()
+        case .cropperSheet:
+            MantisPhotoCropper(selectedImage: $image)
+                .ignoresSafeArea()
+        }
+    }
+    
+    private var savingView: some View {
+        ZStack {
+            Color.black
+                .ignoresSafeArea()
+                .opacity(0.5)
+            ProgressView("Saving".localized())
+                .progressViewStyle(.circular)
+        }
+    }
+    
+    private var upButton: some View {
+        Button {
+            moveUp()
+        } label: {
+            Image(systemName: "chevron.up")
+        }
+        .disabled(focusState == .name)
+    }
+    
+    private var downButton: some View {
+        Button {
+            moveDown()
+        } label: {
+            Image(systemName: "chevron.down")
+        }
+        .disabled(focusState == .youtube)
+    }
+    
     private var keyboardView: some View {
         HStack {
-            Button {
-                switch focusState {
-                case .youtube:
-                    focusState = .insta
-                case .insta:
-                    focusState = .tiktok
-                case .tiktok:
-                    focusState = .email
-                case .email:
-                    focusState = .bio
-                case .bio:
-                    focusState = .pronoun
-                case .pronoun:
-                    focusState = .name
-                default:
-                    focusState = nil
-                }
-            } label: {
-                Image(systemName: "chevron.up")
-            }
-            .disabled(focusState == .name)
-            Button {
-                switch focusState {
-                case .insta:
-                    focusState = .youtube
-                case .tiktok:
-                    focusState = .insta
-                case .email:
-                    focusState = .tiktok
-                case .bio:
-                    focusState = .email
-                case .name:
-                    focusState = .pronoun
-                case .pronoun:
-                    focusState = .bio
-                default:
-                    focusState = nil
-                }
-            } label: {
-                Image(systemName: "chevron.down")
-            }
-            .disabled(focusState == .youtube)
+            upButton
+            downButton
             Spacer()
             Button("Done".localized()) {
                 focusState = nil
             }
+        }
+    }
+    
+    @ViewBuilder
+    private var imageView: some View {
+        if let image = image {
+            Image(uiImage: image)
+                .resizable()
+                .frame(width: 130, height: 130)
+                .clipShape(Circle())
+        } else {
+            Image(systemName: "camera")
+                .resizable()
+                .frame(width: 60, height: 45)
+                .padding(30)
+                .clipShape(Circle())
+                .overlay(
+                    Circle()
+                        .stroke((colorScheme == .dark ? .white : .black), lineWidth: 4)
+                )
         }
     }
     
@@ -238,22 +236,7 @@ struct CreateAccountView: View {
             Button {
                 showingAddImageAlert = true
             } label: {
-                if let image = image {
-                    Image(uiImage: image)
-                        .resizable()
-                        .frame(width: 130, height: 130)
-                        .clipShape(Circle())
-                } else {
-                    Image(systemName: "camera")
-                        .resizable()
-                        .frame(width: 60, height: 45)
-                        .padding(30)
-                        .clipShape(Circle())
-                        .overlay(
-                            Circle()
-                                .stroke((colorScheme == .dark ? .white : .black), lineWidth: 4)
-                        )
-                }
+                imageView
             }
             Spacer()
         }
@@ -314,12 +297,7 @@ struct CreateAccountView: View {
     private var displayNamePrompt: some View {
         TextField("Enter Name".localized(), text: $name)
             .onAppear {
-                if let accountModel = accountModel {
-                    if !nameChecked {
-                        name = accountModel.name
-                        nameChecked = true
-                    }
-                }
+                setName()
             }
             .focused($focusState, equals: .name)
             .submitLabel(.next)
@@ -334,12 +312,7 @@ struct CreateAccountView: View {
     private var displayPronounPrompt: some View {
         TextField("Optional".localized(), text: $pronoun)
             .onAppear {
-                if let accountModel = accountModel {
-                    if !pronounChecked {
-                        pronoun = accountModel.pronouns ?? ""
-                        pronounChecked = true
-                    }
-                }
+                setPronoun()
             }
             .focused($focusState, equals: .pronoun)
             .submitLabel(.next)
@@ -366,12 +339,7 @@ struct CreateAccountView: View {
     private var displayEmailPrompt: some View {
         TextField("Optional".localized(), text: $email)
             .onAppear {
-                if let accountModel = accountModel {
-                    if !emailChecked {
-                        email = accountModel.email ?? ""
-                        emailChecked = true
-                    }
-                }
+                setEmail()
             }
             .focused($focusState, equals: .email)
             .submitLabel(.next)
@@ -389,12 +357,7 @@ struct CreateAccountView: View {
     private var displayTiktokPrompt: some View {
         TextField("Optional".localized(), text: $tiktok)
             .onAppear {
-                if let accountModel = accountModel {
-                    if !tiktokChecked {
-                        tiktok = accountModel.tiktok ?? ""
-                        tiktokChecked = true
-                    }
-                }
+                setTiktok()
             }
             .focused($focusState, equals: .tiktok)
             .submitLabel(.next)
@@ -410,12 +373,7 @@ struct CreateAccountView: View {
     private var displayInstaPrompt: some View {
         TextField("Optional".localized(), text: $insta)
             .onAppear {
-                if let accountModel = accountModel {
-                    if !instaChecked {
-                        insta = accountModel.insta ?? ""
-                        instaChecked = true
-                    }
-                }
+                setInsta()
             }
             .focused($focusState, equals: .insta)
             .submitLabel(.next)
@@ -431,12 +389,7 @@ struct CreateAccountView: View {
     private var displayYoutubePrompt: some View {
         TextField("Optional".localized(), text: $youtube)
             .onAppear {
-                if let accountModel = accountModel {
-                    if !youtubeChecked {
-                        youtube = accountModel.youtube ?? ""
-                        youtubeChecked = true
-                    }
-                }
+                setYoutube()
             }
             .focused($focusState, equals: .youtube)
             .submitLabel(.done)
@@ -447,6 +400,100 @@ struct CreateAccountView: View {
                     youtube = String(youtube.prefix(MaxCharLength.email))
                 }
             }
+    }
+    
+    // MARK: - Functions
+    
+    private func setName() {
+        if let accountModel = accountModel {
+            if !nameChecked {
+                name = accountModel.name
+                nameChecked = true
+            }
+        }
+    }
+    
+    private func setPronoun() {
+        if let accountModel = accountModel {
+            if !pronounChecked {
+                pronoun = accountModel.pronouns ?? ""
+                pronounChecked = true
+            }
+        }
+    }
+    
+    private func setEmail() {
+        if let accountModel = accountModel {
+            if !emailChecked {
+                email = accountModel.email ?? ""
+                emailChecked = true
+            }
+        }
+    }
+    
+    private func setTiktok() {
+        if let accountModel = accountModel {
+            if !tiktokChecked {
+                tiktok = accountModel.tiktok ?? ""
+                tiktokChecked = true
+            }
+        }
+    }
+    
+    private func setInsta() {
+        if let accountModel = accountModel {
+            if !instaChecked {
+                insta = accountModel.insta ?? ""
+                instaChecked = true
+            }
+        }
+    }
+    
+    private func setYoutube() {
+        if let accountModel = accountModel {
+            if !youtubeChecked {
+                youtube = accountModel.youtube ?? ""
+                youtubeChecked = true
+            }
+        }
+    }
+    
+    private func moveDown() {
+        switch focusState {
+        case .insta:
+            focusState = .youtube
+        case .tiktok:
+            focusState = .insta
+        case .email:
+            focusState = .tiktok
+        case .bio:
+            focusState = .email
+        case .name:
+            focusState = .pronoun
+        case .pronoun:
+            focusState = .bio
+        default:
+            focusState = nil
+        }
+    }
+    
+    private func moveUp() {
+        switch focusState {
+        case .youtube:
+            focusState = .insta
+        case .insta:
+            focusState = .tiktok
+        case .tiktok:
+            focusState = .email
+        case .email:
+            focusState = .bio
+        case .bio:
+            focusState = .pronoun
+        case .pronoun:
+            focusState = .name
+        default:
+            focusState = nil
+        }
     }
     
     private func save() async {
@@ -497,6 +544,17 @@ struct CreateAccountView: View {
         } else {
             isSaving = false
             updateAlert.toggle()
+        }
+    }
+    
+    private func checkForExistingAccountModel() {
+        if let accountModel = accountModel {
+            if image == nil {
+                image = accountModel.image
+                if let b = accountModel.bio {
+                    bio = b
+                }
+            }
         }
     }
 }

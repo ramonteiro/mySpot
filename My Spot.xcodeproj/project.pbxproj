@@ -584,8 +584,8 @@
 		C51503E927D7C9CE009F0DCD /* Map */ = {
 			isa = PBXGroup;
 			children = (
-				C594284F285EA62E003CF5AA /* AddSpotMap */,
 				C51503F027D7CA1D009F0DCD /* ViewSingleSpotOnMap.swift */,
+				C594284F285EA62E003CF5AA /* AddSpotMap */,
 				C51503EF27D7CA10009F0DCD /* Discover */,
 				C51503EC27D7C9F6009F0DCD /* Spot */,
 			);

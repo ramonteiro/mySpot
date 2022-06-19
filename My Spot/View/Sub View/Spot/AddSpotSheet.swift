@@ -247,7 +247,7 @@ struct AddSpotSheet: View {
                                     
                                 }
                                 .font(.subheadline)
-                                Text(dateFound.format())
+                                Text(dateFound.toString())
                                     .font(.caption)
                                     .foregroundColor(.gray)
                             }
