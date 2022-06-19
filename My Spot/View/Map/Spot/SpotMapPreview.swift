@@ -67,7 +67,7 @@ struct SpotMapPreview: View {
     
     private var bottomRow: some View {
         HStack {
-            founder
+            date
             Spacer()
             distanceAway
         }
@@ -87,17 +87,10 @@ struct SpotMapPreview: View {
         }
     }
     
-    @ViewBuilder
-    private var founder: some View {
-        if spot.addedBy == nil {
-            Text("By: ".localized() + (spot.founder ?? ""))
-                .font(.subheadline)
-                .foregroundColor(.white)
-        } else {
-            Text("Added By: ".localized() + (spot.addedBy ?? ""))
-                .font(.subheadline)
-                .foregroundColor(.white)
-        }
+    private var date: some View {
+        Text(spot.dateObject?.toString() ?? ("By: ".localized() + (spot.founder ?? "")))
+            .font(.subheadline)
+            .foregroundColor(.white)
     }
     
     private var spotName: some View {

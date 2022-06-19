@@ -145,7 +145,7 @@ struct DetailPlaylistView: View {
                     }
                     .disabled(playlist.spotArr.count == 0)
                     .fullScreenCover(isPresented: $showingMapSheet) {
-                        ViewPlaylistMap(playlist: playlist, isShared: stack.isShared(object: playlist))
+                        ViewMapSpots(spots: playlist.spotArr, fromPlaylist: true)
                     }
                     Button{
                         showingAddSpotToPlaylistSheet = true

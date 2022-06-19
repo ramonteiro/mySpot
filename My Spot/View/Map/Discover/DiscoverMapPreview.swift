@@ -12,77 +12,122 @@ struct DiscoverMapPreview: View {
     
     let spot: SpotFromCloud
     @State private var tags: [String] = []
-    @State private var pad:CGFloat = 20
+    @State private var padding: CGFloat = 20
+    @State private var distance: String = ""
     @EnvironmentObject var mapViewModel: MapViewModel
     
     var body: some View {
         VStack {
             Spacer()
             ZStack {
-                displayImage
-                VStack {
-                    HStack {
-                        if (!spot.locationName.isEmpty) {
-                            Image(systemName: (spot.customLocation != 0 ? "mappin" : "figure.wave"))
-                                .font(.subheadline)
-                                .foregroundColor(.white)
-                            Text(spot.locationName)
-                                .font(.subheadline)
-                                .foregroundColor(.white)
-                        }
-                        Spacer()
-                        Image(systemName: "icloud.and.arrow.down")
-                            .font(.subheadline)
-                            .foregroundColor(.white)
-                        Text("\(spot.likes)")
-                            .font(.subheadline)
-                            .foregroundColor(.white)
-                    }
-                    .padding(.top)
-                    Spacer()
-                    HStack {
-                        Text(spot.name)
-                            .foregroundColor(.white)
-                            .font(.largeTitle)
-                            .fontWeight(.bold)
-                        Spacer()
-                    }
-                    HStack {
-                        Text("By: \(spot.founder)")
-                            .font(.subheadline)
-                            .foregroundColor(.white)
-                        Spacer()
-                        Text("\(calculateDistance())")
-                            .foregroundColor(.white)
-                            .font(.subheadline)
-                    }
-                    .padding(.bottom, pad)
-                    if (!(spot.type.isEmpty)) {
-                        ScrollView(.horizontal, showsIndicators: false) {
-                            HStack {
-                                ForEach(spot.type.components(separatedBy: ", "), id: \.self) { tag in
-                                    Text(tag)
-                                        .font(.system(size: 12, weight: .regular))
-                                        .lineLimit(2)
-                                        .foregroundColor(.white)
-                                        .padding(5)
-                                        .background(.tint)
-                                        .cornerRadius(5)
-                                }
-                            }
-                        }
-                        .padding(.bottom, 20)
-                        .onAppear {
-                            pad = 2
-                        }
-                    }
-                }
-                .padding(.horizontal)
+                image
+                content
             }
         }
     }
     
-    private var displayImage: some View {
+    private var locationName: some View {
+        HStack {
+            Image(systemName: (spot.customLocation != 0 ? "mappin" : "figure.wave"))
+                .font(.subheadline)
+                .foregroundColor(.white)
+            Text(spot.locationName)
+                .font(.subheadline)
+                .foregroundColor(.white)
+        }
+    }
+    
+    private var spotDownloads: some View {
+        HStack {
+            Image(systemName: "icloud.and.arrow.down")
+                .font(.subheadline)
+                .foregroundColor(.white)
+            Text("\(spot.likes)")
+                .font(.subheadline)
+                .foregroundColor(.white)
+        }
+    }
+    
+    private var topRow: some View {
+        HStack {
+            if (!spot.locationName.isEmpty) {
+                locationName
+            }
+            Spacer()
+            spotDownloads
+        }
+        .padding(.top)
+    }
+    
+    private var spotName: some View {
+        HStack {
+            if (!spot.locationName.isEmpty) {
+                locationName
+            }
+            Spacer()
+            spotDownloads
+        }
+        .padding(.top)
+    }
+    
+    private var date: some View {
+        Text(spot.dateObject?.toString() ?? ("By: \(spot.founder)"))
+            .font(.subheadline)
+            .foregroundColor(.white)
+    }
+    
+    private var distanceAwayView: some View {
+        Text("\(distance)")
+            .foregroundColor(.white)
+            .font(.subheadline)
+            .onAppear {
+                distance = mapViewModel.calculateDistance(from: spot.location)
+            }
+    }
+    
+    private var bottomRow: some View {
+        HStack {
+            date
+            Spacer()
+            distanceAwayView
+        }
+        .padding(.bottom, padding)
+    }
+    
+    private var tagsView: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack {
+                ForEach(spot.type.components(separatedBy: ", "), id: \.self) { tag in
+                    Text(tag)
+                        .font(.system(size: 12, weight: .regular))
+                        .lineLimit(2)
+                        .foregroundColor(.white)
+                        .padding(5)
+                        .background(.tint)
+                        .cornerRadius(5)
+                }
+            }
+        }
+        .padding(.bottom, 20)
+        .onAppear {
+            padding = 2
+        }
+    }
+    
+    private var content: some View {
+        VStack {
+            topRow
+            Spacer()
+            spotName
+            bottomRow
+            if (!(spot.type.isEmpty)) {
+                tagsView
+            }
+        }
+        .padding(.horizontal)
+    }
+    
+    private var image: some View {
         ZStack {
             if let url = spot.imageURL, let data = try? Data(contentsOf: url), let image = UIImage(data: data) {
                 Image(uiImage: image)
@@ -101,25 +146,5 @@ struct DiscoverMapPreview: View {
                 .frame(width: UIScreen.screenWidth - 20, height: UIScreen.screenHeight * 0.25)
                 .cornerRadius(40)
         }
-    }
-    
-    private func calculateDistance() -> String {
-        if !mapViewModel.isAuthorized {
-            return spot.date.components(separatedBy: ";")[0]
-        }
-        var distance = ""
-        let userLocation = CLLocation(latitude: mapViewModel.region.center.latitude, longitude: mapViewModel.region.center.longitude)
-        let distanceInMeters = userLocation.distance(from: spot.location)
-        if isMetric() {
-            let distanceDouble = distanceInMeters / 1000
-            distance = String(format: "%.1f", distanceDouble) + " km" + " away".localized()
-        } else {
-            let distanceDouble = distanceInMeters / 1609.344
-            distance = String(format: "%.1f", distanceDouble) + " mi" + " away".localized()
-        }
-        return distance
-    }
-    private func isMetric() -> Bool {
-        return ((Locale.current as NSLocale).object(forKey: NSLocale.Key.usesMetricSystem) as? Bool) ?? true
     }
 }
