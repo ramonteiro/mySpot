@@ -28,26 +28,36 @@ struct ViewSingleSpotOnMap: View {
     
     var body: some View {
         ZStack {
-            Map(coordinateRegion: $spotRegion, interactionModes: [.pan, .zoom], showsUserLocation: mapViewModel.isAuthorized, annotationItems: singlePin) { location in
-                MapMarker(coordinate: singlePin[0].coordinate, tint: cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex])
+            Map(coordinateRegion: $spotRegion,
+                interactionModes: [.pan, .zoom],
+                showsUserLocation: mapViewModel.isAuthorized,
+                annotationItems: singlePin) { location in
+                MapMarker(coordinate: singlePin[0].coordinate,
+                          tint: cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex])
             }
-            HStack {
-                Spacer()
-                VStack {
-                    displayLocationButton
-                    Spacer()
-                }
-            }
+            locationButton
         }
         .onAppear {
-            spotRegion = MKCoordinateRegion(center: singlePin[0].coordinate, span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01))
+            spotRegion = MKCoordinateRegion(center: singlePin[0].coordinate,
+                                            span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01))
+        }
+    }
+    
+    private var locationButton: some View {
+        HStack {
+            Spacer()
+            VStack {
+                displayLocationButton
+                Spacer()
+            }
         }
     }
     
     private var displayLocationButton: some View {
         Button {
             withAnimation {
-                spotRegion = MKCoordinateRegion(center: singlePin[0].coordinate, span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01))
+                spotRegion = MKCoordinateRegion(center: singlePin[0].coordinate,
+                                                span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01))
             }
         } label: {
             Image(systemName: "mappin").imageScale(.large)
