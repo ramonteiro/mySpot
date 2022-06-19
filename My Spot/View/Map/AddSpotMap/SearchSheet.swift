@@ -60,7 +60,7 @@ struct SearchSheetMaps: View {
         if let location = landmark.placemark.location {
             withAnimation {
                 presentationMode.wrappedValue.dismiss()
-                map.setRegion(MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: location.coordinate.latitude, longitude: location.coordinate.longitude), span: MKCoordinateSpan(latitudeDelta: 0.005, longitudeDelta: 0.005)), animated: true)
+                map.setRegion(MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: location.coordinate.latitude, longitude: location.coordinate.longitude), span: DefaultLocations.spanFar), animated: true)
             }
         }
     }

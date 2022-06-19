@@ -61,13 +61,12 @@ struct DiscoverMapPreview: View {
     
     private var spotName: some View {
         HStack {
-            if (!spot.locationName.isEmpty) {
-                locationName
-            }
+            Text(spot.name)
+                .foregroundColor(.white)
+                .font(.largeTitle)
+                .fontWeight(.bold)
             Spacer()
-            spotDownloads
         }
-        .padding(.top)
     }
     
     private var date: some View {

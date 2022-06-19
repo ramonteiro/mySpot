@@ -24,7 +24,7 @@ struct ViewSingleSpotOnMap: View {
     @EnvironmentObject var cloudViewModel: CloudKitViewModel
     @EnvironmentObject var mapViewModel: MapViewModel
     @State var singlePin: [SinglePin]
-    @State private var spotRegion = MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: 33.714712646421, longitude: -112.29072718706581), span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01))
+    @State private var spotRegion = DefaultLocations.region
     
     var body: some View {
         ZStack {
@@ -39,7 +39,7 @@ struct ViewSingleSpotOnMap: View {
         }
         .onAppear {
             spotRegion = MKCoordinateRegion(center: singlePin[0].coordinate,
-                                            span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01))
+                                            span: DefaultLocations.spanClose)
         }
     }
     
@@ -57,7 +57,7 @@ struct ViewSingleSpotOnMap: View {
         Button {
             withAnimation {
                 spotRegion = MKCoordinateRegion(center: singlePin[0].coordinate,
-                                                span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01))
+                                                span: DefaultLocations.spanClose)
             }
         } label: {
             Image(systemName: "mappin").imageScale(.large)

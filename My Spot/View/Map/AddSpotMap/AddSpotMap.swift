@@ -245,7 +245,7 @@ struct AddSpotMap: View {
     
     private func dismissCustomCoordinateSheet() {
         if didSet {
-            map.setRegion(MKCoordinateRegion(center: customCoordinates, span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01)), animated: true)
+            map.setRegion(MKCoordinateRegion(center: customCoordinates, span: DefaultLocations.spanClose), animated: true)
             didSet = false
         }
     }

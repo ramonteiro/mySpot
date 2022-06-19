@@ -15,10 +15,10 @@ import MapKit
 
 final class MapViewModel: NSObject, ObservableObject, CLLocationManagerDelegate {
     
-    @Published var region = MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: 33.714712646421, longitude: -112.29072718706581), span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01))
+    @Published var region = DefaultLocations.region
     var locationManager: CLLocationManager?
     @Published var isAuthorized: Bool = false
-    @Published var searchingHere = MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: 33.714712646421, longitude: -112.29072718706581), span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01))
+    @Published var searchingHere = DefaultLocations.region
     @Published var isMetric = false
     
     override init() {
@@ -71,7 +71,7 @@ final class MapViewModel: NSObject, ObservableObject, CLLocationManagerDelegate 
         case .authorizedAlways, .authorizedWhenInUse:
             if let center = locationManager.location?.coordinate {
                 isAuthorized = true
-                region = MKCoordinateRegion(center: center, span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01))
+                region = MKCoordinateRegion(center: center, span: DefaultLocations.spanClose)
                 setLastKnownLocation()
             } else {
                 isAuthorized = false

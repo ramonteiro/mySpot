@@ -15,7 +15,7 @@ struct DetailView: View {
     @State private var didSend = false
     @State private var showingDescription = false
     let spot: Spot
-    @State private var spotRegion = MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: 33.714712646421, longitude: -112.29072718706581), span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01))
+    @State private var spotRegion = DefaultLocations.region
     
     var body: some View {
         ScrollView {
@@ -98,7 +98,7 @@ struct DetailView: View {
         }
         .onAppear {
             away = calculateDistance(x: spot.x, y: spot.y)
-            spotRegion = MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: spot.x, longitude: spot.y), span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05))
+            spotRegion = MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: spot.x, longitude: spot.y), span: DefaultLocations.spanFar)
         }
         
     }

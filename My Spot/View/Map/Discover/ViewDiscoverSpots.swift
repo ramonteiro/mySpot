@@ -19,8 +19,8 @@ struct ViewDiscoverSpots: View {
     @EnvironmentObject var mapViewModel: MapViewModel
     @EnvironmentObject var cloudViewModel: CloudKitViewModel
     @State private var selection = 0
-    @State private var originalRegion = MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: 33.714712646421, longitude: -112.29072718706581), span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01))
-    @State private var spotRegion: MKCoordinateRegion = MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: 33.714712646421, longitude: -112.29072718706581), span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01))
+    @State private var originalRegion = DefaultLocations.region
+    @State private var spotRegion = DefaultLocations.region
     @Binding var sortBy: String
     @Binding var searchText: String
     @State private var presentDetailsSheet = false
@@ -193,7 +193,7 @@ struct ViewDiscoverSpots: View {
     }
     
     private func setSpotRegion() {
-        spotRegion = MKCoordinateRegion(center: cloudViewModel.spots[selection].location.coordinate, span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01))
+        spotRegion = MKCoordinateRegion(center: cloudViewModel.spots[selection].location.coordinate, span: DefaultLocations.spanClose)
     }
     
     private func search() async {

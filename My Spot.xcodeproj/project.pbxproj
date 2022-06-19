@@ -122,6 +122,10 @@
 		C5C2C4DD285EDDBF00E585C9 /* UserDefaults.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5C2C4DC285EDDBF00E585C9 /* UserDefaults.swift */; };
 		C5C2C4DF285EDDD400E585C9 /* DefaultImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5C2C4DE285EDDD400E585C9 /* DefaultImage.swift */; };
 		C5C2C4E1285EE16900E585C9 /* DateToString.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5C2C4E0285EE16900E585C9 /* DateToString.swift */; };
+		C5C2C4E3285EEA2000E585C9 /* DefaultRegion.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5C2C4E2285EEA2000E585C9 /* DefaultRegion.swift */; };
+		C5C2C4E4285EEAD800E585C9 /* DefaultRegion.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5C2C4E2285EEA2000E585C9 /* DefaultRegion.swift */; };
+		C5C2C4E7285EEAED00E585C9 /* DefaultRegion.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5C2C4E2285EEA2000E585C9 /* DefaultRegion.swift */; };
+		C5C2C4E8285EEC1B00E585C9 /* DefaultRegion.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5C2C4E2285EEA2000E585C9 /* DefaultRegion.swift */; };
 		C5D2954C2823719100FBA01E /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C5D2954B2823719100FBA01E /* WidgetKit.framework */; };
 		C5D2954E2823719100FBA01E /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C5D2954D2823719100FBA01E /* SwiftUI.framework */; };
 		C5D295512823719100FBA01E /* MySpotWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5D295502823719100FBA01E /* MySpotWidget.swift */; };
@@ -334,6 +338,7 @@
 		C5C2C4DC285EDDBF00E585C9 /* UserDefaults.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDefaults.swift; sourceTree = "<group>"; };
 		C5C2C4DE285EDDD400E585C9 /* DefaultImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultImage.swift; sourceTree = "<group>"; };
 		C5C2C4E0285EE16900E585C9 /* DateToString.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateToString.swift; sourceTree = "<group>"; };
+		C5C2C4E2285EEA2000E585C9 /* DefaultRegion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultRegion.swift; sourceTree = "<group>"; };
 		C5D2954A2823719100FBA01E /* MySpotWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = MySpotWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		C5D2954B2823719100FBA01E /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
 		C5D2954D2823719100FBA01E /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
@@ -712,6 +717,7 @@
 				C5C2C4DA285EDDA500E585C9 /* MaxCharacterLength.swift */,
 				C5C2C4DC285EDDBF00E585C9 /* UserDefaults.swift */,
 				C5C2C4DE285EDDD400E585C9 /* DefaultImage.swift */,
+				C5C2C4E2285EEA2000E585C9 /* DefaultRegion.swift */,
 			);
 			path = Constant;
 			sourceTree = "<group>";
@@ -992,6 +998,7 @@
 				C507157B282584AC000F344C /* My_SpotApp.swift in Sources */,
 				C5071581282584AC000F344C /* NotificationView.swift in Sources */,
 				C507159828258645000F344C /* MapViewModel.swift in Sources */,
+				C5C2C4E7285EEAED00E585C9 /* DefaultRegion.swift in Sources */,
 				C50715A928259CD2000F344C /* RowView.swift in Sources */,
 				C507159A28258650000F344C /* CloudKitViewModel.swift in Sources */,
 				C50715A2282596EF000F344C /* ListView.swift in Sources */,
@@ -1013,6 +1020,7 @@
 				C51503E127D7C856009F0DCD /* Spot+CoreDataClass.swift in Sources */,
 				C502D4FB27E1A6310057A65C /* SpotEditSheet.swift in Sources */,
 				C5942842285E5FAE003CF5AA /* ColorRGBA.swift in Sources */,
+				C5C2C4E3285EEA2000E585C9 /* DefaultRegion.swift in Sources */,
 				C51503E427D7C856009F0DCD /* Spots.xcdatamodeld in Sources */,
 				C5942834285E5DFA003CF5AA /* ImageCompression.swift in Sources */,
 				C594284C285E8C16003CF5AA /* DiscoverSearchBar.swift in Sources */,
@@ -1093,6 +1101,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				C5266AD0283EBF0000A923A1 /* MessagesViewController.swift in Sources */,
+				C5C2C4E8285EEC1B00E585C9 /* DefaultRegion.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1102,6 +1111,7 @@
 			files = (
 				C5D295562823719300FBA01E /* MySpotWidget.intentdefinition in Sources */,
 				C5D295512823719100FBA01E /* MySpotWidget.swift in Sources */,
+				C5C2C4E4285EEAD800E585C9 /* DefaultRegion.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

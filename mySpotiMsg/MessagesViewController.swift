@@ -170,7 +170,7 @@ class MessagesViewController: MSMessagesAppViewController, UITableViewDelegate, 
         
         let options = MKMapSnapshotter.Options()
         
-        options.region = MKCoordinateRegion(center: location, span: MKCoordinateSpan(latitudeDelta: 0.007, longitudeDelta: 0.007))
+        options.region = MKCoordinateRegion(center: location, span: DefaultLocations.spanSuperClose)
         options.mapType = .standard
         options.showsBuildings = true
         options.size = CGSize(width: 217, height: 217)

@@ -22,7 +22,7 @@ struct ViewMapSpots: View {
     @EnvironmentObject var cloudViewModel: CloudKitViewModel
     @State private var selection = 0
     @State private var presentDetailsSheet = false
-    @State private var spotRegion: MKCoordinateRegion = MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: 33.714712646421, longitude: -112.29072718706581), span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01))
+    @State private var spotRegion = DefaultLocations.region
 
     var body: some View {
         map
@@ -159,6 +159,6 @@ struct ViewMapSpots: View {
     // MARK: - Functions
     
     private func setNewSpotRegion() {
-        spotRegion = MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: spots[selection].x, longitude: spots[selection].y), span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01))
+        spotRegion = MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: spots[selection].x, longitude: spots[selection].y), span: DefaultLocations.spanClose)
     }
 }
