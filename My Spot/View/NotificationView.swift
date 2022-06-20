@@ -15,7 +15,6 @@ struct NotificationView: View {
     @EnvironmentObject var cloudViewModel: CloudKitViewModel
     @State private var presentDetailView = false
     @State private var presentRemoveAllAlert = false
-    @State private var index: Int?
     @State private var hasError = false
     @State private var isFetching = false
     @State private var spots: [SpotFromCloud] = []
@@ -201,24 +200,28 @@ struct NotificationView: View {
     }
     
     private var listSpots: some View {
-        VStack {
-            List {
+        ScrollView(showsIndicators: false) {
+            PullToRefresh(coordinateSpaceName: "pullToRefresh") {
+                reloadData()
+            }
+            LazyVStack(alignment: .leading, spacing: 0) {
                 ForEach(spots.indices, id: \.self) { i in
-                    Button {
-                        index = i
-                        presentDetailView = true
+                    NavigationLink {
+                        DetailView(isSheet: false, from: Tab.discover, spot: spots[i], didDelete: $didDelete)
                     } label: {
-                        SpotRow(spot: $spots[i])
+                        HStack {
+                            SpotRow(spot: $spots[i])
+                            Spacer()
+                        }
+                        .background(Color(uiColor: UIColor.systemBackground))
+                        .padding(10)
                     }
+                    .buttonStyle(PlainButtonStyle())
                 }
-                .onDelete(perform: removeRows)
             }
-            .animation(.default, value: cloudViewModel.notificationSpots)
-            NavigationLink(destination: DetailView(isSheet: false, from: Tab.discover, spot: spots[index ?? 0], didDelete: $didDelete), isActive: $presentDetailView) {
-                EmptyView()
-            }
-            .isDetailLink(false)
         }
+        .animation(.default, value: spots)
+        .coordinateSpace(name: "pullToRefresh")
     }
     
     // MARK: - Functions
@@ -237,13 +240,8 @@ struct NotificationView: View {
         }
     }
     
-    private func removeRows(at offsets: IndexSet) {
-        guard var recordid = UserDefaults.standard.stringArray(forKey: "newSpotNotiRecords") else { return }
-        recordid.remove(atOffsets: offsets)
-        spots.remove(atOffsets: offsets)
-    }
-    
     private func reloadData() {
+        if isFetching { return }
         guard let recordids = UserDefaults.standard.stringArray(forKey: "newSpotNotiRecords") else {
             return
         }

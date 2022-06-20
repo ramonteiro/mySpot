@@ -24,7 +24,6 @@ final class CloudKitViewModel: ObservableObject {
     @Published var cursorMain: CKQueryOperation.Cursor?
     @Published var cursorAccount: CKQueryOperation.Cursor?
     var shared: SpotFromCloud? = nil
-    var notificationSpots: SpotFromCloud? = nil
     var deepAccount: String? = nil
     var userID: String = ""
     var isErrorMessage = ""
@@ -146,6 +145,9 @@ final class CloudKitViewModel: ObservableObject {
                     self.shared = SpotFromCloud(id: id, name: name, founder: founder, description: description, date: date, location: location, type: types, imageURL: imageURL ?? URL(fileURLWithPath: "none"),  image2URL: image2 , image3URL: nil, isMultipleImages: isMultipleImages , likes: likes, offensive: offensive, spam: spam, inappropriate: inappropriate, dangerous: dangerous, customLocation: customLocation, locationName: locationName, userID: user, dateObject: dateObject, record: record)
                 } else {
                     self.shared = SpotFromCloud(id: id, name: name, founder: founder, description: description, date: date, location: location, type: types, imageURL: imageURL ?? URL(fileURLWithPath: "none"),  image2URL: nil , image3URL: nil, isMultipleImages: isMultipleImages , likes: likes, offensive: offensive, spam: spam, inappropriate: inappropriate, dangerous: dangerous, customLocation: customLocation, locationName: locationName, userID: user, dateObject: dateObject, record: record)
+                }
+                DispatchQueue.main.async {
+                    self.sharedSpotToggle.toggle()
                 }
             }
         } catch {
