@@ -100,8 +100,14 @@ struct DiscoverView: View {
             NavigationLink {
                 DetailView(isSheet: false, from: Tab.discover, spot: spots[i], didDelete: $didDelete)
             } label: {
-                SpotRow(spot: $spots[i])
+                HStack {
+                    SpotRow(spot: $spots[i])
+                    Spacer()
+                }
+                .background(Color(uiColor: UIColor.systemBackground))
+                .padding(10)
             }
+            .buttonStyle(PlainButtonStyle())
             .id(i)
         }
     }
@@ -136,21 +142,13 @@ struct DiscoverView: View {
     }
     
     private func listOfSpots(scroll: ScrollViewProxy) -> some View {
-        List {
+        LazyVStack(alignment: .leading, spacing: 0) {
             spotRows
             if cloudViewModel.isFetching {
                 progressSpinner
             } else {
                 paginationCursor
             }
-        }
-        .if(cloudViewModel.canRefresh) { view in
-            view.refreshable {
-                refreshSpots()
-            }
-        }
-        .onAppear {
-            cloudViewModel.canRefresh = true
         }
         .onChange(of: isSearching) { _ in
             refreshSpots()
@@ -176,8 +174,16 @@ struct DiscoverView: View {
                               searchName: $searchLocationName,
                               hasSearched: $hasSearched)
             ScrollViewReader { scroll in
-                listOfSpots(scroll: scroll)
+                ScrollView(showsIndicators: false) {
+                    PullToRefresh(coordinateSpaceName: "pullToRefresh") {
+                        let generator = UIImpactFeedbackGenerator(style: .light)
+                        generator.impactOccurred()
+                        refreshSpots()
+                    }
+                    listOfSpots(scroll: scroll)
+                }
             }
+            .coordinateSpace(name: "pullToRefresh")
         }
         .navigationTitle("Discover".localized())
         .toolbar {
@@ -203,7 +209,6 @@ struct DiscoverView: View {
         Button {
             distance = 5
             UserDefaults.standard.set(5, forKey: "savedDistance")
-            mapViewModel.checkLocationAuthorization()
             loadSpotsFromDB(location: CLLocation(latitude: mapViewModel.searchingHere.center.latitude, longitude: mapViewModel.searchingHere.center.longitude), radiusInMeters: CGFloat(distance), filteringBy: sortBy)
         } label: {
             if mapViewModel.isMetric {
@@ -218,7 +223,6 @@ struct DiscoverView: View {
         Button {
             distance = 10
             UserDefaults.standard.set(10, forKey: "savedDistance")
-            mapViewModel.checkLocationAuthorization()
             loadSpotsFromDB(location: CLLocation(latitude: mapViewModel.searchingHere.center.latitude, longitude: mapViewModel.searchingHere.center.longitude), radiusInMeters: CGFloat(distance), filteringBy: sortBy)
         } label: {
             if mapViewModel.isMetric {
@@ -233,7 +237,6 @@ struct DiscoverView: View {
         Button {
             distance = 25
             UserDefaults.standard.set(25, forKey: "savedDistance")
-            mapViewModel.checkLocationAuthorization()
             loadSpotsFromDB(location: CLLocation(latitude: mapViewModel.searchingHere.center.latitude, longitude: mapViewModel.searchingHere.center.longitude), radiusInMeters: CGFloat(distance), filteringBy: sortBy)
         } label: {
             if mapViewModel.isMetric {
@@ -248,7 +251,6 @@ struct DiscoverView: View {
         Button {
             distance = 50
             UserDefaults.standard.set(50, forKey: "savedDistance")
-            mapViewModel.checkLocationAuthorization()
             loadSpotsFromDB(location: CLLocation(latitude: mapViewModel.searchingHere.center.latitude, longitude: mapViewModel.searchingHere.center.longitude), radiusInMeters: CGFloat(distance), filteringBy: sortBy)
         } label: {
             if mapViewModel.isMetric {
@@ -263,7 +265,6 @@ struct DiscoverView: View {
         Button {
             distance = 100
             UserDefaults.standard.set(100, forKey: "savedDistance")
-            mapViewModel.checkLocationAuthorization()
             loadSpotsFromDB(location: CLLocation(latitude: mapViewModel.searchingHere.center.latitude, longitude: mapViewModel.searchingHere.center.longitude), radiusInMeters: CGFloat(distance), filteringBy: sortBy)
         } label: {
             if mapViewModel.isMetric {
@@ -278,7 +279,6 @@ struct DiscoverView: View {
         Button {
             distance = 0
             UserDefaults.standard.set(0, forKey: "savedDistance")
-            mapViewModel.checkLocationAuthorization()
             loadSpotsFromDB(location: CLLocation(latitude: mapViewModel.searchingHere.center.latitude, longitude: mapViewModel.searchingHere.center.longitude), radiusInMeters: CGFloat(distance), filteringBy: sortBy)
         } label: {
             Text("Anywhere In The World".localized())
@@ -368,6 +368,7 @@ struct DiscoverView: View {
     
     private func loadSpotsFromDB(location: CLLocation, radiusInMeters: CGFloat, filteringBy: String) {
         if cloudViewModel.isFetching { return }
+        mapViewModel.checkLocationAuthorization()
         if mapViewModel.isMetric {
             let radiusUnit = Measurement(value: radiusInMeters, unit: UnitLength.kilometers)
             let unitMeters = radiusUnit.converted(to: .meters)
@@ -429,7 +430,6 @@ struct DiscoverView: View {
     }
     
     private func refreshSpots() {
-        mapViewModel.checkLocationAuthorization()
         loadSpotsFromDB(location: CLLocation(latitude: mapViewModel.searchingHere.center.latitude, longitude: mapViewModel.searchingHere.center.longitude), radiusInMeters: CGFloat(distance), filteringBy: sortBy)
     }
     

@@ -41,7 +41,7 @@ struct PullToRefresh: View {
             if needRefresh {
                 ProgressView()
             } else {
-                Text("⬇️")
+                Image(systemName: "arrow.down")
             }
             Spacer()
         }

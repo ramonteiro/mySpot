@@ -926,7 +926,6 @@ struct DetailView<T: SpotPreviewType>: View {
     }
     
     private func loadCloudImages() {
-        cloudViewModel.canRefresh = false
         spotInCD = isSpotInCoreData()
         images.append(spot.imagePreview ?? defaultImages.errorImage!)
         if let image2 = spot.image2Preview {

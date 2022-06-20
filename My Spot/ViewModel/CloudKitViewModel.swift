@@ -18,7 +18,6 @@ final class CloudKitViewModel: ObservableObject {
     @Published var accountStatus: CKAccountStatus?
     @Published var sharedSpotToggle = false
     @Published var AccountModelToggle = false
-    @Published var canRefresh = false
     @Published var isFetching = false
     @Published var isError = false
     @Published var notiPermission = 0 // 0: not determined, 1: denied, 2: allowed, 3: provisional, 4: ephemeral, 5: unknown

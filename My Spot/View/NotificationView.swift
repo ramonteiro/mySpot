@@ -214,14 +214,6 @@ struct NotificationView: View {
                 .onDelete(perform: removeRows)
             }
             .animation(.default, value: cloudViewModel.notificationSpots)
-            .if(cloudViewModel.canRefresh) { view in
-                view.refreshable {
-                    reloadData()
-                }
-            }
-            .onAppear {
-                cloudViewModel.canRefresh = true
-            }
             NavigationLink(destination: DetailView(isSheet: false, from: Tab.discover, spot: spots[index ?? 0], didDelete: $didDelete), isActive: $presentDetailView) {
                 EmptyView()
             }

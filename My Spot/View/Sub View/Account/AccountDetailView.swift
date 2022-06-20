@@ -281,6 +281,7 @@ struct AccountDetailView: View {
             }
             .buttonStyle(PlainButtonStyle())
         }
+        .animation(.default, value: spots)
     }
     
     private var badgeRow: some View {
