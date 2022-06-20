@@ -54,7 +54,11 @@ struct AccountDetailView: View {
             ScrollView(showsIndicators: false) {
                 if !isLoading {
                     PullToRefresh(coordinateSpaceName: "pullToRefresh") {
-                        pullRefresh()
+                        let generator = UIImpactFeedbackGenerator(style: .light)
+                        generator.impactOccurred()
+                        Task {
+                            await pullRefresh()
+                        }
                     }
                     VStack {
                         imageView
@@ -103,6 +107,14 @@ struct AccountDetailView: View {
             })
             .onChange(of: UserDefaults.standard.integer(forKey: "badge")) { newValue in
                 badgeNum = newValue
+            }
+            .onChange(of: didDelete) { deleted in
+                if deleted {
+                    Task {
+                        await pullRefresh()
+                        didDelete = false
+                    }
+                }
             }
             .navigationBarTitleDisplayMode(.inline)
             .navigationViewStyle(.stack)
@@ -528,21 +540,17 @@ struct AccountDetailView: View {
         return ""
     }
     
-    private func pullRefresh() {
-        let generator = UIImpactFeedbackGenerator(style: .light)
-        generator.impactOccurred()
-        Task {
-            await refreshAccount()
-            do {
-                let fetchedArr = try await cloudViewModel.getDownloadsAndSpots(from: userid)
-                downloads = fetchedArr[0]
-                spotCount = fetchedArr[1]
-            } catch {
-                print("failed to load spot count")
-            }
-            initializeBadgesAndLinks()
-            await fetchSpots()
+    private func pullRefresh() async {
+        await refreshAccount()
+        do {
+            let fetchedArr = try await cloudViewModel.getDownloadsAndSpots(from: userid)
+            downloads = fetchedArr[0]
+            spotCount = fetchedArr[1]
+        } catch {
+            print("failed to load spot count")
         }
+        initializeBadgesAndLinks()
+        await fetchSpots()
     }
     
     private func initializeBadgesAndLinks() {

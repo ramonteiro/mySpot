@@ -139,7 +139,7 @@ struct DetailView<T: SpotPreviewType>: View {
                     .transition(.scale)
             }
         }
-        .ignoresSafeArea(.all, edges: (isSheet ? .top : [.top, .bottom]))
+        .ignoresSafeArea()
         .onAppear {
             initializeVars()
         }
@@ -830,8 +830,8 @@ struct DetailView<T: SpotPreviewType>: View {
     
     private func isSpotInCoreData() -> Bool {
         var isInSpots = false
-        spots.forEach { spot in
-            if spot.dbid == self.spot.parentIDPreview {
+        spots.forEach { s in
+            if s.dbid == spot.dataBaseIdPreview {
                 isInSpots = true
                 return
             }
@@ -876,6 +876,7 @@ struct DetailView<T: SpotPreviewType>: View {
         }
         newSpot.id = UUID()
         newSpot.dbid = spot.dataBaseIdPreview
+        print(newSpot)
         CoreDataStack.shared.save()
         let hashcode = newSpot.name ?? "" + "\(newSpot.x)\(newSpot.y)"
         await updateAppGroup(hashcode: hashcode, image: newSpot.image, x: newSpot.x, y: newSpot.y, name: newSpot.name ?? "", locatioName: newSpot.name ?? "")

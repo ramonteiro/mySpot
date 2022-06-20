@@ -145,9 +145,6 @@ struct AddSpotToPlaylistSheet: View {
     private func filterSpots() {
         spotsFiltered = spots.filter { spot in
             !spot.isShared &&
-            (spot.userId == UserDefaults(suiteName: "group.com.isaacpaschall.My-Spot")?.string(forKey: "userid") ||
-             spot.userId == "" ||
-             spot.userId == nil) &&
             (!currentSpots.contains("\(spot.name ?? "name")\(spot.x + spot.y)"))
         }
     }

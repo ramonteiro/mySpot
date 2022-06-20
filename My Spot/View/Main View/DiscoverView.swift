@@ -53,6 +53,12 @@ struct DiscoverView: View {
                 errorLoadingSpots
             }
         }
+        .onChange(of: didDelete) { deleted in
+            if deleted {
+                refreshSpots()
+                didDelete = false
+            }
+        }
         .fullScreenCover(isPresented: $presentMapSheet) {
             MapViewSpots(spots: $spots, sortBy: $sortBy, searchText: searchText)
         }
