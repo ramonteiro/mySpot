@@ -35,6 +35,10 @@ struct SpotFromCloud: Hashable, Identifiable {
 
 extension SpotFromCloud: SpotPreviewType {
     
+    var addedByPreview: String? {
+        nil
+    }
+    
     var descriptionPreview: String {
         description
     }
@@ -55,7 +59,7 @@ extension SpotFromCloud: SpotPreviewType {
         userID
     }
     
-    var playlistEmojiPreview: String? {
+    var playlistPreview: Playlist? {
         nil
     }
     

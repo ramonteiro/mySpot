@@ -54,7 +54,7 @@ struct DiscoverView: View {
             }
         }
         .fullScreenCover(isPresented: $presentMapSheet) {
-            ViewDiscoverSpots(sortBy: $sortBy, searchText: $searchText)
+            MapViewSpots(spots: $cloudViewModel.spots, sortBy: $sortBy, searchText: searchText)
         }
     }
     
@@ -101,7 +101,7 @@ struct DiscoverView: View {
                 index = i
                 presentDetailView = true
             } label: {
-                DiscoverRow(spot: cloudViewModel.spots[i])
+                SpotRow(spot: cloudViewModel.spots[i], isShared: false)
             }
             .id(i)
         }

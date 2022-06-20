@@ -45,8 +45,8 @@ struct SpotMapAnnotation<T: SpotPreviewType>: View {
     
     @ViewBuilder
     private var annotationImage: some View {
-        if spot.playlistEmojiPreview != nil {
-            emojiAnnotation
+        if let emoji = spot.playlistPreview?.emoji {
+            emojiAnnotation(emoji: emoji)
         } else {
             mapInCircle
         }
@@ -64,7 +64,7 @@ struct SpotMapAnnotation<T: SpotPreviewType>: View {
             .cornerRadius(36)
     }
     
-    private var emojiAnnotation: some View {
+    private func emojiAnnotation(emoji: String) -> some View {
         ZStack {
             Circle()
                 .foregroundColor(Color(UIColor.systemBackground))
@@ -75,7 +75,7 @@ struct SpotMapAnnotation<T: SpotPreviewType>: View {
                 .frame(width: UIScreen.main.bounds.width * 9.5/100, height: UIScreen.main.bounds.height * (40/812), alignment: .center)
                 .padding(6)
                 .offset(y: 8)
-            Text(spot.playlistEmojiPreview ?? "🚫")
+            Text(emoji)
                 .font(.system(size: 32))
                 .offset(y: 8)
         }

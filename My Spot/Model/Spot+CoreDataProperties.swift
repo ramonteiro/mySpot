@@ -52,6 +52,10 @@ extension Spot: Identifiable { }
 
 extension Spot: SpotPreviewType {
     
+    var addedByPreview: String? {
+        addedBy
+    }
+    
     var descriptionPreview: String {
         description
     }
@@ -72,8 +76,8 @@ extension Spot: SpotPreviewType {
         userId ?? ""
     }
     
-    var playlistEmojiPreview: String? {
-        playlist?.emoji
+    var playlistPreview: Playlist? {
+        playlist
     }
     
     var isFromDiscover: Bool {

@@ -16,75 +16,35 @@ import Combine
 struct AddPlaylistSheet: View {
     
     @Environment(\.presentationMode) var presentationMode
-    private var stack = CoreDataStack.shared
-    
     @State private var showingAlert = false
     @State private var name = ""
     @State private var emoji = ""
     @State private var isEmoji: Bool = true
+    @FocusState private var focusState: Field?
     
     private var disableSave: Bool {
-        name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || emoji.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+        name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ||
+        emoji.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
     }
     
     enum Field {
         case emoji
         case name
     }
-    
-    @FocusState private var focusState: Field?
 
     var body: some View {
         NavigationView {
             Form {
-                Section {
-                    playlistNamePrompt
-                } header: {
-                    Text("Playlist Name*".localized())
-                }
-                Section {
-                    emojiPrompt
-                } header: {
-                    Text("Emoji ID*".localized())
-                }
+                nameSection
+                emojiSection
             }
             .onSubmit {
-                switch focusState {
-                case .name:
-                    focusState = .emoji
-                default:
-                    focusState = nil
-                }
+                moveDown()
             }
             .navigationTitle("Create Playlist".localized())
             .toolbar {
                 ToolbarItemGroup(placement: .keyboard) {
-                    HStack {
-                        Button {
-                            switch focusState {
-                            case .emoji:
-                                focusState = .name
-                            default:
-                                focusState = nil
-                            }
-                        } label: {
-                            Image(systemName: "chevron.up")
-                        }
-                        .disabled(focusState == .name)
-                        Button {
-                            switch focusState {
-                            case .name:
-                                focusState = .emoji
-                            default:
-                                focusState = nil
-                            }
-                        } label: {
-                            Image(systemName: "chevron.down")
-                        }
-                        .disabled(focusState == .emoji)
-                        Spacer()
-                        doneButton
-                    }
+                    keyboardButtons
                 }
                 ToolbarItemGroup(placement: .navigationBarTrailing) {
                     saveButton
@@ -97,17 +57,50 @@ struct AddPlaylistSheet: View {
         .navigationViewStyle(.automatic)
         .interactiveDismissDisabled()
     }
-
-    func close() {
-        presentationMode.wrappedValue.dismiss()
+    
+    // MARK: - Sub Views
+    
+    private var keyboardButtons: some View {
+        HStack {
+            upButton
+            downButton
+            Spacer()
+            doneButton
+        }
     }
     
-    func save() {
-        let newPlaylist = Playlist(context: CoreDataStack.shared.context)
-        newPlaylist.id = UUID()
-        newPlaylist.name = name
-        newPlaylist.emoji = emoji
-        stack.save()
+    private var downButton: some View {
+        Button {
+            moveDown()
+        } label: {
+            Image(systemName: "chevron.down")
+        }
+        .disabled(focusState == .emoji)
+    }
+    
+    private var upButton: some View {
+        Button {
+            moveUp()
+        } label: {
+            Image(systemName: "chevron.up")
+        }
+        .disabled(focusState == .name)
+    }
+    
+    private var nameSection: some View {
+        Section {
+            playlistNamePrompt
+        } header: {
+            Text("Playlist Name*".localized())
+        }
+    }
+    
+    private var emojiSection: some View {
+        Section {
+            emojiPrompt
+        } header: {
+            Text("Emoji ID*".localized())
+        }
     }
     
     private var doneButton: some View {
@@ -119,7 +112,7 @@ struct AddPlaylistSheet: View {
     private var saveButton: some View {
         Button("Save".localized()) {
             save()
-            close()
+            presentationMode.wrappedValue.dismiss()
         }
         .tint(.blue)
         .padding()
@@ -131,7 +124,9 @@ struct AddPlaylistSheet: View {
             showingAlert = true
         }
         .alert("Are you sure you want to delete playlist?".localized(), isPresented: $showingAlert) {
-            Button("Delete".localized(), role: .destructive) { close() }
+            Button("Delete".localized(), role: .destructive) {
+                presentationMode.wrappedValue.dismiss()
+            }
         }
         .padding()
     }
@@ -154,5 +149,33 @@ struct AddPlaylistSheet: View {
             .onReceive(Just(emoji), perform: { _ in
                 self.emoji = String(self.emoji.onlyEmoji().prefix(MaxCharLength.emojis))
             })
+    }
+    
+    // MARK: - Functions
+    
+    private func save() {
+        let newPlaylist = Playlist(context: CoreDataStack.shared.context)
+        newPlaylist.id = UUID()
+        newPlaylist.name = name
+        newPlaylist.emoji = emoji
+        CoreDataStack.shared.save()
+    }
+    
+    private func moveDown() {
+        switch focusState {
+        case .name:
+            focusState = .emoji
+        default:
+            focusState = nil
+        }
+    }
+    
+    private func moveUp() {
+        switch focusState {
+        case .emoji:
+            focusState = .name
+        default:
+            focusState = nil
+        }
     }
 }

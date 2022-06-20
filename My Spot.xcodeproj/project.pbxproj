@@ -61,16 +61,14 @@
 		C515040227D7CA72009F0DCD /* SpotRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = C51503FF27D7CA72009F0DCD /* SpotRow.swift */; };
 		C515040327D7CA72009F0DCD /* AddSpotSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = C515040027D7CA72009F0DCD /* AddSpotSheet.swift */; };
 		C515040427D7CA72009F0DCD /* DetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C515040127D7CA72009F0DCD /* DetailView.swift */; };
-		C515040727D7CA7B009F0DCD /* DiscoverRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = C515040527D7CA7B009F0DCD /* DiscoverRow.swift */; };
 		C515040827D7CA7B009F0DCD /* DiscoverDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C515040627D7CA7B009F0DCD /* DiscoverDetailView.swift */; };
 		C515040D27D7CA87009F0DCD /* DetailedPlaylistView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C515040927D7CA87009F0DCD /* DetailedPlaylistView.swift */; };
 		C515040E27D7CA87009F0DCD /* PlaylistRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = C515040A27D7CA87009F0DCD /* PlaylistRow.swift */; };
 		C515040F27D7CA87009F0DCD /* AddSpotToPlaylistSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = C515040B27D7CA87009F0DCD /* AddSpotToPlaylistSheet.swift */; };
 		C515041027D7CA87009F0DCD /* AddPlaylistSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = C515040C27D7CA87009F0DCD /* AddPlaylistSheet.swift */; };
-		C515041427D7CAA3009F0DCD /* ViewMapSpots.swift in Sources */ = {isa = PBXBuildFile; fileRef = C515041127D7CAA3009F0DCD /* ViewMapSpots.swift */; };
 		C515041A27D7CAAA009F0DCD /* MapSpotPreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = C515041727D7CAAA009F0DCD /* MapSpotPreview.swift */; };
 		C515041B27D7CAAA009F0DCD /* SpotMapAnnotation.swift in Sources */ = {isa = PBXBuildFile; fileRef = C515041827D7CAAA009F0DCD /* SpotMapAnnotation.swift */; };
-		C515041C27D7CAAA009F0DCD /* ViewDiscoverSpots.swift in Sources */ = {isa = PBXBuildFile; fileRef = C515041927D7CAAA009F0DCD /* ViewDiscoverSpots.swift */; };
+		C515041C27D7CAAA009F0DCD /* MapViewSpots.swift in Sources */ = {isa = PBXBuildFile; fileRef = C515041927D7CAAA009F0DCD /* MapViewSpots.swift */; };
 		C515042427D7CAC6009F0DCD /* TakePhoto.swift in Sources */ = {isa = PBXBuildFile; fileRef = C515042127D7CAC6009F0DCD /* TakePhoto.swift */; };
 		C515042527D7CAC6009F0DCD /* UIEmojiTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = C515042227D7CAC6009F0DCD /* UIEmojiTextField.swift */; };
 		C515042927D8540A009F0DCD /* TabController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C515042827D8540A009F0DCD /* TabController.swift */; };
@@ -265,16 +263,14 @@
 		C51503FF27D7CA72009F0DCD /* SpotRow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SpotRow.swift; sourceTree = "<group>"; };
 		C515040027D7CA72009F0DCD /* AddSpotSheet.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AddSpotSheet.swift; sourceTree = "<group>"; };
 		C515040127D7CA72009F0DCD /* DetailView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DetailView.swift; sourceTree = "<group>"; };
-		C515040527D7CA7B009F0DCD /* DiscoverRow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DiscoverRow.swift; sourceTree = "<group>"; };
 		C515040627D7CA7B009F0DCD /* DiscoverDetailView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DiscoverDetailView.swift; sourceTree = "<group>"; };
 		C515040927D7CA87009F0DCD /* DetailedPlaylistView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DetailedPlaylistView.swift; sourceTree = "<group>"; };
 		C515040A27D7CA87009F0DCD /* PlaylistRow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlaylistRow.swift; sourceTree = "<group>"; };
 		C515040B27D7CA87009F0DCD /* AddSpotToPlaylistSheet.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AddSpotToPlaylistSheet.swift; sourceTree = "<group>"; };
 		C515040C27D7CA87009F0DCD /* AddPlaylistSheet.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AddPlaylistSheet.swift; sourceTree = "<group>"; };
-		C515041127D7CAA3009F0DCD /* ViewMapSpots.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ViewMapSpots.swift; sourceTree = "<group>"; };
 		C515041727D7CAAA009F0DCD /* MapSpotPreview.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MapSpotPreview.swift; sourceTree = "<group>"; };
 		C515041827D7CAAA009F0DCD /* SpotMapAnnotation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SpotMapAnnotation.swift; sourceTree = "<group>"; };
-		C515041927D7CAAA009F0DCD /* ViewDiscoverSpots.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ViewDiscoverSpots.swift; sourceTree = "<group>"; };
+		C515041927D7CAAA009F0DCD /* MapViewSpots.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MapViewSpots.swift; sourceTree = "<group>"; };
 		C515042127D7CAC6009F0DCD /* TakePhoto.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TakePhoto.swift; sourceTree = "<group>"; };
 		C515042227D7CAC6009F0DCD /* UIEmojiTextField.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UIEmojiTextField.swift; sourceTree = "<group>"; };
 		C515042827D8540A009F0DCD /* TabController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabController.swift; sourceTree = "<group>"; };
@@ -576,8 +572,6 @@
 				C51503EB27D7C9E2009F0DCD /* Main View */,
 				C51503EA27D7C9DB009F0DCD /* Sub View */,
 				C51503E927D7C9CE009F0DCD /* Map */,
-				C594284B285E8C16003CF5AA /* DiscoverSearchBar.swift */,
-				C594284D285E8EB4003CF5AA /* SignInToiCloudErrorView.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -587,8 +581,7 @@
 			children = (
 				C51503F027D7CA1D009F0DCD /* ViewSingleSpotOnMap.swift */,
 				C594284F285EA62E003CF5AA /* AddSpotMap */,
-				C51503EF27D7CA10009F0DCD /* Discover */,
-				C51503EC27D7C9F6009F0DCD /* Spot */,
+				C51503EF27D7CA10009F0DCD /* SpotMap */,
 			);
 			path = Map;
 			sourceTree = "<group>";
@@ -615,22 +608,14 @@
 			path = "Main View";
 			sourceTree = "<group>";
 		};
-		C51503EC27D7C9F6009F0DCD /* Spot */ = {
-			isa = PBXGroup;
-			children = (
-				C515041127D7CAA3009F0DCD /* ViewMapSpots.swift */,
-			);
-			path = Spot;
-			sourceTree = "<group>";
-		};
-		C51503EF27D7CA10009F0DCD /* Discover */ = {
+		C51503EF27D7CA10009F0DCD /* SpotMap */ = {
 			isa = PBXGroup;
 			children = (
 				C515041727D7CAAA009F0DCD /* MapSpotPreview.swift */,
 				C515041827D7CAAA009F0DCD /* SpotMapAnnotation.swift */,
-				C515041927D7CAAA009F0DCD /* ViewDiscoverSpots.swift */,
+				C515041927D7CAAA009F0DCD /* MapViewSpots.swift */,
 			);
-			path = Discover;
+			path = SpotMap;
 			sourceTree = "<group>";
 		};
 		C51503F627D7CA31009F0DCD /* Spot */ = {
@@ -649,7 +634,6 @@
 			isa = PBXGroup;
 			children = (
 				C515040627D7CA7B009F0DCD /* DiscoverDetailView.swift */,
-				C515040527D7CA7B009F0DCD /* DiscoverRow.swift */,
 				C502D4FC27E1B63D0057A65C /* DiscoverSheetShared.swift */,
 				C5552CCE2828207500AF2683 /* DiscoverDetailNotification.swift */,
 				C5F10911284BFBCD00B71CBC /* DiscoverDetailAccountSpots.swift */,
@@ -672,18 +656,8 @@
 		C515041F27D7CABD009F0DCD /* Utility */ = {
 			isa = PBXGroup;
 			children = (
+				C5850D02285FB69C0067EE7F /* Logic */,
 				C5942832285E5D82003CF5AA /* View */,
-				C515042227D7CAC6009F0DCD /* UIEmojiTextField.swift */,
-				C5F10913284C49DD00B71CBC /* ShareViewController.swift */,
-				C5942833285E5DFA003CF5AA /* ImageCompression.swift */,
-				C5942835285E5E3C003CF5AA /* CheckUserDefaultsValue.swift */,
-				C5942837285E5E73003CF5AA /* GetTags.swift */,
-				C594283B285E5EBE003CF5AA /* ConditionalViewModifier.swift */,
-				C594283F285E5F79003CF5AA /* KeyboardDismissal.swift */,
-				C5942841285E5FAE003CF5AA /* ColorRGBA.swift */,
-				C5942843285E5FCB003CF5AA /* LocalizeStrings.swift */,
-				C5942847285E6008003CF5AA /* EmojiToImage.swift */,
-				C5C2C4E0285EE16900E585C9 /* DateToString.swift */,
 			);
 			path = Utility;
 			sourceTree = "<group>";
@@ -698,6 +672,24 @@
 				C5266AD6283EBF0100A923A1 /* Info.plist */,
 			);
 			path = mySpotiMsg;
+			sourceTree = "<group>";
+		};
+		C5850D02285FB69C0067EE7F /* Logic */ = {
+			isa = PBXGroup;
+			children = (
+				C515042227D7CAC6009F0DCD /* UIEmojiTextField.swift */,
+				C5F10913284C49DD00B71CBC /* ShareViewController.swift */,
+				C5942833285E5DFA003CF5AA /* ImageCompression.swift */,
+				C5942835285E5E3C003CF5AA /* CheckUserDefaultsValue.swift */,
+				C5942837285E5E73003CF5AA /* GetTags.swift */,
+				C594283B285E5EBE003CF5AA /* ConditionalViewModifier.swift */,
+				C594283F285E5F79003CF5AA /* KeyboardDismissal.swift */,
+				C5942841285E5FAE003CF5AA /* ColorRGBA.swift */,
+				C5942843285E5FCB003CF5AA /* LocalizeStrings.swift */,
+				C5942847285E6008003CF5AA /* EmojiToImage.swift */,
+				C5C2C4E0285EE16900E585C9 /* DateToString.swift */,
+			);
+			path = Logic;
 			sourceTree = "<group>";
 		};
 		C594282F285E408C003CF5AA /* Shared */ = {
@@ -724,6 +716,9 @@
 		C5942832285E5D82003CF5AA /* View */ = {
 			isa = PBXGroup;
 			children = (
+				C5C2C4E9285EF51400E585C9 /* PullToRefresh.swift */,
+				C594284D285E8EB4003CF5AA /* SignInToiCloudErrorView.swift */,
+				C594284B285E8C16003CF5AA /* DiscoverSearchBar.swift */,
 				C501FC1B27E4419A008FEFA1 /* BottomPopupView.swift */,
 				C501FC1727E3FAB7008FEFA1 /* ZoomableScrollView.swift */,
 				C501FC1927E41FF1008FEFA1 /* ImagePopUp.swift */,
@@ -763,7 +758,6 @@
 			children = (
 				C5B01353284AD15B00121163 /* CreateAccountView.swift */,
 				C5F1090F284BEE7E00B71CBC /* AccountDetailView.swift */,
-				C5C2C4E9285EF51400E585C9 /* PullToRefresh.swift */,
 			);
 			path = Account;
 			sourceTree = "<group>";
@@ -1030,7 +1024,7 @@
 				C5552CCB2827616600AF2683 /* AppDelegate.swift in Sources */,
 				C51503E227D7C856009F0DCD /* Spot+CoreDataProperties.swift in Sources */,
 				C51503B027D7C347009F0DCD /* ContentView.swift in Sources */,
-				C515041C27D7CAAA009F0DCD /* ViewDiscoverSpots.swift in Sources */,
+				C515041C27D7CAAA009F0DCD /* MapViewSpots.swift in Sources */,
 				C51503F427D7CA1D009F0DCD /* MapViewModel.swift in Sources */,
 				C51503FC27D7CA60009F0DCD /* MySpotsView.swift in Sources */,
 				C594285B285EA90D003CF5AA /* MapSearchBar.swift in Sources */,
@@ -1063,7 +1057,6 @@
 				C594283E285E5EF8003CF5AA /* SetNavigationSwipeToPop.swift in Sources */,
 				C5F10912284BFBCD00B71CBC /* DiscoverDetailAccountSpots.swift in Sources */,
 				C5C2C4DB285EDDA500E585C9 /* MaxCharacterLength.swift in Sources */,
-				C515040727D7CA7B009F0DCD /* DiscoverRow.swift in Sources */,
 				C5C2C4DF285EDDD400E585C9 /* DefaultImage.swift in Sources */,
 				C515042527D7CAC6009F0DCD /* UIEmojiTextField.swift in Sources */,
 				C515040E27D7CA87009F0DCD /* PlaylistRow.swift in Sources */,
@@ -1071,7 +1064,6 @@
 				C51503E727D7C87D009F0DCD /* CloudKitViewModel.swift in Sources */,
 				C50CF4B027F3CD4C001A9698 /* SetUpNewSpotNotification.swift in Sources */,
 				C515040427D7CA72009F0DCD /* DetailView.swift in Sources */,
-				C515041427D7CAA3009F0DCD /* ViewMapSpots.swift in Sources */,
 				C5B01354284AD15B00121163 /* CreateAccountView.swift in Sources */,
 				C51503E327D7C856009F0DCD /* CoreDataManager.swift in Sources */,
 				C5942851285EA641003CF5AA /* SearchSheet.swift in Sources */,

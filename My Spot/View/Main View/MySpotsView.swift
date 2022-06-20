@@ -53,7 +53,7 @@ struct MySpotsView: View {
             setFilteringType()
         }
         .fullScreenCover(isPresented: $presentMapSheet) {
-            ViewMapSpots(spots: filteredSpots, fromPlaylist: false)
+            MapViewSpots(spots: $filteredSpots, sortBy: $sortBy, searchText: nil)
         }
     }
     

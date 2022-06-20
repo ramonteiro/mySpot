@@ -206,7 +206,7 @@ struct NotificationView: View {
                         index = i
                         presentDetailView = true
                     } label: {
-                        DiscoverRow(spot: cloudViewModel.notificationSpots[i])
+                        SpotRow(spot: cloudViewModel.notificationSpots[i], isShared: false)
                     }
                 }
                 .onDelete(perform: removeRows)

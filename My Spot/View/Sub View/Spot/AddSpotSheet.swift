@@ -20,37 +20,37 @@ struct AddSpotSheet: View {
     @Environment(\.presentationMode) var presentationMode
     @EnvironmentObject var mapViewModel: MapViewModel
     @EnvironmentObject var cloudViewModel: CloudKitViewModel
-    
-    @State private var showingAlert = false
-    @State private var showingAddImageAlert = false
+    @State private var presentDeleteAlert = false
+    @State private var presentAddImageAlert = false
+    @State private var presentCannotSavePrivateAlert = false
+    @State private var presentMapView = false
     @State private var usingCustomLocation = false
     @State private var isFromImagesUnedited = false
     @State private var indexFromUnedited = 0
-    @State private var initChecked = false
-    @Binding var isSaving: Bool
-    
     @State private var name = ""
     @State private var descript = ""
     @State private var tags = ""
     @State private var locationName = ""
     @State private var isPublic = true
-    @State private var presentMapView = false
     @State private var presentCalendar = false
     @State private var dateFound = Date()
     @State private var didSave = false
-    
-    @State private var long = 1.0
+    @State private var initChecked = false
     @State private var centerRegion = MKCoordinateRegion()
-    @State private var lat = 1.0
     @State private var imageTemp: UIImage?
-    @State private var images: [UIImage?]?
-    @State private var imagesUnedited: [UIImage?]?
+    @State private var images: [UIImage?] = []
+    @State private var imagesUnedited: [UIImage?] = []
+    @State private var activeSheet: ActiveSheet?
+    @State private var imageCount: ImageCount?
+    @FocusState private var focusState: Field?
+    @Binding var isSaving: Bool
     @Binding var showingCannotSavePublicAlert: Bool
-    @State private var showingCannotSavePrivateAlert: Bool = false
     
     
     private var disableSave: Bool {
-        name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || images?.isEmpty ?? true || (isPublic && !cloudViewModel.isSignedInToiCloud)
+        name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ||
+        images.isEmpty ||
+        (isPublic && !cloudViewModel.isSignedInToiCloud)
     }
     
     private enum Field {
@@ -73,318 +73,362 @@ struct AddSpotSheet: View {
         }
     }
     
-    @State private var activeSheet: ActiveSheet?
-    @State private var imageCount: ImageCount?
-    @FocusState private var focusState: Field?
-    
+    @ViewBuilder
     var body: some View {
-        ZStack {
-            if (mapViewModel.isAuthorized || usingCustomLocation) {
-                NavigationView {
-                    Form {
-                        Section {
-                            displayNamePrompt
-                            displayIsPublicPrompt
-                        } header: {
-                            Text("Spot Name*".localized())
-                        } footer: {
-                            Text("Public spots are shown in discover tab to other users.".localized())
-                                .font(.footnote)
-                                .foregroundColor(.gray)
-                        }
-                        Section {
-                            displayDescriptionPrompt
-                        } header: {
-                            Text("Spot Description".localized())
-                        } footer: {
-                            Text("Use # to add tags. Example: #hiking #skating".localized())
-                                .font(.footnote)
-                                .foregroundColor(.gray)
-                        }
-                        
-                        Section {
-                            if (images?.count ?? 0 > 0) {
-                                List {
-                                    ForEach(images!.indices, id: \.self) { i in
-                                        if let image = images?[i] {
-                                            HStack {
-                                                Spacer()
-                                                Image(uiImage: image)
-                                                    .resizable()
-                                                    .scaledToFit()
-                                                    .frame(width: UIScreen.screenWidth / 2, alignment: .center)
-                                                    .cornerRadius(10)
-                                                    .onTapGesture {
-                                                        guard let imageTmp = imagesUnedited?[i] else { return }
-                                                        imageTemp = imageTmp
-                                                        if let _ = imageTemp {
-                                                            indexFromUnedited = i
-                                                            isFromImagesUnedited = true
-                                                            activeSheet = .cropperSheet
-                                                        }
-                                                    }
-                                                Spacer()
-                                            }
-                                        }
-                                    }
-                                    .onMove { indexSet, offset in
-                                        images!.move(fromOffsets: indexSet, toOffset: offset)
-                                        imagesUnedited!.move(fromOffsets: indexSet, toOffset: offset)
-                                    }
-                                    .onDelete { indexSet in
-                                        images!.remove(atOffsets: indexSet)
-                                        imagesUnedited!.remove(atOffsets: indexSet)
-                                    }
-                                }
-                            }
-                        } header: {
-                            Text("Photo of Spot".localized())
-                        } footer: {
-                            VStack(spacing: 0) {
-                                HStack {
-                                    Text("Only 1 image is required (up to 3).".localized())
-                                        .font(.footnote)
-                                        .foregroundColor(.gray)
-                                    Spacer()
-                                }
-                                HStack {
-                                    Text("Add Some With The".localized())
-                                        .font(.footnote)
-                                        .foregroundColor(.gray)
-                                    Image(systemName: "plus")
-                                        .font(.footnote)
-                                        .foregroundColor(.gray)
-                                    Spacer()
-                                }
-                            }
-                        }
-                    }
-                    .onSubmit {
-                        switch focusState {
-                        case .name:
-                            focusState = .descript
-                        default:
-                            focusState = nil
-                        }
-                    }
-                    .alert("Unable To Save Spot".localized(), isPresented: $showingCannotSavePrivateAlert) {
-                        Button("OK".localized(), role: .cancel) { }
-                    } message: {
-                        Text("Failed to save spot. Please try again.".localized())
-                    }
-                    .confirmationDialog("Choose Image From Photos or Camera".localized(), isPresented: $showingAddImageAlert) {
-                        Button("Camera".localized()) {
-                            activeSheet = .cameraSheet
-                        }
-                        Button("Photos".localized()) {
-                            activeSheet = .cameraRollSheet
-                        }
-                        Button("Cancel".localized(), role: .cancel) { }
-                    }
-                    .sheet(isPresented: $presentCalendar) {
-                        DatePickerSheet(dateFound: $dateFound)
-                    }
-                    .fullScreenCover(isPresented: $presentMapView) {
-                        if didSave && usingCustomLocation {
-                            mapViewModel.getPlacmarkOfLocation(location: CLLocation(latitude: centerRegion.center.latitude, longitude: centerRegion.center.longitude), isPrecise: true) { name in
-                                locationName = name
-                            }
-                        }
-                        didSave = false
-                    } content: {
-                        AddSpotMap(customLocation: $usingCustomLocation, didSave: $didSave, centerRegion: $centerRegion)
-                            .ignoresSafeArea()
-                    }
-                    .fullScreenCover(item: $activeSheet) { item in
-                        switch item {
-                        case .cameraSheet:
-                            TakePhoto(selectedImage: $imageTemp)
-                                .onDisappear {
-                                    if (imageTemp != nil) {
-                                        imagesUnedited?.append(imageTemp)
-                                        isFromImagesUnedited = false
-                                        activeSheet = .cropperSheet
-                                    } else {
-                                        activeSheet = nil
-                                    }
-                                }
-                                .ignoresSafeArea()
-                        case .cameraRollSheet:
-                            ChoosePhoto() { image in
-                                imageTemp = image
-                                imagesUnedited?.append(imageTemp)
-                                isFromImagesUnedited = false
-                                activeSheet = .cropperSheet
-                            }
-                            .ignoresSafeArea()
-                        case .cropperSheet:
-                            MantisPhotoCropper(selectedImage: $imageTemp)
-                                .onDisappear {
-                                    if let _ = imageTemp {
-                                        if isFromImagesUnedited {
-                                            images?[indexFromUnedited] = imageTemp
-                                        } else {
-                                            images?.append(imageTemp)
-                                        }
-                                    } else {
-                                        imagesUnedited?.removeLast()
-                                    }
-                                    imageTemp = nil
-                                    isFromImagesUnedited = false
-                                }
-                                .ignoresSafeArea()
-                        }
-                    }
-                    .navigationBarTitle("")
-                    .navigationBarTitleDisplayMode(.inline)
-                    .navigationViewStyle(.stack)
-                    .toolbar {
-                        ToolbarItemGroup(placement: .principal) {
-                            VStack {
-                                HStack {
-                                    Image(systemName: (usingCustomLocation ? "mappin" : "figure.wave"))
-                                    Text(locationName.isEmpty ? "My Spot" : locationName)
-                                    
-                                }
-                                .font(.subheadline)
-                                Text(dateFound.toString())
-                                    .font(.caption)
-                                    .foregroundColor(.gray)
-                            }
-                            .frame(width: UIScreen.screenWidth * 0.7)
-                        }
-                        ToolbarItemGroup(placement: .bottomBar) {
-                            HStack {
-                                Spacer()
-                                Button {
-                                    showingAddImageAlert = true
-                                    focusState = nil
-                                } label: {
-                                    Image(systemName: "plus")
-                                }
-                                .disabled(images?.count ?? 3 > 2)
-                                Spacer()
-                                EditButton()
-                                    .disabled(images?.isEmpty ?? true)
-                                Spacer()
-                                Button {
-                                    presentMapView.toggle()
-                                } label: {
-                                    Image(systemName: "map")
-                                }
-                                Spacer()
-                                Button {
-                                    presentCalendar.toggle()
-                                } label: {
-                                    Image(systemName: "calendar")
-                                }
-                                Spacer()
-                            }
-                        }
-                        ToolbarItemGroup(placement: .keyboard) {
-                            HStack {
-                                Button {
-                                    switch focusState {
-                                    case .descript:
-                                        focusState = .name
-                                    default:
-                                        focusState = nil
-                                    }
-                                } label: {
-                                    Image(systemName: "chevron.up")
-                                }
-                                .disabled(focusState == .name)
-                                Button {
-                                    switch focusState {
-                                    case .name:
-                                        focusState = .descript
-                                    default:
-                                        focusState = nil
-                                    }
-                                } label: {
-                                    Image(systemName: "chevron.down")
-                                }
-                                .disabled(focusState == .descript)
-                                Spacer()
-                                Button("Done".localized()) {
-                                    focusState = nil
-                                }
-                            }
-                        }
-                        ToolbarItemGroup(placement: .navigationBarTrailing) {
-                            Button("Save".localized()) {
-                                tags = descript.findTags()
-                                if (isPublic) {
-                                    Task {
-                                        isSaving = true
-                                        await savePublic()
-                                        isSaving = false
-                                    }
-                                    close()
-                                } else {
-                                    Task {
-                                        isSaving = true
-                                        await save()
-                                        isSaving = false
-                                    }
-                                }
-                            }
-                            .tint(.blue)
-                            .padding()
-                            .disabled(disableSave || isSaving)
-                        }
-                        ToolbarItemGroup(placement: .navigationBarLeading) {
-                            Button("Delete".localized()) {
-                                showingAlert = true
-                            }
-                            .alert("Are you sure you want to delete spot?".localized(), isPresented: $showingAlert) {
-                                Button("Delete".localized(), role: .destructive) { close() }
-                            }
-                            .padding()
-                        }
-                    }
-                }
-                .onAppear {
-                    mapViewModel.checkLocationAuthorization()
-                    lat = getLatitude()
-                    long = getLongitude()
-                    mapViewModel.getPlacmarkOfLocation(location: CLLocation(latitude: mapViewModel.region.center.latitude, longitude: mapViewModel.region.center.longitude), isPrecise: true, completionHandler: { location in
-                        locationName = location
-                    })
-                }
-                .interactiveDismissDisabled()
-            } else {
-                VStack {
-                    Text("Location services are not enabled for My Spot.".localized())
-                    Text("Please enable location in settings.".localized())
-                    Button("Settings".localized()) {
-                        guard let url = URL(string: UIApplication.openSettingsURLString) else { return }
-                        UIApplication.shared.open(url)
-                    }
-                    .padding(.bottom)
-                    Text("Or create a spot with a custom location".localized())
-                    Button("Set Custom Location".localized()) {
-                        usingCustomLocation = true
-                    }
+        if (mapViewModel.isAuthorized || usingCustomLocation) {
+            addSpotView
+        } else {
+            noLocationWarning
+        }
+    }
+    
+    // MARK: - Sub Views
+    
+    private var noLocationWarning: some View {
+        VStack {
+            Text("Location services are not enabled for My Spot.".localized())
+            Text("Please enable location in settings.".localized())
+            Button("Settings".localized()) {
+                guard let url = URL(string: UIApplication.openSettingsURLString) else { return }
+                UIApplication.shared.open(url)
+            }
+            .padding(.bottom)
+            Text("Or create a spot with a custom location".localized())
+            Button("Set Custom Location".localized()) {
+                withAnimation {
+                    usingCustomLocation = true
                 }
             }
         }
+    }
+    
+    private var descriptionSection: some View {
+        Section {
+            displayDescriptionPrompt
+        } header: {
+            Text("Spot Description".localized())
+        } footer: {
+            Text("Use # to add tags. Example: #hiking #skating".localized())
+                .font(.footnote)
+                .foregroundColor(.gray)
+        }
+    }
+    
+    private var nameAndPublicSection: some View {
+        Section {
+            displayNamePrompt
+            displayIsPublicPrompt
+        } header: {
+            Text("Spot Name*".localized())
+        } footer: {
+            Text("Public spots are shown in discover tab to other users.".localized())
+                .font(.footnote)
+                .foregroundColor(.gray)
+        }
+    }
+    
+    @ViewBuilder
+    private func imageRowView(index i: Int) -> some View {
+        if let image = images[i] {
+            HStack {
+                Spacer()
+                Image(uiImage: image)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: UIScreen.screenWidth / 2, alignment: .center)
+                    .cornerRadius(10)
+                    .onTapGesture {
+                        guard let imageTmp = imagesUnedited[i] else { return }
+                        imageTemp = imageTmp
+                        if let _ = imageTemp {
+                            indexFromUnedited = i
+                            isFromImagesUnedited = true
+                            activeSheet = .cropperSheet
+                        }
+                    }
+                Spacer()
+            }
+        }
+    }
+    
+    private var imageList: some View {
+        List {
+            ForEach(images.indices, id: \.self) { i in
+                imageRowView(index: i)
+            }
+            .onMove { indexSet, offset in
+                images.move(fromOffsets: indexSet, toOffset: offset)
+                imagesUnedited.move(fromOffsets: indexSet, toOffset: offset)
+            }
+            .onDelete { indexSet in
+                images.remove(atOffsets: indexSet)
+                imagesUnedited.remove(atOffsets: indexSet)
+            }
+        }
+    }
+    
+    private var imageSection: some View {
+        Section {
+            if (images.count > 0) {
+                imageList
+            }
+        } header: {
+            Text("Photo of Spot".localized())
+        } footer: {
+            imageSectionFooter
+        }
+    }
+    
+    private var imageSectionFooter: some View {
+        VStack(spacing: 0) {
+            HStack {
+                Text("Only 1 image is required (up to 3).".localized())
+                    .font(.footnote)
+                    .foregroundColor(.gray)
+                Spacer()
+            }
+            HStack {
+                Text("Add Some With The".localized())
+                    .font(.footnote)
+                    .foregroundColor(.gray)
+                Image(systemName: "plus")
+                    .font(.footnote)
+                    .foregroundColor(.gray)
+                Spacer()
+            }
+        }
+    }
+    
+    private var customNavigationBarTitle: some View {
+        VStack {
+            HStack {
+                Image(systemName: (usingCustomLocation ? "mappin" : "figure.wave"))
+                Text(locationName.isEmpty ? "My Spot" : locationName)
+                
+            }
+            .font(.subheadline)
+            Text(dateFound.toString())
+                .font(.caption)
+                .foregroundColor(.gray)
+        }
+        .frame(width: UIScreen.screenWidth * 0.7)
+    }
+    
+    private var bottomButtonOverlay: some View {
+        HStack {
+            Spacer()
+            addImageButton
+            Spacer()
+            EditButton()
+                .disabled(images.isEmpty)
+            Spacer()
+            mapButton
+            Spacer()
+            calendarButton
+            Spacer()
+        }
+    }
+    
+    private var addImageButton: some View {
+        Button {
+            presentAddImageAlert = true
+            focusState = nil
+        } label: {
+            Image(systemName: "plus")
+        }
+        .disabled(images.count > 2)
+    }
+    
+    private var mapButton: some View {
+        Button {
+            presentMapView.toggle()
+        } label: {
+            Image(systemName: "map")
+        }
+    }
+    
+    private var calendarButton: some View {
+        Button {
+            presentCalendar.toggle()
+        } label: {
+            Image(systemName: "calendar")
+        }
+    }
+    
+    private var upButton: some View {
+        Button {
+            moveUp()
+        } label: {
+            Image(systemName: "chevron.up")
+        }
+        .disabled(focusState == .name)
+    }
+    
+    private var downButton: some View {
+        Button {
+            moveDown()
+        } label: {
+            Image(systemName: "chevron.down")
+        }
+        .disabled(focusState == .descript)
+    }
+    
+    private var keyboardButtons: some View {
+        HStack {
+            upButton
+            downButton
+            Spacer()
+            Button("Done".localized()) {
+                focusState = nil
+            }
+        }
+    }
+    
+    private var addSpotForm: some View {
+        Form {
+            nameAndPublicSection
+            descriptionSection
+            imageSection
+        }
+        .onSubmit {
+            moveDown()
+        }
+        .navigationBarTitle("")
+        .navigationBarTitleDisplayMode(.inline)
+        .navigationViewStyle(.stack)
+        .toolbar {
+            ToolbarItemGroup(placement: .principal) {
+                customNavigationBarTitle
+            }
+            ToolbarItemGroup(placement: .bottomBar) {
+                bottomButtonOverlay
+            }
+            ToolbarItemGroup(placement: .keyboard) {
+                keyboardButtons
+            }
+            ToolbarItemGroup(placement: .navigationBarTrailing) {
+                saveButton
+            }
+            ToolbarItemGroup(placement: .navigationBarLeading) {
+                deleteButton
+            }
+        }
+    }
+    
+    private var deleteButton: some View {
+        Button("Delete".localized()) {
+            presentDeleteAlert = true
+        }
+        .padding()
+    }
+    
+    private var saveButton: some View {
+        Button("Save".localized()) {
+            saveButtonTapped()
+        }
+        .tint(.blue)
+        .padding()
+        .disabled(disableSave || isSaving)
+
+    }
+    
+    private var addSpotView: some View {
+        NavigationView {
+            addSpotForm
+        }
         .onAppear {
-            if !cloudViewModel.isSignedInToiCloud {
-                isPublic = false
-            }
-            if (UserDefaults.standard.valueExists(forKey: "isBanned") && UserDefaults.standard.bool(forKey: "isBanned")) {
-                isPublic = false
-            }
-            lat = getLatitude()
-            long = getLongitude()
             if !initChecked {
-                images = []
-                imagesUnedited = []
+                updateLocationName()
+                setIsPublic()
                 initChecked = true
             }
         }
-        .disabled(isSaving)
+        .alert("Unable To Save Spot".localized(), isPresented: $presentCannotSavePrivateAlert) {
+            Button("OK".localized(), role: .cancel) { }
+        } message: {
+            Text("Failed to save spot. Please try again.".localized())
+        }
+        .alert("Are you sure you want to delete spot?".localized(), isPresented: $presentDeleteAlert) {
+            Button("Delete".localized(), role: .destructive) {
+                presentationMode.wrappedValue.dismiss()
+            }
+        }
+        .confirmationDialog("Choose Image From Photos or Camera".localized(), isPresented: $presentAddImageAlert) {
+            Button("Camera".localized()) {
+                activeSheet = .cameraSheet
+            }
+            Button("Photos".localized()) {
+                activeSheet = .cameraRollSheet
+            }
+            Button("Cancel".localized(), role: .cancel) { }
+        }
+        .sheet(isPresented: $presentCalendar) {
+            DatePickerSheet(dateFound: $dateFound)
+        }
+        .fullScreenCover(isPresented: $presentMapView) {
+            dismissMap()
+        } content: {
+            AddSpotMap(customLocation: $usingCustomLocation, didSave: $didSave, centerRegion: $centerRegion)
+                .ignoresSafeArea()
+        }
+        .fullScreenCover(item: $activeSheet) { item in
+            switchPhotoSheet(sheet: item)
+        }
+        .interactiveDismissDisabled()
+    }
+    
+    private var takePhotoView: some View {
+        TakePhoto(selectedImage: $imageTemp)
+            .onDisappear {
+                if (imageTemp != nil) {
+                    imagesUnedited.append(imageTemp)
+                    isFromImagesUnedited = false
+                    activeSheet = .cropperSheet
+                } else {
+                    activeSheet = nil
+                }
+            }
+            .ignoresSafeArea()
+    }
+    
+    private var choosePhotoView: some View {
+        ChoosePhoto() { image in
+            imageTemp = image
+            imagesUnedited.append(imageTemp)
+            isFromImagesUnedited = false
+            activeSheet = .cropperSheet
+        }
+        .ignoresSafeArea()
+    }
+    
+    private var photoCropperView: some View {
+        MantisPhotoCropper(selectedImage: $imageTemp)
+            .onDisappear {
+                if let _ = imageTemp {
+                    if isFromImagesUnedited {
+                        images[indexFromUnedited] = imageTemp
+                    } else {
+                        images.append(imageTemp)
+                    }
+                } else {
+                    imagesUnedited.removeLast()
+                }
+                imageTemp = nil
+                isFromImagesUnedited = false
+            }
+            .ignoresSafeArea()
+    }
+    
+    @ViewBuilder
+    private func switchPhotoSheet(sheet: ActiveSheet) -> some View {
+        switch sheet {
+        case .cameraSheet:
+            takePhotoView
+        case .cameraRollSheet:
+            choosePhotoView
+        case .cropperSheet:
+            photoCropperView
+        }
     }
     
     private var displayDescriptionPrompt: some View {
@@ -423,11 +467,9 @@ struct AddSpotSheet: View {
             }
     }
     
-    private func close() {
-        presentationMode.wrappedValue.dismiss()
-    }
+    // MARK: - Functions
     
-    private func getDate()->String{
+    private func getDate() -> String{
         let timeFormatter = DateFormatter()
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "MMM d, yyyy"
@@ -439,36 +481,36 @@ struct AddSpotSheet: View {
     
     private func save() async {
         let newSpot = Spot(context: CoreDataStack.shared.context)
-        if let imageData = cloudViewModel.compressImage(image: images?[0] ?? defaultImages.errorImage!).pngData() {
+        if let imageData = cloudViewModel.compressImage(image: images[0] ?? defaultImages.errorImage!).pngData() {
             newSpot.image = UIImage(data: imageData)
         } else {
-            showingCannotSavePrivateAlert = true
+            presentCannotSavePrivateAlert = true
             let generator = UINotificationFeedbackGenerator()
             generator.notificationOccurred(.warning)
             return
         }
-        if (images?.count == 3) {
-            if let imageData = cloudViewModel.compressImage(image: images?[1] ?? defaultImages.errorImage!).pngData() {
+        if (images.count == 3) {
+            if let imageData = cloudViewModel.compressImage(image: images[1] ?? defaultImages.errorImage!).pngData() {
                 newSpot.image2 = UIImage(data: imageData)
             } else {
-                showingCannotSavePrivateAlert = true
+                presentCannotSavePrivateAlert = true
                 let generator = UINotificationFeedbackGenerator()
                 generator.notificationOccurred(.warning)
                 return
             }
-            if let imageData = cloudViewModel.compressImage(image: images?[2] ?? defaultImages.errorImage!).pngData() {
+            if let imageData = cloudViewModel.compressImage(image: images[2] ?? defaultImages.errorImage!).pngData() {
                 newSpot.image3 = UIImage(data: imageData)
             } else {
-                showingCannotSavePrivateAlert = true
+                presentCannotSavePrivateAlert = true
                 let generator = UINotificationFeedbackGenerator()
                 generator.notificationOccurred(.warning)
                 return
             }
-        } else if (images?.count == 2) {
-            if let imageData = cloudViewModel.compressImage(image: images?[1] ?? defaultImages.errorImage!).pngData() {
+        } else if (images.count == 2) {
+            if let imageData = cloudViewModel.compressImage(image: images[1] ?? defaultImages.errorImage!).pngData() {
                 newSpot.image2 = UIImage(data: imageData)
             } else {
-                showingCannotSavePrivateAlert = true
+                presentCannotSavePrivateAlert = true
                 let generator = UINotificationFeedbackGenerator()
                 generator.notificationOccurred(.warning)
                 return
@@ -479,8 +521,8 @@ struct AddSpotSheet: View {
             newSpot.y = centerRegion.center.longitude
             newSpot.wasThere = false
         } else {
-            newSpot.x = lat
-            newSpot.y = long
+            newSpot.x = mapViewModel.region.center.latitude
+            newSpot.y = mapViewModel.region.center.longitude
             newSpot.wasThere = true
         }
         
@@ -504,12 +546,12 @@ struct AddSpotSheet: View {
             try CoreDataStack.shared.context.save()
             askForReview()
         } catch {
-            showingCannotSavePrivateAlert = true
+            presentCannotSavePrivateAlert = true
             let generator = UINotificationFeedbackGenerator()
             generator.notificationOccurred(.warning)
             return
         }
-        close()
+        presentationMode.wrappedValue.dismiss()
     }
     
     private func askForReview() {
@@ -535,21 +577,21 @@ struct AddSpotSheet: View {
     
     private func savePublic() async {
         let newSpot = Spot(context: CoreDataStack.shared.context)
-        if let imageData = cloudViewModel.compressImage(image: images?[0] ?? defaultImages.errorImage!).pngData() {
+        if let imageData = cloudViewModel.compressImage(image: images[0] ?? defaultImages.errorImage!).pngData() {
             newSpot.image = UIImage(data: imageData)
             var imageData2: Data? = nil
             var imageData3: Data? = nil
-            if (images?.count == 3) {
-                if let imageData2Check = cloudViewModel.compressImage(image: images?[1] ?? defaultImages.errorImage!).pngData() {
+            if (images.count == 3) {
+                if let imageData2Check = cloudViewModel.compressImage(image: images[1] ?? defaultImages.errorImage!).pngData() {
                     newSpot.image2 = UIImage(data: imageData2Check)
                     imageData2 = imageData2Check
                 }
-                if let imageData3Check = cloudViewModel.compressImage(image: images?[2] ?? defaultImages.errorImage!).pngData() {
+                if let imageData3Check = cloudViewModel.compressImage(image: images[2] ?? defaultImages.errorImage!).pngData() {
                     newSpot.image3 = UIImage(data: imageData3Check)
                     imageData3 = imageData3Check
                 }
-            } else if (images?.count == 2) {
-                if let imageData2Check = cloudViewModel.compressImage(image: images?[1] ?? defaultImages.errorImage!).pngData() {
+            } else if (images.count == 2) {
+                if let imageData2Check = cloudViewModel.compressImage(image: images[1] ?? defaultImages.errorImage!).pngData() {
                     newSpot.image2 = UIImage(data: imageData2Check)
                     imageData2 = imageData2Check
                 }
@@ -559,7 +601,20 @@ struct AddSpotSheet: View {
                 if let founderName = UserDefaults.standard.string(forKey: "founder") {
                     founder = founderName
                 }
-                let id = try await cloudViewModel.addSpotToPublic(name: name, founder: founder, date: getDate(), locationName: locationName, x: (usingCustomLocation ? centerRegion.center.latitude : lat), y: (usingCustomLocation ? centerRegion.center.longitude : long), description: descript, type: tags, image: imageData, image2: imageData2, image3: imageData3, isMultipleImages: (images?.count ?? 1) - 1, customLocation: usingCustomLocation, dateObject: dateFound)
+                let id = try await cloudViewModel.addSpotToPublic(name: name,
+                                                                  founder: founder,
+                                                                  date: getDate(),
+                                                                  locationName: locationName,
+                                                                  x: (usingCustomLocation ? centerRegion.center.latitude : mapViewModel.region.center.latitude),
+                                                                  y: (usingCustomLocation ? centerRegion.center.longitude : mapViewModel.region.center.longitude),
+                                                                  description: descript,
+                                                                  type: tags,
+                                                                  image: imageData,
+                                                                  image2: imageData2,
+                                                                  image3: imageData3,
+                                                                  isMultipleImages: images.count - 1,
+                                                                  customLocation: usingCustomLocation,
+                                                                  dateObject: dateFound)
                 if !id.isEmpty {
                     newSpot.dbid = id
                     newSpot.isPublic = true
@@ -585,8 +640,8 @@ struct AddSpotSheet: View {
                 newSpot.y = centerRegion.center.longitude
                 newSpot.wasThere = false
             } else {
-                newSpot.x = lat
-                newSpot.y = long
+                newSpot.x = mapViewModel.region.center.latitude
+                newSpot.y = mapViewModel.region.center.longitude
                 newSpot.wasThere = true
             }
             newSpot.date = getDate()
@@ -598,7 +653,7 @@ struct AddSpotSheet: View {
             do {
                 try CoreDataStack.shared.context.save()
             } catch {
-                showingCannotSavePrivateAlert = true
+                presentCannotSavePrivateAlert = true
                 let generator = UINotificationFeedbackGenerator()
                 generator.notificationOccurred(.warning)
                 return
@@ -609,26 +664,75 @@ struct AddSpotSheet: View {
                 showingCannotSavePublicAlert = true
             }
         } else {
-            showingCannotSavePrivateAlert = true
+            presentCannotSavePrivateAlert = true
             let generator = UINotificationFeedbackGenerator()
             generator.notificationOccurred(.warning)
             return
         }
     }
     
-    private func getLongitude() -> Double {
-        if let longitude = mapViewModel.locationManager?.location?.coordinate.longitude {
-            return longitude
-        } else {
-            return 1.0
+    private func setIsPublic() {
+        if !cloudViewModel.isSignedInToiCloud {
+            isPublic = false
+        }
+        if (UserDefaults.standard.valueExists(forKey: "isBanned") && UserDefaults.standard.bool(forKey: "isBanned")) {
+            isPublic = false
         }
     }
     
-    private func getLatitude() -> Double {
-        if let latitude = mapViewModel.locationManager?.location?.coordinate.latitude {
-            return latitude
+    private func updateLocationName() {
+        mapViewModel.checkLocationAuthorization()
+        mapViewModel.getPlacmarkOfLocation(location: CLLocation(latitude: mapViewModel.region.center.latitude,
+                                                                longitude: mapViewModel.region.center.longitude),
+                                           isPrecise: true) { location in
+            locationName = location
+        }
+    }
+    
+    private func dismissMap() {
+        if didSave && usingCustomLocation {
+            mapViewModel.getPlacmarkOfLocation(location: CLLocation(latitude: centerRegion.center.latitude,
+                                                                    longitude: centerRegion.center.longitude),
+                                               isPrecise: true) { name in
+                locationName = name
+            }
+        }
+        didSave = false
+    }
+    
+    private func moveDown() {
+        switch focusState {
+        case .name:
+            focusState = .descript
+        default:
+            focusState = nil
+        }
+    }
+    
+    private func moveUp() {
+        switch focusState {
+        case .descript:
+            focusState = .name
+        default:
+            focusState = nil
+        }
+    }
+    
+    private func saveButtonTapped() {
+        tags = descript.findTags()
+        if (isPublic) {
+            Task {
+                isSaving = true
+                await savePublic()
+                isSaving = false
+            }
+            presentationMode.wrappedValue.dismiss()
         } else {
-            return 1.0
+            Task {
+                isSaving = true
+                await save()
+                isSaving = false
+            }
         }
     }
 }

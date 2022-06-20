@@ -36,9 +36,6 @@ struct My_SpotApp: App {
                 }
                 .tint(cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex])
                 .accentColor(cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex])
-                .onAppear {
-                    loadAccentColor()
-                }
         }
     }
     
@@ -59,19 +56,5 @@ struct My_SpotApp: App {
                 await cloudViewModel.checkDeepLink(url: url, isFromNoti: false)
             }
         }
-    }
-    
-    private func loadAccentColor() {
-        let color = UIColor(cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex])
-        var red: CGFloat = 0
-        var green: CGFloat = 0
-        var blue: CGFloat = 0
-        var alpha: CGFloat = 0
-
-        color.getRed(&red, green: &green, blue: &blue, alpha: &alpha)
-        UserDefaults(suiteName: "group.com.isaacpaschall.My-Spot")?.set(Double(green), forKey: "colorg")
-        UserDefaults(suiteName: "group.com.isaacpaschall.My-Spot")?.set(Double(blue), forKey: "colorb")
-        UserDefaults(suiteName: "group.com.isaacpaschall.My-Spot")?.set(Double(red), forKey: "colorr")
-        UserDefaults(suiteName: "group.com.isaacpaschall.My-Spot")?.set(Double(alpha), forKey: "colora")
     }
 }

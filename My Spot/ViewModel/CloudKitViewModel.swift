@@ -63,6 +63,20 @@ final class CloudKitViewModel: ObservableObject {
         } else {
             UserDefaults.standard.set(false, forKey: "sharednot")
         }
+        setColors()
+    }
+    
+    private func setColors() {
+        if let i = UserDefaults(suiteName: "group.com.isaacpaschall.My-Spot")?.integer(forKey: "colorIndex") {
+            systemColorIndex = i
+        }
+        if UserDefaults.standard.valueExists(forKey: "customColorA") {
+            let green = UserDefaults.standard.double(forKey: "customColorG")
+            let blue = UserDefaults.standard.double(forKey: "customColorB")
+            let red = UserDefaults.standard.double(forKey: "customColorR")
+            let alpha = UserDefaults.standard.double(forKey: "customColorA")
+            systemColorArray[systemColorIndex] = Color(uiColor: UIColor(red: red, green: green, blue: blue, alpha: alpha))
+        }
     }
     
     func deleteSpot(id: CKRecord.ID) async throws {
@@ -706,21 +720,21 @@ final class CloudKitViewModel: ObservableObject {
             let compoundPredicate = NSCompoundPredicate(andPredicateWithSubpredicates: [predicate, predicate2, secondPredicate])
             query = CKQuery(recordType: "Spots", predicate: compoundPredicate)
         }
-        if filteringBy == "Closest" {
+        if filteringBy == "Closest".localized() {
             let distance = CKLocationSortDescriptor(key: "location", relativeLocation: userLocation)
             let creation = NSSortDescriptor(key: "creationDate", ascending: false)
             query.sortDescriptors = [distance, creation]
-        } else if filteringBy == "Likes" {
+        } else if filteringBy == "Downloads".localized() {
             let likes = NSSortDescriptor(key: "likes", ascending: false)
             let distance = CKLocationSortDescriptor(key: "location", relativeLocation: userLocation)
             let creation = NSSortDescriptor(key: "creationDate", ascending: false)
             query.sortDescriptors = [likes, distance, creation]
-        } else if filteringBy == "Name" {
+        } else if filteringBy == "Name".localized() {
             let name = NSSortDescriptor(key: "name", ascending: true)
             let distance = CKLocationSortDescriptor(key: "location", relativeLocation: userLocation)
             let creation = NSSortDescriptor(key: "creationDate", ascending: false)
             query.sortDescriptors = [name, distance, creation]
-        } else if filteringBy == "Newest" {
+        } else if filteringBy == "Newest".localized() {
             let distance = CKLocationSortDescriptor(key: "location", relativeLocation: userLocation)
             let creation = NSSortDescriptor(key: "creationDate", ascending: false)
             query.sortDescriptors = [creation, distance]

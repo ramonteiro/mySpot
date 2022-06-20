@@ -275,7 +275,7 @@ struct AccountDetailView: View {
                                            myAccount: myAccount,
                                            accountModel: accountModel)
             } label: {
-                DiscoverRow(spot: spots[i])
+                SpotRow(spot: spots[i], isShared: false)
                     .padding(4)
             }
             .buttonStyle(PlainButtonStyle())

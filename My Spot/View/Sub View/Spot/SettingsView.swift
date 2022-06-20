@@ -11,64 +11,41 @@ import CoreLocation
 struct SettingsView: View {
     
     @Environment(\.presentationMode) var presentationMode
+    @Environment(\.colorScheme) var colorScheme
     @EnvironmentObject var cloudViewModel: CloudKitViewModel
     @EnvironmentObject var mapViewModel: MapViewModel
-    @Environment(\.colorScheme) var colorScheme
     @State private var showingMailSheet = false
     @State private var showingConfigure = false
-    @State private var placeName = ""
-    @State private var showNotificationSheet = false
-    @State private var newPlace = false
-    @State private var message = "Message to My Spot developer: ".localized()
-    @State private var discoverNoti = false
-    @State private var sharedNoti = false
-    @State private var discoverProcess = false
-    @State private var unableToAddSpot = 0 // 0: ok, 1: no connection, 2: no permission
     @State private var showingErrorNoPermission = false
     @State private var showingErrorNoConnection = false
-    @State private var preventDoubleTrigger = false // stops onchange from triggering itself
+    @State private var showNotificationSheet = false
+    @State private var placeName = ""
+    @State private var newPlace = false
+    @State private var message = "Message to My Spot developer: ".localized()
+    @State private var discoverNotification = false
+    @State private var sharedNotification = false
+    @State private var processingNotificationToggle = false
+    @State private var unableToAddSpot = 0 // 0: ok, 1: no connection, 2: no permission
+    @State private var preventDoubleTrigger = false
     @State private var preventDoubleTriggerShared = false
     @State private var limits: Double = 10
-    @State private var showNotiView = false
     @State private var dateMemberSince = "?"
-    let def = UserDefaults.standard
     
     var body: some View {
         NavigationView {
             formView
-                .onChange(of: sharedNoti) { newValue in
-                    triggerSharedNoti(newValue)
+                .onChange(of: cloudViewModel.systemColorArray[cloudViewModel.systemColorArray.count - 1]) { newColor in
+                    setNewColor(newColor)
                 }
-                .onChange(of: discoverNoti) { newValue in
-                    triggerDiscoverNoti(newValue)
+                .onChange(of: cloudViewModel.systemColorIndex) { index in
+                    setNewColorFromIndex(index: index)
                 }
-                .onChange(of: limits) { newValue in
-                    UserDefaults.standard.set(Int(limits), forKey: "limit")
-                    cloudViewModel.limit = Int(limits)
+                .onChange(of: newPlace) { newValue in
+                    placeName = UserDefaults.standard.string(forKey: "discovernotiname") ?? ""
                 }
-                .alert("Notification Permissions Denied".localized(), isPresented: $showingErrorNoPermission) {
-                    Button("Settings".localized()) {
-                        guard let url = URL(string: UIApplication.openSettingsURLString) else { return }
-                        UIApplication.shared.open(url)
-                    }
-                    Button("Cancel".localized(), role: .cancel) { }
-                } message: {
-                    Text("Please check settings and make sure notifications are on for My Spot.".localized())
-                }
-                .alert("Connection Error".localized(), isPresented: $showingErrorNoConnection) {
-                    Button("OK".localized(), role: .cancel) { }
-                } message: {
-                    Text("Please check internet connection and try again.".localized())
-                }
-                .onAppear {
-                    if UserDefaults.standard.valueExists(forKey: "discovernotiname") {
-                        placeName = UserDefaults.standard.string(forKey: "discovernotiname") ?? ""
-                    }
-                    limits = Double(cloudViewModel.limit)
-                }
-                .fullScreenCover(isPresented: $showingConfigure, onDismiss: {
+                .fullScreenCover(isPresented: $showingConfigure) {
                     checkForErrors()
-                }) {
+                } content: {
                     SetUpNewSpotNotification(newPlace: $newPlace, unableToAddSpot: $unableToAddSpot)
                         .accentColor(cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex])
                 }
@@ -78,25 +55,12 @@ struct SettingsView: View {
                     }
                     .accentColor(cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex])
                 }
-                .onChange(of: newPlace) { newValue in
-                    placeName = UserDefaults.standard.string(forKey: "discovernotiname") ?? ""
-                }
-                .onChange(of: cloudViewModel.systemColorArray[cloudViewModel.systemColorArray.count - 1]) { newColor in
-                    setNewColor(newColor)
-                }
-                .onChange(of: cloudViewModel.systemColorIndex) { index in
-                    setNewColorFromIndex(index: index)
-                }
                 .navigationTitle("Settings".localized())
                 .navigationViewStyle(.stack)
                 .interactiveDismissDisabled(true)
                 .toolbar {
                     ToolbarItemGroup(placement: .navigationBarTrailing) {
-                        Button {
-                            presentationMode.wrappedValue.dismiss()
-                        } label: {
-                            Text("Done".localized())
-                        }
+                       doneButton
                     }
                 }
         }
@@ -106,139 +70,199 @@ struct SettingsView: View {
         }
     }
     
-    private var formView: some View {
-        Form {
-            Section {
-                ScrollView(.horizontal, showsIndicators: false) {
-                    colorWheel
+    // MARK: - Sub Views
+    
+    private var doneButton: some View {
+        Button {
+            presentationMode.wrappedValue.dismiss()
+        } label: {
+            Text("Done".localized())
+        }
+    }
+    
+    private var colorPickerSection: some View {
+        Section {
+            ScrollView(.horizontal, showsIndicators: false) {
+                colorWheel
+            }
+            if (cloudViewModel.systemColorIndex == cloudViewModel.systemColorArray.count - 1) {
+                ColorPicker(selection: $cloudViewModel.systemColorArray[cloudViewModel.systemColorArray.count - 1], supportsOpacity: false) {
+                    Text("Edit Custom Color".localized())
                 }
-                if (cloudViewModel.systemColorIndex == cloudViewModel.systemColorArray.count - 1) {
-                    ColorPicker(selection: $cloudViewModel.systemColorArray[cloudViewModel.systemColorArray.count - 1], supportsOpacity: false) {
-                        Text("Edit Custom Color".localized())
-                    }
+            }
+        } header: {
+            Text("Color Scheme".localized())
+                .font(.headline)
+        }
+    }
+    
+    private var newSpotNotificationSection: some View {
+        Section {
+            Toggle(isOn: $discoverNotification) {
+                Text("New Spots".localized())
+            }
+            .disabled(processingNotificationToggle)
+            .tint(cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex])
+            if (cloudViewModel.notiNewSpotOn) {
+                Button {
+                    showingConfigure.toggle()
+                } label: {
+                    Text("Configure".localized())
+                        .foregroundColor(colorScheme == .dark ? .white : .black)
+                        .disabled(processingNotificationToggle)
                 }
-            } header: {
-                Text("Color Scheme".localized())
+            }
+        } header: {
+            VStack(spacing: 0) {
+                Text("Notifications".localized())
                     .font(.headline)
-            }
-            Section {
-                Toggle(isOn: $discoverNoti) {
-                    Text("New Spots".localized())
+                if (cloudViewModel.notiNewSpotOn && !placeName.isEmpty) {
+                    Text("Area Set To: ".localized() + (placeName))
+                        .padding(.top)
                 }
-                .disabled(discoverProcess)
-                .tint(cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex])
-                if (cloudViewModel.notiNewSpotOn) {
-                    Button {
-                        showingConfigure.toggle()
-                    } label: {
-                        Text("Configure".localized())
-                            .foregroundColor(colorScheme == .dark ? .white : .black)
-                            .disabled(discoverProcess)
+            }
+        } footer: {
+            Text("Alerts when new spots are added to your location, within a 10 mile radius. Tap 'Configure' to change the location where new spots should alert you.".localized())
+        }
+        .onChange(of: discoverNotification) { newValue in
+            triggerDiscoverNoti(newValue)
+        }
+    }
+    
+    private var sharedNotificationSection: some View {
+        Section {
+            Toggle(isOn: $sharedNotification) {
+                Text("Shared Playlists".localized())
+            }
+            .disabled(processingNotificationToggle)
+            .tint(cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex])
+        } footer: {
+            Text("Alerts when a shared playlist is modified.".localized())
+        }
+        .onChange(of: sharedNotification) { newValue in
+            triggerSharedNoti(newValue)
+        }
+    }
+    
+    private var limitSection: some View {
+        Section {
+            Slider(value: $limits, in: 1...30, step: 1) { didChange in
+                if didChange {
+                    let generator = UIImpactFeedbackGenerator(style: .light)
+                    generator.impactOccurred()
+                }
+            }
+        } header: {
+            Text("Max Spots To Load: ".localized() + String(Int(limits)))
+        } footer: {
+            Text("Set how many spots to load at once. If load times are slow, lower this number.".localized())
+        }
+        .onChange(of: limits) { newValue in
+            UserDefaults.standard.set(Int(limits), forKey: "limit")
+            cloudViewModel.limit = Int(limits)
+        }
+    }
+    
+    private var emailSection: some View {
+        Section {
+            Button {
+                showingMailSheet = true
+            } label: {
+                Text("Email Developer".localized())
+                    .foregroundColor(colorScheme == .dark ? .white : .black)
+            }
+        } header: {
+            Text("Help".localized())
+                .font(.headline)
+        } footer: {
+            Text("Ask questions, submit bugs, or suggest new features. All comments are welcomed and I will read every email sent!".localized())
+        }
+    }
+    
+    private var tiktokSection: some View {
+        Section {
+            Button {
+                if let url = URL(string:"https://www.tiktok.com/@myspotexploration") {
+                    UIApplication.shared.open(url)
+                }
+            } label: {
+                Text("Tiktok")
+                    .foregroundColor(colorScheme == .dark ? .white : .black)
+            }
+        } footer: {
+            Text("Follow me on".localized() + " Tiktok!")
+        }
+    }
+    
+    private var aboutMeSection: some View {
+        Section {
+            Button {
+                if let url = URL(string:"https://wp.me/PdMUcQ-7") {
+                    UIApplication.shared.open(url)
+                }
+            } label: {
+                Text("About Me".localized())
+                    .foregroundColor(colorScheme == .dark ? .white : .black)
+            }
+        } footer: {
+            if let date = UserDefaults.standard.object(forKey: "accountdate") as? Date {
+                Text("A link to my wordpress site with short detail about me and the current privacy policy in My Spot.".localized() + "\n\n\nMy Spot v 2.0.1" + "\n" + "Member Since".localized() + ": \(dateMemberSince)")
+                    .onAppear {
+                        let dateFormatter = DateFormatter()
+                        dateFormatter.dateFormat = "MMM d, yyyy"
+                        dateMemberSince = dateFormatter.string(from: date)
                     }
-                }
-            } header: {
-                VStack(spacing: 0) {
-                    Text("Notifications".localized())
-                        .font(.headline)
-                    if (cloudViewModel.notiNewSpotOn && !placeName.isEmpty) {
-                        Text("Area Set To: ".localized() + (placeName))
-                            .padding(.top)
-                    }
-                }
-            } footer: {
-                Text("Alerts when new spots are added to your location, within a 10 mile radius. Tap 'Configure' to change the location where new spots should alert you.".localized())
-            }
-            Section {
-                Toggle(isOn: $sharedNoti) {
-                    Text("Shared Playlists".localized())
-                }
-                .disabled(discoverProcess)
-                .tint(cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex])
-            } footer: {
-                Text("Alerts when a shared playlist is modified.".localized())
-            }
-            Section {
-                Slider(value: $limits, in: 1...30, step: 1) { didChange in
-                    if didChange {
-                        let generator = UIImpactFeedbackGenerator(style: .light)
-                        generator.impactOccurred()
-                    }
-                }
-            } header: {
-                Text("Max Spots To Load: ".localized() + String(Int(limits)))
-            } footer: {
-                Text("Set how many spots to load at once. If load times are slow, lower this number.".localized())
-            }
-            Section {
-                Button {
-                    showingMailSheet = true
-                } label: {
-                    Text("Email Developer".localized())
-                        .foregroundColor(colorScheme == .dark ? .white : .black)
-                }
-            } header: {
-                Text("Help".localized())
-                    .font(.headline)
-            } footer: {
-                Text("Ask questions, submit bugs, or suggest new features. All comments are welcomed and I will read every email sent!".localized())
-            }
-            Section {
-                Button {
-                    if let url = URL(string:"https://www.tiktok.com/@myspotexploration") {
-                        UIApplication.shared.open(url)
-                    }
-                } label: {
-                    Text("Tiktok")
-                        .foregroundColor(colorScheme == .dark ? .white : .black)
-                }
-            } footer: {
-                Text("Follow me on".localized() + " Tiktok!")
-            }
-            Section {
-                Button {
-                    if let url = URL(string:"https://wp.me/PdMUcQ-7") {
-                        UIApplication.shared.open(url)
-                    }
-                } label: {
-                    Text("About Me".localized())
-                        .foregroundColor(colorScheme == .dark ? .white : .black)
-                }
-            } footer: {
-                if let date = UserDefaults.standard.object(forKey: "accountdate") as? Date {
-                    Text("A link to my wordpress site with short detail about me and the current privacy policy in My Spot.".localized() + "\n\n\nMy Spot v 2.0.1" + "\n" + "Member Since".localized() + ": \(dateMemberSince)")
-                        .onAppear {
-                            let dateFormatter = DateFormatter()
-                            dateFormatter.dateFormat = "MMM d, yyyy"
-                            dateMemberSince = dateFormatter.string(from: date)
-                        }
-                } else {
-                    Text("A link to my wordpress site with short detail about me and the current privacy policy in My Spot.".localized() + "\n\n\nMy Spot v 2.0")
-                }
+            } else {
+                Text("A link to my wordpress site with short detail about me and the current privacy policy in My Spot.".localized() + "\n\n\nMy Spot v 2.0")
             }
         }
+    }
+    
+    private var formView: some View {
+        Form {
+            colorPickerSection
+            newSpotNotificationSection
+            sharedNotificationSection
+            limitSection
+            emailSection
+            tiktokSection
+            aboutMeSection
+        }
+        .alert("Notification Permissions Denied".localized(), isPresented: $showingErrorNoPermission) {
+            Button("Settings".localized()) {
+                guard let url = URL(string: UIApplication.openSettingsURLString) else { return }
+                UIApplication.shared.open(url)
+            }
+            Button("Cancel".localized(), role: .cancel) { }
+        } message: {
+            Text("Please check settings and make sure notifications are on for My Spot.".localized())
+        }
+        .alert("Connection Error".localized(), isPresented: $showingErrorNoConnection) {
+            Button("OK".localized(), role: .cancel) { }
+        } message: {
+            Text("Please check internet connection and try again.".localized())
+        }
+    }
+    
+    private func colorCircle(i: Int) -> some View {
+        Circle()
+            .strokeBorder(cloudViewModel.systemColorIndex == i ? (colorScheme == .dark ? .white : .black) : .clear, lineWidth: 5)
+            .frame(width: 40, height: 40)
+            .background(Circle().foregroundColor(cloudViewModel.systemColorArray[i]))
+            .onTapGesture {
+                cloudViewModel.systemColorIndex = i
+                UserDefaults(suiteName: "group.com.isaacpaschall.My-Spot")?.set(i, forKey: "colorIndex")
+            }
     }
     
     private var colorWheel: some View {
         HStack {
             ForEach(cloudViewModel.systemColorArray.indices, id: \.self) { i in
                 if i != cloudViewModel.systemColorArray.count - 1 {
-                    Circle()
-                        .strokeBorder(cloudViewModel.systemColorIndex == i ? (colorScheme == .dark ? .white : .black) : .clear, lineWidth: 5)
-                        .frame(width: 40, height: 40)
-                        .background(Circle().foregroundColor(cloudViewModel.systemColorArray[i]))
-                        .onTapGesture {
-                            cloudViewModel.systemColorIndex = i
-                        }
+                    colorCircle(i: i)
                 } else {
                     ZStack {
-                        Circle()
-                            .strokeBorder(cloudViewModel.systemColorIndex == i ? (colorScheme == .dark ? .white : .black) : .clear, lineWidth: 5)
-                            .frame(width: 40, height: 40)
-                            .background(Circle().foregroundColor(cloudViewModel.systemColorArray[i]))
-                            .onTapGesture {
-                                cloudViewModel.systemColorIndex = i
-                                UserDefaults(suiteName: "group.com.isaacpaschall.My-Spot")?.set(i, forKey: "colorIndex")
-                            }
+                        colorCircle(i: i)
                         Image(systemName: "pencil")
                             .frame(width: 40, height: 40)
                     }
@@ -247,10 +271,12 @@ struct SettingsView: View {
         }
     }
     
+    // MARK: - Functions
+    
     private func triggerSharedNoti(_ newValue: Bool) {
         if newValue && !preventDoubleTriggerShared {
             Task {
-                discoverProcess = true
+                processingNotificationToggle = true
                 await cloudViewModel.checkNotificationPermission()
                 if cloudViewModel.notiPermission == 0 { // not determined
                     // ask
@@ -267,7 +293,7 @@ struct SettingsView: View {
                         cloudViewModel.notiSharedOn = false
                         UserDefaults.standard.set(false, forKey: "sharednot")
                         preventDoubleTriggerShared = true
-                        sharedNoti = false
+                        sharedNotification = false
                         let generator = UINotificationFeedbackGenerator()
                         generator.notificationOccurred(.warning)
                         showingErrorNoConnection = true
@@ -277,18 +303,18 @@ struct SettingsView: View {
                     cloudViewModel.notiSharedOn = false
                     UserDefaults.standard.set(false, forKey: "sharednot")
                     preventDoubleTriggerShared = true
-                    sharedNoti = false
+                    sharedNotification = false
                     let generator = UINotificationFeedbackGenerator()
                     generator.notificationOccurred(.warning)
                     showingErrorNoPermission = true
                 }
-                discoverProcess = false
+                processingNotificationToggle = false
             }
         }
         if !newValue && !preventDoubleTriggerShared {
             // unsubscribe
             Task {
-                discoverProcess = true
+                processingNotificationToggle = true
                 do {
                     try await cloudViewModel.unsubscribeAllShared()
                     try await cloudViewModel.unsubscribeAllPrivate()
@@ -297,14 +323,14 @@ struct SettingsView: View {
                 } catch {
                     // alert no connection
                     preventDoubleTriggerShared = true
-                    sharedNoti = true
+                    sharedNotification = true
                     cloudViewModel.notiSharedOn = true
                     UserDefaults.standard.set(true, forKey: "sharednot")
                     let generator = UINotificationFeedbackGenerator()
                     generator.notificationOccurred(.warning)
                     showingErrorNoConnection = true
                 }
-                discoverProcess = false
+                processingNotificationToggle = false
             }
         }
         if preventDoubleTriggerShared {
@@ -315,7 +341,7 @@ struct SettingsView: View {
     private func triggerDiscoverNoti(_ newValue: Bool) {
         if newValue && !preventDoubleTrigger {
             Task {
-                discoverProcess = true
+                processingNotificationToggle = true
                 await cloudViewModel.checkNotificationPermission()
                 if cloudViewModel.notiPermission == 0 { // not determined
                     // ask
@@ -343,7 +369,7 @@ struct SettingsView: View {
                         cloudViewModel.notiNewSpotOn = false
                         UserDefaults.standard.set(false, forKey: "discovernot")
                         preventDoubleTrigger = true
-                        discoverNoti = false
+                        discoverNotification = false
                         let generator = UINotificationFeedbackGenerator()
                         generator.notificationOccurred(.warning)
                         showingErrorNoConnection = true
@@ -353,18 +379,18 @@ struct SettingsView: View {
                     cloudViewModel.notiNewSpotOn = false
                     UserDefaults.standard.set(false, forKey: "discovernot")
                     preventDoubleTrigger = true
-                    discoverNoti = false
+                    discoverNotification = false
                     let generator = UINotificationFeedbackGenerator()
                     generator.notificationOccurred(.warning)
                     showingErrorNoPermission = true
                 }
-                discoverProcess = false
+                processingNotificationToggle = false
             }
         }
         if !newValue && !preventDoubleTrigger {
             // unsubscribe
             Task {
-                discoverProcess = true
+                processingNotificationToggle = true
                 do {
                     try await cloudViewModel.unsubscribeAllPublic()
                     cloudViewModel.notiNewSpotOn = false
@@ -372,14 +398,14 @@ struct SettingsView: View {
                 } catch {
                     // alert no connection
                     preventDoubleTrigger = true
-                    discoverNoti = true
+                    discoverNotification = true
                     cloudViewModel.notiNewSpotOn = true
                     UserDefaults.standard.set(true, forKey: "discovernot")
                     let generator = UINotificationFeedbackGenerator()
                     generator.notificationOccurred(.warning)
                     showingErrorNoConnection = true
                 }
-                discoverProcess = false
+                processingNotificationToggle = false
             }
         }
         if preventDoubleTrigger {
@@ -393,7 +419,7 @@ struct SettingsView: View {
             cloudViewModel.notiNewSpotOn = false
             UserDefaults.standard.set(false, forKey: "discovernot")
             preventDoubleTrigger = true
-            discoverNoti = false
+            discoverNotification = false
             let generator = UINotificationFeedbackGenerator()
             generator.notificationOccurred(.warning)
             showingErrorNoPermission = true
@@ -417,6 +443,10 @@ struct SettingsView: View {
         UserDefaults(suiteName: "group.com.isaacpaschall.My-Spot")?.set(Double(blue), forKey: "colorb")
         UserDefaults(suiteName: "group.com.isaacpaschall.My-Spot")?.set(Double(red), forKey: "colorr")
         UserDefaults(suiteName: "group.com.isaacpaschall.My-Spot")?.set(Double(alpha), forKey: "colora")
+        UserDefaults.standard.set(Double(green), forKey: "customColorG")
+        UserDefaults.standard.set(Double(blue), forKey: "customColorB")
+        UserDefaults.standard.set(Double(red), forKey: "customColorR")
+        UserDefaults.standard.set(Double(alpha), forKey: "customColorA")
     }
     
     private func setNewColorFromIndex(index: Int) {
@@ -437,10 +467,14 @@ struct SettingsView: View {
         if cloudViewModel.notiNewSpotOn ==  true {
             preventDoubleTrigger = true
         }
-        discoverNoti = cloudViewModel.notiNewSpotOn
+        discoverNotification = cloudViewModel.notiNewSpotOn
         if cloudViewModel.notiSharedOn ==  true {
             preventDoubleTriggerShared = true
         }
-        sharedNoti = cloudViewModel.notiSharedOn
+        sharedNotification = cloudViewModel.notiSharedOn
+        if UserDefaults.standard.valueExists(forKey: "discovernotiname") {
+            placeName = UserDefaults.standard.string(forKey: "discovernotiname") ?? ""
+        }
+        limits = Double(cloudViewModel.limit)
     }
 }

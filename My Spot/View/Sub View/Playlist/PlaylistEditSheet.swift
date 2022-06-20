@@ -10,14 +10,12 @@ import Combine
 
 struct PlaylistEditSheet: View {
     
+    let playlist: Playlist
+    @Environment(\.presentationMode) var presentationMode
     @State private var nameChecked = false
     @State private var emojiChecked = false
-    
-    @ObservedObject var playlist: Playlist
-    @Environment(\.presentationMode) var presentationMode
     @State private var name = ""
     @State private var emoji = ""
-    @State private var exists = true
     
     private enum Field {
         case name
@@ -27,117 +25,139 @@ struct PlaylistEditSheet: View {
     @FocusState private var focusState: Field?
     
     var body: some View {
-        ZStack {
-            if (exists) {
-                NavigationView {
-                    Form {
-                        Section {
-                            TextField("Enter Playlist Name".localized(), text: $name)
-                                .onReceive(Just(name)) { _ in
-                                    if (name.count > MaxCharLength.names) {
-                                        name = String(name.prefix(MaxCharLength.names))
-                                    }
-                                }
-                                .onAppear {
-                                    if !nameChecked {
-                                        name = playlist.name ?? ""
-                                        nameChecked = true
-                                    }
-                                }
-                                .focused($focusState, equals: .name)
-                                .submitLabel(.next)
-                        } header: {
-                            Text("Playlist Name*".localized())
-                        }
-                        Section {
-                            EmojiTextField(text: $emoji, placeholder: "Enter Emoji".localized())
-                                .onReceive(Just(emoji), perform: { _ in
-                                    self.emoji = String(self.emoji.onlyEmoji().prefix(MaxCharLength.emojis))
-                                })
-                                .onAppear {
-                                    if !emojiChecked {
-                                        emoji = playlist.emoji ?? ""
-                                        emojiChecked = true
-                                    }
-                                }
-                                .focused($focusState, equals: .emoji)
-                                .submitLabel(.done)
-                        } header: {
-                            Text("Emoji*".localized())
-                        }
-                    }
-                    .onSubmit {
-                        switch focusState {
-                        case .name:
-                            focusState = .emoji
-                        default:
-                            focusState = nil
-                        }
-                    }
-                    .navigationTitle(name)
-                    .toolbar {
-                        ToolbarItemGroup(placement: .navigationBarLeading) {
-                            Button("Cancel".localized()) {
-                                name = ""
-                                emoji = ""
-                                presentationMode.wrappedValue.dismiss()
-                            }
-                            .padding(.leading)
-                        }
-                        ToolbarItemGroup(placement: .navigationBarTrailing) {
-                            Button("Save".localized()) {
-                                saveChanges()
-                            }
-                            .padding(.trailing)
-                            .disabled(name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || emoji.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
-                            .tint(.blue)
-                        }
-                        ToolbarItemGroup(placement: .keyboard) {
-                            HStack {
-                                Button {
-                                    switch focusState {
-                                    case .emoji:
-                                        focusState = .name
-                                    default:
-                                        focusState = nil
-                                    }
-                                } label: {
-                                    Image(systemName: "chevron.up")
-                                }
-                                .disabled(focusState == .name)
-                                Button {
-                                    switch focusState {
-                                    case .name:
-                                        focusState = .emoji
-                                    default:
-                                        focusState = nil
-                                    }
-                                } label: {
-                                    Image(systemName: "chevron.down")
-                                }
-                                .disabled(focusState == .emoji)
-                                Spacer()
-                                Button("Done".localized()) {
-                                    focusState = nil
-                                }
-                            }
-                        }
-                    }
-                }
-                .navigationViewStyle(.automatic)
+        NavigationView {
+            Form {
+                nameTextField
+                emojiTextField
             }
-        }
-        .onAppear {
-            exists = checkExists()
+            .onSubmit {
+                moveDown()
+            }
+            .navigationTitle(name)
+            .toolbar {
+                ToolbarItemGroup(placement: .navigationBarLeading) {
+                    cancelButton
+                }
+                ToolbarItemGroup(placement: .navigationBarTrailing) {
+                    saveButton
+                }
+                ToolbarItemGroup(placement: .keyboard) {
+                    keyboardButtons
+                }
+            }
+            .navigationViewStyle(.automatic)
         }
     }
     
-    private func checkExists() -> Bool {
-        guard let _ = playlist.name else {return false}
-        guard let _ = playlist.emoji else {return false}
-        return true
+    // MARK: - Sub Views
+    
+    private var upButton: some View {
+        Button {
+            moveUp()
+        } label: {
+            Image(systemName: "chevron.up")
+        }
+        .disabled(focusState == .name)
     }
- 
+    
+    private var downButton: some View {
+        Button {
+            moveDown()
+        } label: {
+            Image(systemName: "chevron.down")
+        }
+        .disabled(focusState == .emoji)
+    }
+    
+    private var keyboardButtons: some View {
+        HStack {
+            upButton
+            downButton
+            Spacer()
+            Button("Done".localized()) {
+                focusState = nil
+            }
+        }
+    }
+    
+    private var saveButton: some View {
+        Button("Save".localized()) {
+            saveChanges()
+        }
+        .padding(.trailing)
+        .disabled(name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || emoji.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+        .tint(.blue)
+    }
+    
+    private var cancelButton: some View {
+        Button("Cancel".localized()) {
+            name = ""
+            emoji = ""
+            presentationMode.wrappedValue.dismiss()
+        }
+        .padding(.leading)
+    }
+    
+    private var nameTextField: some View {
+        Section {
+            TextField("Enter Playlist Name".localized(), text: $name)
+                .onReceive(Just(name)) { _ in
+                    if (name.count > MaxCharLength.names) {
+                        name = String(name.prefix(MaxCharLength.names))
+                    }
+                }
+                .onAppear {
+                    if !nameChecked {
+                        name = playlist.name ?? ""
+                        nameChecked = true
+                    }
+                }
+                .focused($focusState, equals: .name)
+                .submitLabel(.next)
+        } header: {
+            Text("Playlist Name*".localized())
+        }
+    }
+    
+    private var emojiTextField: some View {
+        Section {
+            EmojiTextField(text: $emoji, placeholder: "Enter Emoji".localized())
+                .onReceive(Just(emoji)) { _ in
+                    self.emoji = String(self.emoji.onlyEmoji().prefix(MaxCharLength.emojis))
+                }
+                .onAppear {
+                    if !emojiChecked {
+                        emoji = playlist.emoji ?? ""
+                        emojiChecked = true
+                    }
+                }
+                .focused($focusState, equals: .emoji)
+                .submitLabel(.done)
+        } header: {
+            Text("Emoji*".localized())
+        }
+    }
+    
+    // MARK: - Functions
+    
+    private func moveDown() {
+        switch focusState {
+        case .name:
+            focusState = .emoji
+        default:
+            focusState = nil
+        }
+    }
+    
+    private func moveUp() {
+        switch focusState {
+        case .emoji:
+            focusState = .name
+        default:
+            focusState = nil
+        }
+    }
+    
     private func saveChanges() {
         playlist.name = name
         playlist.emoji = emoji

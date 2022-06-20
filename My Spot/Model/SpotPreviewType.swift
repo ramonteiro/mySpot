@@ -21,10 +21,11 @@ protocol SpotPreviewType: Identifiable, Hashable {
     var isPublicPreview: Bool { get }
     var downloadsPreview: Int { get }
     var isFromDiscover: Bool { get }
-    var playlistEmojiPreview: String? { get }
+    var playlistPreview: Playlist? { get }
     var descriptionPreview: String { get }
     var locationPreview: CLLocation { get }
     var isMultipleImagesPreview: Bool { get }
     var dateAddedToPlaylistPreview: Date? { get }
     var userIDPreview: String { get }
+    var addedByPreview: String? { get }
 }

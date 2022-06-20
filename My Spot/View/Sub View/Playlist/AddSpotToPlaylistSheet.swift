@@ -16,37 +16,35 @@ import CoreData
 struct AddSpotToPlaylistSheet: View {
     
     @FetchRequest(sortDescriptors: []) var spots: FetchedResults<Spot>
-    @Environment(\.presentationMode) var presentationMode
-    @State private var spotsFiltered: [Spot] = []
     @EnvironmentObject var cloudViewModel: CloudKitViewModel
-    var currPlaylist: Playlist
-    @State private var addedSpots: [NSManagedObject] = []
-    private let stack = CoreDataStack.shared
-    @Binding var isSaving: Bool
+    @Environment(\.presentationMode) var presentationMode
+    let currPlaylist: Playlist
     let currentSpots: [String]
+    @State private var spotsFiltered: [Spot] = []
+    @State private var addedSpots: [NSManagedObject] = []
+    @Binding var isSaving: Bool
     @Binding var errorSaving: Bool
     
     var body: some View {
         NavigationView {
-            ZStack {
-                if (!spotsFiltered.isEmpty) {
-                    availableSpots
-                } else {
-                    messageNoSpotsAvailable
+            addSpotView
+                .onAppear {
+                    filterSpots()
                 }
-            }
-            .onAppear {
-                spotsFiltered = spots.filter{ spot in
-                    !spot.isShared && (spot.userId == UserDefaults(suiteName: "group.com.isaacpaschall.My-Spot")?.string(forKey: "userid") || spot.userId == "" || spot.userId == nil) && (!currentSpots.contains("\(spot.name ?? "name")\(spot.x + spot.y)"))
-                }
-            }
         }
         .navigationViewStyle(.automatic)
         .interactiveDismissDisabled()
     }
     
-    func close() {
-        presentationMode.wrappedValue.dismiss()
+    // MARK: - Sub Views
+    
+    @ViewBuilder
+    private var addSpotView: some View {
+        if (!spotsFiltered.isEmpty) {
+            availableSpots
+        } else {
+            messageNoSpotsAvailable
+        }
     }
     
     private var availableSpots: some View {
@@ -64,53 +62,27 @@ struct AddSpotToPlaylistSheet: View {
         }
         .toolbar {
             ToolbarItemGroup(placement: .navigationBarTrailing) {
-                Button("Save".localized()) {
-                    if addedSpots.count > 0 {
-                        isSaving = true
-                        close()
-                        if stack.isShared(object: currPlaylist) {
-                            if let share = stack.getShare(currPlaylist) {
-                                stack.addToParentShared(children: addedSpots, parent: currPlaylist, share: share, userid: cloudViewModel.userID) { (results) in
-                                    switch results {
-                                    case .success():
-                                        DispatchQueue.main.async {
-                                            stack.save()
-                                        }
-                                        isSaving = false
-                                    case .failure(let error):
-                                        errorSaving = true
-                                        print("failed: \(error)")
-                                        isSaving = false
-                                    }
-                                }
-                            } else {
-                                errorSaving = true
-                                isSaving = false
-                            }
-                        } else {
-                            for object in addedSpots {
-                                let spot = object as! Spot
-                                spot.playlist = currPlaylist
-                            }
-                            DispatchQueue.main.async {
-                                stack.save()
-                            }
-                            isSaving = false
-                        }
-                    } else {
-                        close()
-                    }
-                }
-                .padding()
+                saveButton
             }
             ToolbarItemGroup(placement: .navigationBarLeading) {
-                Button("Cancel".localized()) {
-                    close()
-                }
-                .padding()
+                cancelButton
             }
         }
         .navigationTitle("Add Spots".localized())
+    }
+    
+    private var cancelButton: some View {
+        Button("Cancel".localized()) {
+            presentationMode.wrappedValue.dismiss()
+        }
+        .padding()
+    }
+    
+    private var saveButton: some View {
+        Button("Save".localized()) {
+            save()
+        }
+        .padding()
     }
     
     private var messageNoSpotsAvailable: some View {
@@ -122,11 +94,61 @@ struct AddSpotToPlaylistSheet: View {
         .toolbar {
             ToolbarItemGroup(placement: .navigationBarTrailing) {
                 Button("Done".localized()) {
-                    close()
+                    presentationMode.wrappedValue.dismiss()
                 }
                 .padding()
             }
         }
         .navigationTitle("Add Spots".localized())
+    }
+    
+    // MARK: - Functions
+    
+    private func save() {
+        if addedSpots.count > 0 {
+            isSaving = true
+            presentationMode.wrappedValue.dismiss()
+            if CoreDataStack.shared.isShared(object: currPlaylist) {
+                if let share = CoreDataStack.shared.getShare(currPlaylist) {
+                    CoreDataStack.shared.addToParentShared(children: addedSpots, parent: currPlaylist, share: share, userid: cloudViewModel.userID) { (results) in
+                        switch results {
+                        case .success():
+                            DispatchQueue.main.async {
+                                CoreDataStack.shared.save()
+                            }
+                            isSaving = false
+                        case .failure(let error):
+                            errorSaving = true
+                            print("failed: \(error)")
+                            isSaving = false
+                        }
+                    }
+                } else {
+                    errorSaving = true
+                    isSaving = false
+                }
+            } else {
+                for object in addedSpots {
+                    let spot = object as! Spot
+                    spot.playlist = currPlaylist
+                }
+                DispatchQueue.main.async {
+                    CoreDataStack.shared.save()
+                }
+                isSaving = false
+            }
+        } else {
+            presentationMode.wrappedValue.dismiss()
+        }
+    }
+    
+    private func filterSpots() {
+        spotsFiltered = spots.filter { spot in
+            !spot.isShared &&
+            (spot.userId == UserDefaults(suiteName: "group.com.isaacpaschall.My-Spot")?.string(forKey: "userid") ||
+             spot.userId == "" ||
+             spot.userId == nil) &&
+            (!currentSpots.contains("\(spot.name ?? "name")\(spot.x + spot.y)"))
+        }
     }
 }
