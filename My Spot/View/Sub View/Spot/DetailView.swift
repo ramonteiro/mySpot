@@ -13,103 +13,120 @@
 import SwiftUI
 import MapKit
 
-struct DetailView: View {
+struct DetailView<T: SpotPreviewType>: View {
     
-    var canShare: Bool
-    var fromPlaylist: Bool
+    var isSheet: Bool
+    var from: Tab
+    let spot: T
+    @Binding var didDelete: Bool
     @EnvironmentObject var cloudViewModel: CloudKitViewModel
     @EnvironmentObject var mapViewModel: MapViewModel
-    @FetchRequest(sortDescriptors: [], animation: .default) var spots: FetchedResults<Spot>
-    @ObservedObject var spot:Spot
+    @EnvironmentObject var tabController: TabController
+    @FetchRequest(sortDescriptors: []) var spots: FetchedResults<Spot>
     @Environment(\.presentationMode) var presentationMode
     @Environment(\.colorScheme) var colorScheme
-    @EnvironmentObject var tabController: TabController
-    @State private var showingEditSheet = false
+    @State private var presentEditSheet = false
+    @State private var presentAccountView = false
+    @State private var presentImageCloseUp = false
+    @State private var presentShareSheet = false
+    @State private var presentFailedToUploadAlert = false
+    @State private var presentDeleteAlert = false
+    @State private var presentCannotSavePublicAlert = false
+    @State private var presentSavePublicSpotSpinner = false
+    @State private var presentSaveSheet = false
+    @State private var presentErrorDeletingSpot = false
+    @State private var presentReportSpot = false
+    @State private var spotInCD = false
+    @State private var attemptToReport = false
     @State private var didCopy = false
-    @State private var backImage = "chevron.left"
-    @State private var scope:String = "Private".localized()
-    @State private var tags: [String] = []
-    @State private var didChange = false
-    @State private var showingImage = false
+    @State private var didCopyDescription = false
+    @State private var downloads = -1
+    @State private var newName = ""
     @State private var expand = false
-    @State private var dateToShow = ""
-    @State private var dateToShowAdded = ""
-    @State private var deleteAlert = false
-    @State private var distance: String = ""
+    @State private var isSaved = false
+    @State private var isSaving = false
+    @State private var initChecked = false
+    @State private var hasReported = false
     @State private var loadingAccount = true
     @State private var accountModel: AccountModel?
-    @State private var openAccountView = false
-    @State private var exists = true
     @State private var imageOffset: CGFloat = -50
-    @State private var selection = 0
+    @State private var imageSelection = 0
     @State private var images: [UIImage] = []
-    @State private var didCopyDescription = false
-    @State private var showingCannotSavePublicAlert = false
-    @State private var pu = false
-    @State private var isShare = false
-    @State var canEdit: Bool
-    @State private var canDelete = true
+    private var backImage: String {
+        if isSheet { return "chevron.down" }
+        else { return "chevron.left" }
+    }
+    private var scope: String {
+        if spot.isPublicPreview { return "Private".localized() }
+        else { return "Public".localized() }
+    }
+    private var tags: [String] {
+        spot.tagsPreview.components(separatedBy: ", ")
+    }
+    private var canModify: Bool {
+        from != .playlists && spot.userIDPreview == cloudViewModel.userID
+    }
+    private var isAdmin: Bool {
+        cloudViewModel.userID == UserDefaultKeys.admin
+    }
+    private var date: String {
+        if let date = spot.dateObjectPreview {
+            return date.toString()
+        } else {
+            return spot.datePreview.components(separatedBy: ";")[0]
+        }
+    }
+    private var dateAdded: String {
+        spot.dateAddedToPlaylistPreview?.toString() ?? ""
+    }
+    private var distance: String {
+        mapViewModel.calculateDistance(from: spot.locationPreview)
+    }
     
     var body: some View {
-        ZStack {
-            if (exists) {
-                displaySpot
-                    .alert("Unable To Save Spot".localized(), isPresented: $pu) {
-                        Button("OK".localized(), role: .cancel) { }
-                    } message: {
-                        Text("Failed to upload spot. Spot is now set to private, please try again later and check internet connection.".localized())
-                    }
-                    .onChange(of: tabController.playlistPopToRoot) { _ in
-                        if (fromPlaylist) {
-                            presentationMode.wrappedValue.dismiss()
-                        }
-                    }
-                    .onChange(of: tabController.spotPopToRoot) { _ in
-                        if (!fromPlaylist) {
-                            presentationMode.wrappedValue.dismiss()
-                        }
-                    }
-                    .onAppear {
-                        if canEdit {
-                            canEdit = CoreDataStack.shared.canEdit(object: spot)
-                        }
-                        canDelete = CoreDataStack.shared.canDelete(object: spot)
-                    }
-                    .fullScreenCover(isPresented: $openAccountView) {
-                        AccountDetailView(userid: spot.userId ?? "", accountModel: accountModel)
-                    }
+        displaySpot
+            .alert("Unable To Save Spot".localized(), isPresented: $presentFailedToUploadAlert) {
+                Button("OK".localized(), role: .cancel) { }
+            } message: {
+                Text("Failed to upload spot. Spot is now set to private, please try again later and check internet connection.".localized())
             }
-        }
-        .onAppear {
-            exists = checkExists()
-            if loadingAccount && exists {
-                Task {
-                    do {
-                        accountModel = try await cloudViewModel.fetchAccount(userid: spot.userId ?? "")
-                        withAnimation {
-                            loadingAccount = false
-                        }
-                    } catch {
-                        print("failed to load user account")
-                    }
+            .alert("Error Deleting Spot".localized(), isPresented: $presentErrorDeletingSpot) {
+                Button("OK".localized(), role: .cancel) { }
+            } message: {
+                Text("Please check internet connection and try again.".localized())
+            }
+            .onChange(of: isSaving) { newValue in
+                if newValue {
+                    addDownloadToSpot()
                 }
             }
-        }
+            .onChange(of: tabController.playlistPopToRoot) { _ in
+                if (from == .playlists) { popView() }
+            }
+            .onChange(of: tabController.spotPopToRoot) { _ in
+                if (from == .spots) { popView() }
+            }
+            .onChange(of: tabController.discoverPopToRoot) { _ in
+                if (from == .discover) { popView() }
+            }
+            .onChange(of: tabController.profilePopToRoot) { _ in
+                if (from == .profile) { popView() }
+            }
+            .fullScreenCover(isPresented: $presentAccountView) {
+                AccountDetailView(userid: spot.userIDPreview, accountModel: accountModel)
+            }
+            .popup(isPresented: $presentSaveSheet) {
+                BottomPopupView {
+                    NamePopupView(isPresented: $presentSaveSheet, text: $newName, saved: $isSaving, spotName: spot.namePreview)
+                }
+            }
     }
     
-    private func checkExists() -> Bool {
-        guard let _ = spot.name else {return false}
-        guard let _ = spot.locationName else {return false}
-        guard let _ = spot.date else {return false}
-        guard let _ = spot.details else {return false}
-        guard let _ = spot.founder else {return false}
-        return true
-    }
+    // MARK: Sub Views
     
     private var displaySpot: some View {
         ZStack {
             displayImage
-                .offset(y: imageOffset)
             VStack {
                 Spacer()
                     .frame(height: (expand ? 90 : UIScreen.screenWidth - 65))
@@ -117,41 +134,20 @@ struct DetailView: View {
             }
             topButtonRow
             middleButtonRow
-                .offset(y: -50)
-            if (showingImage) {
-                ImagePopUp(showingImage: $showingImage, image: images[selection])
+            if (presentImageCloseUp) {
+                ImagePopUp(showingImage: $presentImageCloseUp, image: images[imageSelection])
                     .transition(.scale)
             }
         }
-        .ignoresSafeArea(.all, edges: (canShare ? .top : [.top, .bottom]))
+        .ignoresSafeArea(.all, edges: (isSheet ? .top : [.top, .bottom]))
         .onAppear {
-            // check for images
-            if !images.isEmpty { return }
-            images.append(spot.image ?? defaultImages.errorImage!)
-            if let _ = spot.image3 {
-                images.append(spot.image2 ?? defaultImages.errorImage!)
-                images.append(spot.image3 ?? defaultImages.errorImage!)
-            } else if let _ = spot.image2 {
-                images.append(spot.image2 ?? defaultImages.errorImage!)
-            }
-            
-            tags = spot.tags?.components(separatedBy: ", ") ?? []
-            if (spot.isPublic) {
-                scope = "Public".localized()
-            } else {
-                scope = "Private".localized()
-            }
-            if (canShare) {
-                backImage = "chevron.left"
-            } else {
-                backImage = "chevron.down"
-            }
+            initializeVars()
         }
         .navigationBarHidden(true)
-        .background(ShareViewController(isPresenting: $isShare) {
-            let av = getShareAC(id: spot.dbid ?? "", name: spot.name ?? "???")
+        .background(ShareViewController(isPresenting: $presentShareSheet) {
+            let av = getShareAC(id: spot.dataBaseIdPreview, name: spot.namePreview)
             av.completionWithItemsHandler = { _, _, _, _ in
-                isShare = false
+                presentShareSheet = false
             }
             return av
         })
@@ -163,11 +159,31 @@ struct DetailView: View {
                 multipleImages
             } else {
                 if (!images.isEmpty) {
-                    Image(uiImage: images[0])
-                        .resizable()
-                        .frame(width: UIScreen.screenWidth, height: UIScreen.screenWidth)
-                        .scaledToFit()
-                        .ignoresSafeArea()
+                    if spot.isFromDiscover && spot.isMultipleImagesPreview {
+                            ZStack {
+                                Image(uiImage: images[0])
+                                    .resizable()
+                                    .frame(width: UIScreen.screenWidth, height: UIScreen.screenWidth)
+                                    .scaledToFit()
+                                    .ignoresSafeArea()
+                                VStack {
+                                    Spacer()
+                                    HStack {
+                                        Spacer()
+                                        ProgressView()
+                                            .frame(width: 30, height: 30)
+                                        Spacer()
+                                    }
+                                }
+                            }
+                            .frame(width: UIScreen.screenWidth, height: UIScreen.screenWidth)
+                        } else {
+                            Image(uiImage: images[0])
+                                .resizable()
+                                .frame(width: UIScreen.screenWidth, height: UIScreen.screenWidth)
+                                .scaledToFit()
+                                .ignoresSafeArea()
+                        }
                 } else {
                     Image(uiImage: defaultImages.errorImage!)
                         .resizable()
@@ -178,6 +194,7 @@ struct DetailView: View {
             }
             Spacer()
         }
+        .offset(y: imageOffset)
     }
     
     private var topButtonRow: some View {
@@ -185,10 +202,10 @@ struct DetailView: View {
             HStack(spacing: 0) {
                 backButtonView
                 Spacer()
-                if (canDelete && !fromPlaylist) {
+                if (canModify || isAdmin) {
                     deleteButton
                 }
-                if (spot.isPublic && UIDevice.current.userInterfaceIdiom != .pad) {
+                if (spot.isPublicPreview && UIDevice.current.userInterfaceIdiom != .pad) {
                     shareButton
                 }
             }
@@ -204,25 +221,47 @@ struct DetailView: View {
                 .frame(height: UIScreen.screenWidth)
             HStack {
                 enLargeButton
-                    .padding()
-                    .rotationEffect(Angle(degrees: (expand ? 360 : 0)), anchor: UnitPoint(x: 0.5, y: 0.5))
-                    .offset(x: (expand ? -50 : 0), y: -30)
-                    .opacity(expand ? 0 : 1)
                 Spacer()
-                if canEdit {
+                if from == .discover || from == .profile {
+                    downloadButton
+                } else if canModify {
                     editButton
-                        .padding()
-                        .rotationEffect(Angle(degrees: (expand ? 360 : 0)), anchor: UnitPoint(x: 0.5, y: 0.5))
-                        .offset(x: (expand ? 100 : 0))
                 }
             }
             .offset(y: -60)
             Spacer()
         }
+        .offset(y: -50)
+    }
+    
+    private var downloadButton: some View {
+        Button {
+            withAnimation {
+                presentSaveSheet = true
+            }
+        } label: {
+            if !presentSavePublicSpotSpinner {
+                Image(systemName: "icloud.and.arrow.down")
+                    .font(.system(size: 30, weight: .regular))
+                    .padding(15)
+                    .foregroundColor(.white)
+            } else {
+                ProgressView().progressViewStyle(.circular)
+            }
+        }
+        .background(
+            Circle()
+                .foregroundColor((spotInCD || isSaved) == true ? .gray : cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex])
+                .shadow(color: Color.black.opacity(0.3), radius: 5)
+        )
+        .disabled(spotInCD || isSaved)
+        .padding()
+        .rotationEffect(Angle(degrees: (expand ? 360 : 0)), anchor: UnitPoint(x: 0.5, y: 0.5))
+        .offset(x: (expand ? 100 : 0))
     }
     
     private var multipleImages: some View {
-        TabView(selection: $selection) {
+        TabView(selection: $imageSelection) {
             ForEach(images.indices, id: \.self) { index in
                 Image(uiImage: images[index]).resizable()
                     .frame(width: UIScreen.screenWidth, height: UIScreen.screenWidth)
@@ -238,7 +277,7 @@ struct DetailView: View {
     private var enLargeButton: some View {
         Button {
             withAnimation {
-                showingImage.toggle()
+                presentImageCloseUp.toggle()
             }
         } label: {
             Image(systemName: "arrow.up.left.and.arrow.down.right")
@@ -248,11 +287,15 @@ struct DetailView: View {
         }
         .background(.ultraThinMaterial)
         .clipShape(Circle())
+        .padding()
+        .rotationEffect(Angle(degrees: (expand ? 360 : 0)), anchor: UnitPoint(x: 0.5, y: 0.5))
+        .offset(x: (expand ? -50 : 0), y: -30)
+        .opacity(expand ? 0 : 1)
     }
     
     private var shareButton: some View {
         Button {
-            isShare = true
+            presentShareSheet = true
         } label: {
             Image(systemName: "square.and.arrow.up")
                 .foregroundColor(.white)
@@ -262,15 +305,11 @@ struct DetailView: View {
         }
     }
     
-    private func getShareAC(id: String, name: String) -> UIActivityViewController {
-        return UIActivityViewController(activityItems: ["Check out, \"".localized() + name + "\" on My Spot! ".localized(), URL(string: "myspot://" + (id)) ?? "", "\n\nIf you don't have My Spot, get it on the Appstore here: ".localized(), URL(string: "https://apps.apple.com/us/app/my-spot-exploration/id1613618373")!], applicationActivities: nil)
-    }
-    
     private var deleteButton: some View {
         Button {
             let generator = UINotificationFeedbackGenerator()
             generator.notificationOccurred(.warning)
-            deleteAlert.toggle()
+            presentDeleteAlert.toggle()
         } label: {
             Image(systemName: "trash.fill")
                 .foregroundColor(.white)
@@ -278,29 +317,27 @@ struct DetailView: View {
                 .padding(10)
                 .shadow(color: Color.black.opacity(0.5), radius: 5)
         }
-        .alert("Are you sure you want to delete ".localized() + (spot.name ?? "") + "?".localized(), isPresented: $deleteAlert) {
+        .alert("Are you sure you want to delete ".localized() + (spot.namePreview) + "?", isPresented: $presentDeleteAlert) {
             Button("Delete".localized(), role: .destructive) {
-                if let i = spots.firstIndex(of: spot) {
-                    CoreDataStack.shared.deleteSpot(spots[i])
-                    CoreDataStack.shared.save()
-                    if !canShare {
-                        imageOffset = 0
-                    }
-                    presentationMode.wrappedValue.dismiss()
+                if spot.isFromDiscover {
+                    deleteCloudSpot()
+                } else {
+                    deleteMySpot()
                 }
             }
         } message: {
-            Text("Spot will be removed from 'My Spots' tab. If this spot is still in 'Discover' tab, it will not be deleted there.".localized())
+            if spot.isFromDiscover {
+                Text("Spot will be removed from 'Discover' tab and no longer sharable. If this spot is still in 'My Spots' tab, it will not be deleted there.".localized())
+            } else {
+                Text("Spot will be removed from 'My Spots' tab. If this spot is still in 'Discover' tab, it will not be deleted there.".localized())
+            }
         }
 
     }
     
     private var backButtonView: some View {
         Button {
-            if !canShare {
-                imageOffset = 0
-            }
-            presentationMode.wrappedValue.dismiss()
+            popView()
         } label: {
             Image(systemName: backImage)
                 .foregroundColor(.white)
@@ -313,7 +350,7 @@ struct DetailView: View {
     private var editButton: some View {
         Button {
             Task { try? await cloudViewModel.isBanned() }
-            showingEditSheet = true
+            presentEditSheet = true
         } label: {
             Image(systemName: "slider.horizontal.3")
                 .font(.system(size: 30, weight: .regular))
@@ -325,42 +362,96 @@ struct DetailView: View {
                 .foregroundColor(cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex])
                 .shadow(color: Color.black.opacity(0.3), radius: 5)
         )
-        .sheet(isPresented: $showingEditSheet, onDismiss: {
-            if showingCannotSavePublicAlert {
-                let generator = UINotificationFeedbackGenerator()
-                generator.notificationOccurred(.warning)
-                pu.toggle()
-                showingCannotSavePublicAlert = false
+        .sheet(isPresented: $presentEditSheet) {
+            dismissEditSheet()
+        } content: {
+            if let spot = spot as? Spot {
+                SpotEditSheet(spot: spot, showingCannotSavePublicAlert: $presentCannotSavePublicAlert)
             }
-            if didChange {
-                presentationMode.wrappedValue.dismiss()
-            }
-        }) {
-            SpotEditSheet(spot: spot, showingCannotSavePublicAlert: $showingCannotSavePublicAlert, didChange: $didChange)
         }
-        .disabled(spot.isPublic && !cloudViewModel.isSignedInToiCloud)
+        .disabled(spot.isPublicPreview && !cloudViewModel.isSignedInToiCloud)
+        .padding()
+        .rotationEffect(Angle(degrees: (expand ? 360 : 0)), anchor: UnitPoint(x: 0.5, y: 0.5))
+        .offset(x: (expand ? 100 : 0))
+    }
+    
+    private var downloadsView: some View {
+        HStack {
+            Image(systemName: "icloud.and.arrow.down")
+                .font(.system(size: 15, weight: .light))
+                .foregroundColor(Color.gray)
+            Text("\(downloads)")
+                .font(.system(size: 15, weight: .light))
+                .foregroundColor(Color.gray)
+                .padding(.leading, 1)
+            Spacer()
+        }
+        .padding([.leading, .trailing], 30)
     }
     
     private var detailSheet: some View {
         ZStack {
             ScrollView(showsIndicators: false) {
                 expandDetailsButton
-                if (!(spot.locationName?.isEmpty ?? true)) {
+                if !spot.locationNamePreview.isEmpty {
                     locationNameView
                 }
                 middlePart
-                if (!(spot.tags?.isEmpty ?? true)) {
+                if spot.isFromDiscover {
+                    downloadsView
+                }
+                if !spot.tagsPreview.isEmpty {
                     tagView
                 }
                 descriptionView
                 
-                ViewSingleSpotOnMap(singlePin: [SinglePin(name: spot.name ?? "", coordinate: CLLocationCoordinate2D(latitude: spot.x, longitude: spot.y))])
+                ViewSingleSpotOnMap(singlePin: [SinglePin(name: spot.namePreview, coordinate: spot.locationPreview.coordinate)])
                     .aspectRatio(contentMode: .fit)
                     .cornerRadius(15)
                     .padding([.leading, .trailing], 30)
                 routeMeToButton
                 bottomHalf
+                    .padding(.bottom, 100)
             }
+        }
+        .confirmationDialog("How should this spot be reported?".localized(), isPresented: $presentReportSpot) {
+            Button("Offensive".localized()) {
+                guard let spot = spot as? SpotFromCloud else { return }
+                Task {
+                    attemptToReport = true
+                    await cloudViewModel.report(spot: spot, report: "offensive")
+                    hasReported = true
+                    attemptToReport = false
+                }
+            }
+            Button("Inappropriate".localized()) {
+                guard let spot = spot as? SpotFromCloud else { return }
+                Task {
+                    attemptToReport = true
+                    await cloudViewModel.report(spot: spot, report: "inappropriate")
+                    hasReported = true
+                    attemptToReport = false
+                }
+            }
+            Button("Spam".localized()) {
+                guard let spot = spot as? SpotFromCloud else { return }
+                Task {
+                    attemptToReport = true
+                    await cloudViewModel.report(spot: spot, report: "spam")
+                    hasReported = true
+                    attemptToReport = false
+                }
+            }
+            Button("Dangerous".localized()) {
+                guard let spot = spot as? SpotFromCloud else { return }
+                Task {
+                    attemptToReport = true
+                    await cloudViewModel.report(spot: spot, report: "dangerous")
+                    hasReported = true
+                    attemptToReport = false
+                }
+            }
+            Button("Cancel".localized(), role: .cancel) { }
         }
         .frame(maxWidth: .infinity)
         .background(
@@ -370,18 +461,13 @@ struct DetailView: View {
                 .shadow(color: Color.black.opacity(0.8), radius: 5)
                 .mask(Rectangle().padding(.top, -20))
         )
-        .onAppear {
-            if (mapViewModel.isAuthorized) {
-                calculateDistance()
-            }
-        }
     }
     
     private var middlePart: some View {
         VStack(spacing: 4) {
             nameView
             dateView
-            if fromPlaylist && spot.addedBy != nil && spot.dateAdded != nil {
+            if from == .playlists && spot.addedByPreview != nil && spot.dateAddedToPlaylistPreview != nil {
                 addedByView
             }
         }
@@ -390,7 +476,7 @@ struct DetailView: View {
     private var descriptionView: some View {
         ZStack {
             HStack(spacing: 5) {
-                Text(spot.details ?? "")
+                Text(spot.descriptionPreview)
                 Spacer()
             }
             if didCopyDescription {
@@ -406,15 +492,7 @@ struct DetailView: View {
         .padding(.top, 10)
         .padding([.leading, .trailing], 30)
         .onTapGesture {
-            if let details = spot.details {
-                let generator = UIImpactFeedbackGenerator(style: .light)
-                generator.impactOccurred()
-                let pasteboard = UIPasteboard.general
-                pasteboard.string = details
-                withAnimation {
-                    didCopyDescription = true
-                }
-            }
+            copyDescription()
         }
         .onChange(of: didCopyDescription) { newValue in
             if newValue {
@@ -429,7 +507,7 @@ struct DetailView: View {
     
     private var nameView: some View {
         HStack {
-            Text("\(spot.name ?? "")")
+            Text(spot.namePreview)
                 .font(.system(size: 45, weight: .heavy))
             Spacer()
         }
@@ -437,49 +515,45 @@ struct DetailView: View {
         .padding(.trailing, 5)
     }
     
-    private var dateView: some View {
-        HStack {
-            if !loadingAccount {
-                if let accountModel = accountModel {
-                    Button {
-                        if cloudViewModel.userID == spot.userId ?? "" {
-                            tabController.open(.profile)
-                            if !canShare {
-                                if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene {
-                                    windowScene.keyWindow?.rootViewController?.dismiss(animated: true)
-                                }
+    @ViewBuilder
+    private var accountRowView: some View {
+        if !loadingAccount {
+            if let accountModel = accountModel {
+                Button {
+                    if cloudViewModel.userID == spot.userIDPreview {
+                        tabController.open(.profile)
+                        if isSheet {
+                            if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene {
+                                windowScene.keyWindow?.rootViewController?.dismiss(animated: true)
                             }
-                        } else {
-                            openAccountView.toggle()
                         }
-                    } label: {
-                        HStack {
-                            Image(uiImage: accountModel.image)
-                                .resizable()
-                                .frame(width: 60, height: 60)
-                                .clipShape(Circle())
-                            Text(accountModel.name)
-                                .font(.headline)
-                                .foregroundColor(colorScheme == .dark ? .white : .black)
-                        }
+                    } else {
+                        presentAccountView.toggle()
+                    }
+                } label: {
+                    HStack {
+                        Image(uiImage: accountModel.image)
+                            .resizable()
+                            .frame(width: 60, height: 60)
+                            .clipShape(Circle())
+                        Text(accountModel.name)
+                            .font(.headline)
+                            .foregroundColor(colorScheme == .dark ? .white : .black)
                     }
                 }
             }
+        }
+    }
+    
+    private var dateView: some View {
+        HStack {
+            accountRowView
             Spacer()
-            Text(dateToShow)
+            Text(date)
                 .font(.system(size: 15, weight: .light))
                 .foregroundColor(Color.gray)
         }
         .padding([.leading, .trailing], 30)
-        .onAppear {
-            if let date = spot.dateObject {
-                let timeFormatter = DateFormatter()
-                timeFormatter.dateFormat = "MMM d, yyyy"
-                dateToShow = timeFormatter.string(from: date)
-            } else {
-                dateToShow = spot.date?.components(separatedBy: ";")[0] ?? ""
-            }
-        }
     }
     
     private var expandDetailsButton: some View {
@@ -488,42 +562,31 @@ struct DetailView: View {
             .frame(width: (expand ? 50 : 30), height: (expand ? 50 : 30))
             .foregroundColor(Color.secondary)
             .onTapGesture {
-                let generator = UIImpactFeedbackGenerator(style: .light)
-                generator.impactOccurred()
-                withAnimation {
-                    expand.toggle()
-                }
+                expandSheet()
             }
             .padding(.top, 5)
     }
     
     private var addedByView: some View {
         HStack {
-            Text("Added By: ".localized() + (spot.addedBy ?? ""))
+            Text("Added By: ".localized() + (spot.addedByPreview ?? ""))
                 .font(.system(size: 15, weight: .light))
                 .foregroundColor(Color.gray)
             Spacer()
-            Text(dateToShowAdded)
+            Text(dateAdded)
                 .font(.system(size: 15, weight: .light))
                 .foregroundColor(Color.gray)
         }
         .padding([.leading, .trailing], 30)
         .padding(.top, 1)
-        .onAppear {
-            if let date = spot.dateAdded {
-                let timeFormatter = DateFormatter()
-                timeFormatter.dateFormat = "MMM d, yyyy"
-                dateToShowAdded = timeFormatter.string(from: date)
-            }
-        }
     }
     
     private var locationNameView: some View {
         HStack {
-            Image(systemName: (!spot.wasThere ? "mappin" : "figure.wave"))
+            Image(systemName: (spot.customLocationPreview ? "mappin" : "figure.wave"))
                 .font(.system(size: 15, weight: .light))
                 .foregroundColor(Color.gray)
-            Text("\(spot.locationName ?? "")")
+            Text(spot.locationNamePreview)
                 .font(.system(size: 15, weight: .light))
                 .foregroundColor(Color.gray)
                 .padding(.leading, 1)
@@ -552,13 +615,13 @@ struct DetailView: View {
     
     private var routeMeToButton: some View {
         Button {
-            let routeMeTo = MKMapItem(placemark: MKPlacemark(coordinate: CLLocationCoordinate2D(latitude: spot.x, longitude: spot.y)))
-            routeMeTo.name = spot.name ?? "Spot"
+            let routeMeTo = MKMapItem(placemark: MKPlacemark(coordinate: spot.locationPreview.coordinate))
+            routeMeTo.name = spot.namePreview
             routeMeTo.openInMaps(launchOptions: nil)
         } label: {
             HStack {
                 Image(systemName: "location.fill")
-                Text(spot.name ?? "")
+                Text(spot.namePreview)
             }
             .padding(.horizontal)
         }
@@ -569,11 +632,7 @@ struct DetailView: View {
     
     private var copyIdButton: some View {
         Button {
-            let generator = UIImpactFeedbackGenerator(style: .light)
-            generator.impactOccurred()
-            let pasteboard = UIPasteboard.general
-            pasteboard.string = "myspot://" + (spot.dbid ?? "Error")
-            didCopy = true
+            copyId()
         } label: {
             HStack {
                 Image(systemName: "doc.on.doc.fill")
@@ -597,11 +656,21 @@ struct DetailView: View {
     
     private var bottomHalf: some View {
         VStack {
-            if spot.isPublic && spot.dbid != nil {
+            if spot.isPublicPreview && !spot.dataBaseIdPreview.isEmpty {
                 if !didCopy {
                     copyIdButton
                 } else {
                     idCopiedView
+                }
+            }
+            if isAdmin && spot.isFromDiscover {
+                Button {
+                    Task {
+                        guard let spot = spot as? SpotFromCloud else { return }
+                        await cloudViewModel.addDownloads(spot: spot)
+                    }
+                } label: {
+                    Text("add random downloads")
                 }
             }
             if (!distance.isEmpty) {
@@ -610,7 +679,32 @@ struct DetailView: View {
                     .font(.system(size: 15, weight: .light))
                     .padding(.bottom, 1)
             }
-            isPublicView
+            if spot.isFromDiscover {
+                if (!attemptToReport) {
+                    if !hasReported {
+                        Button {
+                            presentReportSpot = true
+                        } label: {
+                            HStack {
+                                Text("Report Spot".localized())
+                                Image(systemName: "exclamationmark.triangle.fill")
+                            }
+                        }
+                        .padding([.top, .bottom], 10)
+                    } else {
+                        HStack {
+                            Text("Report Received".localized())
+                            Image(systemName: "checkmark.square.fill")
+                        }
+                        .padding([.top, .bottom], 10)
+                    }
+                } else {
+                    ProgressView().progressViewStyle(.circular)
+                        .padding([.top, .bottom], 10)
+                }
+            } else {
+                isPublicView
+            }
         }
     }
     
@@ -622,56 +716,272 @@ struct DetailView: View {
             Text("\(scope)")
                 .font(.system(size: 15, weight: .light))
                 .foregroundColor(Color.gray)
-                .onChange(of: spot.isPublic) { newValue in
-                    if (newValue) {
-                        scope = "Public".localized()
-                    } else {
-                        scope = "Private".localized()
-                    }
-                }
-            if (spot.isPublic && spot.likes >= 0) {
+            if (spot.isPublicPreview && downloads > -1) {
                 Image(systemName: "icloud.and.arrow.down")
                     .font(.system(size: 15, weight: .light))
                     .foregroundColor(Color.gray)
-                Text("\(Int(spot.likes))")
+                Text("\(downloads)")
                     .font(.system(size: 15, weight: .light))
                     .foregroundColor(Color.gray)
             }
         }
         .padding(.bottom, 20)
         .onAppear {
-            if spot.isPublic {
-                Task {
-                    do {
-                        let l = try await cloudViewModel.getLikes(idString: spot.dbid ?? "")
-                        if let l = l {
-                            spot.likes = Double(l)
-                        } else {
-                            spot.likes = -1
+            fetchDownloads()
+        }
+    }
+    
+    // MARK: - Functions
+    
+    private func loadAccount() {
+        if loadingAccount {
+            Task {
+                do {
+                    accountModel = try await cloudViewModel.fetchAccount(userid: spot.userIDPreview)
+                    withAnimation {
+                        loadingAccount = false
+                    }
+                } catch {
+                    print("failed to load user account")
+                }
+            }
+        }
+    }
+    
+    private func loadMySpotImages() {
+        if !images.isEmpty { return }
+        images.append(spot.imagePreview ?? defaultImages.errorImage!)
+        if let image2 = spot.image2Preview {
+            images.append(image2)
+        } else if let image3 = spot.image3Preview {
+            images.append(image3)
+        }
+    }
+    
+    private func getShareAC(id: String, name: String) -> UIActivityViewController {
+        return UIActivityViewController(activityItems: ["Check out, \"".localized() + name + "\" on My Spot! ".localized(), URL(string: "myspot://" + (id)) ?? "", "\n\nIf you don't have My Spot, get it on the Appstore here: ".localized(), URL(string: "https://apps.apple.com/us/app/my-spot-exploration/id1613618373")!], applicationActivities: nil)
+    }
+    
+    private func deleteMySpot() {
+        if let i = spots.firstIndex(where: { $0.id?.uuidString == spot.parentIDPreview }) {
+            CoreDataStack.shared.deleteSpot(spots[i])
+            CoreDataStack.shared.save()
+            didDelete = true
+            popView()
+        }
+    }
+    
+    private func popView() {
+        if isSheet {
+            imageOffset = 0
+        }
+        presentationMode.wrappedValue.dismiss()
+    }
+    
+    private func dismissEditSheet() {
+        if presentCannotSavePublicAlert {
+            let generator = UINotificationFeedbackGenerator()
+            generator.notificationOccurred(.warning)
+            presentFailedToUploadAlert.toggle()
+            presentCannotSavePublicAlert = false
+        }
+    }
+    
+    private func copyDescription() {
+        let generator = UIImpactFeedbackGenerator(style: .light)
+        generator.impactOccurred()
+        let pasteboard = UIPasteboard.general
+        pasteboard.string = spot.descriptionPreview
+        withAnimation {
+            didCopyDescription = true
+        }
+    }
+    
+    private func expandSheet() {
+        let generator = UIImpactFeedbackGenerator(style: .light)
+        generator.impactOccurred()
+        withAnimation {
+            expand.toggle()
+        }
+    }
+    
+    private func copyId() {
+        let generator = UIImpactFeedbackGenerator(style: .light)
+        generator.impactOccurred()
+        let pasteboard = UIPasteboard.general
+        pasteboard.string = "myspot://" + (spot.dataBaseIdPreview)
+        didCopy = true
+    }
+    
+    private func fetchDownloads() {
+        if spot.isPublicPreview {
+            Task {
+                do {
+                    let download = try await cloudViewModel.getLikes(idString: spot.dataBaseIdPreview)
+                    if let download = download {
+                        downloads = Int(download)
+                    }
+                } catch {
+                    print("failed to find downloads")
+                }
+            }
+        }
+    }
+    
+    private func isSpotInCoreData() -> Bool {
+        var isInSpots = false
+        spots.forEach { spot in
+            if spot.dbid == self.spot.parentIDPreview {
+                isInSpots = true
+                return
+            }
+        }
+        return isInSpots
+    }
+    
+    private func save() async {
+        let newSpot = Spot(context: CoreDataStack.shared.context)
+        newSpot.founder = spot.founderPreview
+        newSpot.details = spot.descriptionPreview
+        newSpot.image = images[0]
+        if images.count == 3 {
+            newSpot.image2 = images[1]
+            newSpot.image3 = images[2]
+        } else if images.count == 2 {
+            newSpot.image2 = images[1]
+        }
+        newSpot.isShared = false
+        newSpot.userId = spot.userIDPreview
+        newSpot.locationName = spot.locationNamePreview
+        newSpot.name = (newName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? spot.namePreview : newName)
+        newSpot.x = spot.locationPreview.coordinate.latitude
+        newSpot.y = spot.locationPreview.coordinate.longitude
+        newSpot.isPublic = false
+        if spot.userIDPreview != cloudViewModel.userID {
+            newSpot.fromDB = true
+        } else {
+            newSpot.fromDB = false
+        }
+        newSpot.tags = spot.tagsPreview
+        newSpot.date = spot.datePreview
+        if let dateObject = spot.dateObjectPreview {
+            newSpot.dateObject = dateObject
+        } else {
+            newSpot.dateObject = nil
+        }
+        if spot.customLocationPreview {
+            newSpot.wasThere = false
+        } else {
+            newSpot.wasThere = true
+        }
+        newSpot.id = UUID()
+        newSpot.dbid = spot.dataBaseIdPreview
+        CoreDataStack.shared.save()
+        let hashcode = newSpot.name ?? "" + "\(newSpot.x)\(newSpot.y)"
+        await updateAppGroup(hashcode: hashcode, image: newSpot.image, x: newSpot.x, y: newSpot.y, name: newSpot.name ?? "", locatioName: newSpot.name ?? "")
+        isSaved = true
+    }
+    
+    private func updateAppGroup(hashcode: String,
+                                image: UIImage?,
+                                x: Double,
+                                y: Double,
+                                name: String,
+                                locatioName: String) async {
+        let userDefaults = UserDefaults(suiteName: "group.com.isaacpaschall.My-Spot")
+        guard var xArr: [Double] = userDefaults?.object(forKey: "spotXs") as? [Double] else { return }
+        guard var yArr: [Double] = userDefaults?.object(forKey: "spotYs") as? [Double] else { return }
+        guard var nameArr: [String] = userDefaults?.object(forKey: "spotNames") as? [String] else { return }
+        guard var locationNameArr: [String] = userDefaults?.object(forKey: "spotLocationName") as? [String] else { return }
+        guard var imgArr: [Data] = userDefaults?.object(forKey: "spotImgs") as? [Data] else { return }
+        guard let data = image?.jpegData(compressionQuality: 0.5) else { return }
+        let encoded = try! PropertyListEncoder().encode(data)
+        locationNameArr.append(locatioName)
+        nameArr.append(name)
+        xArr.append(x)
+        yArr.append(y)
+        imgArr.append(encoded)
+        userDefaults?.set(locationNameArr, forKey: "spotLocationName")
+        userDefaults?.set(xArr, forKey: "spotXs")
+        userDefaults?.set(yArr, forKey: "spotYs")
+        userDefaults?.set(nameArr, forKey: "spotNames")
+        userDefaults?.set(imgArr, forKey: "spotImgs")
+        userDefaults?.set(imgArr.count, forKey: "spotCount")
+    }
+    
+    private func addDownloadToSpot() {
+        Task {
+            if let spot = spot as? SpotFromCloud {
+                presentSavePublicSpotSpinner = true
+                let didLike = await cloudViewModel.likeSpot(spot: spot)
+                if (didLike) {
+                    DispatchQueue.main.async {
+                        downloads += 1
+                    }
+                }
+            }
+            await save()
+            presentSavePublicSpotSpinner = false
+        }
+    }
+    
+    private func loadCloudImages() {
+        cloudViewModel.canRefresh = false
+        spotInCD = isSpotInCoreData()
+        images.append(spot.imagePreview ?? defaultImages.errorImage!)
+        if let image2 = spot.image2Preview {
+            images.append(image2)
+        }
+        if let image3 = spot.image3Preview {
+            images.append(image3)
+        }
+        if images.count < 2 {
+            Task {
+                let id = spot.dataBaseIdPreview
+                let fetchedImages: [UIImage?] = await cloudViewModel.fetchImages(id: id)
+                if !fetchedImages.isEmpty {
+                    fetchedImages.forEach { image in
+                        if let image = image {
+                            self.images.append(image)
                         }
-                    } catch {
-                        spot.likes = -1
                     }
                 }
             }
         }
     }
     
-    private func calculateDistance() {
-        let userLocation = CLLocation(latitude: mapViewModel.region.center.latitude, longitude: mapViewModel.region.center.longitude)
-        let spotLocation = CLLocation(latitude: spot.x, longitude: spot.y)
-        let distanceInMeters = userLocation.distance(from: spotLocation)
-        if isMetric() {
-            let distanceDouble = distanceInMeters / 1000
-            distance = String(format: "%.1f", distanceDouble) + " km"
-        } else {
-            let distanceDouble = distanceInMeters / 1609.344
-            distance = String(format: "%.1f", distanceDouble) + " mi"
+    private func deleteCloudSpot() {
+        let spotID = spot.dataBaseIdPreview
+        Task {
+            do {
+                try await cloudViewModel.deleteSpot(id: spotID)
+                DispatchQueue.main.async {
+                    spots.forEach { i in
+                        if i.dbid == spotID {
+                            i.isPublic = false
+                            CoreDataStack.shared.save()
+                            return
+                        }
+                    }
+                    didDelete = true
+                    popView()
+                }
+            } catch {
+                presentErrorDeletingSpot = true
+            }
         }
-        
     }
     
-    private func isMetric() -> Bool {
-        return ((Locale.current as NSLocale).object(forKey: NSLocale.Key.usesMetricSystem) as? Bool) ?? true
+    private func initializeVars() {
+        if !initChecked {
+            loadAccount()
+            downloads = spot.downloadsPreview
+            if spot.isFromDiscover {
+                loadCloudImages()
+            } else {
+                loadMySpotImages()
+            }
+            initChecked = true
+        }
     }
 }

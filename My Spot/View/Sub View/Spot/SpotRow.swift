@@ -15,10 +15,15 @@ import CoreLocation
 
 struct SpotRow<T: SpotPreviewType>: View {
     
-    let spot: T
-    let isShared: Bool
-    @State private var scope:String = "Private".localized()
-    @State private var tags: [String] = []
+    @Binding var spot: T
+    var isShared: Bool?
+    private var scope: String {
+        if spot.isPublicPreview { return "Public".localized() }
+        else { return "Private".localized() }
+    }
+    private var tags: [String] {
+        spot.tagsPreview.components(separatedBy: ", ")
+    }
     @State private var exists = true
     @State private var distance: String = ""
     @Environment(\.colorScheme) var colorScheme
@@ -157,9 +162,11 @@ struct SpotRow<T: SpotPreviewType>: View {
     
     @ViewBuilder
     private var sharedCheckMarkForPlaylist: some View {
-        if isShared {
-            Spacer()
-            checkMark
+        if let isShared = isShared {
+            if isShared {
+                Spacer()
+                checkMark
+            }
         }
     }
     
@@ -175,12 +182,6 @@ struct SpotRow<T: SpotPreviewType>: View {
     // MARK: - Functions
     
     private func initializeValues() {
-        tags = spot.tagsPreview.components(separatedBy: ", ")
-        if (spot.isPublicPreview) {
-            scope = "Public".localized()
-        } else {
-            scope = "Private".localized()
-        }
         if (mapViewModel.isAuthorized) {
             distance = mapViewModel.calculateDistance(from: spot.locationPreview)
         }

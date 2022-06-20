@@ -12,7 +12,6 @@
 		C501FC1C27E4419A008FEFA1 /* BottomPopupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C501FC1B27E4419A008FEFA1 /* BottomPopupView.swift */; };
 		C502D4F927E1A02C0057A65C /* PlaylistEditSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = C502D4F827E1A02C0057A65C /* PlaylistEditSheet.swift */; };
 		C502D4FB27E1A6310057A65C /* SpotEditSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = C502D4FA27E1A6310057A65C /* SpotEditSheet.swift */; };
-		C502D4FD27E1B63D0057A65C /* DiscoverSheetShared.swift in Sources */ = {isa = PBXBuildFile; fileRef = C502D4FC27E1B63D0057A65C /* DiscoverSheetShared.swift */; };
 		C5071570282584AC000F344C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C507156F282584AC000F344C /* Assets.xcassets */; };
 		C5071576282584AC000F344C /* MySpotWatch WatchKit Extension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = C5071575282584AC000F344C /* MySpotWatch WatchKit Extension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		C507157B282584AC000F344C /* My_SpotApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = C507157A282584AC000F344C /* My_SpotApp.swift */; };
@@ -61,7 +60,6 @@
 		C515040227D7CA72009F0DCD /* SpotRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = C51503FF27D7CA72009F0DCD /* SpotRow.swift */; };
 		C515040327D7CA72009F0DCD /* AddSpotSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = C515040027D7CA72009F0DCD /* AddSpotSheet.swift */; };
 		C515040427D7CA72009F0DCD /* DetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C515040127D7CA72009F0DCD /* DetailView.swift */; };
-		C515040827D7CA7B009F0DCD /* DiscoverDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C515040627D7CA7B009F0DCD /* DiscoverDetailView.swift */; };
 		C515040D27D7CA87009F0DCD /* DetailedPlaylistView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C515040927D7CA87009F0DCD /* DetailedPlaylistView.swift */; };
 		C515040E27D7CA87009F0DCD /* PlaylistRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = C515040A27D7CA87009F0DCD /* PlaylistRow.swift */; };
 		C515040F27D7CA87009F0DCD /* AddSpotToPlaylistSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = C515040B27D7CA87009F0DCD /* AddSpotToPlaylistSheet.swift */; };
@@ -85,7 +83,6 @@
 		C5552CC928274CB400AF2683 /* DescriptionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5552CC828274CB400AF2683 /* DescriptionView.swift */; };
 		C5552CCB2827616600AF2683 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5552CCA2827616600AF2683 /* AppDelegate.swift */; };
 		C5552CCD2827696500AF2683 /* NotificationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5552CCC2827696500AF2683 /* NotificationView.swift */; };
-		C5552CCF2828207500AF2683 /* DiscoverDetailNotification.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5552CCE2828207500AF2683 /* DiscoverDetailNotification.swift */; };
 		C5552CD128298E6900AF2683 /* CloudSharingController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5552CD028298E6900AF2683 /* CloudSharingController.swift */; };
 		C56011B52800E66A00C49597 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = C56011B72800E66A00C49597 /* Localizable.strings */; };
 		C5850D01285F853C0067EE7F /* SpotPreviewType.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5850D00285F853C0067EE7F /* SpotPreviewType.swift */; };
@@ -134,7 +131,6 @@
 		C5D2956028238CA400FBA01E /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C51503BF27D7C531009F0DCD /* CloudKit.framework */; };
 		C5D29561282504D700FBA01E /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = C56011B72800E66A00C49597 /* Localizable.strings */; };
 		C5F10910284BEE7E00B71CBC /* AccountDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5F1090F284BEE7E00B71CBC /* AccountDetailView.swift */; };
-		C5F10912284BFBCD00B71CBC /* DiscoverDetailAccountSpots.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5F10911284BFBCD00B71CBC /* DiscoverDetailAccountSpots.swift */; };
 		C5F10914284C49DD00B71CBC /* ShareViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5F10913284C49DD00B71CBC /* ShareViewController.swift */; };
 /* End PBXBuildFile section */
 
@@ -212,7 +208,6 @@
 		C501FC1B27E4419A008FEFA1 /* BottomPopupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BottomPopupView.swift; sourceTree = "<group>"; };
 		C502D4F827E1A02C0057A65C /* PlaylistEditSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistEditSheet.swift; sourceTree = "<group>"; };
 		C502D4FA27E1A6310057A65C /* SpotEditSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpotEditSheet.swift; sourceTree = "<group>"; };
-		C502D4FC27E1B63D0057A65C /* DiscoverSheetShared.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiscoverSheetShared.swift; sourceTree = "<group>"; };
 		C507156D282584AB000F344C /* My Spot.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "My Spot.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		C507156F282584AC000F344C /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		C5071575282584AC000F344C /* MySpotWatch WatchKit Extension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "MySpotWatch WatchKit Extension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -263,7 +258,6 @@
 		C51503FF27D7CA72009F0DCD /* SpotRow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SpotRow.swift; sourceTree = "<group>"; };
 		C515040027D7CA72009F0DCD /* AddSpotSheet.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AddSpotSheet.swift; sourceTree = "<group>"; };
 		C515040127D7CA72009F0DCD /* DetailView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DetailView.swift; sourceTree = "<group>"; };
-		C515040627D7CA7B009F0DCD /* DiscoverDetailView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DiscoverDetailView.swift; sourceTree = "<group>"; };
 		C515040927D7CA87009F0DCD /* DetailedPlaylistView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DetailedPlaylistView.swift; sourceTree = "<group>"; };
 		C515040A27D7CA87009F0DCD /* PlaylistRow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlaylistRow.swift; sourceTree = "<group>"; };
 		C515040B27D7CA87009F0DCD /* AddSpotToPlaylistSheet.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AddSpotToPlaylistSheet.swift; sourceTree = "<group>"; };
@@ -289,7 +283,6 @@
 		C5552CC828274CB400AF2683 /* DescriptionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DescriptionView.swift; sourceTree = "<group>"; };
 		C5552CCA2827616600AF2683 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		C5552CCC2827696500AF2683 /* NotificationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationView.swift; sourceTree = "<group>"; };
-		C5552CCE2828207500AF2683 /* DiscoverDetailNotification.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiscoverDetailNotification.swift; sourceTree = "<group>"; };
 		C5552CD028298E6900AF2683 /* CloudSharingController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudSharingController.swift; sourceTree = "<group>"; };
 		C56011B62800E66A00C49597 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		C56011B82800E66D00C49597 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Localizable.strings"; sourceTree = "<group>"; };
@@ -344,7 +337,6 @@
 		C5D295552823719300FBA01E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		C5D2955F28238C9C00FBA01E /* MySpotWidgetExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = MySpotWidgetExtension.entitlements; sourceTree = "<group>"; };
 		C5F1090F284BEE7E00B71CBC /* AccountDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountDetailView.swift; sourceTree = "<group>"; };
-		C5F10911284BFBCD00B71CBC /* DiscoverDetailAccountSpots.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiscoverDetailAccountSpots.swift; sourceTree = "<group>"; };
 		C5F10913284C49DD00B71CBC /* ShareViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -591,7 +583,6 @@
 			children = (
 				C5F1090E284BEE5000B71CBC /* Account */,
 				C51503F827D7CA49009F0DCD /* Playlist */,
-				C51503F727D7CA3F009F0DCD /* Discover */,
 				C51503F627D7CA31009F0DCD /* Spot */,
 				C587B46A2854F472007C3263 /* DatePickerSheet.swift */,
 			);
@@ -628,17 +619,6 @@
 				C50CF4AD27F395E2001A9698 /* SettingsView.swift */,
 			);
 			path = Spot;
-			sourceTree = "<group>";
-		};
-		C51503F727D7CA3F009F0DCD /* Discover */ = {
-			isa = PBXGroup;
-			children = (
-				C515040627D7CA7B009F0DCD /* DiscoverDetailView.swift */,
-				C502D4FC27E1B63D0057A65C /* DiscoverSheetShared.swift */,
-				C5552CCE2828207500AF2683 /* DiscoverDetailNotification.swift */,
-				C5F10911284BFBCD00B71CBC /* DiscoverDetailAccountSpots.swift */,
-			);
-			path = Discover;
 			sourceTree = "<group>";
 		};
 		C51503F827D7CA49009F0DCD /* Playlist */ = {
@@ -1011,7 +991,6 @@
 				C515042927D8540A009F0DCD /* TabController.swift in Sources */,
 				C5850D01285F853C0067EE7F /* SpotPreviewType.swift in Sources */,
 				C501FC1A27E41FF1008FEFA1 /* ImagePopUp.swift in Sources */,
-				C515040827D7CA7B009F0DCD /* DiscoverDetailView.swift in Sources */,
 				C51503E127D7C856009F0DCD /* Spot+CoreDataClass.swift in Sources */,
 				C502D4FB27E1A6310057A65C /* SpotEditSheet.swift in Sources */,
 				C5942842285E5FAE003CF5AA /* ColorRGBA.swift in Sources */,
@@ -1055,7 +1034,6 @@
 				C5C2C4EA285EF51400E585C9 /* PullToRefresh.swift in Sources */,
 				C587027427E27F1900DFB6C4 /* MailViewCallback.swift in Sources */,
 				C594283E285E5EF8003CF5AA /* SetNavigationSwipeToPop.swift in Sources */,
-				C5F10912284BFBCD00B71CBC /* DiscoverDetailAccountSpots.swift in Sources */,
 				C5C2C4DB285EDDA500E585C9 /* MaxCharacterLength.swift in Sources */,
 				C5C2C4DF285EDDD400E585C9 /* DefaultImage.swift in Sources */,
 				C515042527D7CAC6009F0DCD /* UIEmojiTextField.swift in Sources */,
@@ -1067,7 +1045,6 @@
 				C5B01354284AD15B00121163 /* CreateAccountView.swift in Sources */,
 				C51503E327D7C856009F0DCD /* CoreDataManager.swift in Sources */,
 				C5942851285EA641003CF5AA /* SearchSheet.swift in Sources */,
-				C5552CCF2828207500AF2683 /* DiscoverDetailNotification.swift in Sources */,
 				C515040327D7CA72009F0DCD /* AddSpotSheet.swift in Sources */,
 				C50CF4A827F12328001A9698 /* MantisPhotoCropper.swift in Sources */,
 				C594283C285E5EBE003CF5AA /* ConditionalViewModifier.swift in Sources */,
@@ -1076,7 +1053,6 @@
 				C515041027D7CA87009F0DCD /* AddPlaylistSheet.swift in Sources */,
 				C5D295572823719300FBA01E /* MySpotWidget.intentdefinition in Sources */,
 				C51503DE27D7C856009F0DCD /* SpotFromCloud.swift in Sources */,
-				C502D4FD27E1B63D0057A65C /* DiscoverSheetShared.swift in Sources */,
 				C5C2C4E1285EE16900E585C9 /* DateToString.swift in Sources */,
 				C594BB82284D37730012DA6C /* AccountModel.swift in Sources */,
 				C51503FE27D7CA60009F0DCD /* PlaylistView.swift in Sources */,

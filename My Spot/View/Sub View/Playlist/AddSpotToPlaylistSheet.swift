@@ -48,14 +48,14 @@ struct AddSpotToPlaylistSheet: View {
     }
     
     private var availableSpots: some View {
-        List(spotsFiltered) { spot in
-            if (spot.playlist == nil) {
-                SpotRow(spot: spot, isShared: addedSpots.contains(spot))
+        List(0..<spotsFiltered.count, id: \.self) { i in
+            if (spotsFiltered[i].playlist == nil) {
+                SpotRow(spot: $spotsFiltered[i], isShared: addedSpots.contains(spotsFiltered[i]))
                     .onTapGesture {
-                        if addedSpots.contains(spot) {
-                            addedSpots.remove(at: addedSpots.firstIndex(of: spot)!)
+                        if addedSpots.contains(spotsFiltered[i]) {
+                            addedSpots.remove(at: addedSpots.firstIndex(of: spotsFiltered[i])!)
                         } else {
-                            addedSpots.append(spot)
+                            addedSpots.append(spotsFiltered[i])
                         }
                     }
             }

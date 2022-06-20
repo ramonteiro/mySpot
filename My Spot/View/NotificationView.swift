@@ -18,6 +18,8 @@ struct NotificationView: View {
     @State private var index: Int?
     @State private var hasError = false
     @State private var isFetching = false
+    @State private var spots: [SpotFromCloud] = []
+    @State private var didDelete = false
     
     var body: some View {
         NavigationView {
@@ -38,9 +40,9 @@ struct NotificationView: View {
     
     @ViewBuilder
     private var notificationMainView: some View {
-        if !cloudViewModel.notiNewSpotOn && cloudViewModel.notificationSpots.isEmpty {
+        if !cloudViewModel.notiNewSpotOn && spots.isEmpty {
             noNotification
-        } else if cloudViewModel.notificationSpots.isEmpty && !isFetching {
+        } else if spots.isEmpty && !isFetching {
             noSpotsMessage
         } else {
             notificationSpots
@@ -78,7 +80,7 @@ struct NotificationView: View {
             Text("Remove All".localized())
                 .foregroundColor(.red)
         }
-        .disabled(isFetching || cloudViewModel.notificationSpots.isEmpty)
+        .disabled(isFetching || spots.isEmpty)
     }
     
     private var doneButton: some View {
@@ -201,12 +203,12 @@ struct NotificationView: View {
     private var listSpots: some View {
         VStack {
             List {
-                ForEach(cloudViewModel.notificationSpots.indices, id: \.self) { i in
+                ForEach(spots.indices, id: \.self) { i in
                     Button {
                         index = i
                         presentDetailView = true
                     } label: {
-                        SpotRow(spot: cloudViewModel.notificationSpots[i], isShared: false)
+                        SpotRow(spot: $spots[i])
                     }
                 }
                 .onDelete(perform: removeRows)
@@ -220,7 +222,7 @@ struct NotificationView: View {
             .onAppear {
                 cloudViewModel.canRefresh = true
             }
-            NavigationLink(destination: DiscoverDetailNotification(index: index ?? 0), isActive: $presentDetailView) {
+            NavigationLink(destination: DetailView(isSheet: false, from: Tab.discover, spot: spots[index ?? 0], didDelete: $didDelete), isActive: $presentDetailView) {
                 EmptyView()
             }
             .isDetailLink(false)
@@ -237,7 +239,7 @@ struct NotificationView: View {
     }
     
     private func removeNotificationSpots() {
-        cloudViewModel.notificationSpots = []
+        spots = []
         if UserDefaults.standard.valueExists(forKey: "newSpotNotiRecords") {
             UserDefaults.standard.set([], forKey: "newSpotNotiRecords")
         }
@@ -246,7 +248,7 @@ struct NotificationView: View {
     private func removeRows(at offsets: IndexSet) {
         guard var recordid = UserDefaults.standard.stringArray(forKey: "newSpotNotiRecords") else { return }
         recordid.remove(atOffsets: offsets)
-        cloudViewModel.notificationSpots.remove(atOffsets: offsets)
+        spots.remove(atOffsets: offsets)
     }
     
     private func reloadData() {
@@ -256,10 +258,12 @@ struct NotificationView: View {
         if recordids.isEmpty { return }
         Task {
             isFetching = true
-            cloudViewModel.notificationSpots.removeAll()
             do {
                 for recordid in recordids {
-                    try await cloudViewModel.fetchNotificationSpots(recordid: recordid)
+                    let spot = try await cloudViewModel.fetchNotificationSpots(recordid: recordid)
+                    if let spot = spot {
+                        spots.append(spot)
+                    }
                 }
                 isFetching = false
             } catch {
@@ -270,7 +274,7 @@ struct NotificationView: View {
     }
     
     private func checkIfNotificationSpotsHaveLoaded() {
-        if cloudViewModel.notificationSpots.count != 0 {
+        if spots.count != 0 {
             withAnimation {
                 hasError = false
             }

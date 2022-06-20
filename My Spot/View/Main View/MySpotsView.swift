@@ -26,6 +26,7 @@ struct MySpotsView: View {
     @State private var filteredSpots: [Spot] = []
     @State private var searchText = ""
     @State private var sortBy = "Name".localized()
+    @State private var didDelete = false
     
     private var searchResults: [Spot] {
         if searchText.isEmpty {
@@ -124,9 +125,11 @@ struct MySpotsView: View {
     }
     
     private var listOfFilteredSpots: some View {
-        ForEach(searchResults) { spot in
-            NavigationLink(destination: DetailView(canShare: true, fromPlaylist: false, spot: spot, canEdit: true)) {
-                SpotRow(spot: spot, isShared: false)
+        ForEach(0..<searchResults.count, id: \.self) { i in
+            NavigationLink {
+                DetailView(isSheet: false, from: Tab.spots, spot: filteredSpots[i], didDelete: $didDelete)
+            } label: {
+                SpotRow(spot: $filteredSpots[i])
                     .alert(isPresented: self.$presentDeleteAlert) {
                         deleteSpotAlert
                     }

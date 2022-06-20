@@ -38,7 +38,6 @@ struct SpotEditSheet: View {
     @State private var presentCannotDeleteAlert = false
     @State private var presentCannotSavePrivateAlert = false
     @Binding var showingCannotSavePublicAlert: Bool
-    @Binding var didChange: Bool
     
     
     private enum Field {
@@ -496,7 +495,6 @@ struct SpotEditSheet: View {
             generator.notificationOccurred(.warning)
             return
         }
-        didChange = true
         presentationMode.wrappedValue.dismiss()
     }
     
@@ -565,13 +563,12 @@ struct SpotEditSheet: View {
         if !spot.isPublic {
             showingCannotSavePublicAlert = true
         }
-        didChange = true
         presentationMode.wrappedValue.dismiss()
     }
     
     private func removePublic() async {
         do {
-            try await cloudViewModel.deleteSpot(id: CKRecord.ID(recordName: spot.dbid ?? ""))
+            try await cloudViewModel.deleteSpot(id: spot.dbid ?? "")
             spot.isPublic = false
             if (imageChanged) {
                 if let imageData = cloudViewModel.compressImage(image: images[0]).pngData() {
@@ -611,7 +608,6 @@ struct SpotEditSheet: View {
                 generator.notificationOccurred(.warning)
                 return
             }
-            didChange = true
             presentationMode.wrappedValue.dismiss()
         } catch {
             spot.isPublic = true
@@ -690,7 +686,6 @@ struct SpotEditSheet: View {
             generator.notificationOccurred(.warning)
             return
         }
-        didChange = true
         presentationMode.wrappedValue.dismiss()
     }
     

@@ -35,6 +35,7 @@ struct ContentView: View {
     @State private var errorAddingSpot = false
     @State private var addedSpotIsSaving = false
     @State private var doNotTriggerRepeatWhenTabSelectionChanges = false
+    @State private var didDelete = false
     
     var body: some View {
         ZStack {
@@ -59,11 +60,11 @@ struct ContentView: View {
         .onChange(of: cloudViewModel.isSignedInToiCloud) { signedIn in
             checkForValidProfile(isSignedInToiCloud: signedIn)
         }
-        .onChange(of: cloudViewModel.sharedAccount.count) { accounts in
-            presentSharedAccount(accounts: accounts)
+        .onChange(of: cloudViewModel.AccountModelToggle) { _ in
+            presentSharedAccount.toggle()
         }
-        .onChange(of: cloudViewModel.shared.count) { spots in
-            presentSharedSpot(spots: spots)
+        .onChange(of: cloudViewModel.sharedSpotToggle) { _ in
+            presentSharedSpotSheet.toggle()
         }
         .onChange(of: cloudViewModel.isError) { _ in
             presentCloudError()
@@ -95,12 +96,14 @@ struct ContentView: View {
             Text(cloudViewModel.isErrorMessageDetails)
         }
         .fullScreenCover(isPresented: $presentSharedSpotSheet) {
-            cloudViewModel.shared = []
-        } content: {
-            DiscoverSheetShared()
+            if let spot = cloudViewModel.shared {
+                DetailView(isSheet: true, from: Tab.discover, spot: spot, didDelete: $didDelete)
+            }
         }
         .fullScreenCover(isPresented: $presentSharedAccount) {
-            AccountDetailView(userid: cloudViewModel.sharedAccount)
+            if let userid = cloudViewModel.deepAccount {
+                AccountDetailView(userid: userid)
+            }
         }
         .fullScreenCover(isPresented: $presentAccountCreation) {
             dismissAccountCreation()
@@ -242,18 +245,6 @@ struct ContentView: View {
             return
         }
         tabController.lastPressedTab = newSelection
-    }
-    
-    private func presentSharedAccount(accounts: Int) {
-        if accounts == 1 {
-            presentSharedAccount.toggle()
-        }
-    }
-    
-    private func presentSharedSpot(spots: Int) {
-        if spots == 1 {
-            presentSharedSpotSheet.toggle()
-        }
     }
     
     private func presentCloudError() {

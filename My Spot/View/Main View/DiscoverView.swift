@@ -19,7 +19,6 @@ struct DiscoverView: View {
     @EnvironmentObject var cloudViewModel: CloudKitViewModel
     @EnvironmentObject var tabController: TabController
     @State private var presentMapSheet = false
-    @State private var presentDetailView = false
     @State private var searchText = ""
     @State private var searchLocationName = ""
     @State private var sortBy = "Closest".localized()
@@ -27,8 +26,9 @@ struct DiscoverView: View {
     @State private var hasSearched = false
     @State private var hasError = false
     @State private var isSearching = false
-    @State private var index: Int?
     @State private var scrollToTop = false
+    @State private var didDelete = false
+    @State private var spots: [SpotFromCloud] = []
     
     var body: some View {
         NavigationView {
@@ -54,7 +54,7 @@ struct DiscoverView: View {
             }
         }
         .fullScreenCover(isPresented: $presentMapSheet) {
-            MapViewSpots(spots: $cloudViewModel.spots, sortBy: $sortBy, searchText: searchText)
+            MapViewSpots(spots: $spots, sortBy: $sortBy, searchText: searchText)
         }
     }
     
@@ -96,12 +96,11 @@ struct DiscoverView: View {
     }
     
     private var spotRows: some View {
-        ForEach(cloudViewModel.spots.indices, id: \.self) { i in
-            Button {
-                index = i
-                presentDetailView = true
+        ForEach(spots.indices, id: \.self) { i in
+            NavigationLink {
+                DetailView(isSheet: false, from: Tab.discover, spot: spots[i], didDelete: $didDelete)
             } label: {
-                SpotRow(spot: cloudViewModel.spots[i], isShared: false)
+                SpotRow(spot: $spots[i])
             }
             .id(i)
         }
@@ -114,7 +113,10 @@ struct DiscoverView: View {
             if minY < height {
                 if let cursor = cloudViewModel.cursorMain {
                     Task {
-                        await cloudViewModel.fetchMoreSpotsPublic(cursor: cursor, desiredKeys: cloudViewModel.desiredKeys, resultLimit: cloudViewModel.limit)
+                        let newSpots = await cloudViewModel.fetchMoreSpotsPublic(cursor: cursor, desiredKeys: cloudViewModel.desiredKeys, resultLimit: cloudViewModel.limit)
+                        DispatchQueue.main.async {
+                            spots += newSpots
+                        }
                     }
                 }
             }
@@ -153,7 +155,7 @@ struct DiscoverView: View {
         .onChange(of: isSearching) { _ in
             refreshSpots()
         }
-        .animation(.default, value: cloudViewModel.spots)
+        .animation(.default, value: spots)
         .onChange(of: mapViewModel.searchingHere.center.longitude) { _ in
             updateLocationName()
         }
@@ -175,7 +177,6 @@ struct DiscoverView: View {
                               hasSearched: $hasSearched)
             ScrollViewReader { scroll in
                 listOfSpots(scroll: scroll)
-                NavigationLink(destination: DiscoverDetailView(index: index ?? 0, canShare: true), isActive: $presentDetailView) { EmptyView() }.isDetailLink(false)
             }
         }
         .navigationTitle("Discover".localized())
@@ -356,7 +357,7 @@ struct DiscoverView: View {
         if (UserDefaults.standard.valueExists(forKey: "savedDistance")) {
             distance = UserDefaults.standard.integer(forKey: "savedDistance")
         }
-        if (cloudViewModel.spots.count == 0) {
+        if (spots.count == 0) {
             let dis = CGFloat(cloudViewModel.radiusInMeters)
             loadSpotsFromDB(location: CLLocation(latitude: mapViewModel.searchingHere.center.latitude, longitude: mapViewModel.searchingHere.center.longitude), radiusInMeters: dis, filteringBy: sortBy)
         }
@@ -370,11 +371,11 @@ struct DiscoverView: View {
         if mapViewModel.isMetric {
             let radiusUnit = Measurement(value: radiusInMeters, unit: UnitLength.kilometers)
             let unitMeters = radiusUnit.converted(to: .meters)
-            cloudViewModel.radiusInMeters = unitMeters.value
+            UserDefaults.standard.set(unitMeters.value, forKey: "savedDistance")
         } else {
             let radiusUnit = Measurement(value: radiusInMeters, unit: UnitLength.miles)
             let unitMeters = radiusUnit.converted(to: .meters)
-            cloudViewModel.radiusInMeters = unitMeters.value
+            UserDefaults.standard.set(unitMeters.value, forKey: "savedDistance")
         }
         if !searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
             hasSearched = true
@@ -383,8 +384,11 @@ struct DiscoverView: View {
         }
         Task {
             do {
-                try await cloudViewModel.fetchSpotPublic(userLocation: location, filteringBy: filteringBy, search: searchText)
-                scrollToTop.toggle()
+                let newSpots = try await cloudViewModel.fetchSpotPublic(userLocation: location, filteringBy: filteringBy, search: searchText)
+                DispatchQueue.main.async {
+                    spots = newSpots
+                    scrollToTop.toggle()
+                }
             } catch {
                 cloudViewModel.isFetching = false
                 hasError = true
@@ -417,7 +421,7 @@ struct DiscoverView: View {
     }
     
     private func checkToLoadMoreSpots() {
-        if cloudViewModel.spots.count != 0 {
+        if spots.count != 0 {
             withAnimation {
                 hasError.toggle()
             }
@@ -436,7 +440,7 @@ struct DiscoverView: View {
     }
     
     private func scrollToTop(scroll: ScrollViewProxy) {
-        if cloudViewModel.spots.count > 0 {
+        if spots.count > 0 {
             withAnimation(.easeInOut(duration: 0.5)) {
                 scroll.scrollTo(0, anchor: .top)
             }

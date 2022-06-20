@@ -10,11 +10,14 @@ import UIKit
 import CoreLocation
 
 protocol SpotPreviewType: Identifiable, Hashable {
+    var parentIDPreview: String { get }
     var namePreview: String { get }
     var founderPreview: String { get }
     var datePreview: String { get }
     var dateObjectPreview: Date? { get }
     var imagePreview: UIImage? { get }
+    var image2Preview: UIImage? { get }
+    var image3Preview: UIImage? { get }
     var locationNamePreview: String { get }
     var customLocationPreview: Bool { get }
     var tagsPreview: String { get }
@@ -28,4 +31,5 @@ protocol SpotPreviewType: Identifiable, Hashable {
     var dateAddedToPlaylistPreview: Date? { get }
     var userIDPreview: String { get }
     var addedByPreview: String? { get }
+    var dataBaseIdPreview: String { get }
 }

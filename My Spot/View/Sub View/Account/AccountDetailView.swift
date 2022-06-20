@@ -39,6 +39,7 @@ struct AccountDetailView: View {
     @State private var presentEditSheet = false
     @State private var presentNotificationSheet = false
     @State private var presentAccountCreation =  false
+    @State private var didDelete = false
     @EnvironmentObject var cloudViewModel: CloudKitViewModel
     @EnvironmentObject var tabController: TabController
     @Environment(\.presentationMode) private var presentationMode
@@ -269,14 +270,14 @@ struct AccountDetailView: View {
     private func mySpotsList(accountModel: AccountModel) -> some View {
         ForEach(spots.indices, id: \.self) { i in
             NavigationLink {
-                DiscoverDetailAccountSpots(index: i,
-                                           spotsFromCloud: $spots,
-                                           canShare: true,
-                                           myAccount: myAccount,
-                                           accountModel: accountModel)
+                DetailView(isSheet: false, from: Tab.profile, spot: spots[i], didDelete: $didDelete)
             } label: {
-                SpotRow(spot: spots[i], isShared: false)
-                    .padding(4)
+                HStack {
+                    SpotRow(spot: $spots[i])
+                    Spacer()
+                }
+                .background(Color(uiColor: UIColor.systemBackground))
+                .padding(10)
             }
             .buttonStyle(PlainButtonStyle())
         }

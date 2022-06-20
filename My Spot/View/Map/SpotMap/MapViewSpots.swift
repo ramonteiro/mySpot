@@ -18,6 +18,7 @@ struct MapViewSpots<T: SpotPreviewType>: View {
     @State private var spotRegion = DefaultLocations.region
     @State private var presentDetailsSheet = false
     @State private var presentErrorConnectionAlert = false
+    @State private var didDelete = false
     @Binding var spots: [T]
     @Binding var sortBy: String
     let searchText: String?
@@ -40,7 +41,10 @@ struct MapViewSpots<T: SpotPreviewType>: View {
                 originalRegion = spotRegion
             }
             .fullScreenCover(isPresented: $presentDetailsSheet) {
-                DiscoverDetailView(index: selection, canShare: false)
+                DetailView(isSheet: true,
+                           from: (spots[selection].isFromDiscover ? Tab.discover : Tab.spots),
+                           spot: spots[selection],
+                           didDelete: $didDelete)
             }
             .alert("Unable To Find New Spots".localized(), isPresented: $presentErrorConnectionAlert) {
                 Button("OK".localized(), role: .cancel) { }
@@ -209,9 +213,13 @@ struct MapViewSpots<T: SpotPreviewType>: View {
         do {
             sortBy = "Closest".localized()
             UserDefaults.standard.set(sortBy, forKey: "savedSort")
-            try await cloudViewModel.fetchSpotPublic(userLocation: CLLocation(latitude: spotRegion.center.latitude, longitude: spotRegion.center.longitude), filteringBy: "Closest".localized(), search: searchText ?? "")
+            let cloudSpots = try await cloudViewModel.fetchSpotPublic(userLocation: CLLocation(latitude: spotRegion.center.latitude, longitude: spotRegion.center.longitude), filteringBy: "Closest".localized(), search: searchText ?? "")
+            if let cloudSpots = cloudSpots as? [T] {
+                spots = cloudSpots
+                print("worked")
+            }
             originalRegion = spotRegion
-            // TODO: - check if list is not empty and set section to 0 
+            if spots.count > 0 { selection = 0 }
             mapViewModel.searchingHere = spotRegion
         } catch {
             presentErrorConnectionAlert = true

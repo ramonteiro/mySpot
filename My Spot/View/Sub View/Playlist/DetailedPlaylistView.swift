@@ -41,6 +41,7 @@ struct DetailPlaylistView: View {
     @State private var sortBy = "Name".localized()
     @State private var isSaving = false
     @State private var errorSaving = false
+    @State private var didDelete = false
     
     private var canEdit: Bool {
         CoreDataStack.shared.canEdit(object: playlist)
@@ -257,9 +258,11 @@ struct DetailPlaylistView: View {
     private var listFiltered: some View {
         ZStack {
             List {
-                ForEach(searchResults) { spot in
-                    NavigationLink(destination: DetailView(canShare: true, fromPlaylist: true, spot: spot, canEdit: !CoreDataStack.shared.isShared(object: playlist))) {
-                        SpotRow(spot: spot, isShared: false)
+                ForEach(0..<searchResults.count, id: \.self) { i in
+                    NavigationLink {
+                        DetailView(isSheet: false, from: Tab.playlists, spot: filteredSpots[i], didDelete: $didDelete)
+                    } label: {
+                        SpotRow(spot: $filteredSpots[i])
                             .alert(isPresented: self.$showingDeleteAlert) {
                                 Alert(title: Text("Are you sure you want to delete?".localized()),
                                       message: Text(deleteAlertText),

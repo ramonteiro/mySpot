@@ -52,12 +52,28 @@ extension Spot: Identifiable { }
 
 extension Spot: SpotPreviewType {
     
+    var parentIDPreview: String {
+        id?.uuidString ?? ""
+    }
+    
+    var image2Preview: UIImage? {
+        image2
+    }
+    
+    var image3Preview: UIImage? {
+        image3
+    }
+    
+    var dataBaseIdPreview: String {
+        dbid ?? ""
+    }
+    
     var addedByPreview: String? {
         addedBy
     }
     
     var descriptionPreview: String {
-        description
+        details ?? ""
     }
     
     var locationPreview: CLLocation {

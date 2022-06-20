@@ -16,25 +16,23 @@ final class CloudKitViewModel: ObservableObject {
     @Published var systemColorArray: [Color] = [.red,.green,.pink,.blue,.indigo,.mint,.orange,.purple,.teal,.yellow, .gray]
     @Published var isSignedInToiCloud: Bool = false
     @Published var accountStatus: CKAccountStatus?
-    @Published var spots: [SpotFromCloud] = []
-    @Published var shared: [SpotFromCloud] = []
-    @Published var notificationSpots: [SpotFromCloud] = []
-    @Published var userID: String = ""
+    @Published var sharedSpotToggle = false
+    @Published var AccountModelToggle = false
     @Published var canRefresh = false
     @Published var isFetching = false
     @Published var isError = false
-    @Published var savedName = ""
-    @Published var isErrorMessage = ""
-    @Published var isErrorMessageDetails = ""
-    @Published var isPostError = false
-    @Published var limit = 10
-    @Published var sharedAccount = ""
-    @Published var deepAccount: [AccountModel] = []
-    @Published var radiusInMeters: Double = 0
     @Published var notiPermission = 0 // 0: not determined, 1: denied, 2: allowed, 3: provisional, 4: ephemeral, 5: unknown
     @Published var cursorMain: CKQueryOperation.Cursor?
     @Published var cursorAccount: CKQueryOperation.Cursor?
-    @Published var desiredKeys = ["name", "founder", "date", "location", "likes", "inappropriate", "offensive", "dangerous", "spam", "id", "userID", "image", "type", "isMultipleImages", "locationName", "description", "customLocation", "dateObject"]
+    var shared: SpotFromCloud? = nil
+    var notificationSpots: SpotFromCloud? = nil
+    var deepAccount: String? = nil
+    var userID: String = ""
+    var isErrorMessage = ""
+    var isErrorMessageDetails = ""
+    var limit = 10
+    var radiusInMeters: Double { Double(UserDefaults.standard.integer(forKey: "savedDistance")) }
+    let desiredKeys = ["name", "founder", "date", "location", "likes", "inappropriate", "offensive", "dangerous", "spam", "id", "userID", "image", "type", "isMultipleImages", "locationName", "description", "customLocation", "dateObject"]
     
     init() {
         getiCloudStatus()
@@ -49,9 +47,6 @@ final class CloudKitViewModel: ObservableObject {
             limit = UserDefaults.standard.integer(forKey: "limit")
         } else {
             UserDefaults.standard.set(10, forKey: "limit")
-        }
-        if (UserDefaults.standard.valueExists(forKey: "savedDistance")) {
-            radiusInMeters = Double(UserDefaults.standard.integer(forKey: "savedDistance"))
         }
         if (UserDefaults.standard.valueExists(forKey: "discovernot")) {
             notiNewSpotOn = UserDefaults.standard.bool(forKey: "discovernot")
@@ -79,25 +74,14 @@ final class CloudKitViewModel: ObservableObject {
         }
     }
     
-    func deleteSpot(id: CKRecord.ID) async throws {
-        try await CKContainer.default().publicCloudDatabase.deleteRecord(withID: id)
+    func deleteSpot(id: String) async throws {
+        let ckid = CKRecord.ID(recordName: id)
+        try await CKContainer.default().publicCloudDatabase.deleteRecord(withID: ckid)
     }
     
-    func checkDeepLink(url: URL, isFromNoti: Bool) async {
-        var recordName = ""
-        if isFromNoti {
-            recordName = ""
-        } else {
-            guard let host = URLComponents(url: url, resolvingAgainstBaseURL: true)?.host else {
-                isErrorMessage = "Invalid Link".localized()
-                isErrorMessageDetails = "Check that the link was not modified and try again.".localized()
-                isError.toggle()
-                return
-            }
-            recordName = host
-        }
+    func checkDeepLink(host: String) async {
         do {
-            let record = try await CKContainer.default().publicCloudDatabase.record(for: CKRecord.ID(recordName: recordName))
+            let record = try await CKContainer.default().publicCloudDatabase.record(for: CKRecord.ID(recordName: host))
             DispatchQueue.main.async {
                 guard let name = record["name"] as? String else { return }
                 guard let founder = record["founder"] as? String else { return }
@@ -155,14 +139,14 @@ final class CloudKitViewModel: ObservableObject {
                     guard let data3 = try? Data(contentsOf: image3URL) else { return }
                     let image2 = UIImage(data: data2)
                     let image3 = UIImage(data: data3)
-                    self.shared = [SpotFromCloud(id: id, name: name, founder: founder, description: description, date: date, location: location, type: types, imageURL: imageURL ?? URL(fileURLWithPath: "none"),  image2URL: image2 , image3URL: image3, isMultipleImages: isMultipleImages , likes: likes, offensive: offensive, spam: spam, inappropriate: inappropriate, dangerous: dangerous, customLocation: customLocation, locationName: locationName, userID: user, dateObject: dateObject, record: record)]
+                    self.shared = SpotFromCloud(id: id, name: name, founder: founder, description: description, date: date, location: location, type: types, imageURL: imageURL ?? URL(fileURLWithPath: "none"),  image2URL: image2 , image3URL: image3, isMultipleImages: isMultipleImages , likes: likes, offensive: offensive, spam: spam, inappropriate: inappropriate, dangerous: dangerous, customLocation: customLocation, locationName: locationName, userID: user, dateObject: dateObject, record: record)
                 } else if let image2Check = record["image2"] as? CKAsset {
                     let image2URL = image2Check.fileURL ?? URL(fileURLWithPath: "none")
                     guard let data2 = try? Data(contentsOf: image2URL) else { return }
                     let image2 = UIImage(data: data2)
-                    self.shared = [SpotFromCloud(id: id, name: name, founder: founder, description: description, date: date, location: location, type: types, imageURL: imageURL ?? URL(fileURLWithPath: "none"),  image2URL: image2 , image3URL: nil, isMultipleImages: isMultipleImages , likes: likes, offensive: offensive, spam: spam, inappropriate: inappropriate, dangerous: dangerous, customLocation: customLocation, locationName: locationName, userID: user, dateObject: dateObject, record: record)]
+                    self.shared = SpotFromCloud(id: id, name: name, founder: founder, description: description, date: date, location: location, type: types, imageURL: imageURL ?? URL(fileURLWithPath: "none"),  image2URL: image2 , image3URL: nil, isMultipleImages: isMultipleImages , likes: likes, offensive: offensive, spam: spam, inappropriate: inappropriate, dangerous: dangerous, customLocation: customLocation, locationName: locationName, userID: user, dateObject: dateObject, record: record)
                 } else {
-                    self.shared = [SpotFromCloud(id: id, name: name, founder: founder, description: description, date: date, location: location, type: types, imageURL: imageURL ?? URL(fileURLWithPath: "none"),  image2URL: nil , image3URL: nil, isMultipleImages: isMultipleImages , likes: likes, offensive: offensive, spam: spam, inappropriate: inappropriate, dangerous: dangerous, customLocation: customLocation, locationName: locationName, userID: user, dateObject: dateObject, record: record)]
+                    self.shared = SpotFromCloud(id: id, name: name, founder: founder, description: description, date: date, location: location, type: types, imageURL: imageURL ?? URL(fileURLWithPath: "none"),  image2URL: nil , image3URL: nil, isMultipleImages: isMultipleImages , likes: likes, offensive: offensive, spam: spam, inappropriate: inappropriate, dangerous: dangerous, customLocation: customLocation, locationName: locationName, userID: user, dateObject: dateObject, record: record)
                 }
             }
         } catch {
@@ -491,15 +475,15 @@ final class CloudKitViewModel: ObservableObject {
         }
     }
     
-    func fetchNotificationSpots(recordid: String) async throws {
+    func fetchNotificationSpots(recordid: String) async throws -> SpotFromCloud? {
         let predicate = NSPredicate(format: "id == %@", recordid)
         let query = CKQuery(recordType: "Spots", predicate: predicate)
         
         let results = try await CKContainer.default().publicCloudDatabase.records(matching: query, desiredKeys: desiredKeys, resultsLimit: 1)
+        var spot: SpotFromCloud? = nil
         results.matchResults.forEach { (_,result) in
             switch result {
             case .success(let record):
-                DispatchQueue.main.async {
                     guard let name = record["name"] as? String else { return }
                     guard let founder = record["founder"] as? String else { return }
                     guard let date = record["date"] as? String else { return }
@@ -551,13 +535,14 @@ final class CloudKitViewModel: ObservableObject {
                         locationName = locationNameCheck
                     }
                     let imageURL = image.fileURL
-                    self.notificationSpots.append(SpotFromCloud(id: id, name: name, founder: founder, description: description, date: date, location: location, type: types, imageURL: imageURL ?? URL(fileURLWithPath: "none"),  image2URL: nil , image3URL: nil, isMultipleImages: isMultipleImages , likes: likes, offensive: offensive, spam: spam, inappropriate: inappropriate, dangerous: dangerous, customLocation: customLocation, locationName: locationName, userID: user, dateObject: dateObject, record: record))
-                }
+                    spot = SpotFromCloud(id: id, name: name, founder: founder, description: description, date: date, location: location, type: types, imageURL: imageURL ?? URL(fileURLWithPath: "none"),  image2URL: nil , image3URL: nil, isMultipleImages: isMultipleImages , likes: likes, offensive: offensive, spam: spam, inappropriate: inappropriate, dangerous: dangerous, customLocation: customLocation, locationName: locationName, userID: user, dateObject: dateObject, record: record)
+                
             case .failure(let error):
                 print("\(error)")
                 return
             }
         }
+        return spot
     }
     
     func fetchMoreAccountSpots(cursor: CKQueryOperation.Cursor) async throws -> [SpotFromCloud] {
@@ -704,8 +689,9 @@ final class CloudKitViewModel: ObservableObject {
         return spots
     }
     
-    func fetchSpotPublic(userLocation: CLLocation, filteringBy: String, search: String) async throws {
+    func fetchSpotPublic(userLocation: CLLocation, filteringBy: String, search: String) async throws -> [SpotFromCloud] {
         self.isFetching = true
+        var spots: [SpotFromCloud] = []
         var predicate = NSPredicate()
         if radiusInMeters == 0 {
             predicate = NSPredicate(value: true)
@@ -742,13 +728,11 @@ final class CloudKitViewModel: ObservableObject {
         
         let results = try await CKContainer.default().publicCloudDatabase.records(matching: query, desiredKeys: desiredKeys, resultsLimit: limit)
         DispatchQueue.main.async {
-            self.spots.removeAll()
             self.cursorMain = nil
         }
         results.matchResults.forEach { (_,result) in
             switch result {
             case .success(let record):
-                DispatchQueue.main.async {
                     guard let name = record["name"] as? String else { return }
                     guard let founder = record["founder"] as? String else { return }
                     guard let date = record["date"] as? String else { return }
@@ -800,8 +784,7 @@ final class CloudKitViewModel: ObservableObject {
                         locationName = locationNameCheck
                     }
                     let imageURL = image.fileURL
-                    self.spots.append(SpotFromCloud(id: id, name: name, founder: founder, description: description, date: date, location: location, type: types, imageURL: imageURL ?? URL(fileURLWithPath: "none"),  image2URL: nil , image3URL: nil, isMultipleImages: isMultipleImages , likes: likes, offensive: offensive, spam: spam, inappropriate: inappropriate, dangerous: dangerous, customLocation: customLocation, locationName: locationName, userID: user, dateObject: dateObject, record: record))
-                }
+                    spots.append(SpotFromCloud(id: id, name: name, founder: founder, description: description, date: date, location: location, type: types, imageURL: imageURL ?? URL(fileURLWithPath: "none"),  image2URL: nil , image3URL: nil, isMultipleImages: isMultipleImages , likes: likes, offensive: offensive, spam: spam, inappropriate: inappropriate, dangerous: dangerous, customLocation: customLocation, locationName: locationName, userID: user, dateObject: dateObject, record: record))
             case .failure(let error):
                 print("\(error)")
                 DispatchQueue.main.async {
@@ -818,6 +801,7 @@ final class CloudKitViewModel: ObservableObject {
         DispatchQueue.main.async {
             self.cursorMain = results.queryCursor
         }
+        return spots
     }
     
     func updateSpotPublic(id: String, newName: String, newDescription: String, newFounder: String, newType: String, imageChanged: Bool, image: Data?, image2: Data?, image3: Data?, isMultipleImages: Int) async throws -> Bool {
@@ -952,7 +936,8 @@ final class CloudKitViewModel: ObservableObject {
         }
     }
     
-    func fetchMoreSpotsPublic(cursor: CKQueryOperation.Cursor, desiredKeys: [String], resultLimit: Int) async {
+    func fetchMoreSpotsPublic(cursor: CKQueryOperation.Cursor, desiredKeys: [String], resultLimit: Int) async -> [SpotFromCloud] {
+        var spots: [SpotFromCloud] = []
         self.isFetching = true
         self.cursorMain = nil
         do {
@@ -960,7 +945,6 @@ final class CloudKitViewModel: ObservableObject {
             results.matchResults.forEach { (_,result) in
                 switch result {
                 case .success(let record):
-                    DispatchQueue.main.async {
                         guard let name = record["name"] as? String else { return }
                         guard let founder = record["founder"] as? String else { return }
                         guard let date = record["date"] as? String else { return }
@@ -1012,8 +996,8 @@ final class CloudKitViewModel: ObservableObject {
                             locationName = locationNameCheck
                         }
                         let imageURL = image.fileURL
-                        self.spots.append(SpotFromCloud(id: id, name: name, founder: founder, description: description, date: date, location: location, type: types, imageURL: imageURL ?? URL(fileURLWithPath: "none"),  image2URL: nil , image3URL: nil, isMultipleImages: isMultipleImages , likes: likes, offensive: offensive, spam: spam, inappropriate: inappropriate, dangerous: dangerous, customLocation: customLocation, locationName: locationName, userID: user, dateObject: dateObject, record: record))
-                    }
+                        spots.append(SpotFromCloud(id: id, name: name, founder: founder, description: description, date: date, location: location, type: types, imageURL: imageURL ?? URL(fileURLWithPath: "none"),  image2URL: nil , image3URL: nil, isMultipleImages: isMultipleImages , likes: likes, offensive: offensive, spam: spam, inappropriate: inappropriate, dangerous: dangerous, customLocation: customLocation, locationName: locationName, userID: user, dateObject: dateObject, record: record))
+                    
                 case .failure(let error):
                     print("\(error)")
                     DispatchQueue.main.async {
@@ -1039,6 +1023,7 @@ final class CloudKitViewModel: ObservableObject {
                 self.isError.toggle()
             }
         }
+        return spots
     }
     
     func isMySpot(user: String) -> Bool {

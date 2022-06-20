@@ -46,14 +46,16 @@ struct My_SpotApp: App {
                 if id == host {
                     tabController.open(Tab.profile)
                 } else {
-                    cloudViewModel.sharedAccount = host
+                    cloudViewModel.deepAccount = host
+                    cloudViewModel.AccountModelToggle.toggle()
                 }
             } else {
-                cloudViewModel.sharedAccount = host
+                cloudViewModel.deepAccount = host
+                cloudViewModel.AccountModelToggle.toggle()
             }
         } else {
             Task {
-                await cloudViewModel.checkDeepLink(url: url, isFromNoti: false)
+                await cloudViewModel.checkDeepLink(host: host)
             }
         }
     }

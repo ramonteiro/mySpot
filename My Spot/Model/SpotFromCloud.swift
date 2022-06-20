@@ -35,6 +35,22 @@ struct SpotFromCloud: Hashable, Identifiable {
 
 extension SpotFromCloud: SpotPreviewType {
     
+    var parentIDPreview: String {
+        id
+    }
+    
+    var image2Preview: UIImage? {
+        image2URL
+    }
+    
+    var image3Preview: UIImage? {
+        image3URL
+    }
+    
+    var dataBaseIdPreview: String {
+        record.recordID.recordName
+    }
+    
     var addedByPreview: String? {
         nil
     }
