@@ -37,62 +37,75 @@ struct ListView: View {
                     .multilineTextAlignment(.center)
                     .font(.subheadline)
             } else {
-                List {
-                    ForEach(spots, id: \.self) { spot in
-                        NavigationLink(destination: DetailView(mapViewModel: mapViewModel, watchViewModel: watchViewModel, spot: spot)) {
-                            RowView(mapViewModel: mapViewModel, spot: spot)
-                                .swipeActions(edge: .trailing, allowsFullSwipe: true) {
-                                    Button {
-                                        let routeMeTo = MKMapItem(placemark: MKPlacemark(coordinate: CLLocationCoordinate2D(latitude: spot.x, longitude: spot.y)))
-                                        routeMeTo.name = spot.name
-                                        routeMeTo.openInMaps(launchOptions: nil)
-                                    } label: {
-                                        Image(systemName: "location.fill")
-                                            .font(.subheadline)
-                                    }
-                                    .tint(.green)
-                                }
-                                .if(watchViewModel.session.isReachable) { view in
-                                    view.swipeActions(edge: .leading, allowsFullSwipe: true) {
-                                        Button {
-                                            watchViewModel.sendSpotId(id: spot.spotid)
-                                        } label: {
-                                            Image(systemName: "icloud.and.arrow.down")
-                                        }
-                                        .tint(.blue)
-                                    }
-                                }
-                        }
-                    }
-                }
+                listOfSpots
             }
         }
         .onAppear {
             if spots.isEmpty {
-                hasLoaded = false
-                isError = false
-                cloudViewModel.fetchSpotPublic(userLocation: mapViewModel.location, resultLimit: maxLoad, distance: distance) { (results) in
-                    switch results {
-                    case .success(let spots):
-                        self.spots = spots
-                        hasLoaded = true
-                    case .failure(let error):
-                        print("cloudkit fetch error: \(error)")
-                        isError = true
-                    }
+                loadSpots()
+            }
+        }
+    }
+    
+    // MARK: - Sub Views
+    
+    private var listOfSpots: some View {
+        List {
+            ForEach(spots, id: \.self) { spot in
+                NavigationLink(destination: DetailView(spot: spot, mapViewModel: mapViewModel, watchViewModel: watchViewModel)) {
+                    rowView(spot: spot)
                 }
             }
         }
     }
-}
-
-extension View {
     
-    @ViewBuilder func `if`<Content: View>(_ condition: @autoclosure () -> Bool, transform: (Self) -> Content) -> some View {
-        if condition() {
-            transform(self)
-        } else {
-            self
+    private func rowView(spot: Spot) -> some View {
+        RowView(mapViewModel: mapViewModel, spot: spot)
+            .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                routeButton(spot: spot)
+            }
+            .if(watchViewModel.session.isReachable) { view in
+                view.swipeActions(edge: .leading, allowsFullSwipe: true) {
+                    downloadButton(spot: spot)
+                }
+            }
+    }
+    
+    private func routeButton(spot: Spot) -> some View {
+        Button {
+            let routeMeTo = MKMapItem(placemark: MKPlacemark(coordinate: CLLocationCoordinate2D(latitude: spot.x, longitude: spot.y)))
+            routeMeTo.name = spot.name
+            routeMeTo.openInMaps(launchOptions: nil)
+        } label: {
+            Image(systemName: "location.fill")
+                .font(.subheadline)
+        }
+        .tint(.green)
+    }
+    
+    private func downloadButton(spot: Spot) -> some View {
+        Button {
+            watchViewModel.sendSpotId(id: spot.spotid)
+        } label: {
+            Image(systemName: "icloud.and.arrow.down")
+        }
+        .tint(.blue)
+    }
+    
+    // MARK: - Functions
+    
+    private func loadSpots() {
+        hasLoaded = false
+        isError = false
+        cloudViewModel.fetchSpotPublic(userLocation: mapViewModel.location, resultLimit: maxLoad, distance: distance) { (results) in
+            switch results {
+            case .success(let spots):
+                self.spots = spots
+                hasLoaded = true
+            case .failure(let error):
+                print("cloudkit fetch error: \(error)")
+                isError = true
+            }
         }
     }
 }

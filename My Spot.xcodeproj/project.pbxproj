@@ -25,8 +25,6 @@
 		C507159828258645000F344C /* MapViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C507159728258645000F344C /* MapViewModel.swift */; };
 		C507159A28258650000F344C /* CloudKitViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C507159928258650000F344C /* CloudKitViewModel.swift */; };
 		C507159D282586B1000F344C /* SpotModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C507159C282586B1000F344C /* SpotModel.swift */; };
-		C507159E28258FA8000F344C /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = C56011B72800E66A00C49597 /* Localizable.strings */; };
-		C507159F28258FA8000F344C /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = C56011B72800E66A00C49597 /* Localizable.strings */; };
 		C50715A028258FF1000F344C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C507156F282584AC000F344C /* Assets.xcassets */; };
 		C50715A2282596EF000F344C /* ListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C50715A1282596EF000F344C /* ListView.swift */; };
 		C50715A728259CB3000F344C /* DetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C50715A628259CB3000F344C /* DetailView.swift */; };
@@ -76,7 +74,6 @@
 		C5266AD3283EBF0000A923A1 /* MainInterface.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C5266AD1283EBF0000A923A1 /* MainInterface.storyboard */; };
 		C5266AD5283EBF0100A923A1 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C5266AD4283EBF0100A923A1 /* Assets.xcassets */; };
 		C5266AD9283EBF0100A923A1 /* mySpotiMsg.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = C5266ACB283EBF0000A923A1 /* mySpotiMsg.appex */; platformFilter = ios; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
-		C54792DA2841795E005F1D2D /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = C56011B72800E66A00C49597 /* Localizable.strings */; };
 		C5552CC22826472900AF2683 /* PhoneViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5552CC12826472800AF2683 /* PhoneViewModel.swift */; };
 		C5552CC42826482A00AF2683 /* WatchViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5552CC32826482A00AF2683 /* WatchViewModel.swift */; };
 		C5552CC728266EB600AF2683 /* MapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5552CC628266EB600AF2683 /* MapView.swift */; };
@@ -84,7 +81,6 @@
 		C5552CCB2827616600AF2683 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5552CCA2827616600AF2683 /* AppDelegate.swift */; };
 		C5552CCD2827696500AF2683 /* NotificationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5552CCC2827696500AF2683 /* NotificationView.swift */; };
 		C5552CD128298E6900AF2683 /* CloudSharingController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5552CD028298E6900AF2683 /* CloudSharingController.swift */; };
-		C56011B52800E66A00C49597 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = C56011B72800E66A00C49597 /* Localizable.strings */; };
 		C5850D01285F853C0067EE7F /* SpotPreviewType.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5850D00285F853C0067EE7F /* SpotPreviewType.swift */; };
 		C587027427E27F1900DFB6C4 /* MailViewCallback.swift in Sources */ = {isa = PBXBuildFile; fileRef = C587027327E27F1900DFB6C4 /* MailViewCallback.swift */; };
 		C587B46B2854F472007C3263 /* DatePickerSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = C587B46A2854F472007C3263 /* DatePickerSheet.swift */; };
@@ -111,6 +107,27 @@
 		C594285B285EA90D003CF5AA /* MapSearchBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = C594285A285EA90D003CF5AA /* MapSearchBar.swift */; };
 		C594285D285EA9D3003CF5AA /* Landmark.swift in Sources */ = {isa = PBXBuildFile; fileRef = C594285C285EA9D3003CF5AA /* Landmark.swift */; };
 		C594BB82284D37730012DA6C /* AccountModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C594BB81284D37730012DA6C /* AccountModel.swift */; };
+		C5ABCF5528613764003C8B51 /* SpotTimeLineEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5ABCF532861373C003C8B51 /* SpotTimeLineEntry.swift */; };
+		C5ABCF572861377A003C8B51 /* SpotModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5ABCF562861377A003C8B51 /* SpotModel.swift */; };
+		C5ABCF59286137A7003C8B51 /* TimeLineProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5ABCF58286137A7003C8B51 /* TimeLineProvider.swift */; };
+		C5ABCF5B286137ED003C8B51 /* LocationViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5ABCF5A286137ED003C8B51 /* LocationViewModel.swift */; };
+		C5ABCF5D28613859003C8B51 /* CloudKitViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5ABCF5C28613859003C8B51 /* CloudKitViewModel.swift */; };
+		C5ABCF6128613B21003C8B51 /* WidgetTile.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5ABCF6028613B21003C8B51 /* WidgetTile.swift */; };
+		C5ABCF6328613B60003C8B51 /* WidgetHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5ABCF6228613B60003C8B51 /* WidgetHeader.swift */; };
+		C5ABCF6528613B89003C8B51 /* SmallWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5ABCF6428613B89003C8B51 /* SmallWidget.swift */; };
+		C5ABCF6728613B98003C8B51 /* MediumWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5ABCF6628613B98003C8B51 /* MediumWidget.swift */; };
+		C5ABCF6928613BA3003C8B51 /* LargeWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5ABCF6828613BA3003C8B51 /* LargeWidget.swift */; };
+		C5ABCF6B28613BDB003C8B51 /* WidgetEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5ABCF6A28613BDB003C8B51 /* WidgetEntry.swift */; };
+		C5ABCF6C28613C04003C8B51 /* LocalizeStrings.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5942843285E5FCB003CF5AA /* LocalizeStrings.swift */; };
+		C5ABCF6D28613C3F003C8B51 /* CheckUserDefaultsValue.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5942835285E5E3C003CF5AA /* CheckUserDefaultsValue.swift */; };
+		C5ABCF6E28613C6F003C8B51 /* LocalizeStrings.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5942843285E5FCB003CF5AA /* LocalizeStrings.swift */; };
+		C5ABCF6F28613D11003C8B51 /* ConditionalViewModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = C594283B285E5EBE003CF5AA /* ConditionalViewModifier.swift */; };
+		C5ABCF70286141D8003C8B51 /* CheckUserDefaultsValue.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5942835285E5E3C003CF5AA /* CheckUserDefaultsValue.swift */; };
+		C5ABCF71286141DD003C8B51 /* LocalizeStrings.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5942843285E5FCB003CF5AA /* LocalizeStrings.swift */; };
+		C5ABCF7328614219003C8B51 /* SpotCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5ABCF7228614219003C8B51 /* SpotCell.swift */; };
+		C5ABCF7528614241003C8B51 /* SpotModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5ABCF7428614241003C8B51 /* SpotModel.swift */; };
+		C5ABCF782861426E003C8B51 /* PinView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5ABCF772861426E003C8B51 /* PinView.swift */; };
+		C5ABCF7A2861428C003C8B51 /* UnpackUrl.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5ABCF792861428C003C8B51 /* UnpackUrl.swift */; };
 		C5B01354284AD15B00121163 /* CreateAccountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5B01353284AD15B00121163 /* CreateAccountView.swift */; };
 		C5C2C4DB285EDDA500E585C9 /* MaxCharacterLength.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5C2C4DA285EDDA500E585C9 /* MaxCharacterLength.swift */; };
 		C5C2C4DD285EDDBF00E585C9 /* UserDefaults.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5C2C4DC285EDDBF00E585C9 /* UserDefaults.swift */; };
@@ -129,7 +146,6 @@
 		C5D295572823719300FBA01E /* MySpotWidget.intentdefinition in Sources */ = {isa = PBXBuildFile; fileRef = C5D295522823719100FBA01E /* MySpotWidget.intentdefinition */; };
 		C5D2955A2823719300FBA01E /* MySpotWidgetExtension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = C5D2954A2823719100FBA01E /* MySpotWidgetExtension.appex */; platformFilter = ios; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		C5D2956028238CA400FBA01E /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C51503BF27D7C531009F0DCD /* CloudKit.framework */; };
-		C5D29561282504D700FBA01E /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = C56011B72800E66A00C49597 /* Localizable.strings */; };
 		C5F10910284BEE7E00B71CBC /* AccountDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5F1090F284BEE7E00B71CBC /* AccountDetailView.swift */; };
 		C5F10914284C49DD00B71CBC /* ShareViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5F10913284C49DD00B71CBC /* ShareViewController.swift */; };
 /* End PBXBuildFile section */
@@ -284,18 +300,6 @@
 		C5552CCA2827616600AF2683 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		C5552CCC2827696500AF2683 /* NotificationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationView.swift; sourceTree = "<group>"; };
 		C5552CD028298E6900AF2683 /* CloudSharingController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudSharingController.swift; sourceTree = "<group>"; };
-		C56011B62800E66A00C49597 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
-		C56011B82800E66D00C49597 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Localizable.strings"; sourceTree = "<group>"; };
-		C56011B92800E86B00C49597 /* pt-BR */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "pt-BR"; path = "pt-BR.lproj/Localizable.strings"; sourceTree = "<group>"; };
-		C56011BA2800E89300C49597 /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = uk; path = uk.lproj/Localizable.strings; sourceTree = "<group>"; };
-		C56011BB2800F60500C49597 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/Localizable.strings; sourceTree = "<group>"; };
-		C56011BC2800F60700C49597 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/Localizable.strings; sourceTree = "<group>"; };
-		C56011BD2800F60A00C49597 /* hi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = hi; path = hi.lproj/Localizable.strings; sourceTree = "<group>"; };
-		C56011BE2800F60C00C49597 /* id */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = id; path = id.lproj/Localizable.strings; sourceTree = "<group>"; };
-		C56011BF2800F60E00C49597 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/Localizable.strings; sourceTree = "<group>"; };
-		C56011C02800F61100C49597 /* ko */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ko; path = ko.lproj/Localizable.strings; sourceTree = "<group>"; };
-		C56011C12800F61300C49597 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/Localizable.strings; sourceTree = "<group>"; };
-		C56011C22800F64000C49597 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/Localizable.strings; sourceTree = "<group>"; };
 		C5850D00285F853C0067EE7F /* SpotPreviewType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpotPreviewType.swift; sourceTree = "<group>"; };
 		C587027327E27F1900DFB6C4 /* MailViewCallback.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MailViewCallback.swift; sourceTree = "<group>"; };
 		C587B46A2854F472007C3263 /* DatePickerSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DatePickerSheet.swift; sourceTree = "<group>"; };
@@ -321,6 +325,21 @@
 		C594285A285EA90D003CF5AA /* MapSearchBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapSearchBar.swift; sourceTree = "<group>"; };
 		C594285C285EA9D3003CF5AA /* Landmark.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Landmark.swift; sourceTree = "<group>"; };
 		C594BB81284D37730012DA6C /* AccountModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountModel.swift; sourceTree = "<group>"; };
+		C5ABCF532861373C003C8B51 /* SpotTimeLineEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpotTimeLineEntry.swift; sourceTree = "<group>"; };
+		C5ABCF562861377A003C8B51 /* SpotModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpotModel.swift; sourceTree = "<group>"; };
+		C5ABCF58286137A7003C8B51 /* TimeLineProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeLineProvider.swift; sourceTree = "<group>"; };
+		C5ABCF5A286137ED003C8B51 /* LocationViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationViewModel.swift; sourceTree = "<group>"; };
+		C5ABCF5C28613859003C8B51 /* CloudKitViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudKitViewModel.swift; sourceTree = "<group>"; };
+		C5ABCF6028613B21003C8B51 /* WidgetTile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetTile.swift; sourceTree = "<group>"; };
+		C5ABCF6228613B60003C8B51 /* WidgetHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetHeader.swift; sourceTree = "<group>"; };
+		C5ABCF6428613B89003C8B51 /* SmallWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmallWidget.swift; sourceTree = "<group>"; };
+		C5ABCF6628613B98003C8B51 /* MediumWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediumWidget.swift; sourceTree = "<group>"; };
+		C5ABCF6828613BA3003C8B51 /* LargeWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LargeWidget.swift; sourceTree = "<group>"; };
+		C5ABCF6A28613BDB003C8B51 /* WidgetEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetEntry.swift; sourceTree = "<group>"; };
+		C5ABCF7228614219003C8B51 /* SpotCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpotCell.swift; sourceTree = "<group>"; };
+		C5ABCF7428614241003C8B51 /* SpotModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpotModel.swift; sourceTree = "<group>"; };
+		C5ABCF772861426E003C8B51 /* PinView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PinView.swift; sourceTree = "<group>"; };
+		C5ABCF792861428C003C8B51 /* UnpackUrl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UnpackUrl.swift; sourceTree = "<group>"; };
 		C5B01353284AD15B00121163 /* CreateAccountView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateAccountView.swift; sourceTree = "<group>"; };
 		C5C2C4DA285EDDA500E585C9 /* MaxCharacterLength.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MaxCharacterLength.swift; sourceTree = "<group>"; };
 		C5C2C4DC285EDDBF00E585C9 /* UserDefaults.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDefaults.swift; sourceTree = "<group>"; };
@@ -473,7 +492,6 @@
 			isa = PBXGroup;
 			children = (
 				C5D2955F28238C9C00FBA01E /* MySpotWidgetExtension.entitlements */,
-				C594282F285E408C003CF5AA /* Shared */,
 				C51503AC27D7C347009F0DCD /* My Spot */,
 				C5D2954F2823719100FBA01E /* MySpotWidget */,
 				C507156E282584AB000F344C /* MySpotWatch */,
@@ -558,9 +576,6 @@
 		C51503E827D7C9B1009F0DCD /* View */ = {
 			isa = PBXGroup;
 			children = (
-				C5942849285E69DB003CF5AA /* NewSpotNotificationMapView.swift */,
-				C5552CCC2827696500AF2683 /* NotificationView.swift */,
-				C50CF4AF27F3CD4C001A9698 /* SetUpNewSpotNotification.swift */,
 				C51503EB27D7C9E2009F0DCD /* Main View */,
 				C51503EA27D7C9DB009F0DCD /* Sub View */,
 				C51503E927D7C9CE009F0DCD /* Map */,
@@ -571,7 +586,6 @@
 		C51503E927D7C9CE009F0DCD /* Map */ = {
 			isa = PBXGroup;
 			children = (
-				C51503F027D7CA1D009F0DCD /* ViewSingleSpotOnMap.swift */,
 				C594284F285EA62E003CF5AA /* AddSpotMap */,
 				C51503EF27D7CA10009F0DCD /* SpotMap */,
 			);
@@ -584,7 +598,6 @@
 				C5F1090E284BEE5000B71CBC /* Account */,
 				C51503F827D7CA49009F0DCD /* Playlist */,
 				C51503F627D7CA31009F0DCD /* Spot */,
-				C587B46A2854F472007C3263 /* DatePickerSheet.swift */,
 			);
 			path = "Sub View";
 			sourceTree = "<group>";
@@ -602,6 +615,7 @@
 		C51503EF27D7CA10009F0DCD /* SpotMap */ = {
 			isa = PBXGroup;
 			children = (
+				C51503F027D7CA1D009F0DCD /* ViewSingleSpotOnMap.swift */,
 				C515041727D7CAAA009F0DCD /* MapSpotPreview.swift */,
 				C515041827D7CAAA009F0DCD /* SpotMapAnnotation.swift */,
 				C515041927D7CAAA009F0DCD /* MapViewSpots.swift */,
@@ -612,11 +626,9 @@
 		C51503F627D7CA31009F0DCD /* Spot */ = {
 			isa = PBXGroup;
 			children = (
-				C515040027D7CA72009F0DCD /* AddSpotSheet.swift */,
+				C5ABCF50286134D6003C8B51 /* Add and Edit */,
 				C515040127D7CA72009F0DCD /* DetailView.swift */,
 				C51503FF27D7CA72009F0DCD /* SpotRow.swift */,
-				C502D4FA27E1A6310057A65C /* SpotEditSheet.swift */,
-				C50CF4AD27F395E2001A9698 /* SettingsView.swift */,
 			);
 			path = Spot;
 			sourceTree = "<group>";
@@ -645,8 +657,11 @@
 		C5266ACE283EBF0000A923A1 /* mySpotiMsg */ = {
 			isa = PBXGroup;
 			children = (
-				C5266ADD283ECDDD00A923A1 /* mySpotiMsg.entitlements */,
+				C5ABCF762861424E003C8B51 /* Utility */,
+				C5ABCF7428614241003C8B51 /* SpotModel.swift */,
 				C5266ACF283EBF0000A923A1 /* MessagesViewController.swift */,
+				C5ABCF7228614219003C8B51 /* SpotCell.swift */,
+				C5266ADD283ECDDD00A923A1 /* mySpotiMsg.entitlements */,
 				C5266AD1283EBF0000A923A1 /* MainInterface.storyboard */,
 				C5266AD4283EBF0100A923A1 /* Assets.xcassets */,
 				C5266AD6283EBF0100A923A1 /* Info.plist */,
@@ -670,14 +685,6 @@
 				C5C2C4E0285EE16900E585C9 /* DateToString.swift */,
 			);
 			path = Logic;
-			sourceTree = "<group>";
-		};
-		C594282F285E408C003CF5AA /* Shared */ = {
-			isa = PBXGroup;
-			children = (
-				C56011B72800E66A00C49597 /* Localizable.strings */,
-			);
-			path = Shared;
 			sourceTree = "<group>";
 		};
 		C5942830285E5C9F003CF5AA /* Constant */ = {
@@ -722,10 +729,74 @@
 			path = AddSpotMap;
 			sourceTree = "<group>";
 		};
+		C5ABCF50286134D6003C8B51 /* Add and Edit */ = {
+			isa = PBXGroup;
+			children = (
+				C502D4FA27E1A6310057A65C /* SpotEditSheet.swift */,
+				C587B46A2854F472007C3263 /* DatePickerSheet.swift */,
+				C515040027D7CA72009F0DCD /* AddSpotSheet.swift */,
+			);
+			path = "Add and Edit";
+			sourceTree = "<group>";
+		};
+		C5ABCF5128613532003C8B51 /* Notifications */ = {
+			isa = PBXGroup;
+			children = (
+				C5942849285E69DB003CF5AA /* NewSpotNotificationMapView.swift */,
+				C5552CCC2827696500AF2683 /* NotificationView.swift */,
+				C50CF4AF27F3CD4C001A9698 /* SetUpNewSpotNotification.swift */,
+			);
+			path = Notifications;
+			sourceTree = "<group>";
+		};
+		C5ABCF522861372D003C8B51 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				C5ABCF532861373C003C8B51 /* SpotTimeLineEntry.swift */,
+				C5ABCF562861377A003C8B51 /* SpotModel.swift */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		C5ABCF5E28613875003C8B51 /* ViewModel */ = {
+			isa = PBXGroup;
+			children = (
+				C5ABCF5C28613859003C8B51 /* CloudKitViewModel.swift */,
+				C5ABCF58286137A7003C8B51 /* TimeLineProvider.swift */,
+				C5ABCF5A286137ED003C8B51 /* LocationViewModel.swift */,
+			);
+			path = ViewModel;
+			sourceTree = "<group>";
+		};
+		C5ABCF5F28613B0B003C8B51 /* View */ = {
+			isa = PBXGroup;
+			children = (
+				C5ABCF6228613B60003C8B51 /* WidgetHeader.swift */,
+				C5ABCF6028613B21003C8B51 /* WidgetTile.swift */,
+				C5ABCF6428613B89003C8B51 /* SmallWidget.swift */,
+				C5ABCF6628613B98003C8B51 /* MediumWidget.swift */,
+				C5ABCF6828613BA3003C8B51 /* LargeWidget.swift */,
+				C5ABCF6A28613BDB003C8B51 /* WidgetEntry.swift */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		C5ABCF762861424E003C8B51 /* Utility */ = {
+			isa = PBXGroup;
+			children = (
+				C5ABCF772861426E003C8B51 /* PinView.swift */,
+				C5ABCF792861428C003C8B51 /* UnpackUrl.swift */,
+			);
+			path = Utility;
+			sourceTree = "<group>";
+		};
 		C5D2954F2823719100FBA01E /* MySpotWidget */ = {
 			isa = PBXGroup;
 			children = (
 				C5D295502823719100FBA01E /* MySpotWidget.swift */,
+				C5ABCF5F28613B0B003C8B51 /* View */,
+				C5ABCF5E28613875003C8B51 /* ViewModel */,
+				C5ABCF522861372D003C8B51 /* Model */,
 				C5D295522823719100FBA01E /* MySpotWidget.intentdefinition */,
 				C5D295532823719300FBA01E /* Assets.xcassets */,
 				C5D295552823719300FBA01E /* Info.plist */,
@@ -736,6 +807,8 @@
 		C5F1090E284BEE5000B71CBC /* Account */ = {
 			isa = PBXGroup;
 			children = (
+				C5ABCF5128613532003C8B51 /* Notifications */,
+				C50CF4AD27F395E2001A9698 /* SettingsView.swift */,
 				C5B01353284AD15B00121163 /* CreateAccountView.swift */,
 				C5F1090F284BEE7E00B71CBC /* AccountDetailView.swift */,
 			);
@@ -909,7 +982,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				C5071570282584AC000F344C /* Assets.xcassets in Resources */,
-				C507159E28258FA8000F344C /* Localizable.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -918,7 +990,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				C5071588282584AD000F344C /* Preview Assets.xcassets in Resources */,
-				C507159F28258FA8000F344C /* Localizable.strings in Resources */,
 				C50715A028258FF1000F344C /* Assets.xcassets in Resources */,
 				C5071585282584AD000F344C /* Assets.xcassets in Resources */,
 			);
@@ -929,7 +1000,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				C515042C27D95225009F0DCD /* LaunchScreen.storyboard in Resources */,
-				C56011B52800E66A00C49597 /* Localizable.strings in Resources */,
 				C51503B527D7C349009F0DCD /* Preview Assets.xcassets in Resources */,
 				C51503B227D7C349009F0DCD /* Assets.xcassets in Resources */,
 			);
@@ -940,7 +1010,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				C5266AD5283EBF0100A923A1 /* Assets.xcassets in Resources */,
-				C54792DA2841795E005F1D2D /* Localizable.strings in Resources */,
 				C5266AD3283EBF0000A923A1 /* MainInterface.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -950,7 +1019,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				C5D295542823719300FBA01E /* Assets.xcassets in Resources */,
-				C5D29561282504D700FBA01E /* Localizable.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -965,17 +1033,20 @@
 				C5552CC928274CB400AF2683 /* DescriptionView.swift in Sources */,
 				C507159D282586B1000F344C /* SpotModel.swift in Sources */,
 				C5552CC42826482A00AF2683 /* WatchViewModel.swift in Sources */,
+				C5ABCF6F28613D11003C8B51 /* ConditionalViewModifier.swift in Sources */,
 				C507157D282584AC000F344C /* ContentView.swift in Sources */,
 				C5552CC728266EB600AF2683 /* MapView.swift in Sources */,
 				C50715A728259CB3000F344C /* DetailView.swift in Sources */,
 				C5071583282584AC000F344C /* ComplicationController.swift in Sources */,
 				C507157B282584AC000F344C /* My_SpotApp.swift in Sources */,
+				C5ABCF6D28613C3F003C8B51 /* CheckUserDefaultsValue.swift in Sources */,
 				C5071581282584AC000F344C /* NotificationView.swift in Sources */,
 				C507159828258645000F344C /* MapViewModel.swift in Sources */,
 				C5C2C4E7285EEAED00E585C9 /* DefaultRegion.swift in Sources */,
 				C50715A928259CD2000F344C /* RowView.swift in Sources */,
 				C507159A28258650000F344C /* CloudKitViewModel.swift in Sources */,
 				C50715A2282596EF000F344C /* ListView.swift in Sources */,
+				C5ABCF6E28613C6F003C8B51 /* LocalizeStrings.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1069,7 +1140,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				C5266AD0283EBF0000A923A1 /* MessagesViewController.swift in Sources */,
+				C5ABCF71286141DD003C8B51 /* LocalizeStrings.swift in Sources */,
+				C5ABCF782861426E003C8B51 /* PinView.swift in Sources */,
 				C5C2C4E8285EEC1B00E585C9 /* DefaultRegion.swift in Sources */,
+				C5ABCF7528614241003C8B51 /* SpotModel.swift in Sources */,
+				C5ABCF70286141D8003C8B51 /* CheckUserDefaultsValue.swift in Sources */,
+				C5ABCF7328614219003C8B51 /* SpotCell.swift in Sources */,
+				C5ABCF7A2861428C003C8B51 /* UnpackUrl.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1077,9 +1154,21 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C5ABCF6328613B60003C8B51 /* WidgetHeader.swift in Sources */,
 				C5D295562823719300FBA01E /* MySpotWidget.intentdefinition in Sources */,
+				C5ABCF572861377A003C8B51 /* SpotModel.swift in Sources */,
+				C5ABCF5528613764003C8B51 /* SpotTimeLineEntry.swift in Sources */,
+				C5ABCF6528613B89003C8B51 /* SmallWidget.swift in Sources */,
 				C5D295512823719100FBA01E /* MySpotWidget.swift in Sources */,
+				C5ABCF6C28613C04003C8B51 /* LocalizeStrings.swift in Sources */,
+				C5ABCF6728613B98003C8B51 /* MediumWidget.swift in Sources */,
+				C5ABCF5B286137ED003C8B51 /* LocationViewModel.swift in Sources */,
+				C5ABCF6928613BA3003C8B51 /* LargeWidget.swift in Sources */,
+				C5ABCF5D28613859003C8B51 /* CloudKitViewModel.swift in Sources */,
+				C5ABCF6B28613BDB003C8B51 /* WidgetEntry.swift in Sources */,
 				C5C2C4E4285EEAD800E585C9 /* DefaultRegion.swift in Sources */,
+				C5ABCF6128613B21003C8B51 /* WidgetTile.swift in Sources */,
+				C5ABCF59286137A7003C8B51 /* TimeLineProvider.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1118,25 +1207,6 @@
 				C5266AD2283EBF0000A923A1 /* Base */,
 			);
 			name = MainInterface.storyboard;
-			sourceTree = "<group>";
-		};
-		C56011B72800E66A00C49597 /* Localizable.strings */ = {
-			isa = PBXVariantGroup;
-			children = (
-				C56011B62800E66A00C49597 /* en */,
-				C56011B82800E66D00C49597 /* zh-Hans */,
-				C56011B92800E86B00C49597 /* pt-BR */,
-				C56011BA2800E89300C49597 /* uk */,
-				C56011BB2800F60500C49597 /* fr */,
-				C56011BC2800F60700C49597 /* de */,
-				C56011BD2800F60A00C49597 /* hi */,
-				C56011BE2800F60C00C49597 /* id */,
-				C56011BF2800F60E00C49597 /* ja */,
-				C56011C02800F61100C49597 /* ko */,
-				C56011C12800F61300C49597 /* ru */,
-				C56011C22800F64000C49597 /* es */,
-			);
-			name = Localizable.strings;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */

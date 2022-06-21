@@ -1,16 +1,15 @@
 //
-//  MapViewModel.swift
-//  MySpotWatch WatchKit Extension
+//  LocationViewModel.swift
+//  MySpotWidgetExtension
 //
-//  Created by Isaac Paschall on 5/6/22.
+//  Created by Isaac Paschall on 6/20/22.
 //
 
 import CoreLocation
+import WidgetKit
 
-class WatchLocationManager: NSObject, CLLocationManagerDelegate, ObservableObject {
+final class WidgetLocationManager: NSObject, CLLocationManagerDelegate, ObservableObject {
     var locationManager: CLLocationManager?
-    @Published var location = CLLocation(latitude: 0, longitude: 0)
-    @Published var locationName = ""
     private var handler: ((CLLocation) -> Void)?
 
     override init() {
@@ -22,19 +21,6 @@ class WatchLocationManager: NSObject, CLLocationManagerDelegate, ObservableObjec
                 self.locationManager!.requestWhenInUseAuthorization()
             }
         }
-    }
-    
-    func fetchLocation(handler: @escaping (CLLocation) -> Void) {
-        self.handler = handler
-        self.locationManager!.requestLocation()
-    }
-
-    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        self.handler!(locations.last!)
-    }
-    
-    func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
-        print(error)
     }
     
     func getPlacmarkOfLocation(location: CLLocation, completionHandler: @escaping (String) -> Void) {
@@ -61,8 +47,25 @@ class WatchLocationManager: NSObject, CLLocationManagerDelegate, ObservableObjec
         }
     }
     
-    func calculateDistance(x: Double, y: Double) -> String {
-        guard let userLocation = self.locationManager?.location else { return "" }
+    func fetchLocation(handler: @escaping (CLLocation) -> Void) {
+        self.handler = handler
+        self.locationManager!.requestLocation()
+    }
+
+    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        self.handler!(locations.last!)
+    }
+    
+    func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
+        print(error)
+    }
+    
+    func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
+        WidgetCenter.shared.reloadAllTimelines()
+    }
+    
+    func calculateDistance(x: Double, y: Double, x2: Double, y2: Double) -> String {
+        let userLocation = CLLocation(latitude: x2, longitude: y2)
         let spotLocation = CLLocation(latitude: x, longitude: y)
         let distanceInMeters = userLocation.distance(from: spotLocation)
         if isMetric() {
