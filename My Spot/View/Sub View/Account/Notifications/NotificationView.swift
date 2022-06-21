@@ -201,13 +201,10 @@ struct NotificationView: View {
     
     private var listSpots: some View {
         ScrollView(showsIndicators: false) {
-            PullToRefresh(coordinateSpaceName: "pullToRefresh") {
-                reloadData()
-            }
             LazyVStack(alignment: .leading, spacing: 0) {
                 ForEach(spots.indices, id: \.self) { i in
                     NavigationLink {
-                        DetailView(isSheet: false, from: Tab.discover, spot: spots[i], didDelete: $didDelete)
+                        DetailView(isSheet: false, from: Tab.profile, spot: spots[i], didDelete: $didDelete)
                     } label: {
                         HStack {
                             SpotRow(spot: $spots[i])
@@ -221,7 +218,6 @@ struct NotificationView: View {
             }
         }
         .animation(.default, value: spots)
-        .coordinateSpace(name: "pullToRefresh")
     }
     
     // MARK: - Functions

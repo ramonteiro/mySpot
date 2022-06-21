@@ -295,7 +295,11 @@ struct DetailView<T: SpotPreviewType>: View {
     
     private var shareButton: some View {
         Button {
-            presentShareSheet = true
+            if isSheet || (from == .profile && spot.userIDPreview != cloudViewModel.userID) {
+                presentShareSheet = true
+            } else {
+                shareSheet()
+            }
         } label: {
             Image(systemName: "square.and.arrow.up")
                 .foregroundColor(.white)
@@ -970,6 +974,18 @@ struct DetailView<T: SpotPreviewType>: View {
                 presentErrorDeletingSpot = true
             }
         }
+    }
+    
+    private func shareSheet() {
+        let activityView = getShareAC(id: spot.dataBaseIdPreview, name: spot.namePreview)
+
+        let allScenes = UIApplication.shared.connectedScenes
+        let scene = allScenes.first { $0.activationState == .foregroundActive }
+
+        if let windowScene = scene as? UIWindowScene {
+            windowScene.keyWindow?.rootViewController?.present(activityView, animated: true, completion: nil)
+        }
+
     }
     
     private func initializeVars() {

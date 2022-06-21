@@ -228,7 +228,11 @@ struct AccountDetailView: View {
     private var shareButton: some View {
         if UIDevice.current.userInterfaceIdiom != .pad {
             Button {
-                presentShareSheet = true
+                if userid == cloudViewModel.userID {
+                    shareSheet(userid: userid, name: name)
+                } else {
+                    presentShareSheet = true
+                }
             } label: {
                 Image(systemName: "square.and.arrow.up")
             }
@@ -638,6 +642,18 @@ struct AccountDetailView: View {
     
     private func shareSheetAccount(userid: String, name: String) -> UIActivityViewController {
         return UIActivityViewController(activityItems: ["Check out, \"".localized() + name + "\" on My Spot! ".localized(), URL(string: "myspot://" + (userid)) ?? "", "\n\nIf you don't have My Spot, get it on the Appstore here: ".localized(), URL(string: "https://apps.apple.com/us/app/my-spot-exploration/id1613618373")!], applicationActivities: nil)
+    }
+    
+    private func shareSheet(userid: String, name: String) {
+        let activityView = shareSheetAccount(userid: userid, name: name)
+
+        let allScenes = UIApplication.shared.connectedScenes
+        let scene = allScenes.first { $0.activationState == .foregroundActive }
+
+        if let windowScene = scene as? UIWindowScene {
+            windowScene.keyWindow?.rootViewController?.present(activityView, animated: true, completion: nil)
+        }
+
     }
     
     private func fetchSpots() async {
