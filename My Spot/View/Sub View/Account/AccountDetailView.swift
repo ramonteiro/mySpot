@@ -566,7 +566,7 @@ struct AccountDetailView: View {
         }
         if let youtube = youtube {
             if !youtube.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-                linkDictionary["youtube"] = URL(string: "https://www.youtube.com/" + youtube.replacingOccurrences(of: "@", with: "").trimmingCharacters(in: .whitespacesAndNewlines))
+                linkDictionary["youtube"] = URL(string: "https://www.youtube.com/channel/" + youtube.replacingOccurrences(of: "@", with: "").trimmingCharacters(in: .whitespacesAndNewlines))
             }
         }
         if let tiktok = tiktok {
