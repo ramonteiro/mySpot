@@ -28,7 +28,7 @@ final class CloudKitViewModel: ObservableObject {
     var userID: String = ""
     var isErrorMessage = ""
     var isErrorMessageDetails = ""
-    var limit = 10
+    var limit = 5
     var radiusInMeters: Double { Double(UserDefaults.standard.integer(forKey: "savedDistance")) }
     let desiredKeys = ["name", "founder", "date", "location", "likes", "inappropriate", "offensive", "dangerous", "spam", "id", "userID", "image", "type", "isMultipleImages", "locationName", "description", "customLocation", "dateObject"]
     
@@ -547,7 +547,9 @@ final class CloudKitViewModel: ObservableObject {
     }
     
     func fetchMoreAccountSpots(cursor: CKQueryOperation.Cursor) async throws -> [SpotFromCloud] {
-        self.cursorAccount = nil
+        DispatchQueue.main.async {
+            self.cursorAccount = nil
+        }
         let results = try await CKContainer.default().publicCloudDatabase.records(continuingMatchFrom: cursor, desiredKeys: desiredKeys, resultsLimit: limit)
         var spots: [SpotFromCloud] = []
         results.matchResults.forEach { (_,result) in
@@ -691,7 +693,9 @@ final class CloudKitViewModel: ObservableObject {
     }
     
     func fetchSpotPublic(userLocation: CLLocation, filteringBy: String, search: String) async throws -> [SpotFromCloud] {
-        self.isFetching = true
+        DispatchQueue.main.async {
+            self.isFetching = true
+        }
         var spots: [SpotFromCloud] = []
         var predicate = NSPredicate()
         if radiusInMeters == 0 {
@@ -797,9 +801,6 @@ final class CloudKitViewModel: ObservableObject {
         
         DispatchQueue.main.async {
             self.isFetching = false
-        }
-        
-        DispatchQueue.main.async {
             self.cursorMain = results.queryCursor
         }
         return spots
@@ -939,8 +940,10 @@ final class CloudKitViewModel: ObservableObject {
     
     func fetchMoreSpotsPublic(cursor: CKQueryOperation.Cursor, desiredKeys: [String], resultLimit: Int) async -> [SpotFromCloud] {
         var spots: [SpotFromCloud] = []
-        self.isFetching = true
-        self.cursorMain = nil
+        DispatchQueue.main.async {
+            self.isFetching = true
+            self.cursorMain = nil
+        }
         do {
             let results = try await CKContainer.default().publicCloudDatabase.records(continuingMatchFrom: cursor, desiredKeys: desiredKeys, resultsLimit: resultLimit)
             results.matchResults.forEach { (_,result) in
@@ -1010,9 +1013,6 @@ final class CloudKitViewModel: ObservableObject {
             
             DispatchQueue.main.async {
                 self.isFetching = false
-            }
-            
-            DispatchQueue.main.async {
                 self.cursorMain = results.queryCursor
             }
         } catch {

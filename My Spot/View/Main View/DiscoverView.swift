@@ -123,7 +123,7 @@ struct DiscoverView: View {
             let minY = reader.frame(in: .global).minY
             let height = UIScreen.screenHeight / 1.3
             if minY < height {
-                if let cursor = cloudViewModel.cursorMain {
+                if let cursor = cloudViewModel.cursorMain, !cloudViewModel.isFetching {
                     Task {
                         let newSpots = await cloudViewModel.fetchMoreSpotsPublic(cursor: cursor, desiredKeys: cloudViewModel.desiredKeys, resultLimit: cloudViewModel.limit)
                         DispatchQueue.main.async {
