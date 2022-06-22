@@ -11,7 +11,7 @@ struct AccountDetailView: View {
     
     @State var userid: String
     @State var accountModel: AccountModel?
-    @State private var image: UIImage = defaultImages.errorImage!
+    @State private var image: UIImage?
     @State private var name: String = "Account".localized()
     @State private var downloads: Int = 0
     @State private var spotCount: Int = 0
@@ -45,7 +45,7 @@ struct AccountDetailView: View {
     @Environment(\.presentationMode) private var presentationMode
     @Environment(\.colorScheme) private var colorScheme
     
-    var myAccount: Bool {
+    private var myAccount: Bool {
         cloudViewModel.userID == userid
     }
     
@@ -228,7 +228,7 @@ struct AccountDetailView: View {
     private var shareButton: some View {
         if UIDevice.current.userInterfaceIdiom != .pad {
             Button {
-                if userid == cloudViewModel.userID {
+                if myAccount {
                     shareSheet(userid: userid, name: name)
                 } else {
                     presentShareSheet = true
@@ -322,12 +322,15 @@ struct AccountDetailView: View {
         }
     }
     
+    @ViewBuilder
     private var imageView: some View {
-        Image(uiImage: image)
-            .resizable()
-            .frame(width: 130, height: 130)
-            .clipShape(Circle())
-            .padding(.bottom, 5)
+        if let image = image {
+            Image(uiImage: image)
+                .resizable()
+                .frame(width: 130, height: 130)
+                .clipShape(Circle())
+                .padding(.bottom, 5)
+        }
     }
     
     private var loadingAccountSpinner: some View {
@@ -419,6 +422,9 @@ struct AccountDetailView: View {
     // MARK: - Functions
     
     private func inititalize() async {
+        if userid == "error" {
+            userid = cloudViewModel.userID
+        }
         do {
             let fetchedArr = try await cloudViewModel.getDownloadsAndSpots(from: userid)
             downloads = fetchedArr[0]
@@ -615,6 +621,9 @@ struct AccountDetailView: View {
     }
     
     private func refreshAccount() async {
+        if userid == "error" {
+            userid = cloudViewModel.userID
+        }
         do {
             accountModel = try await cloudViewModel.fetchAccount(userid: userid)
             if let account = accountModel {

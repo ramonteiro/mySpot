@@ -10,7 +10,7 @@ import SwiftUI
 
 struct ContentView: View {
 
-    let whatsNewPages = [
+    private let whatsNewPages = [
         WelcomeSheetPage(title: "What's New".localized(), rows: [
             WelcomeSheetPageRow(imageSystemName: "applewatch.radiowaves.left.and.right", title: "Apple Watch Support".localized(), content: "Use the apple watch extension to quickly find spots near you.".localized()),
             WelcomeSheetPageRow(imageSystemName: "square.text.square", title: "Widgets", content: "Add widgets to your home screen to find spots near you at a glance.".localized()),
@@ -18,6 +18,17 @@ struct ContentView: View {
             WelcomeSheetPageRow(imageSystemName: "bell", title: "Notifications".localized(), content: "Get notified when new spots are added near you, or when your shared playlists are modified. Go to settings to turn on notifications.".localized())
         ], mainButtonTitle: "Continue".localized())
     ]
+    
+    private var userid: String {
+        if let id = UserDefaults(suiteName: "group.com.isaacpaschall.My-Spot")?.string(forKey: "userid"),
+           cloudViewModel.userID.isEmpty {
+            return id
+        } else if !cloudViewModel.userID.isEmpty {
+            return cloudViewModel.userID
+        } else {
+            return "error"
+        }
+    }
     
     @EnvironmentObject var cloudViewModel: CloudKitViewModel
     @EnvironmentObject var mapViewModel: MapViewModel
@@ -167,7 +178,7 @@ struct ContentView: View {
     }
     
     private var profileTab: some View {
-        AccountDetailView(userid: (cloudViewModel.userID.isEmpty ? UserDefaults(suiteName: "group.com.isaacpaschall.My-Spot")?.string(forKey: "userid") ?? cloudViewModel.userID : cloudViewModel.userID))
+        AccountDetailView(userid: userid)
             .tabItem() {
                 Image(systemName: "person.fill")
                 Text("Profile".localized())

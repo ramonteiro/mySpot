@@ -103,7 +103,7 @@ struct MapViewSpots<T: SpotPreviewType>: View {
     }
     
     private var mapView: some View {
-        Map(coordinateRegion: $spotRegion, interactionModes: [.pan, .zoom], showsUserLocation: mapViewModel.isAuthorized, annotationItems: spots) { spot in
+        Map(coordinateRegion: $spotRegion, showsUserLocation: mapViewModel.isAuthorized, annotationItems: spots) { spot in
             MapAnnotation(coordinate: spot.locationPreview.coordinate) {
                 mapAnnotation(spot: spot)
             }
