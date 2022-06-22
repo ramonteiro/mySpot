@@ -52,13 +52,30 @@ In order to run this project with cloukit:
 
 - you must change signing and capabilities to your own apple developer accont with an icloud container
 - that container must be in entitlements as well
-- the discover tab will load indefinitely until a spot is uploaded as public (is will keep searching for spots until the cloudkit container is empty) 
+- the discover tab will load indefinitely until a spot is uploaded as public
 - the container must also alow for sorting by creation date and distance in indexes
 - a small package named, mantis is used to crop photos to 1:1. This package should automatically be downloaded by xcode's package manager
 
 
-## Contributing
-Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
+## TODOS
+Features:
+- Re-design detail view
+- add section to find users in discover
+- app clip (ios 16 only, this is due to cloudkit only available in app clips in ios 16)
+- support new ios 16: better ipad screen size handling, share views
+- Mac support
+- Update detail view map to use uikit mapview and add cluters in of map annotations + satellite view
+- Make filters + search a half sheet (ios 16)
 
-Please make sure to update tests as appropriate.
+Clean-up:
+- Create generic cruid funtions for cloudkit…clean up entire cloudkit view model
+- Create view models for each view and inject that view model instead of the model itself 
+- Remove spot data from defaults and change iMessage app to use core data
+
+Bugs:
+- None at the moment :) (at least none found yet)
+
+Business:
+- Create github pages website and replace wordpress
+- Monetize app
 
