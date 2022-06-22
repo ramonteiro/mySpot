@@ -252,6 +252,7 @@ struct NotificationView: View {
                     }
                 }
                 isFetching = false
+                hasError = false
             } catch {
                 isFetching = false
                 hasError = true

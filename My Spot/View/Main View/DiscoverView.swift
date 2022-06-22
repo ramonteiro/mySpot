@@ -128,6 +128,7 @@ struct DiscoverView: View {
                         let newSpots = await cloudViewModel.fetchMoreSpotsPublic(cursor: cursor, desiredKeys: cloudViewModel.desiredKeys, resultLimit: cloudViewModel.limit)
                         DispatchQueue.main.async {
                             spots += newSpots
+                            hasError = false
                         }
                     }
                 }
@@ -395,6 +396,7 @@ struct DiscoverView: View {
                 DispatchQueue.main.async {
                     spots = newSpots
                     scrollToTop.toggle()
+                    hasError = false
                 }
             } catch {
                 cloudViewModel.isFetching = false
@@ -430,7 +432,7 @@ struct DiscoverView: View {
     private func checkToLoadMoreSpots() {
         if spots.count != 0 {
             withAnimation {
-                hasError.toggle()
+                hasError = false
             }
         }
     }

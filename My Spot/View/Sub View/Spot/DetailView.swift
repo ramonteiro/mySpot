@@ -524,16 +524,7 @@ struct DetailView<T: SpotPreviewType>: View {
         if !loadingAccount {
             if let accountModel = accountModel {
                 Button {
-                    if cloudViewModel.userID == spot.userIDPreview {
-                        tabController.open(.profile)
-                        if isSheet {
-                            if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene {
-                                windowScene.keyWindow?.rootViewController?.dismiss(animated: true)
-                            }
-                        }
-                    } else {
-                        presentAccountView.toggle()
-                    }
+                    tapAccountButton()
                 } label: {
                     HStack {
                         Image(uiImage: accountModel.image)
@@ -998,6 +989,21 @@ struct DetailView<T: SpotPreviewType>: View {
                 loadMySpotImages()
             }
             initChecked = true
+        }
+    }
+    
+    private func tapAccountButton() {
+        if cloudViewModel.userID == spot.userIDPreview {
+            tabController.open(.profile)
+            if isSheet {
+                if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene {
+                    windowScene.keyWindow?.rootViewController?.dismiss(animated: true)
+                }
+            }
+        } else if from == .profile {
+            presentationMode.wrappedValue.dismiss()
+        } else {
+            presentAccountView.toggle()
         }
     }
 }
