@@ -258,7 +258,7 @@ struct AccountDetailView: View {
             let minY = reader.frame(in: .global).minY
             let height = UIScreen.screenHeight / 1.3
             if minY < height {
-                if let cursor = cloudViewModel.cursorAccount {
+                if let cursor = cloudViewModel.cursorAccount, !isFetching {
                     Task {
                         isFetching = true
                         do {

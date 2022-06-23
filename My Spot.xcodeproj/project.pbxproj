@@ -143,6 +143,7 @@
 		C5C2C4E7285EEAED00E585C9 /* DefaultRegion.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5C2C4E2285EEA2000E585C9 /* DefaultRegion.swift */; };
 		C5C2C4E8285EEC1B00E585C9 /* DefaultRegion.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5C2C4E2285EEA2000E585C9 /* DefaultRegion.swift */; };
 		C5C2C4EA285EF51400E585C9 /* PullToRefresh.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5C2C4E9285EF51400E585C9 /* PullToRefresh.swift */; };
+		C5D1BF352863D8DF00903236 /* MapViewSpotsWithPreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5D1BF342863D8DF00903236 /* MapViewSpotsWithPreview.swift */; };
 		C5D2954C2823719100FBA01E /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C5D2954B2823719100FBA01E /* WidgetKit.framework */; };
 		C5D2954E2823719100FBA01E /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C5D2954D2823719100FBA01E /* SwiftUI.framework */; };
 		C5D295512823719100FBA01E /* MySpotWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5D295502823719100FBA01E /* MySpotWidget.swift */; };
@@ -364,6 +365,7 @@
 		C5C2C4E0285EE16900E585C9 /* DateToString.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateToString.swift; sourceTree = "<group>"; };
 		C5C2C4E2285EEA2000E585C9 /* DefaultRegion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultRegion.swift; sourceTree = "<group>"; };
 		C5C2C4E9285EF51400E585C9 /* PullToRefresh.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PullToRefresh.swift; sourceTree = "<group>"; };
+		C5D1BF342863D8DF00903236 /* MapViewSpotsWithPreview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapViewSpotsWithPreview.swift; sourceTree = "<group>"; };
 		C5D2954A2823719100FBA01E /* MySpotWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = MySpotWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		C5D2954B2823719100FBA01E /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
 		C5D2954D2823719100FBA01E /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
@@ -637,6 +639,7 @@
 				C515041727D7CAAA009F0DCD /* MapSpotPreview.swift */,
 				C515041827D7CAAA009F0DCD /* SpotMapAnnotation.swift */,
 				C515041927D7CAAA009F0DCD /* MapViewSpots.swift */,
+				C5D1BF342863D8DF00903236 /* MapViewSpotsWithPreview.swift */,
 			);
 			path = SpotMap;
 			sourceTree = "<group>";
@@ -1159,6 +1162,7 @@
 				C594BB82284D37730012DA6C /* AccountModel.swift in Sources */,
 				C51503FE27D7CA60009F0DCD /* PlaylistView.swift in Sources */,
 				C515040227D7CA72009F0DCD /* SpotRow.swift in Sources */,
+				C5D1BF352863D8DF00903236 /* MapViewSpotsWithPreview.swift in Sources */,
 				C5942857285EA816003CF5AA /* CustomCoordinatesSheet.swift in Sources */,
 				C51503DF27D7C856009F0DCD /* Playlist+CoreDataClass.swift in Sources */,
 				C594284A285E69DB003CF5AA /* NewSpotNotificationMapView.swift in Sources */,
