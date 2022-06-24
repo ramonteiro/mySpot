@@ -123,7 +123,8 @@ struct DiscoverView: View {
             let minY = reader.frame(in: .global).minY
             let height = UIScreen.screenHeight / 1.3
             if minY < height {
-                if let cursor = cloudViewModel.cursorMain, !cloudViewModel.isFetching {
+                if let cursor = cloudViewModel.cursorMain, !cloudViewModel.isFetching, spots.count > 0 {
+                    print("adding spots")
                     Task {
                         let newSpots = await cloudViewModel.fetchMoreSpotsPublic(cursor: cursor, desiredKeys: cloudViewModel.desiredKeys, resultLimit: cloudViewModel.limit)
                         DispatchQueue.main.async {
@@ -365,8 +366,7 @@ struct DiscoverView: View {
             distance = UserDefaults.standard.integer(forKey: "savedDistance")
         }
         if (spots.count == 0) {
-            let dis = CGFloat(cloudViewModel.radiusInMeters)
-            loadSpotsFromDB(location: CLLocation(latitude: mapViewModel.searchingHere.center.latitude, longitude: mapViewModel.searchingHere.center.longitude), radiusInMeters: dis, filteringBy: sortBy)
+            refreshSpots()
         }
         mapViewModel.getPlacmarkOfLocation(location: CLLocation(latitude: mapViewModel.searchingHere.center.latitude, longitude: mapViewModel.searchingHere.center.longitude), isPrecise: true) { location in
             searchLocationName = location

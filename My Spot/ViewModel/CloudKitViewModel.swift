@@ -942,7 +942,6 @@ final class CloudKitViewModel: ObservableObject {
         var spots: [SpotFromCloud] = []
         DispatchQueue.main.async {
             self.isFetching = true
-            self.cursorMain = nil
         }
         do {
             let results = try await CKContainer.default().publicCloudDatabase.records(continuingMatchFrom: cursor, desiredKeys: desiredKeys, resultsLimit: resultLimit)
@@ -1018,7 +1017,6 @@ final class CloudKitViewModel: ObservableObject {
         } catch {
             DispatchQueue.main.async {
                 self.isFetching = false
-                self.cursorMain = nil
                 self.isErrorMessage = "Unable To Load More Spots"
                 self.isErrorMessageDetails = "Check internet conection and try again."
                 self.isError.toggle()

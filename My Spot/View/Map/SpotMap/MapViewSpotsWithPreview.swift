@@ -8,11 +8,15 @@
 import SwiftUI
 import MapKit
 
-struct MapViewSpotsWithPreview: UIViewRepresentable {
+struct MapViewSpotsWithPreview<T: SpotPreviewType>: UIViewRepresentable {
     
     @EnvironmentObject var mapViewModel: MapViewModel
     @Binding var map: MKMapView
+    @Binding var centerRegion: MKCoordinateRegion
     @Binding var selectedAnnotation: Int
+    @Binding var spots: [T]
+    @Binding var selectedFromSwipes: Bool
+    @Binding var selectedFromTap: Bool
     
     func makeUIView(context: Context) -> some MKMapView {
         let mapView = map
@@ -31,27 +35,40 @@ struct MapViewSpotsWithPreview: UIViewRepresentable {
     }
     
     class Coordinator: NSObject, MKMapViewDelegate {
+        private var preventDoubleTrigger = false
         var parent: MapViewSpotsWithPreview
         
         init(_ parent: MapViewSpotsWithPreview) {
             self.parent = parent
         }
         
-        func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
-            guard !(annotation is MKUserLocation) else { return nil }
-            if let view = mapView.dequeueReusableAnnotationView(withIdentifier: "custom") {
-                view.annotation = annotation
-                return view
-            }
-            return nil
-        }
-        
         func mapView(_ mapView: MKMapView, didSelect view: MKAnnotationView) {
             if let annotation = view.annotation {
-                let allAnnotations = parent.map.annotations
-                let index = allAnnotations.firstIndex(where: { $0.coordinate.latitude == annotation.coordinate.latitude })
-                if let index = index, parent.selectedAnnotation != index {
-                    parent.selectedAnnotation = index
+                deselectAllExcept(annotation)
+                if !parent.selectedFromSwipes {
+                    let selection = parent.spots.firstIndex(where: {
+                        $0.locationPreview.coordinate.longitude == annotation.coordinate.longitude &&
+                        $0.locationPreview.coordinate.latitude == annotation.coordinate.latitude &&
+                        $0.namePreview == annotation.title
+                    }) ?? 0
+                    parent.selectedFromTap = true
+                    parent.selectedAnnotation = selection
+                } else {
+                    parent.selectedFromSwipes = false
+                }
+            }
+        }
+        
+        func mapViewDidChangeVisibleRegion(_ mapView: MKMapView) {
+            parent.centerRegion = mapView.region
+        }
+        
+        private func deselectAllExcept(_ annotation: MKAnnotation) {
+            for annotaionToDeselect in parent.map.selectedAnnotations {
+                if annotation.coordinate.latitude != annotaionToDeselect.coordinate.latitude &&
+                    annotation.coordinate.longitude != annotaionToDeselect.coordinate.longitude &&
+                    annotation.title != annotaionToDeselect.title {
+                    parent.map.deselectAnnotation(annotaionToDeselect, animated: true)
                 }
             }
         }

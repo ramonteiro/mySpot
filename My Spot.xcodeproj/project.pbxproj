@@ -63,7 +63,6 @@
 		C515040F27D7CA87009F0DCD /* AddSpotToPlaylistSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = C515040B27D7CA87009F0DCD /* AddSpotToPlaylistSheet.swift */; };
 		C515041027D7CA87009F0DCD /* AddPlaylistSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = C515040C27D7CA87009F0DCD /* AddPlaylistSheet.swift */; };
 		C515041A27D7CAAA009F0DCD /* MapSpotPreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = C515041727D7CAAA009F0DCD /* MapSpotPreview.swift */; };
-		C515041B27D7CAAA009F0DCD /* SpotMapAnnotation.swift in Sources */ = {isa = PBXBuildFile; fileRef = C515041827D7CAAA009F0DCD /* SpotMapAnnotation.swift */; };
 		C515041C27D7CAAA009F0DCD /* MapViewSpots.swift in Sources */ = {isa = PBXBuildFile; fileRef = C515041927D7CAAA009F0DCD /* MapViewSpots.swift */; };
 		C515042427D7CAC6009F0DCD /* TakePhoto.swift in Sources */ = {isa = PBXBuildFile; fileRef = C515042127D7CAC6009F0DCD /* TakePhoto.swift */; };
 		C515042527D7CAC6009F0DCD /* UIEmojiTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = C515042227D7CAC6009F0DCD /* UIEmojiTextField.swift */; };
@@ -285,7 +284,6 @@
 		C515040B27D7CA87009F0DCD /* AddSpotToPlaylistSheet.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AddSpotToPlaylistSheet.swift; sourceTree = "<group>"; };
 		C515040C27D7CA87009F0DCD /* AddPlaylistSheet.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AddPlaylistSheet.swift; sourceTree = "<group>"; };
 		C515041727D7CAAA009F0DCD /* MapSpotPreview.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MapSpotPreview.swift; sourceTree = "<group>"; };
-		C515041827D7CAAA009F0DCD /* SpotMapAnnotation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SpotMapAnnotation.swift; sourceTree = "<group>"; };
 		C515041927D7CAAA009F0DCD /* MapViewSpots.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MapViewSpots.swift; sourceTree = "<group>"; };
 		C515042127D7CAC6009F0DCD /* TakePhoto.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TakePhoto.swift; sourceTree = "<group>"; };
 		C515042227D7CAC6009F0DCD /* UIEmojiTextField.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UIEmojiTextField.swift; sourceTree = "<group>"; };
@@ -637,7 +635,6 @@
 			children = (
 				C51503F027D7CA1D009F0DCD /* ViewSingleSpotOnMap.swift */,
 				C515041727D7CAAA009F0DCD /* MapSpotPreview.swift */,
-				C515041827D7CAAA009F0DCD /* SpotMapAnnotation.swift */,
 				C515041927D7CAAA009F0DCD /* MapViewSpots.swift */,
 				C5D1BF342863D8DF00903236 /* MapViewSpotsWithPreview.swift */,
 			);
@@ -1112,7 +1109,6 @@
 				C51503F427D7CA1D009F0DCD /* MapViewModel.swift in Sources */,
 				C51503FC27D7CA60009F0DCD /* MySpotsView.swift in Sources */,
 				C594285B285EA90D003CF5AA /* MapSearchBar.swift in Sources */,
-				C515041B27D7CAAA009F0DCD /* SpotMapAnnotation.swift in Sources */,
 				C5942836285E5E3C003CF5AA /* CheckUserDefaultsValue.swift in Sources */,
 				C587B46B2854F472007C3263 /* DatePickerSheet.swift in Sources */,
 				C5942848285E6008003CF5AA /* EmojiToImage.swift in Sources */,

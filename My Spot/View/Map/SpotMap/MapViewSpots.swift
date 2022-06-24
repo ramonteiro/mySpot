@@ -15,30 +15,46 @@ struct MapViewSpots<T: SpotPreviewType>: View {
     @EnvironmentObject var cloudViewModel: CloudKitViewModel
     @State private var selection = 0
     @State private var originalRegion = DefaultLocations.region
-    @State private var spotRegion = DefaultLocations.region
+    @State private var map = MKMapView()
+    @State private var mapImageToggle = "square.2.stack.3d.top.filled"
+    @State private var centerRegion = MKCoordinateRegion()
+    @State private var selectedFromSwipes = false
+    @State private var selectedFromTap = false
     @State private var presentDetailsSheet = false
     @State private var presentErrorConnectionAlert = false
     @State private var didDelete = false
+    @State private var initialized = false
     @Binding var spots: [T]
     @Binding var sortBy: String
+    private let padding: CGFloat = 10
     let searchText: String?
     
     var canSearchHere: Bool {
-        (spotRegion.center.latitude > originalRegion.center.latitude + 0.01 ||
-         spotRegion.center.latitude < originalRegion.center.latitude - 0.01) ||
-            (spotRegion.center.longitude > originalRegion.center.longitude + 0.01 ||
-             spotRegion.center.longitude < originalRegion.center.longitude - 0.01)
+        (centerRegion.center.latitude > originalRegion.center.latitude + 0.01 ||
+         centerRegion.center.latitude < originalRegion.center.latitude - 0.01) ||
+            (centerRegion.center.longitude > originalRegion.center.longitude + 0.01 ||
+             centerRegion.center.longitude < originalRegion.center.longitude - 0.01)
     }
     
     var body: some View {
-        map
+        mapOfSpots
             .onAppear {
-                if spots.count > 0 {
-                    spotRegion = MKCoordinateRegion(center: spots[0].locationPreview.coordinate, span: DefaultLocations.spanClose)
-                } else {
-                    spotRegion = mapViewModel.searchingHere
+                if !initialized {
+                    if spots.count > 0 {
+                        let region = MKCoordinateRegion(center: spots[0].locationPreview.coordinate, span: DefaultLocations.spanClose)
+                        map.setRegion(region, animated: true)
+                        centerRegion = region
+                        originalRegion = region
+                    } else {
+                        let region = mapViewModel.searchingHere
+                        map.setRegion(region, animated: true)
+                        centerRegion = region
+                        originalRegion = region
+                    }
+                    originalRegion = centerRegion
+                    refreshAnnotations()
+                    initialized = true
                 }
-                originalRegion = spotRegion
             }
             .fullScreenCover(isPresented: $presentDetailsSheet) {
                 DetailView(isSheet: true,
@@ -59,59 +75,56 @@ struct MapViewSpots<T: SpotPreviewType>: View {
         Button {
             route()
         } label: {
-            Image(systemName: "point.topleft.down.curvedto.point.bottomright.up").imageScale(.large)
+            Image(systemName: "point.topleft.down.curvedto.point.bottomright.up")
+                .font(.title2)
+                .foregroundColor(.white)
+                .padding(padding)
+                .frame(width: 50, height: 50)
+                .background(cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex])
+                .clipShape(Circle())
         }
-        .shadow(color: Color.black.opacity(0.3), radius: 5)
-        .buttonStyle(.borderedProminent)
     }
     
     private var myLocationButton: some View {
         Button {
-            withAnimation {
-                spotRegion = mapViewModel.region
-            }
+            map.setRegion(mapViewModel.region, animated: true)
         } label: {
-            Image(systemName: "location").imageScale(.large)
+            Image(systemName: "location")
+                .font(.title2)
+                .foregroundColor(.white)
+                .padding(padding)
+                .frame(width: 50, height: 50)
+                .background(mapViewModel.isAuthorized ? cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex] : .gray)
+                .clipShape(Circle())
         }
         .disabled(!mapViewModel.isAuthorized)
-        .shadow(color: Color.black.opacity(0.3), radius: 5)
-        .buttonStyle(.borderedProminent)
     }
     
     private var backButton: some View {
         Button {
             presentationMode.wrappedValue.dismiss()
         } label: {
-            Image(systemName: "arrowshape.turn.up.backward").imageScale(.large)
+            Image(systemName: "arrowshape.turn.up.backward")
+                .font(.title2)
+                .foregroundColor(.white)
+                .padding(padding)
+                .frame(width: 50, height: 50)
+                .background(cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex])
+                .clipShape(Circle())
         }
-        .shadow(color: Color.black.opacity(0.3), radius: 5)
-        .buttonStyle(.borderedProminent)
-    }
-    
-    private func mapAnnotation(spot: T) -> some View {
-        SpotMapAnnotation(spot: spot,
-                          isSelected: spots[selection] == spot,
-                          color: cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex])
-            .scaleEffect(spots[selection] == spot ? 1.2 : 0.9)
-            .shadow(color: Color.black.opacity(0.3), radius: 5)
-            .onTapGesture {
-                selection = spots.firstIndex(of: spot) ?? 0
-                withAnimation {
-                    setSpotRegion()
-                }
-            }
     }
     
     private var mapView: some View {
-        Map(coordinateRegion: $spotRegion, showsUserLocation: mapViewModel.isAuthorized, annotationItems: spots) { spot in
-            MapAnnotation(coordinate: spot.locationPreview.coordinate) {
-                mapAnnotation(spot: spot)
-            }
-        }
-        .ignoresSafeArea()
+        MapViewSpotsWithPreview(map: $map,
+                                centerRegion: $centerRegion,
+                                selectedAnnotation: $selection,
+                                spots: $spots,
+                                selectedFromSwipes: $selectedFromSwipes,
+                                selectedFromTap: $selectedFromTap)
+            .ignoresSafeArea()
     }
     
-    private var map: some View {
+    private var mapOfSpots: some View {
         ZStack {
             mapView
             buttonOverlay
@@ -126,10 +139,40 @@ struct MapViewSpots<T: SpotPreviewType>: View {
     }
     
     private var rightSide: some View {
-        VStack {
+        VStack(spacing: padding * 1.5) {
             myLocationButton
             routeButon
+            spotLocationButton
+            toggleMapTypeButon
             Spacer()
+        }
+    }
+    
+    private var spotLocationButton: some View {
+        Button {
+            locateSpot()
+        } label: {
+            Image(systemName: "scope")
+                .font(.title2)
+                .foregroundColor(.white)
+                .padding(padding)
+                .frame(width: 50, height: 50)
+                .background(cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex])
+                .clipShape(Circle())
+        }
+    }
+    
+    private var toggleMapTypeButon: some View {
+        Button {
+            toggleMapType()
+        } label: {
+            Image(systemName: mapImageToggle)
+                .font(.title2)
+                .foregroundColor(.white)
+                .padding(padding)
+                .frame(width: 50, height: 50)
+                .background(cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex])
+                .clipShape(Circle())
         }
     }
     
@@ -169,8 +212,18 @@ struct MapViewSpots<T: SpotPreviewType>: View {
         .tabViewStyle(.page(indexDisplayMode: .never))
         .frame(height: UIScreen.screenHeight * 0.25)
         .onChange(of: selection) { _ in
-            withAnimation {
-                setSpotRegion()
+            map.setRegion(MKCoordinateRegion(center: spots[selection].locationPreview.coordinate, span: DefaultLocations.spanClose), animated: true)
+            if !selectedFromTap {
+                if let annotation = map.annotations.first(where: {
+                    $0.coordinate.latitude == spots[selection].locationPreview.coordinate.latitude &&
+                    $0.coordinate.longitude == spots[selection].locationPreview.coordinate.longitude &&
+                    $0.title == spots[selection].namePreview
+                }) {
+                    selectedFromSwipes = true
+                    map.selectAnnotation(annotation, animated: true)
+                }
+            } else {
+                selectedFromTap = false
             }
         }
     }
@@ -190,39 +243,69 @@ struct MapViewSpots<T: SpotPreviewType>: View {
             }
         } label: {
             Text("Search Here".localized())
+                .foregroundColor(.white)
+                .padding(padding)
+                .frame(height: 50)
+                .background(!cloudViewModel.isFetching ? cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex] : .gray)
+                .clipShape(Capsule())
         }
         .disabled(cloudViewModel.isFetching)
-        .shadow(color: Color.black.opacity(0.3), radius: 5)
-        .buttonStyle(.borderedProminent)
     }
     
     // MARK: - Functions
     
     private func route() {
+        if selection >= spots.count { return }
         let routeMeTo = MKMapItem(placemark: MKPlacemark(coordinate: spots[selection].locationPreview.coordinate))
         routeMeTo.name = spots[selection].namePreview
         routeMeTo.openInMaps(launchOptions: nil)
-    }
-    
-    private func setSpotRegion() {
-        spotRegion = MKCoordinateRegion(center: spots[selection].locationPreview.coordinate,
-                                        span: DefaultLocations.spanClose)
     }
     
     private func search() async {
         do {
             sortBy = "Closest".localized()
             UserDefaults.standard.set(sortBy, forKey: "savedSort")
-            let cloudSpots = try await cloudViewModel.fetchSpotPublic(userLocation: CLLocation(latitude: spotRegion.center.latitude, longitude: spotRegion.center.longitude), filteringBy: "Closest".localized(), search: searchText ?? "")
+            let cloudSpots = try await cloudViewModel.fetchSpotPublic(userLocation: CLLocation(latitude: centerRegion.center.latitude, longitude: centerRegion.center.longitude), filteringBy: "Closest".localized(), search: searchText ?? "")
             if let cloudSpots = cloudSpots as? [T] {
                 spots = cloudSpots
-                print("worked")
             }
-            originalRegion = spotRegion
-            if spots.count > 0 { selection = 0 }
-            mapViewModel.searchingHere = spotRegion
+            refreshAnnotations()
+            originalRegion = centerRegion
+            mapViewModel.searchingHere = centerRegion
         } catch {
             presentErrorConnectionAlert = true
         }
+    }
+    
+    private func refreshAnnotations() {
+        var annotations: [MKPointAnnotation] = []
+        spots.forEach { spot in
+            let annotation = MKPointAnnotation()
+            annotation.coordinate = spot.locationPreview.coordinate
+            annotation.title = spot.namePreview
+            annotations.append(annotation)
+        }
+        let oldAnnotations = map.annotations
+        map.removeAnnotations(oldAnnotations)
+        map.addAnnotations(annotations)
+    }
+    
+    private func toggleMapType() {
+        if map.mapType == .standard {
+            map.mapType = .hybrid
+            withAnimation {
+                mapImageToggle = "square.2.stack.3d.bottom.filled"
+            }
+        } else {
+            map.mapType = .standard
+            withAnimation {
+                mapImageToggle = "square.2.stack.3d.top.filled"
+            }
+        }
+    }
+    
+    private func locateSpot() {
+        if selection >= spots.count { return }
+        map.setRegion(MKCoordinateRegion(center: spots[selection].locationPreview.coordinate, span: DefaultLocations.spanClose), animated: true)
     }
 }
