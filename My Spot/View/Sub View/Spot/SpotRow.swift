@@ -72,16 +72,6 @@ struct SpotRow<T: SpotPreviewType>: View {
     }
     
     @ViewBuilder
-    private var addedBy: some View {
-        if let addedBy = spot.addedByPreview {
-            Text("Added By: ".localized() + addedBy)
-                .font(.subheadline)
-                .foregroundColor(Color.gray)
-                .lineLimit(1)
-        }
-    }
-    
-    @ViewBuilder
     private var downloadsOrScope: some View {
         if spot.isFromDiscover {
             HStack(alignment: .center) {
@@ -151,7 +141,6 @@ struct SpotRow<T: SpotPreviewType>: View {
     private var content: some View {
         VStack(alignment: .leading) {
             name
-            addedBy
             downloadsOrScope
             locationName
             distanceAway

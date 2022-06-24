@@ -8,6 +8,7 @@
 import SwiftUI
 import Combine
 import CloudKit
+import Vision
 
 struct SpotEditSheet: View {
     
@@ -75,7 +76,7 @@ struct SpotEditSheet: View {
         .onAppear {
             initializeImages()
         }
-        .disabled(isSaving)
+        .allowsHitTesting(!isSaving)
     }
     
     // MARK: - Sub Views
@@ -495,7 +496,6 @@ struct SpotEditSheet: View {
             generator.notificationOccurred(.warning)
             return
         }
-        presentationMode.wrappedValue.dismiss()
     }
     
     private func savePublic() async {
@@ -563,7 +563,6 @@ struct SpotEditSheet: View {
         if !spot.isPublic {
             showingCannotSavePublicAlert = true
         }
-        presentationMode.wrappedValue.dismiss()
     }
     
     private func removePublic() async {
@@ -608,7 +607,6 @@ struct SpotEditSheet: View {
                 generator.notificationOccurred(.warning)
                 return
             }
-            presentationMode.wrappedValue.dismiss()
         } catch {
             spot.isPublic = true
             isPublic = true
@@ -686,7 +684,6 @@ struct SpotEditSheet: View {
             generator.notificationOccurred(.warning)
             return
         }
-        presentationMode.wrappedValue.dismiss()
     }
     
     private func updateAppGroup(hashcode: String, image: UIImage?, x: Double, y: Double, name: String, locatioName: String) async {
@@ -763,31 +760,20 @@ struct SpotEditSheet: View {
     }
     
     private func saveButtonTapped() {
-        tags = descript.findTags()
-        if (isPublic && wasPublic) {
-            Task {
-                isSaving = true
+        isSaving = true
+        Task {
+            presentationMode.wrappedValue.dismiss()
+            tags = descript.findTags()
+            if (isPublic && wasPublic) {
                 await updatePublic()
-                isSaving = false
-            }
-        } else if (!wasPublic && isPublic) {
-            Task {
-                isSaving = true
+            } else if (!wasPublic && isPublic) {
                 await savePublic()
-                isSaving = false
-            }
-        } else if (wasPublic && !isPublic) {
-            Task {
-                isSaving = true
+            } else if (wasPublic && !isPublic) {
                 await removePublic()
-                isSaving = false
-            }
-        } else {
-            Task {
-                isSaving = true
+            } else {
                 await saveChanges()
-                isSaving = false
             }
+            isSaving = false
         }
     }
 }

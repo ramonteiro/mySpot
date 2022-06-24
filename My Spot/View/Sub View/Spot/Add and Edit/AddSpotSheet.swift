@@ -14,6 +14,7 @@ import SwiftUI
 import MapKit
 import StoreKit
 import Combine
+import Vision
 
 struct AddSpotSheet: View {
     
@@ -77,6 +78,7 @@ struct AddSpotSheet: View {
     var body: some View {
         if (mapViewModel.isAuthorized || usingCustomLocation) {
             addSpotView
+                .allowsHitTesting(!isSaving)
         } else {
             noLocationWarning
         }
@@ -469,20 +471,14 @@ struct AddSpotSheet: View {
     
     // MARK: - Functions
     
-    private func getDate() -> String{
-        let timeFormatter = DateFormatter()
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "MMM d, yyyy"
-        timeFormatter.dateFormat = "HH:mm:ss"
-        let stringTime = timeFormatter.string(from: Date())
-        let stringDate = dateFormatter.string(from: dateFound)
-        return stringDate + "; " + stringTime
-    }
-    
     private func save() async {
+        var hiddenTags = ""
         let newSpot = Spot(context: CoreDataStack.shared.context)
         if let imageData = cloudViewModel.compressImage(image: images[0] ?? defaultImages.errorImage!).pngData() {
-            newSpot.image = UIImage(data: imageData)
+            if let image = UIImage(data: imageData) {
+                newSpot.image = image
+                hiddenTags += await getTextFromImage(uiImage: image)
+            }
         } else {
             presentCannotSavePrivateAlert = true
             let generator = UINotificationFeedbackGenerator()
@@ -491,7 +487,10 @@ struct AddSpotSheet: View {
         }
         if (images.count == 3) {
             if let imageData = cloudViewModel.compressImage(image: images[1] ?? defaultImages.errorImage!).pngData() {
-                newSpot.image2 = UIImage(data: imageData)
+                if let image = UIImage(data: imageData) {
+                    newSpot.image2 = image
+                    hiddenTags += await getTextFromImage(uiImage: image)
+                }
             } else {
                 presentCannotSavePrivateAlert = true
                 let generator = UINotificationFeedbackGenerator()
@@ -499,7 +498,10 @@ struct AddSpotSheet: View {
                 return
             }
             if let imageData = cloudViewModel.compressImage(image: images[2] ?? defaultImages.errorImage!).pngData() {
-                newSpot.image3 = UIImage(data: imageData)
+                if let image = UIImage(data: imageData) {
+                    newSpot.image3 = image
+                    hiddenTags += await getTextFromImage(uiImage: image)
+                }
             } else {
                 presentCannotSavePrivateAlert = true
                 let generator = UINotificationFeedbackGenerator()
@@ -508,7 +510,10 @@ struct AddSpotSheet: View {
             }
         } else if (images.count == 2) {
             if let imageData = cloudViewModel.compressImage(image: images[1] ?? defaultImages.errorImage!).pngData() {
-                newSpot.image2 = UIImage(data: imageData)
+                if let image = UIImage(data: imageData) {
+                    newSpot.image2 = image
+                    hiddenTags += await getTextFromImage(uiImage: image)
+                }
             } else {
                 presentCannotSavePrivateAlert = true
                 let generator = UINotificationFeedbackGenerator()
@@ -525,7 +530,6 @@ struct AddSpotSheet: View {
             newSpot.y = mapViewModel.region.center.longitude
             newSpot.wasThere = true
         }
-        
         newSpot.isShared = false
         newSpot.userId = cloudViewModel.userID
         if let founder = UserDefaults.standard.string(forKey: "founder") {
@@ -537,7 +541,7 @@ struct AddSpotSheet: View {
         newSpot.name = name
         newSpot.fromDB = false
         newSpot.isPublic = false
-        newSpot.date = getDate()
+        newSpot.date = hiddenTags
         newSpot.dateObject = dateFound
         newSpot.tags = tags
         newSpot.locationName = locationName
@@ -551,7 +555,6 @@ struct AddSpotSheet: View {
             generator.notificationOccurred(.warning)
             return
         }
-        presentationMode.wrappedValue.dismiss()
     }
     
     private func askForReview() {
@@ -576,23 +579,36 @@ struct AddSpotSheet: View {
     }
     
     private func savePublic() async {
+        var hiddenTags = ""
         let newSpot = Spot(context: CoreDataStack.shared.context)
         if let imageData = cloudViewModel.compressImage(image: images[0] ?? defaultImages.errorImage!).pngData() {
-            newSpot.image = UIImage(data: imageData)
+            if let image = UIImage(data: imageData) {
+                newSpot.image = image
+                hiddenTags += await getTextFromImage(uiImage: image)
+            }
             var imageData2: Data? = nil
             var imageData3: Data? = nil
             if (images.count == 3) {
                 if let imageData2Check = cloudViewModel.compressImage(image: images[1] ?? defaultImages.errorImage!).pngData() {
-                    newSpot.image2 = UIImage(data: imageData2Check)
+                    if let image = UIImage(data: imageData2Check) {
+                        newSpot.image2 = image
+                        hiddenTags += await getTextFromImage(uiImage: image)
+                    }
                     imageData2 = imageData2Check
                 }
                 if let imageData3Check = cloudViewModel.compressImage(image: images[2] ?? defaultImages.errorImage!).pngData() {
-                    newSpot.image3 = UIImage(data: imageData3Check)
+                    if let image = UIImage(data: imageData3Check) {
+                        newSpot.image3 = image
+                        hiddenTags += await getTextFromImage(uiImage: image)
+                    }
                     imageData3 = imageData3Check
                 }
             } else if (images.count == 2) {
                 if let imageData2Check = cloudViewModel.compressImage(image: images[1] ?? defaultImages.errorImage!).pngData() {
-                    newSpot.image2 = UIImage(data: imageData2Check)
+                    if let image = UIImage(data: imageData2Check) {
+                        newSpot.image2 = image
+                        hiddenTags += await getTextFromImage(uiImage: image)
+                    }
                     imageData2 = imageData2Check
                 }
             }
@@ -603,7 +619,7 @@ struct AddSpotSheet: View {
                 }
                 let id = try await cloudViewModel.addSpotToPublic(name: name,
                                                                   founder: founder,
-                                                                  date: getDate(),
+                                                                  date: hiddenTags,
                                                                   locationName: locationName,
                                                                   x: (usingCustomLocation ? centerRegion.center.latitude : mapViewModel.region.center.latitude),
                                                                   y: (usingCustomLocation ? centerRegion.center.longitude : mapViewModel.region.center.longitude),
@@ -633,6 +649,7 @@ struct AddSpotSheet: View {
             }
             newSpot.details = descript
             newSpot.name = name
+            newSpot.dateObject = dateFound
             newSpot.likes = 0
             newSpot.fromDB = false
             if (usingCustomLocation) {
@@ -644,7 +661,7 @@ struct AddSpotSheet: View {
                 newSpot.y = mapViewModel.region.center.longitude
                 newSpot.wasThere = true
             }
-            newSpot.date = getDate()
+            newSpot.date = hiddenTags
             newSpot.tags = tags
             newSpot.locationName = locationName
             newSpot.id = UUID()
@@ -719,20 +736,37 @@ struct AddSpotSheet: View {
     }
     
     private func saveButtonTapped() {
-        tags = descript.findTags()
-        if (isPublic) {
-            Task {
-                isSaving = true
-                await savePublic()
-                isSaving = false
-            }
+        isSaving = true
+        Task {
             presentationMode.wrappedValue.dismiss()
-        } else {
-            Task {
-                isSaving = true
+            tags = descript.findTags()
+            if (isPublic) {
+                await savePublic()
+            } else {
                 await save()
-                isSaving = false
             }
+            isSaving = false
         }
+    }
+    
+    private func getTextFromImage(uiImage: UIImage) async -> String {
+        var text = ""
+        guard let cgImage = uiImage.cgImage else { return text }
+        let handler = VNImageRequestHandler(cgImage: cgImage, options: [:])
+        let request = VNRecognizeTextRequest { request, error in
+            guard let result = request.results else { return }
+            guard let observations = result as? [VNRecognizedTextObservation], error == nil else { return }
+            text = observations.compactMap({
+                $0.topCandidates(1).first?.string
+            }).joined(separator: ", ")
+            print(text)
+        }
+        request.recognitionLevel = VNRequestTextRecognitionLevel.accurate
+        await performRequest(request, handler: handler)
+        return text
+    }
+    
+    private func performRequest(_ request: VNRecognizeTextRequest, handler: VNImageRequestHandler) async {
+        try? handler.perform([request])
     }
 }

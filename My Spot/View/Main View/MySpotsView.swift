@@ -32,9 +32,12 @@ struct MySpotsView: View {
         if searchText.isEmpty {
             return filteredSpots
         } else {
-            return filteredSpots.filter { ($0.name ?? "").lowercased().contains(searchText.lowercased()) ||
-                ($0.tags ?? "").lowercased().contains(searchText.lowercased()) ||
-                ($0.founder ?? "").lowercased().contains(searchText.lowercased()) }
+            return filteredSpots.filter { spot in
+                (spot.name ?? "").lowercased().contains(searchText.lowercased()) ||
+                (spot.tags ?? "").lowercased().contains(searchText.lowercased()) ||
+                (spot.founder ?? "").lowercased().contains(searchText.lowercased()) ||
+                (spot.date ?? "").lowercased().contains(searchText.lowercased())
+            }
         }
     }
     

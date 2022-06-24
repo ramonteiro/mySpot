@@ -428,8 +428,8 @@
 		C5071579282584AC000F344C /* MySpotWatch WatchKit Extension */ = {
 			isa = PBXGroup;
 			children = (
-				C50715A528259C9F000F344C /* View */,
 				C50715A4282597AB000F344C /* MySpotWatch WatchKit Extension.entitlements */,
+				C50715A528259C9F000F344C /* View */,
 				C507159B282586A4000F344C /* Model */,
 				C507159628258634000F344C /* ViewModel */,
 				C507157A282584AC000F344C /* My_SpotApp.swift */,

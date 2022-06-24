@@ -51,7 +51,9 @@ struct DetailPlaylistView: View {
         if searchText.isEmpty {
             return filteredSpots
         } else {
-            return filteredSpots.filter { ($0.name ?? "").lowercased().contains(searchText.lowercased()) || ($0.tags ?? "").lowercased().contains(searchText.lowercased()) || ($0.founder ?? "").lowercased().contains(searchText.lowercased())}
+            return filteredSpots.filter { ($0.name ?? "").lowercased().contains(searchText.lowercased()) || ($0.tags ?? "").lowercased().contains(searchText.lowercased()) || ($0.founder ?? "").lowercased().contains(searchText.lowercased()) ||
+                ($0.date ?? "").lowercased().contains(searchText.lowercased())
+            }
         }
     }
     
