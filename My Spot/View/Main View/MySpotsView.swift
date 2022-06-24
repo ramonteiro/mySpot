@@ -24,22 +24,10 @@ struct MySpotsView: View {
     @State private var presentDeleteAlert = false
     @State private var toBeDeleted: IndexSet?
     @State private var filteredSpots: [Spot] = []
+    @State private var searchResults: [Spot] = []
     @State private var searchText = ""
     @State private var sortBy = "Name".localized()
     @State private var didDelete = false
-    
-    private var searchResults: [Spot] {
-        if searchText.isEmpty {
-            return filteredSpots
-        } else {
-            return filteredSpots.filter { spot in
-                (spot.name ?? "").lowercased().contains(searchText.lowercased()) ||
-                (spot.tags ?? "").lowercased().contains(searchText.lowercased()) ||
-                (spot.founder ?? "").lowercased().contains(searchText.lowercased()) ||
-                (spot.date ?? "").lowercased().contains(searchText.lowercased())
-            }
-        }
-    }
     
     var body: some View {
         NavigationView {
@@ -70,6 +58,9 @@ struct MySpotsView: View {
             }
             .animation(.default, value: searchResults)
             .searchable(text: $searchText, prompt: "Search All Spots".localized())
+            .onChange(of: searchText) { _ in
+                filterSearch()
+            }
             if filteredSpots.isEmpty {
                 noSpotsMessage
             }
@@ -130,9 +121,9 @@ struct MySpotsView: View {
     private var listOfFilteredSpots: some View {
         ForEach(0..<searchResults.count, id: \.self) { i in
             NavigationLink {
-                DetailView(isSheet: false, from: Tab.spots, spot: filteredSpots[i], didDelete: $didDelete)
+                DetailView(isSheet: false, from: Tab.spots, spot: searchResults[i], didDelete: $didDelete)
             } label: {
-                SpotRow(spot: $filteredSpots[i])
+                SpotRow(spot: $searchResults[i])
                     .alert(isPresented: self.$presentDeleteAlert) {
                         deleteSpotAlert
                     }
@@ -249,6 +240,7 @@ struct MySpotsView: View {
             sortName(sort: spots.reversed())
         }
         filterOutSharedSpotsFromPlaylists()
+        filterSearch()
         Task {
             await updateAppGroup()
         }
@@ -319,6 +311,20 @@ struct MySpotsView: View {
             sortDate(sort: filteredSpots)
         } else if (sortType == "Closest".localized()) {
             sortClosest(sort: filteredSpots)
+        }
+        filterSearch()
+    }
+    
+    private func filterSearch() {
+        if searchText.isEmpty {
+            searchResults = filteredSpots
+        } else {
+            searchResults = filteredSpots.filter { spot in
+                (spot.name ?? "").lowercased().contains(searchText.lowercased()) ||
+                (spot.tags ?? "").lowercased().contains(searchText.lowercased()) ||
+                (spot.founder ?? "").lowercased().contains(searchText.lowercased()) ||
+                (spot.date ?? "").lowercased().contains(searchText.lowercased())
+            }
         }
     }
 }

@@ -37,6 +37,7 @@ struct DetailPlaylistView: View {
     @State private var loadingShare = false
     @State private var shareIcon = "person.crop.circle"
     @State private var filteredSpots: [Spot] = []
+    @State private var searchResults: [Spot] = []
     @State private var searchText = ""
     @State private var sortBy = "Name".localized()
     @State private var isSaving = false
@@ -45,16 +46,6 @@ struct DetailPlaylistView: View {
     
     private var canEdit: Bool {
         CoreDataStack.shared.canEdit(object: playlist)
-    }
-    
-    private var searchResults: [Spot] {
-        if searchText.isEmpty {
-            return filteredSpots
-        } else {
-            return filteredSpots.filter { ($0.name ?? "").lowercased().contains(searchText.lowercased()) || ($0.tags ?? "").lowercased().contains(searchText.lowercased()) || ($0.founder ?? "").lowercased().contains(searchText.lowercased()) ||
-                ($0.date ?? "").lowercased().contains(searchText.lowercased())
-            }
-        }
     }
     
     var body: some View {
@@ -206,6 +197,7 @@ struct DetailPlaylistView: View {
                     } else if (sortType == "Closest".localized()) {
                         sortClosest()
                     }
+                    filterSearch()
                 }
         } else {
             displayMessageNoSpotsFound
@@ -235,17 +227,20 @@ struct DetailPlaylistView: View {
         Menu {
             Button {
                 sortClosest()
+                filterSearch()
             } label: {
                 Text("Sort By Closest".localized())
             }
             .disabled(!mapViewModel.isAuthorized)
             Button {
                 sortDate()
+                filterSearch()
             } label: {
                 Text("Sort By Newest".localized())
             }
             Button {
                 sortName()
+                filterSearch()
             } label: {
                 Text("Sort By Name".localized())
             }
@@ -262,9 +257,9 @@ struct DetailPlaylistView: View {
             List {
                 ForEach(0..<searchResults.count, id: \.self) { i in
                     NavigationLink {
-                        DetailView(isSheet: false, from: Tab.playlists, spot: filteredSpots[i], didDelete: $didDelete)
+                        DetailView(isSheet: false, from: Tab.playlists, spot: searchResults[i], didDelete: $didDelete)
                     } label: {
-                        SpotRow(spot: $filteredSpots[i])
+                        SpotRow(spot: $searchResults[i])
                             .alert(isPresented: self.$showingDeleteAlert) {
                                 Alert(title: Text("Are you sure you want to delete?".localized()),
                                       message: Text(deleteAlertText),
@@ -281,6 +276,9 @@ struct DetailPlaylistView: View {
                 .onDelete(perform: self.deleteRow)
             }
             .searchable(text: $searchText, prompt: "Search ".localized() + (playlist.name ?? "") + (playlist.emoji ?? ""))
+            .onChange(of: searchText) { _ in
+                filterSearch()
+            }
         }
         .alert("Invalid Permission".localized(), isPresented: $showNoPermissionsAlert) {
             Button("OK".localized(), role: .cancel) { }
@@ -437,6 +435,7 @@ struct DetailPlaylistView: View {
                 spot.isShared
             }
         }
+        filterSearch()
     }
     
     private func sortClosest() {
@@ -595,6 +594,19 @@ struct DetailPlaylistView: View {
             deleteAlertText = "The spot will be removed from the playlist.".localized() + " The spot will still be saved in My Spots.".localized()
         } else {
             deleteAlertText = "The spot will be removed from the playlist.".localized() + " If you are the owner of the spot, the spot will still be saved in My Spots.".localized()
+        }
+    }
+    
+    private func filterSearch() {
+        if searchText.isEmpty {
+            searchResults = filteredSpots
+        } else {
+            searchResults = filteredSpots.filter { spot in
+                (spot.name ?? "").lowercased().contains(searchText.lowercased()) ||
+                (spot.tags ?? "").lowercased().contains(searchText.lowercased()) ||
+                (spot.founder ?? "").lowercased().contains(searchText.lowercased()) ||
+                (spot.date ?? "").lowercased().contains(searchText.lowercased())
+            }
         }
     }
 }
