@@ -157,6 +157,8 @@ struct AddSpotSheet: View {
         List {
             ForEach(images.indices, id: \.self) { i in
                 imageRowView(index: i)
+                    .listRowBackground(Color(uiColor: UIColor.secondarySystemBackground))
+                    .listRowSeparator(.hidden)
             }
             .onMove { indexSet, offset in
                 images.move(fromOffsets: indexSet, toOffset: offset)

@@ -240,6 +240,7 @@ struct CreateAccountView: View {
             }
             Spacer()
         }
+        .listRowBackground(Color(uiColor: UIColor.secondarySystemBackground))
     }
     
     private var textForm: some View {
