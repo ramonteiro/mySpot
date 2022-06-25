@@ -13,7 +13,6 @@
 import SwiftUI
 import MapKit
 import CoreData
-import WidgetKit
 
 struct MySpotsView: View {
     
@@ -21,8 +20,6 @@ struct MySpotsView: View {
     @EnvironmentObject var mapViewModel: MapViewModel
     @EnvironmentObject var cloudViewModel: CloudKitViewModel
     @State private var presentMapSheet = false
-    @State private var presentDeleteAlert = false
-    @State private var toBeDeleted: IndexSet?
     @State private var filteredSpots: [Spot] = []
     @State private var searchResults: [Spot] = []
     @State private var searchText = ""
@@ -53,19 +50,16 @@ struct MySpotsView: View {
     
     private var listFiltered: some View {
         ZStack {
-            List {
-                listOfFilteredSpots
-            }
-            .animation(.default, value: searchResults)
-            .searchable(text: $searchText, prompt: "Search All Spots".localized())
-            .onChange(of: searchText) { _ in
-                filterSearch()
-            }
+            listOfFilteredSpots
+                .onChange(of: searchText) { _ in
+                    filterSearch()
+                }
             if filteredSpots.isEmpty {
                 noSpotsMessage
             }
         }
-        .navigationTitle("My Spots")
+        .navigationTitle("Spots")
+        .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItemGroup(placement: .navigationBarTrailing) {
                 mapButton
@@ -119,17 +113,42 @@ struct MySpotsView: View {
     }
     
     private var listOfFilteredSpots: some View {
-        ForEach(0..<searchResults.count, id: \.self) { i in
-            NavigationLink {
-                DetailView(isSheet: false, from: Tab.spots, spot: searchResults[i], didDelete: $didDelete)
-            } label: {
-                SpotRow(spot: $searchResults[i])
-                    .alert(isPresented: self.$presentDeleteAlert) {
-                        deleteSpotAlert
+        VStack(spacing: 0) {
+            SpotsSearchBar(searchBackText: "Search All Spots".localized(), searchText: $searchText)
+                .padding(.vertical, 10)
+                ScrollView(showsIndicators: false) {
+                    listOfSpots
+                }
+        }
+    }
+    
+    private var listOfSpots: some View {
+        LazyVStack(alignment: .leading, spacing: 0) {
+            spotRows
+        }
+        .animation(.default, value: searchResults)
+    }
+    
+    private var spotRows: some View {
+        ForEach(searchResults.indices, id: \.self) { i in
+            VStack(spacing: 0) {
+                HStack {
+                    Spacer()
+                    NavigationLink {
+                        DetailView(isSheet: false, from: Tab.spots, spot: searchResults[i], didDelete: $didDelete)
+                    } label: {
+                        MapSpotPreview(spot: $searchResults[i])
                     }
+                    .buttonStyle(PlainButtonStyle())
+                    Spacer()
+                }
+                .id(i)
+                if i != searchResults.count - 1 {
+                Divider()
+                    .padding()
+                }
             }
         }
-        .onDelete(perform: deleteRow)
     }
     
     private var displayLocationIcon: some View {
@@ -156,16 +175,6 @@ struct MySpotsView: View {
                 Text("\(sortBy)")
             }
         }
-    }
-    
-    private var deleteSpotAlert: Alert {
-        Alert(title: Text("Are you sure you want to delete?".localized()), message: Text(""), primaryButton: .destructive(Text("Delete".localized())) {
-            self.deleteFiltered(at: self.toBeDeleted!)
-            self.toBeDeleted = nil
-        }, secondaryButton: .cancel() {
-            self.toBeDeleted = nil
-        }
-        )
     }
     
     // MARK: - Functions
@@ -252,27 +261,6 @@ struct MySpotsView: View {
         }
     }
     
-    private func deleteRow(at indexSet: IndexSet) {
-        self.toBeDeleted = indexSet
-        self.presentDeleteAlert = true
-        let generator = UINotificationFeedbackGenerator()
-        generator.notificationOccurred(.warning)
-    }
-    
-    private func deleteFiltered(at offsets: IndexSet) {
-        offsets.forEach { i in
-            spots.forEach { j in
-                if (filteredSpots[i] == j) {
-                    DispatchQueue.main.async {
-                        CoreDataStack.shared.deleteSpot(j)
-                        return
-                    }
-                }
-            }
-        }
-        filteredSpots.remove(atOffsets: offsets)
-    }
-    
     private func updateAppGroup() async {
         let userDefaults = UserDefaults(suiteName: "group.com.isaacpaschall.My-Spot")
         var spotCount = 0
@@ -328,3 +316,66 @@ struct MySpotsView: View {
         }
     }
 }
+
+struct SpotsSearchBar: View {
+    
+    let searchBackText: String
+    @Binding var searchText: String
+    @State private var canCancel: Bool = false
+    
+    var body: some View {
+        ZStack {
+            Rectangle()
+                .foregroundColor(Color(UIColor.secondarySystemBackground))
+            searchBarContent
+        }
+        .frame(height: 40)
+        .cornerRadius(13)
+        .padding(.horizontal)
+        .onChange(of: searchText) { text in
+            toggleCancelButton(text: text)
+        }
+    }
+    
+    private var searchBarContent: some View {
+        HStack {
+            Image(systemName: "magnifyingglass")
+            TextField(searchBackText, text: $searchText)
+                .submitLabel(.search)
+                .onSubmit {
+                    UIApplication.shared.dismissKeyboard()
+                }
+            if (canCancel) {
+                Spacer()
+                xMarkImage
+            }
+        }
+        .foregroundColor(.gray)
+        .padding(.leading, 13)
+    }
+    
+    private var xMarkImage: some View {
+        Image(systemName: "xmark")
+            .padding(5)
+            .background(.ultraThinMaterial)
+            .clipShape(Circle())
+            .onTapGesture {
+                UIApplication.shared.dismissKeyboard()
+                searchText = ""
+            }
+            .padding(.trailing, 13)
+    }
+    
+    private func toggleCancelButton(text: String) {
+        if !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            withAnimation(.easeInOut(duration: 0.2)) {
+                canCancel = true
+            }
+        } else {
+            withAnimation(.easeInOut(duration: 0.2)) {
+                canCancel = false
+            }
+        }
+    }
+}
+

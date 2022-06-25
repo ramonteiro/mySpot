@@ -203,17 +203,23 @@ struct NotificationView: View {
         ScrollView(showsIndicators: false) {
             LazyVStack(alignment: .leading, spacing: 0) {
                 ForEach(spots.indices, id: \.self) { i in
-                    NavigationLink {
-                        DetailView(isSheet: false, from: Tab.profile, spot: spots[i], didDelete: $didDelete)
-                    } label: {
+                    VStack(spacing: 0) {
                         HStack {
-                            SpotRow(spot: $spots[i])
+                            Spacer()
+                            NavigationLink {
+                                DetailView(isSheet: false, from: Tab.discover, spot: spots[i], didDelete: $didDelete)
+                            } label: {
+                                MapSpotPreview(spot: $spots[i])
+                            }
+                            .buttonStyle(PlainButtonStyle())
                             Spacer()
                         }
-                        .background(Color(uiColor: UIColor.systemBackground))
-                        .padding(10)
+                        .id(i)
+                        if i != spots.count - 1 {
+                        Divider()
+                            .padding()
+                        }
                     }
-                    .buttonStyle(PlainButtonStyle())
                 }
             }
         }

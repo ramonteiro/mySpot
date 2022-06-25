@@ -151,6 +151,7 @@
 		C5D295572823719300FBA01E /* MySpotWidget.intentdefinition in Sources */ = {isa = PBXBuildFile; fileRef = C5D295522823719100FBA01E /* MySpotWidget.intentdefinition */; };
 		C5D2955A2823719300FBA01E /* MySpotWidgetExtension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = C5D2954A2823719100FBA01E /* MySpotWidgetExtension.appex */; platformFilter = ios; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		C5D2956028238CA400FBA01E /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C51503BF27D7C531009F0DCD /* CloudKit.framework */; };
+		C5E129F828678CB2002A39E5 /* SpotRowDemo.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5E129F728678CB2002A39E5 /* SpotRowDemo.swift */; };
 		C5F10910284BEE7E00B71CBC /* AccountDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5F1090F284BEE7E00B71CBC /* AccountDetailView.swift */; };
 		C5F10914284C49DD00B71CBC /* ShareViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5F10913284C49DD00B71CBC /* ShareViewController.swift */; };
 /* End PBXBuildFile section */
@@ -372,6 +373,7 @@
 		C5D295532823719300FBA01E /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		C5D295552823719300FBA01E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		C5D2955F28238C9C00FBA01E /* MySpotWidgetExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = MySpotWidgetExtension.entitlements; sourceTree = "<group>"; };
+		C5E129F728678CB2002A39E5 /* SpotRowDemo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpotRowDemo.swift; sourceTree = "<group>"; };
 		C5F1090F284BEE7E00B71CBC /* AccountDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountDetailView.swift; sourceTree = "<group>"; };
 		C5F10913284C49DD00B71CBC /* ShareViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -647,6 +649,7 @@
 				C5ABCF50286134D6003C8B51 /* Add and Edit */,
 				C515040127D7CA72009F0DCD /* DetailView.swift */,
 				C51503FF27D7CA72009F0DCD /* SpotRow.swift */,
+				C5E129F728678CB2002A39E5 /* SpotRowDemo.swift */,
 			);
 			path = Spot;
 			sourceTree = "<group>";
@@ -1118,6 +1121,7 @@
 				C5F10914284C49DD00B71CBC /* ShareViewController.swift in Sources */,
 				C5942838285E5E73003CF5AA /* GetTags.swift in Sources */,
 				C5942855285EA7AE003CF5AA /* CircleShape.swift in Sources */,
+				C5E129F828678CB2002A39E5 /* SpotRowDemo.swift in Sources */,
 				C51503FD27D7CA60009F0DCD /* DiscoverView.swift in Sources */,
 				C51503DD27D7C856009F0DCD /* UIImageTransformer.swift in Sources */,
 				C5552CD128298E6900AF2683 /* CloudSharingController.swift in Sources */,

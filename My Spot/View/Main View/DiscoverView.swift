@@ -103,39 +103,37 @@ struct DiscoverView: View {
     
     private var spotRows: some View {
         ForEach(spots.indices, id: \.self) { i in
-            NavigationLink {
-                DetailView(isSheet: false, from: Tab.discover, spot: spots[i], didDelete: $didDelete)
-            } label: {
+            VStack(spacing: 0) {
                 HStack {
-                    SpotRow(spot: $spots[i])
+                    Spacer()
+                    NavigationLink {
+                        DetailView(isSheet: false, from: Tab.discover, spot: spots[i], didDelete: $didDelete)
+                    } label: {
+                        MapSpotPreview(spot: $spots[i])
+                    }
+                    .buttonStyle(PlainButtonStyle())
                     Spacer()
                 }
-                .background(Color(uiColor: UIColor.systemBackground))
-                .padding(10)
+                .id(i)
+                if i != spots.count - 1 {
+                Divider()
+                    .padding()
+                }
             }
-            .buttonStyle(PlainButtonStyle())
-            .id(i)
         }
     }
     
     private var paginationCursor: some View {
-        GeometryReader { reader -> Color in
-            let minY = reader.frame(in: .global).minY
-            let height = UIScreen.screenHeight / 1.3
-            if minY < height {
+        Color.clear
+            .task {
                 if let cursor = cloudViewModel.cursorMain, !cloudViewModel.isFetching, spots.count > 0 {
-                    Task {
-                        let newSpots = await cloudViewModel.fetchMoreSpotsPublic(cursor: cursor, desiredKeys: cloudViewModel.desiredKeys, resultLimit: cloudViewModel.limit)
-                        DispatchQueue.main.async {
-                            spots += newSpots
-                            hasError = false
-                        }
+                    let newSpots = await cloudViewModel.fetchMoreSpotsPublic(cursor: cursor, desiredKeys: cloudViewModel.desiredKeys, resultLimit: cloudViewModel.limit)
+                    DispatchQueue.main.async {
+                        spots += newSpots
+                        hasError = false
                     }
                 }
             }
-            return Color.clear
-        }
-        .listRowBackground(Color.clear)
     }
     
     private var progressSpinner: some View {
@@ -179,7 +177,7 @@ struct DiscoverView: View {
             DiscoverSearchBar(searchText: $searchText,
                               searching: $isSearching,
                               searchName: $searchLocationName,
-                              hasSearched: $hasSearched).padding(.top, 10)
+                              hasSearched: $hasSearched).padding(.vertical, 10)
             ScrollViewReader { scroll in
                 ScrollView(showsIndicators: false) {
                     PullToRefresh(coordinateSpaceName: "pullToRefresh") {
@@ -192,7 +190,7 @@ struct DiscoverView: View {
             }
             .coordinateSpace(name: "pullToRefresh")
         }
-        .navigationTitle("")
+        .navigationTitle("Spots")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItemGroup(placement: .navigationBarTrailing) {
@@ -365,7 +363,7 @@ struct DiscoverView: View {
         if (UserDefaults.standard.valueExists(forKey: "savedDistance")) {
             distance = UserDefaults.standard.integer(forKey: "savedDistance")
         }
-        if (spots.count == 0) {
+        if (spots.isEmpty) {
             refreshSpots()
         }
         mapViewModel.getPlacmarkOfLocation(location: CLLocation(latitude: mapViewModel.searchingHere.center.latitude, longitude: mapViewModel.searchingHere.center.longitude), isPrecise: true) { location in

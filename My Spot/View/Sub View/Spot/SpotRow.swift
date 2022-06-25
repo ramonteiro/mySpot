@@ -11,7 +11,6 @@
  */
 
 import SwiftUI
-import CoreLocation
 
 struct SpotRow<T: SpotPreviewType>: View {
     
@@ -24,7 +23,6 @@ struct SpotRow<T: SpotPreviewType>: View {
     private var tags: [String] {
         spot.tagsPreview.components(separatedBy: ", ")
     }
-    @State private var exists = true
     @State private var distance: String = ""
     @Environment(\.colorScheme) var colorScheme
     @EnvironmentObject var mapViewModel: MapViewModel

@@ -202,7 +202,7 @@ struct MapViewSpots<T: SpotPreviewType>: View {
     private var spotPreview: some View {
         TabView(selection: $selection) {
             ForEach(spots.indices, id: \.self) { i in
-                MapSpotPreview(spot: spots[i])
+                MapSpotPreview(spot: $spots[i])
                     .tag(i)
                     .onTapGesture {
                         presentDetailsSheet.toggle()

@@ -254,24 +254,18 @@ struct AccountDetailView: View {
     }
     
     private var paginationRow: some View {
-        GeometryReader { reader -> Color in
-            let minY = reader.frame(in: .global).minY
-            let height = UIScreen.screenHeight / 1.3
-            if minY < height {
-                if let cursor = cloudViewModel.cursorAccount, !isFetching {
-                    Task {
-                        isFetching = true
-                        do {
-                            spots += try await cloudViewModel.fetchMoreAccountSpots(cursor: cursor)
-                        } catch {
-                            print("Failed to fetch more spots")
-                        }
-                        isFetching = false
+        Color.clear
+            .task {
+                if let cursor = cloudViewModel.cursorAccount, !isFetching, !spots.isEmpty {
+                    isFetching = true
+                    do {
+                        spots += try await cloudViewModel.fetchMoreAccountSpots(cursor: cursor)
+                    } catch {
+                        print("Failed to fetch more spots")
                     }
+                    isFetching = false
                 }
             }
-            return Color.clear
-        }
     }
     
     private var loadingSpotsSpinner: some View {
@@ -285,17 +279,23 @@ struct AccountDetailView: View {
     
     private func mySpotsList(accountModel: AccountModel) -> some View {
         ForEach(spots.indices, id: \.self) { i in
-            NavigationLink {
-                DetailView(isSheet: false, from: Tab.profile, spot: spots[i], didDelete: $didDelete)
-            } label: {
+            VStack(spacing: 0) {
                 HStack {
-                    SpotRow(spot: $spots[i])
+                    Spacer()
+                    NavigationLink {
+                        DetailView(isSheet: false, from: Tab.profile, spot: spots[i], didDelete: $didDelete)
+                    } label: {
+                        MapSpotPreview(spot: $spots[i])
+                    }
+                    .buttonStyle(PlainButtonStyle())
                     Spacer()
                 }
-                .background(Color(uiColor: UIColor.systemBackground))
-                .padding(10)
+                .id(i)
+                if i != spots.count - 1 {
+                Divider()
+                    .padding()
+                }
             }
-            .buttonStyle(PlainButtonStyle())
         }
         .animation(.default, value: spots)
     }

@@ -10,7 +10,7 @@ import CoreLocation
 
 struct MapSpotPreview<T: SpotPreviewType>: View {
     
-    let spot: T
+    @Binding var spot: T
     @State private var tags: [String] = []
     @State private var padding: CGFloat = 20
     @State private var scope:String = "Private".localized()
@@ -18,16 +18,13 @@ struct MapSpotPreview<T: SpotPreviewType>: View {
     @EnvironmentObject var mapViewModel: MapViewModel
     
     var body: some View {
-        VStack {
-            Spacer()
-            ZStack {
-                image
-                content
+        content
+            .frame(width: UIScreen.screenWidth - 20, height: UIScreen.screenHeight * 0.25)
+            .background(image)
+            .clipShape(RoundedRectangle(cornerRadius: 20))
+            .onAppear {
+                initializeValues()
             }
-        }
-        .onAppear {
-            initializeValues()
-        }
     }
     
     // MARK: - Sub Views
@@ -144,27 +141,20 @@ struct MapSpotPreview<T: SpotPreviewType>: View {
                 tagsView
             }
         }
-        .padding(.horizontal)
+        .padding(.horizontal, 5)
     }
     
     private var image: some View {
-        ZStack {
-            if let image = spot.imagePreview {
-                Image(uiImage: image)
-                    .resizable()
-                    .scaledToFill()
-                    .frame(width: UIScreen.screenWidth - 20, height: UIScreen.screenHeight * 0.25)
-                    .clipShape(RoundedRectangle(cornerRadius: 40))
-            } else {
-                Image(systemName: "exclamationmark.triangle")
-                    .resizable()
-                    .scaledToFill()
-                    .frame(width: UIScreen.screenWidth - 20, height: UIScreen.screenHeight * 0.25)
-                    .clipShape(RoundedRectangle(cornerRadius: 40))
-            }
-            Color.black.opacity(0.4)
-                .frame(width: UIScreen.screenWidth - 20, height: UIScreen.screenHeight * 0.25)
-                .cornerRadius(40)
+        Color.black.opacity(0.4)
+            .background(imageRender.allowsHitTesting(false))
+    }
+    
+    @ViewBuilder
+    private var imageRender: some View {
+        if let image = spot.imagePreview {
+            Image(uiImage: image)
+        } else {
+            Image(systemName: "exclamationmark.triangle")
         }
     }
     

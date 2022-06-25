@@ -50,7 +50,7 @@ struct DetailPlaylistView: View {
     
     var body: some View {
         playlistView
-            .navigationTitle("")
+            .navigationTitle("Spots")
             .navigationBarTitleDisplayMode(.inline)
             .navigationBarBackButtonHidden(true)
             .toolbar {
@@ -257,25 +257,32 @@ struct DetailPlaylistView: View {
         ZStack {
             List {
                 ForEach(0..<searchResults.count, id: \.self) { i in
-                    NavigationLink {
-                        DetailView(isSheet: false, from: Tab.playlists, spot: searchResults[i], didDelete: $didDelete)
-                    } label: {
-                        SpotRow(spot: $searchResults[i])
-                            .alert(isPresented: self.$showingDeleteAlert) {
-                                Alert(title: Text("Are you sure you want to delete?".localized()),
-                                      message: Text(deleteAlertText),
-                                      primaryButton: .destructive(Text("Delete".localized())) {
-                                    self.deleteFiltered(at: self.toBeDeleted!)
-                                    self.toBeDeleted = nil
-                                }, secondaryButton: .cancel() {
-                                    self.toBeDeleted = nil
+                    HStack {
+                        Spacer()
+                        NavigationLink {
+                            DetailView(isSheet: false, from: Tab.playlists, spot: searchResults[i], didDelete: $didDelete)
+                        } label: {
+                            MapSpotPreview(spot: $searchResults[i])
+                                .alert(isPresented: self.$showingDeleteAlert) {
+                                    Alert(title: Text("Are you sure you want to delete?".localized()),
+                                          message: Text(deleteAlertText),
+                                          primaryButton: .destructive(Text("Delete".localized())) {
+                                        self.deleteFiltered(at: self.toBeDeleted!)
+                                        self.toBeDeleted = nil
+                                    }, secondaryButton: .cancel() {
+                                        self.toBeDeleted = nil
+                                    }
+                                    )
                                 }
-                                )
-                            }
+                        }
+                        Spacer()
                     }
+                    .listRowBackground(Color(uiColor: UIColor.systemBackground))
+                    .listRowInsets(EdgeInsets(top: 10, leading: 0, bottom: 10, trailing: 0))
                 }
                 .onDelete(perform: self.deleteRow)
             }
+            .listStyle(.plain)
             .searchable(text: $searchText, prompt: "Search ".localized() + (playlist.name ?? "") + (playlist.emoji ?? ""))
             .onChange(of: searchText) { _ in
                 filterSearch()

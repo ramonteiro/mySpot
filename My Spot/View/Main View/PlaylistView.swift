@@ -32,6 +32,7 @@ struct PlaylistView: View {
                     resetBadges()
                 }
                 .navigationTitle("Playlists".localized())
+                .navigationBarTitleDisplayMode(.inline)
                 .toolbar {
                     ToolbarItemGroup(placement: .navigationBarTrailing) {
                         addPlaylistButton
