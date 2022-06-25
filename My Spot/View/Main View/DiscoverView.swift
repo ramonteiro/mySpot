@@ -124,7 +124,6 @@ struct DiscoverView: View {
             let height = UIScreen.screenHeight / 1.3
             if minY < height {
                 if let cursor = cloudViewModel.cursorMain, !cloudViewModel.isFetching, spots.count > 0 {
-                    print("adding spots")
                     Task {
                         let newSpots = await cloudViewModel.fetchMoreSpotsPublic(cursor: cursor, desiredKeys: cloudViewModel.desiredKeys, resultLimit: cloudViewModel.limit)
                         DispatchQueue.main.async {
@@ -176,11 +175,11 @@ struct DiscoverView: View {
     }
     
     private var listSpots: some View {
-        VStack(spacing: 10) {
+        VStack(spacing: 0) {
             DiscoverSearchBar(searchText: $searchText,
                               searching: $isSearching,
                               searchName: $searchLocationName,
-                              hasSearched: $hasSearched)
+                              hasSearched: $hasSearched).padding(.top, 10)
             ScrollViewReader { scroll in
                 ScrollView(showsIndicators: false) {
                     PullToRefresh(coordinateSpaceName: "pullToRefresh") {
@@ -193,7 +192,8 @@ struct DiscoverView: View {
             }
             .coordinateSpace(name: "pullToRefresh")
         }
-        .navigationTitle("Discover".localized())
+        .navigationTitle("")
+        .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItemGroup(placement: .navigationBarTrailing) {
                 chooseDistanceMenu

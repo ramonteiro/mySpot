@@ -50,7 +50,8 @@ struct DetailPlaylistView: View {
     
     var body: some View {
         playlistView
-            .navigationTitle((playlist.name ?? "") + (playlist.emoji ?? ""))
+            .navigationTitle("")
+            .navigationBarTitleDisplayMode(.inline)
             .navigationBarBackButtonHidden(true)
             .toolbar {
                 ToolbarItemGroup(placement: .navigationBarTrailing) {
