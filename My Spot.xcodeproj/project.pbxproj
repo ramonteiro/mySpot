@@ -55,7 +55,6 @@
 		C51503FC27D7CA60009F0DCD /* MySpotsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C51503F927D7CA60009F0DCD /* MySpotsView.swift */; };
 		C51503FD27D7CA60009F0DCD /* DiscoverView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C51503FA27D7CA60009F0DCD /* DiscoverView.swift */; };
 		C51503FE27D7CA60009F0DCD /* PlaylistView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C51503FB27D7CA60009F0DCD /* PlaylistView.swift */; };
-		C515040227D7CA72009F0DCD /* SpotRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = C51503FF27D7CA72009F0DCD /* SpotRow.swift */; };
 		C515040327D7CA72009F0DCD /* AddSpotSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = C515040027D7CA72009F0DCD /* AddSpotSheet.swift */; };
 		C515040427D7CA72009F0DCD /* DetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C515040127D7CA72009F0DCD /* DetailView.swift */; };
 		C515040D27D7CA87009F0DCD /* DetailedPlaylistView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C515040927D7CA87009F0DCD /* DetailedPlaylistView.swift */; };
@@ -277,7 +276,6 @@
 		C51503F927D7CA60009F0DCD /* MySpotsView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MySpotsView.swift; sourceTree = "<group>"; };
 		C51503FA27D7CA60009F0DCD /* DiscoverView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DiscoverView.swift; sourceTree = "<group>"; };
 		C51503FB27D7CA60009F0DCD /* PlaylistView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlaylistView.swift; sourceTree = "<group>"; };
-		C51503FF27D7CA72009F0DCD /* SpotRow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SpotRow.swift; sourceTree = "<group>"; };
 		C515040027D7CA72009F0DCD /* AddSpotSheet.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AddSpotSheet.swift; sourceTree = "<group>"; };
 		C515040127D7CA72009F0DCD /* DetailView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DetailView.swift; sourceTree = "<group>"; };
 		C515040927D7CA87009F0DCD /* DetailedPlaylistView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DetailedPlaylistView.swift; sourceTree = "<group>"; };
@@ -648,7 +646,6 @@
 			children = (
 				C5ABCF50286134D6003C8B51 /* Add and Edit */,
 				C515040127D7CA72009F0DCD /* DetailView.swift */,
-				C51503FF27D7CA72009F0DCD /* SpotRow.swift */,
 				C5E129F728678CB2002A39E5 /* SpotRowDemo.swift */,
 			);
 			path = Spot;
@@ -1161,7 +1158,6 @@
 				C5C2C4E1285EE16900E585C9 /* DateToString.swift in Sources */,
 				C594BB82284D37730012DA6C /* AccountModel.swift in Sources */,
 				C51503FE27D7CA60009F0DCD /* PlaylistView.swift in Sources */,
-				C515040227D7CA72009F0DCD /* SpotRow.swift in Sources */,
 				C5D1BF352863D8DF00903236 /* MapViewSpotsWithPreview.swift in Sources */,
 				C5942857285EA816003CF5AA /* CustomCoordinatesSheet.swift in Sources */,
 				C51503DF27D7C856009F0DCD /* Playlist+CoreDataClass.swift in Sources */,

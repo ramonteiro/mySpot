@@ -50,16 +50,33 @@ struct AddSpotToPlaylistSheet: View {
     private var availableSpots: some View {
         List(0..<spotsFiltered.count, id: \.self) { i in
             if (spotsFiltered[i].playlist == nil) {
-                SpotRow(spot: $spotsFiltered[i], isShared: addedSpots.contains(spotsFiltered[i]))
-                    .onTapGesture {
+                HStack {
+                    Spacer()
+                    ZStack {
+                        MapSpotPreview(spot: $spotsFiltered[i])
                         if addedSpots.contains(spotsFiltered[i]) {
-                            addedSpots.remove(at: addedSpots.firstIndex(of: spotsFiltered[i])!)
-                        } else {
-                            addedSpots.append(spotsFiltered[i])
+                            HStack {
+                                Spacer()
+                                Image(systemName: "checkmark.square.fill")
+                                    .foregroundColor(.green)
+                            }
+                            .padding(.trailing, 10)
                         }
                     }
+                    Spacer()
+                }
+                .onTapGesture {
+                    if addedSpots.contains(spotsFiltered[i]) {
+                        addedSpots.remove(at: addedSpots.firstIndex(of: spotsFiltered[i])!)
+                    } else {
+                        addedSpots.append(spotsFiltered[i])
+                    }
+                }
+                .listRowInsets(EdgeInsets(top: 10, leading: 0, bottom: 10, trailing: 0))
+                .listRowBackground(Color(uiColor: UIColor.secondarySystemBackground))
             }
         }
+        .listStyle(.plain)
         .toolbar {
             ToolbarItemGroup(placement: .navigationBarTrailing) {
                 saveButton
