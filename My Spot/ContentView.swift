@@ -47,8 +47,21 @@ struct ContentView: View {
     @State private var addedSpotIsSaving = false
     @State private var doNotTriggerRepeatWhenTabSelectionChanges = false
     @State private var didDelete = false
+    @State private var splashAnimation = false
+    @State private var removeSplashScreen = false
     
     var body: some View {
+        ZStack {
+            content
+            if !removeSplashScreen {
+                splashScreen
+            }
+        }
+    }
+    
+    // MARK: - Sub Views
+    
+    private var content: some View {
         ZStack {
             GeometryReader { geo in
                 tabView
@@ -58,7 +71,17 @@ struct ContentView: View {
         .ignoresSafeArea(.keyboard, edges: .bottom)
     }
     
-    // MARK: - Sub Views
+    private var splashScreen: some View {
+        Color("LaunchScreenColor")
+            .overlay(
+                Image("LaunchScreenImage")
+                    .resizable()
+                    .frame(width: 256, height: 256)
+                    .foregroundColor(Color("Color"))
+                    .scaleEffect(splashAnimation ? 35 : 1)
+            )
+            .ignoresSafeArea()
+    }
     
     private var tabView: some View {
         TabView(selection: $tabController.activeTab) {
@@ -194,13 +217,6 @@ struct ContentView: View {
             .disabled(addedSpotIsSaving)
     }
     
-    private func savingSpotSpinner(geo: GeometryProxy) -> some View {
-        ProgressView()
-            .progressViewStyle(.circular)
-            .frame(width: geo.size.width / 7, height: geo.size.width / 7, alignment: .center)
-            .offset(x: geo.size.width / 2 - ((geo.size.width / 7) / 2), y: geo.size.height - (geo.size.height * 0.025) - ((geo.size.width / 7) / 2))
-    }
-    
     // MARK: - Functions
     
     private func checkForValidProfile(isSignedInToiCloud: Bool) {
@@ -210,8 +226,16 @@ struct ContentView: View {
                 if !doesAccountExist {
                     presentAccountCreation.toggle()
                 } else {
-                    Task {
-                        try? await cloudViewModel.getMemberSince(fromid: cloudViewModel.userID)
+                    try? await cloudViewModel.getMemberSince(fromid: cloudViewModel.userID)
+                }
+            }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                withAnimation(.easeInOut(duration: 0.4)) {
+                    splashAnimation.toggle()
+                }
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                    withAnimation(.easeInOut(duration: 0.4)) {
+                        removeSplashScreen.toggle()
                     }
                 }
             }
