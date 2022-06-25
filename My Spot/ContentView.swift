@@ -52,7 +52,7 @@ struct ContentView: View {
         ZStack {
             GeometryReader { geo in
                 tabView
-                addSpotButton(geo: geo)
+                plusButton(geo: geo)
             }
         }
         .ignoresSafeArea(.keyboard, edges: .bottom)
@@ -132,15 +132,6 @@ struct ContentView: View {
                       pages: whatsNewPages)
     }
     
-    @ViewBuilder
-    private func addSpotButton(geo: GeometryProxy) -> some View {
-        if !addedSpotIsSaving {
-            plusButton(geo: geo)
-        } else {
-            savingSpotSpinner(geo: geo)
-        }
-    }
-    
     private var mySpotTab: some View {
         MySpotsView()
             .tabItem() {
@@ -188,13 +179,15 @@ struct ContentView: View {
     }
     
     private func plusButton(geo: GeometryProxy) -> some View {
-        Image(systemName: "plus.app")
+        Image(systemName: "plus")
             .resizable()
-            .frame(width: 40, height: 40, alignment: .center)
+            .frame(width: 20, height: 20, alignment: .center)
+            .padding(10)
+            .background(addedSpotIsSaving ? Color.gray : cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex])
+            .clipShape(Circle())
             .offset(x: geo.size.width / 2 - 20, y: geo.size.height - 40)
-            .foregroundColor(.gray)
+            .foregroundColor(.white)
             .onTapGesture {
-                UserDefaults.standard.set(Double(-1.0), forKey: "tempPinX")
                 Task { try? await cloudViewModel.isBanned() }
                 presentAddSpotSheet.toggle()
             }
