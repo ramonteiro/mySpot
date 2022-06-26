@@ -15,7 +15,7 @@ protocol SpotPreviewType: Identifiable, Hashable {
     var founderPreview: String { get }
     var datePreview: String { get }
     var dateObjectPreview: Date? { get }
-    var imagePreview: UIImage? { get }
+    var imagePreview: UIImage? { get set }
     var image2Preview: UIImage? { get }
     var image3Preview: UIImage? { get }
     var locationNamePreview: String { get }

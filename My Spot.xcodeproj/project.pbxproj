@@ -516,8 +516,8 @@
 		C51503A127D7C347009F0DCD = {
 			isa = PBXGroup;
 			children = (
-				C5AB6F802863688C002E07CF /* Local */,
 				C5D2955F28238C9C00FBA01E /* MySpotWidgetExtension.entitlements */,
+				C5AB6F802863688C002E07CF /* Local */,
 				C51503AC27D7C347009F0DCD /* My Spot */,
 				C5D2954F2823719100FBA01E /* MySpotWidget */,
 				C507156E282584AB000F344C /* MySpotWatch */,

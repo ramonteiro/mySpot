@@ -52,6 +52,15 @@ extension Spot: Identifiable { }
 
 extension Spot: SpotPreviewType {
     
+    var imagePreview: UIImage? {
+        get {
+            image
+        }
+        set {
+            image = newValue
+        }
+    }
+    
     var parentIDPreview: String {
         id?.uuidString ?? ""
     }
@@ -114,10 +123,6 @@ extension Spot: SpotPreviewType {
     
     var dateObjectPreview: Date? {
         dateObject
-    }
-    
-    var imagePreview: UIImage? {
-        image
     }
     
     var locationNamePreview: String {

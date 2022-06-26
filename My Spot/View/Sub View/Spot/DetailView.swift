@@ -15,8 +15,8 @@ import MapKit
 
 struct DetailView<T: SpotPreviewType>: View {
     
-    var isSheet: Bool
-    var from: Tab
+    let isSheet: Bool
+    let from: Tab
     let spot: T
     @Binding var didDelete: Bool
     @EnvironmentObject var cloudViewModel: CloudKitViewModel
@@ -924,7 +924,18 @@ struct DetailView<T: SpotPreviewType>: View {
     
     private func loadCloudImages() {
         spotInCD = isSpotInCoreData()
-        images.append(spot.imagePreview ?? defaultImages.errorImage!)
+        if let image1 = spot.imagePreview {
+            images.append(image1)
+        } else {
+            print("I DONT HAVE IT :((((")
+            Task {
+                let id = spot.dataBaseIdPreview
+                let fetchedImages = await cloudViewModel.fetchMainImage(id: id)
+                if let image = fetchedImages {
+                    images.append(image)
+                }
+            }
+        }
         if let image2 = spot.image2Preview {
             images.append(image2)
         }

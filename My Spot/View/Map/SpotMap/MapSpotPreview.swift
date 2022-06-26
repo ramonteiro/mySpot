@@ -15,6 +15,7 @@ struct MapSpotPreview<T: SpotPreviewType>: View {
     @State private var padding: CGFloat = 20
     @State private var scope:String = "Private".localized()
     @State private var distance: String = ""
+    @EnvironmentObject var cloudViewModel: CloudKitViewModel
     @EnvironmentObject var mapViewModel: MapViewModel
     
     var body: some View {
@@ -160,7 +161,10 @@ struct MapSpotPreview<T: SpotPreviewType>: View {
         if let image = spot.imagePreview {
             Image(uiImage: image)
         } else {
-            Image(systemName: "exclamationmark.triangle")
+            Image(uiImage: defaultImages.errorImage!)
+                .task {
+                    spot.imagePreview = await cloudViewModel.fetchMainImage(id: spot.dataBaseIdPreview)
+                }
         }
     }
     

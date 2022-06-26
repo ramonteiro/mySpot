@@ -12,7 +12,7 @@ struct AccountDetailView: View {
     @State var userid: String
     @State var accountModel: AccountModel?
     @State private var image: UIImage?
-    @State private var name: String = "          " + "Account".localized() + "          "
+    @State private var name: String = "Account".localized()
     @State private var downloads: Int = 0
     @State private var spotCount: Int = 0
     @State private var isExplorer: Bool = false
@@ -158,14 +158,18 @@ struct AccountDetailView: View {
     // MARK: - Sub Views
     
     private var customNavigationTitle: some View {
-        VStack {
-            Text(name)
-                .font(.headline)
-            if let pronouns = pronouns {
-                Text(pronouns)
-                    .foregroundColor(.gray)
-                    .font(.caption)
+        HStack {
+            Spacer()
+            VStack {
+                Text(name)
+                    .font(.headline)
+                if let pronouns = pronouns {
+                    Text(pronouns)
+                        .foregroundColor(.gray)
+                        .font(.caption)
+                }
             }
+            Spacer()
         }
     }
     

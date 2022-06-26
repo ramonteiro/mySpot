@@ -193,18 +193,21 @@ struct AddSpotSheet: View {
     }
     
     private var customNavigationBarTitle: some View {
-        VStack {
-            HStack {
-                Image(systemName: (usingCustomLocation ? "mappin" : "figure.wave"))
-                Text(locationName.isEmpty ? "My Spot" : locationName)
-                
+        HStack {
+            Spacer()
+            VStack {
+                HStack {
+                    Image(systemName: (usingCustomLocation ? "mappin" : "figure.wave"))
+                    Text(locationName.isEmpty ? "My Spot" : locationName)
+                    
+                }
+                .font(.subheadline)
+                Text(dateFound.toString())
+                    .font(.caption)
+                    .foregroundColor(.gray)
             }
-            .font(.subheadline)
-            Text(dateFound.toString())
-                .font(.caption)
-                .foregroundColor(.gray)
+            Spacer()
         }
-        .frame(width: UIScreen.screenWidth * 0.7)
     }
     
     private var bottomButtonOverlay: some View {
