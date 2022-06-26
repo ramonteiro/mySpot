@@ -434,7 +434,7 @@ struct AccountDetailView: View {
         }
         if accountModel == nil {
             do {
-                accountModel = try await cloudViewModel.fetchAccount(userid: userid)
+                accountModel = try await cloudViewModel.fetchAccount(userid: userid, withImage: true)
                 if let account = accountModel {
                     name = account.name
                     image = account.image
@@ -625,7 +625,7 @@ struct AccountDetailView: View {
             userid = cloudViewModel.userID
         }
         do {
-            accountModel = try await cloudViewModel.fetchAccount(userid: userid)
+            accountModel = try await cloudViewModel.fetchAccount(userid: userid, withImage: true)
             if let account = accountModel {
                 name = account.name
                 image = account.image

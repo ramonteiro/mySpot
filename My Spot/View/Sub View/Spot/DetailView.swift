@@ -527,7 +527,7 @@ struct DetailView<T: SpotPreviewType>: View {
                     tapAccountButton()
                 } label: {
                     HStack {
-                        Image(uiImage: accountModel.image)
+                        Image(uiImage: accountModel.image ?? defaultImages.errorImage!)
                             .resizable()
                             .frame(width: 60, height: 60)
                             .clipShape(Circle())
@@ -736,6 +736,7 @@ struct DetailView<T: SpotPreviewType>: View {
                     withAnimation {
                         loadingAccount = false
                     }
+                    accountModel?.image = await cloudViewModel.fetchAccountImage(userid: accountModel?.id ?? "error")
                 } catch {
                     print("failed to load user account")
                 }

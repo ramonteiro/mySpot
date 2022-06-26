@@ -15,6 +15,7 @@ import MapKit
 
 struct DiscoverView: View {
     
+    @Environment(\.colorScheme) var colorScheme
     @EnvironmentObject var mapViewModel: MapViewModel
     @EnvironmentObject var cloudViewModel: CloudKitViewModel
     @EnvironmentObject var tabController: TabController
@@ -24,15 +25,21 @@ struct DiscoverView: View {
     @State private var sortBy = "Closest".localized()
     @State private var distance = 0
     @State private var hasSearched = false
+    @State private var hasSearchedUsers = false
     @State private var hasError = false
     @State private var isSearching = false
     @State private var scrollToTop = false
     @State private var didDelete = false
     @State private var spots: [SpotFromCloud] = []
-    
+    @State private var users: [AccountModel] = []
+    @State private var isSearchingUsers = false
+    @State private var isFetchingUsers = false
+    @State private var scrollToTopUsers = false
     @State private var showUserSearch = false
-    @State private var usersSearchText = "Users"
-    let tabs = ["Users", "Spots"]
+    @State private var presentDetailAccount = false
+    @State private var searchTextUsers = ""
+    @State private var usersSearchText = "Users".localized()
+    let tabs = ["Users".localized(), "Spots"]
     @Namespace var animation
     
     var body: some View {
@@ -50,13 +57,6 @@ struct DiscoverView: View {
     }
     
     // MARK: - Sub Views
-    
-    private var userView: some View {
-        VStack {
-        Text("users")
-        Spacer()
-        }
-    }
     
     private var displaySpotsFromDB: some View {
         ZStack {
@@ -128,9 +128,34 @@ struct DiscoverView: View {
                 }
                 .id(i)
                 if i != spots.count - 1 {
-                Divider()
-                    .padding()
+                    Divider()
+                        .padding()
                 }
+            }
+        }
+    }
+    
+    private var userRows: some View {
+        ForEach(users.indices, id: \.self) { i in
+            VStack(spacing: 0) {
+                HStack {
+                    Spacer()
+                    Button {
+                        presentDetailAccount.toggle()
+                    } label: {
+                        AccountRow(account: $users[i])
+                    }
+                    .buttonStyle(PlainButtonStyle())
+                    Spacer()
+                }
+                .id(i)
+                if i != users.count - 1 {
+                    Divider()
+                        .padding()
+                }
+            }
+            .fullScreenCover(isPresented: $presentDetailAccount) {
+                AccountDetailView(userid: users[i].id, accountModel: users[i])
             }
         }
     }
@@ -142,6 +167,19 @@ struct DiscoverView: View {
                     let newSpots = await cloudViewModel.fetchMoreSpotsPublic(cursor: cursor, desiredKeys: cloudViewModel.desiredKeys, resultLimit: cloudViewModel.limit)
                     DispatchQueue.main.async {
                         spots += newSpots
+                        hasError = false
+                    }
+                }
+            }
+    }
+    
+    private var paginationCursorUsers: some View {
+        Color.clear
+            .task {
+                if let cursor = cloudViewModel.cursorUsers, !isFetchingUsers, !users.isEmpty {
+                    let newUsers = await cloudViewModel.fetchMoreAccounts(cursor: cursor)
+                    DispatchQueue.main.async {
+                        users += newUsers
                         hasError = false
                     }
                 }
@@ -184,12 +222,30 @@ struct DiscoverView: View {
         }
     }
     
+    private func listOfUsers(scroll: ScrollViewProxy) -> some View {
+        LazyVStack(alignment: .leading, spacing: 0) {
+            userRows
+            if isFetchingUsers {
+                progressSpinner
+            } else {
+                paginationCursorUsers
+            }
+        }
+        .onChange(of: isSearchingUsers) { _ in
+            refreshUsers()
+        }
+        .animation(.default, value: users)
+        .onChange(of: scrollToTopUsers) { _ in
+            scrollToTopUsers(scroll: scroll)
+        }
+    }
+    
     private var listSpots: some View {
         VStack(spacing: 0) {
-            DiscoverSearchBar(searchText: $searchText,
-                              searching: $isSearching,
+            DiscoverSearchBar(searchText: (showUserSearch ? $searchTextUsers : $searchText),
+                              searching: (showUserSearch ? $isSearchingUsers : $isSearching),
                               searchName: (showUserSearch ? $usersSearchText : $searchLocationName),
-                              hasSearched: $hasSearched).padding(.vertical, 10)
+                              hasSearched: (showUserSearch ? $hasSearchedUsers : $hasSearched)).padding(.vertical, 10)
             VStack(spacing: 0) {
                 switchView
                 ZStack {
@@ -224,12 +280,12 @@ struct DiscoverView: View {
                 .fontWeight(.semibold)
                 .scaleEffect(0.9)
                 .padding(.vertical,6)
-                .foregroundColor(!showUserSearch ? .white : .black)
+                .foregroundColor(!showUserSearch ? .white : (colorScheme == .dark ? .white : .black))
                 .frame(maxWidth: .infinity)
                 .background {
                     if !showUserSearch {
                         Capsule()
-                            .fill(.black)
+                            .fill(cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex])
                             .matchedGeometryEffect(id: "TAB", in: animation)
                     }
                 }
@@ -239,17 +295,17 @@ struct DiscoverView: View {
                         showUserSearch = false
                     }
                 }
-            Text("Users")
+            Text("Users".localized())
                 .font(.callout)
                 .fontWeight(.semibold)
                 .scaleEffect(0.9)
                 .padding(.vertical,6)
-                .foregroundColor(showUserSearch ? .white : .black)
+                .foregroundColor(showUserSearch ? .white : (colorScheme == .dark ? .white : .black))
                 .frame(maxWidth: .infinity)
                 .background {
                     if showUserSearch {
                         Capsule()
-                            .fill(.black)
+                            .fill(cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex])
                             .matchedGeometryEffect(id: "TAB", in: animation)
                     }
                 }
@@ -257,6 +313,9 @@ struct DiscoverView: View {
                 .onTapGesture {
                     withAnimation {
                         showUserSearch = true
+                    }
+                    if (users.isEmpty) {
+                        refreshUsers()
                     }
                 }
         }
@@ -276,6 +335,20 @@ struct DiscoverView: View {
             }
         }
         .coordinateSpace(name: "pullToRefresh")
+    }
+    
+    private var userView: some View {
+        ScrollViewReader { scroll in
+            ScrollView(showsIndicators: false) {
+                PullToRefresh(coordinateSpaceName: "pullToRefreshUsers") {
+                    let generator = UIImpactFeedbackGenerator(style: .light)
+                    generator.impactOccurred()
+                    refreshUsers()
+                }
+                listOfUsers(scroll: scroll)
+            }
+        }
+        .coordinateSpace(name: "pullToRefreshUsers")
     }
     
     private var mapButton: some View {
@@ -514,6 +587,24 @@ struct DiscoverView: View {
         loadSpotsFromDB(location: CLLocation(latitude: mapViewModel.searchingHere.center.latitude, longitude: mapViewModel.searchingHere.center.longitude), radiusInMeters: CGFloat(distance), filteringBy: sortBy)
     }
     
+    private func refreshUsers() {
+        if isFetchingUsers { return }
+        isFetchingUsers = true
+        if !searchTextUsers.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            hasSearchedUsers = true
+        } else {
+            hasSearchedUsers = false
+        }
+        Task {
+            let newUsers = await cloudViewModel.fetchAccounts(searchText: searchTextUsers)
+            DispatchQueue.main.async {
+                users = newUsers
+                isFetchingUsers = false
+                scrollToTopUsers.toggle()
+            }
+        }
+    }
+    
     private func updateLocationName() {
         mapViewModel.getPlacmarkOfLocation(location: CLLocation(latitude: mapViewModel.searchingHere.center.latitude, longitude: mapViewModel.searchingHere.center.longitude), isPrecise: true) { location in
             searchLocationName = location
@@ -522,6 +613,14 @@ struct DiscoverView: View {
     
     private func scrollToTop(scroll: ScrollViewProxy) {
         if spots.count > 0 {
+            withAnimation(.easeInOut(duration: 0.5)) {
+                scroll.scrollTo(0, anchor: .top)
+            }
+        }
+    }
+    
+    private func scrollToTopUsers(scroll: ScrollViewProxy) {
+        if users.count > 0 {
             withAnimation(.easeInOut(duration: 0.5)) {
                 scroll.scrollTo(0, anchor: .top)
             }

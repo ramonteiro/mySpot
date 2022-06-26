@@ -79,6 +79,7 @@
 		C5552CCB2827616600AF2683 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5552CCA2827616600AF2683 /* AppDelegate.swift */; };
 		C5552CCD2827696500AF2683 /* NotificationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5552CCC2827696500AF2683 /* NotificationView.swift */; };
 		C5552CD128298E6900AF2683 /* CloudSharingController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5552CD028298E6900AF2683 /* CloudSharingController.swift */; };
+		C57E3ADE2867FFFF00D2470D /* AccountRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = C57E3ADD2867FFFF00D2470D /* AccountRow.swift */; };
 		C5850D01285F853C0067EE7F /* SpotPreviewType.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5850D00285F853C0067EE7F /* SpotPreviewType.swift */; };
 		C587027427E27F1900DFB6C4 /* MailViewCallback.swift in Sources */ = {isa = PBXBuildFile; fileRef = C587027327E27F1900DFB6C4 /* MailViewCallback.swift */; };
 		C587B46B2854F472007C3263 /* DatePickerSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = C587B46A2854F472007C3263 /* DatePickerSheet.swift */; };
@@ -303,6 +304,7 @@
 		C5552CCA2827616600AF2683 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		C5552CCC2827696500AF2683 /* NotificationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationView.swift; sourceTree = "<group>"; };
 		C5552CD028298E6900AF2683 /* CloudSharingController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudSharingController.swift; sourceTree = "<group>"; };
+		C57E3ADD2867FFFF00D2470D /* AccountRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountRow.swift; sourceTree = "<group>"; };
 		C5850D00285F853C0067EE7F /* SpotPreviewType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpotPreviewType.swift; sourceTree = "<group>"; };
 		C587027327E27F1900DFB6C4 /* MailViewCallback.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MailViewCallback.swift; sourceTree = "<group>"; };
 		C587B46A2854F472007C3263 /* DatePickerSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DatePickerSheet.swift; sourceTree = "<group>"; };
@@ -837,6 +839,7 @@
 				C50CF4AD27F395E2001A9698 /* SettingsView.swift */,
 				C5B01353284AD15B00121163 /* CreateAccountView.swift */,
 				C5F1090F284BEE7E00B71CBC /* AccountDetailView.swift */,
+				C57E3ADD2867FFFF00D2470D /* AccountRow.swift */,
 			);
 			path = Account;
 			sourceTree = "<group>";
@@ -1115,6 +1118,7 @@
 				C51503AE27D7C347009F0DCD /* My_SpotApp.swift in Sources */,
 				C5552CCD2827696500AF2683 /* NotificationView.swift in Sources */,
 				C501FC1827E3FAB7008FEFA1 /* ZoomableScrollView.swift in Sources */,
+				C57E3ADE2867FFFF00D2470D /* AccountRow.swift in Sources */,
 				C5F10914284C49DD00B71CBC /* ShareViewController.swift in Sources */,
 				C5942838285E5E73003CF5AA /* GetTags.swift in Sources */,
 				C5942855285EA7AE003CF5AA /* CircleShape.swift in Sources */,

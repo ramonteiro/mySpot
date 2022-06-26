@@ -12,7 +12,7 @@ import CloudKit
 struct AccountModel: Hashable, Identifiable {
     let id: String
     let name: String
-    let image: UIImage
+    var image: UIImage?
     let pronouns: String?
     let isExplorer: Bool
     let bio: String?
