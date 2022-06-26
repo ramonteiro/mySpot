@@ -83,6 +83,8 @@
 		C57E3AE02868A94B00D2470D /* ScaleButtonStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = C57E3ADF2868A94B00D2470D /* ScaleButtonStyle.swift */; };
 		C57E3AE42868B8DA00D2470D /* MobileNetV2Int8LUT.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = C57E3AE22868B8D900D2470D /* MobileNetV2Int8LUT.mlmodel */; };
 		C57E3AE52868B8DA00D2470D /* YOLOv3Int8LUT.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = C57E3AE32868B8DA00D2470D /* YOLOv3Int8LUT.mlmodel */; };
+		C57E3AE82868DD7500D2470D /* AlertToast in Frameworks */ = {isa = PBXBuildFile; productRef = C57E3AE72868DD7500D2470D /* AlertToast */; };
+		C57E3AEA2868F5A000D2470D /* UndoDeleteSpot.swift in Sources */ = {isa = PBXBuildFile; fileRef = C57E3AE92868F5A000D2470D /* UndoDeleteSpot.swift */; };
 		C5850D01285F853C0067EE7F /* SpotPreviewType.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5850D00285F853C0067EE7F /* SpotPreviewType.swift */; };
 		C587027427E27F1900DFB6C4 /* MailViewCallback.swift in Sources */ = {isa = PBXBuildFile; fileRef = C587027327E27F1900DFB6C4 /* MailViewCallback.swift */; };
 		C587B46B2854F472007C3263 /* DatePickerSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = C587B46A2854F472007C3263 /* DatePickerSheet.swift */; };
@@ -311,6 +313,7 @@
 		C57E3ADF2868A94B00D2470D /* ScaleButtonStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScaleButtonStyle.swift; sourceTree = "<group>"; };
 		C57E3AE22868B8D900D2470D /* MobileNetV2Int8LUT.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = MobileNetV2Int8LUT.mlmodel; sourceTree = "<group>"; };
 		C57E3AE32868B8DA00D2470D /* YOLOv3Int8LUT.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = YOLOv3Int8LUT.mlmodel; sourceTree = "<group>"; };
+		C57E3AE92868F5A000D2470D /* UndoDeleteSpot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UndoDeleteSpot.swift; sourceTree = "<group>"; };
 		C5850D00285F853C0067EE7F /* SpotPreviewType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpotPreviewType.swift; sourceTree = "<group>"; };
 		C587027327E27F1900DFB6C4 /* MailViewCallback.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MailViewCallback.swift; sourceTree = "<group>"; };
 		C587B46A2854F472007C3263 /* DatePickerSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DatePickerSheet.swift; sourceTree = "<group>"; };
@@ -398,6 +401,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				C50CF4A627F122DB001A9698 /* Mantis in Frameworks */,
+				C57E3AE82868DD7500D2470D /* AlertToast in Frameworks */,
 				C58F2BF62830AA42005FA88F /* WelcomeSheet in Frameworks */,
 				C51503C027D7C531009F0DCD /* CloudKit.framework in Frameworks */,
 			);
@@ -596,6 +600,7 @@
 				C594BB81284D37730012DA6C /* AccountModel.swift */,
 				C594285C285EA9D3003CF5AA /* Landmark.swift */,
 				C5850D00285F853C0067EE7F /* SpotPreviewType.swift */,
+				C57E3AE92868F5A000D2470D /* UndoDeleteSpot.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -919,6 +924,7 @@
 			packageProductDependencies = (
 				C50CF4A527F122DB001A9698 /* Mantis */,
 				C58F2BF52830AA42005FA88F /* WelcomeSheet */,
+				C57E3AE72868DD7500D2470D /* AlertToast */,
 			);
 			productName = "My Spot";
 			productReference = C51503AA27D7C347009F0DCD /* My Spot.app */;
@@ -1008,6 +1014,7 @@
 			packageReferences = (
 				C50CF4A427F122DB001A9698 /* XCRemoteSwiftPackageReference "Mantis" */,
 				C58F2BF42830AA42005FA88F /* XCRemoteSwiftPackageReference "Welcome-Sheet" */,
+				C57E3AE62868DD7500D2470D /* XCRemoteSwiftPackageReference "AlertToast" */,
 			);
 			productRefGroup = C51503AB27D7C347009F0DCD /* Products */;
 			projectDirPath = "";
@@ -1137,6 +1144,7 @@
 				C51503AE27D7C347009F0DCD /* My_SpotApp.swift in Sources */,
 				C5552CCD2827696500AF2683 /* NotificationView.swift in Sources */,
 				C501FC1827E3FAB7008FEFA1 /* ZoomableScrollView.swift in Sources */,
+				C57E3AEA2868F5A000D2470D /* UndoDeleteSpot.swift in Sources */,
 				C57E3ADE2867FFFF00D2470D /* AccountRow.swift in Sources */,
 				C5F10914284C49DD00B71CBC /* ShareViewController.swift in Sources */,
 				C5942838285E5E73003CF5AA /* GetTags.swift in Sources */,
@@ -1792,6 +1800,14 @@
 				kind = branch;
 			};
 		};
+		C57E3AE62868DD7500D2470D /* XCRemoteSwiftPackageReference "AlertToast" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/elai950/AlertToast.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.0.0;
+			};
+		};
 		C58F2BF42830AA42005FA88F /* XCRemoteSwiftPackageReference "Welcome-Sheet" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/MAJKFL/Welcome-Sheet";
@@ -1807,6 +1823,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = C50CF4A427F122DB001A9698 /* XCRemoteSwiftPackageReference "Mantis" */;
 			productName = Mantis;
+		};
+		C57E3AE72868DD7500D2470D /* AlertToast */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C57E3AE62868DD7500D2470D /* XCRemoteSwiftPackageReference "AlertToast" */;
+			productName = AlertToast;
 		};
 		C58F2BF52830AA42005FA88F /* WelcomeSheet */ = {
 			isa = XCSwiftPackageProductDependency;

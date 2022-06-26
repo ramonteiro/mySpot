@@ -15,6 +15,7 @@ struct Badge: View {
         ZStack(alignment: .topTrailing) {
             Color.clear
             Text(String(count))
+                .foregroundColor(.white)
                 .font(.system(size: 16))
                 .padding(5)
                 .background { color }

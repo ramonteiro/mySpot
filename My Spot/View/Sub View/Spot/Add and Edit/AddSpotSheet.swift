@@ -5,6 +5,13 @@ import Combine
 import Vision
 import CoreML
 
+enum SavingSpot {
+    case didSave
+    case errorSavingPublic
+    case errorSavingPrivate
+    case noChange
+}
+
 struct AddSpotSheet: View {
     
     @Environment(\.presentationMode) var presentationMode
@@ -12,7 +19,6 @@ struct AddSpotSheet: View {
     @EnvironmentObject var cloudViewModel: CloudKitViewModel
     @State private var presentDeleteAlert = false
     @State private var presentAddImageAlert = false
-    @State private var presentCannotSavePrivateAlert = false
     @State private var presentMapView = false
     @State private var usingCustomLocation = false
     @State private var isFromImagesUnedited = false
@@ -34,7 +40,7 @@ struct AddSpotSheet: View {
     @State private var imageCount: ImageCount?
     @FocusState private var focusState: Field?
     @Binding var isSaving: Bool
-    @Binding var showingCannotSavePublicAlert: Bool
+    @Binding var progress: SavingSpot
     
     
     private var disableSave: Bool {
@@ -199,7 +205,6 @@ struct AddSpotSheet: View {
                 HStack {
                     Image(systemName: (usingCustomLocation ? "mappin" : "figure.wave"))
                     Text(locationName.isEmpty ? "My Spot" : locationName)
-                    
                 }
                 .font(.subheadline)
                 Text(dateFound.toString())
@@ -339,11 +344,6 @@ struct AddSpotSheet: View {
                 initChecked = true
             }
         }
-        .alert("Unable To Save Spot".localized(), isPresented: $presentCannotSavePrivateAlert) {
-            Button("OK".localized(), role: .cancel) { }
-        } message: {
-            Text("Failed to save spot. Please try again.".localized())
-        }
         .alert("Are you sure you want to delete spot?".localized(), isPresented: $presentDeleteAlert) {
             Button("Delete".localized(), role: .destructive) {
                 presentationMode.wrappedValue.dismiss()
@@ -474,9 +474,7 @@ struct AddSpotSheet: View {
                 hiddenTags += await getTagsFromImage(uiImage: image)
             }
         } else {
-            presentCannotSavePrivateAlert = true
-            let generator = UINotificationFeedbackGenerator()
-            generator.notificationOccurred(.warning)
+            progress = .errorSavingPrivate
             return
         }
         if (images.count == 3) {
@@ -486,9 +484,7 @@ struct AddSpotSheet: View {
                     hiddenTags += await getTagsFromImage(uiImage: image)
                 }
             } else {
-                presentCannotSavePrivateAlert = true
-                let generator = UINotificationFeedbackGenerator()
-                generator.notificationOccurred(.warning)
+                progress = .errorSavingPrivate
                 return
             }
             if let imageData = cloudViewModel.compressImage(image: images[2] ?? defaultImages.errorImage!).pngData() {
@@ -497,9 +493,7 @@ struct AddSpotSheet: View {
                     hiddenTags += await getTagsFromImage(uiImage: image)
                 }
             } else {
-                presentCannotSavePrivateAlert = true
-                let generator = UINotificationFeedbackGenerator()
-                generator.notificationOccurred(.warning)
+                progress = .errorSavingPrivate
                 return
             }
         } else if (images.count == 2) {
@@ -509,9 +503,7 @@ struct AddSpotSheet: View {
                     hiddenTags += await getTagsFromImage(uiImage: image)
                 }
             } else {
-                presentCannotSavePrivateAlert = true
-                let generator = UINotificationFeedbackGenerator()
-                generator.notificationOccurred(.warning)
+                progress = .errorSavingPrivate
                 return
             }
         }
@@ -542,11 +534,10 @@ struct AddSpotSheet: View {
         newSpot.id = UUID()
         do {
             try CoreDataStack.shared.context.save()
+            progress = .didSave
             askForReview()
         } catch {
-            presentCannotSavePrivateAlert = true
-            let generator = UINotificationFeedbackGenerator()
-            generator.notificationOccurred(.warning)
+            progress = .errorSavingPrivate
             return
         }
     }
@@ -664,20 +655,17 @@ struct AddSpotSheet: View {
             do {
                 try CoreDataStack.shared.context.save()
             } catch {
-                presentCannotSavePrivateAlert = true
-                let generator = UINotificationFeedbackGenerator()
-                generator.notificationOccurred(.warning)
+                progress = .errorSavingPrivate
                 return
             }
             if newSpot.isPublic {
+                progress = .didSave
                 askForReview()
             } else {
-                showingCannotSavePublicAlert = true
+                progress = .errorSavingPublic
             }
         } else {
-            presentCannotSavePrivateAlert = true
-            let generator = UINotificationFeedbackGenerator()
-            generator.notificationOccurred(.warning)
+            progress = .errorSavingPrivate
             return
         }
     }

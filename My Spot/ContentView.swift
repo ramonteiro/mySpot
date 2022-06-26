@@ -1,11 +1,5 @@
-//
-//  ContentView.swift
-//  My Spot
-//
-//  Created by Isaac Paschall on 3/8/22.
-//
-
 import WelcomeSheet
+import AlertToast
 import SwiftUI
 
 struct ContentView: View {
@@ -43,12 +37,14 @@ struct ContentView: View {
     @State private var presentFailedToAcceptShareInviteAlert = false
     @State private var presentShareInviteAcceptedSuccessfullyAlert = false
     @State private var prsentWhatsNewWelcomeSheet = false
-    @State private var errorAddingSpot = false
     @State private var addedSpotIsSaving = false
     @State private var doNotTriggerRepeatWhenTabSelectionChanges = false
     @State private var didDelete = false
     @State private var splashAnimation = false
     @State private var removeSplashScreen = false
+    @State private var progress: SavingSpot = .noChange
+    @State private var errorSavingPrivateToast = false
+    @State private var successSavedToast = false
     
     var body: some View {
         ZStack {
@@ -106,6 +102,12 @@ struct ContentView: View {
         .onChange(of: CoreDataStack.shared.recievedShare) { _ in
             presentShareInviteAlert()
         }
+        .onChange(of: progress) { newValue in
+            if newValue != .noChange {
+                updateSaveState(progress: newValue)
+                progress = .noChange
+            }
+        }
         .onReceive(tabController.$activeTab) { selection in
             controlTapsOfTabBarItems(newSelection: selection)
         }
@@ -145,14 +147,18 @@ struct ContentView: View {
             CreateAccountView(accountModel: nil)
         }
         .sheet(isPresented: $presentAddSpotSheet) {
-            dismissAddSpotSheet()
-        } content: {
-            AddSpotSheet(isSaving: $addedSpotIsSaving, showingCannotSavePublicAlert: $errorAddingSpot)
+            AddSpotSheet(isSaving: $addedSpotIsSaving, progress: $progress)
         }
         .welcomeSheet(isPresented: $prsentWhatsNewWelcomeSheet,
                       onDismiss: { UserDefaults.standard.set(true, forKey: "whatsnew") },
                       isSlideToDismissDisabled: false,
                       pages: whatsNewPages)
+        .toast(isPresenting: $successSavedToast) {
+            AlertToast(displayMode: .hud, type: .systemImage("checkmark", .green), title: "Saved!".localized())
+        }
+        .toast(isPresenting: $errorSavingPrivateToast) {
+            AlertToast(displayMode: .hud, type: .systemImage("xmark", .red), title: "Error Saving".localized())
+        }
     }
     
     private var mySpotTab: some View {
@@ -281,12 +287,18 @@ struct ContentView: View {
         presentErrorAlert.toggle()
     }
     
-    private func dismissAddSpotSheet() {
-        if errorAddingSpot {
+    private func updateSaveState(progress: SavingSpot) {
+        switch progress {
+        case .didSave:
+            successSavedToast.toggle()
+        case .errorSavingPublic:
             let generator = UINotificationFeedbackGenerator()
             generator.notificationOccurred(.warning)
             presentAddSpotErrorAlert.toggle()
-            errorAddingSpot = false
+        case .errorSavingPrivate:
+            errorSavingPrivateToast.toggle()
+        case .noChange:
+            print("no change")
         }
     }
     

@@ -8,7 +8,6 @@
 import SwiftUI
 import Combine
 import CloudKit
-import Vision
 
 struct SpotEditSheet: View {
     
@@ -39,6 +38,7 @@ struct SpotEditSheet: View {
     @State private var presentCannotDeleteAlert = false
     @State private var presentCannotSavePrivateAlert = false
     @Binding var showingCannotSavePublicAlert: Bool
+    @Binding var didSave: Bool
     
     
     private enum Field {
@@ -492,6 +492,7 @@ struct SpotEditSheet: View {
         spot.tags = tags
         do {
             try CoreDataStack.shared.context.save()
+            didSave = true
             await updateAppGroup(hashcode: hashcode, image: spot.image, x: spot.x, y: spot.y, name: spot.name ?? "", locatioName: spot.name ?? "")
         } catch {
             presentCannotSavePrivateAlert = true
@@ -530,6 +531,7 @@ struct SpotEditSheet: View {
                     spot.dbid = ""
                     spot.isPublic = false
                 }
+                didSave = true
             } catch {
                 spot.dbid = ""
                 spot.isPublic = false
@@ -603,6 +605,7 @@ struct SpotEditSheet: View {
             spot.tags = tags
             do {
                 try CoreDataStack.shared.context.save()
+                didSave = true
                 await updateAppGroup(hashcode: hashcode, image: spot.image, x: spot.x, y: spot.y, name: spot.name ?? "", locatioName: spot.name ?? "")
             } catch {
                 presentCannotSavePrivateAlert = true
@@ -647,6 +650,7 @@ struct SpotEditSheet: View {
                 let isSuccess = try await cloudViewModel.updateSpotPublic(id: id, newName: name, newDescription: descript, newFounder: UserDefaults.standard.string(forKey: "founder") ?? spot.founder ?? "?", newType: tags, imageChanged: imageChanged, image: imageData, image2: imageData2, image3: imageData3, isMultipleImages: images.count - 1)
                 if isSuccess {
                     spot.isPublic = true
+                    didSave = true
                 } else {
                     presentCannotSaveAlert = true
                     let generator = UINotificationFeedbackGenerator()

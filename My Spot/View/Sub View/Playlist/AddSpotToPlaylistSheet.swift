@@ -24,6 +24,7 @@ struct AddSpotToPlaylistSheet: View {
     @State private var addedSpots: [NSManagedObject] = []
     @Binding var isSaving: Bool
     @Binding var errorSaving: Bool
+    @Binding var didSave: Bool
     
     var body: some View {
         NavigationView {
@@ -135,6 +136,7 @@ struct AddSpotToPlaylistSheet: View {
                             DispatchQueue.main.async {
                                 CoreDataStack.shared.save()
                             }
+                            didSave = true
                             isSaving = false
                         case .failure(let error):
                             errorSaving = true
@@ -154,6 +156,7 @@ struct AddSpotToPlaylistSheet: View {
                 DispatchQueue.main.async {
                     CoreDataStack.shared.save()
                 }
+                didSave = true
                 isSaving = false
             }
         } else {

@@ -24,6 +24,7 @@ final class CloudKitViewModel: ObservableObject {
     @Published var cursorMain: CKQueryOperation.Cursor?
     @Published var cursorAccount: CKQueryOperation.Cursor?
     @Published var cursorUsers: CKQueryOperation.Cursor?
+    var undoDeleteSpot: UndoDeleteSpot? = nil
     var shared: SpotFromCloud? = nil
     var deepAccount: String? = nil
     var userID: String = ""
@@ -231,6 +232,7 @@ final class CloudKitViewModel: ObservableObject {
     }
     
     func fetchImages(id: String) async -> [UIImage?] {
+        if id.isEmpty { return [] }
         do {
             let results = try await CKContainer.default().publicCloudDatabase.records(for: [CKRecord.ID(recordName: id)], desiredKeys: ["image2", "image3"])
             let record = results[CKRecord.ID(recordName: id)]
@@ -265,6 +267,7 @@ final class CloudKitViewModel: ObservableObject {
     }
     
     func fetchMainImage(id: String) async -> UIImage? {
+        if id == "error" || id.isEmpty { return nil }
         do {
             let results = try await CKContainer.default().publicCloudDatabase.records(for: [CKRecord.ID(recordName: id)], desiredKeys: ["image"])
             let record = results[CKRecord.ID(recordName: id)]

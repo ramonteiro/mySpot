@@ -14,6 +14,7 @@ import SwiftUI
 import MapKit
 import CloudKit
 import CoreData
+import AlertToast
 
 struct DetailPlaylistView: View {
     
@@ -35,6 +36,7 @@ struct DetailPlaylistView: View {
     @State private var toBeDeleted: IndexSet?
     @State private var deleteAlertText = ""
     @State private var loadingShare = false
+    @State private var didSave = false
     @State private var shareIcon = "person.crop.circle"
     @State private var filteredSpots: [Spot] = []
     @State private var searchResults: [Spot] = []
@@ -97,6 +99,9 @@ struct DetailPlaylistView: View {
             } message: {
                 Text("Please check internet connection and try again.".localized())
             }
+            .toast(isPresenting: $didSave) {
+                AlertToast(displayMode: .alert, type: .complete(.green), title: "Added Spots".localized())
+            }
     }
     
     // MARK: - Sub Views
@@ -153,7 +158,8 @@ struct DetailPlaylistView: View {
             AddSpotToPlaylistSheet(currPlaylist: playlist,
                                    currentSpots: getCurrentSpotIds(),
                                    isSaving: $isSaving,
-                                   errorSaving: $errorSaving)
+                                   errorSaving: $errorSaving,
+                                   didSave: $didSave)
         }
     }
     

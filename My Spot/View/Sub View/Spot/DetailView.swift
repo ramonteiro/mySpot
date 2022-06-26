@@ -12,6 +12,7 @@
 
 import SwiftUI
 import MapKit
+import AlertToast
 
 struct DetailView<T: SpotPreviewType>: View {
     
@@ -48,6 +49,7 @@ struct DetailView<T: SpotPreviewType>: View {
     @State private var initChecked = false
     @State private var hasReported = false
     @State private var loadingAccount = true
+    @State private var didSave = false
     @State private var accountModel: AccountModel?
     @State private var imageOffset: CGFloat = -50
     @State private var imageSelection = 0
@@ -119,6 +121,9 @@ struct DetailView<T: SpotPreviewType>: View {
                 BottomPopupView {
                     NamePopupView(isPresented: $presentSaveSheet, text: $newName, saved: $isSaving, spotName: spot.namePreview)
                 }
+            }
+            .toast(isPresenting: $didSave) {
+                AlertToast(displayMode: .hud, type: .systemImage("checkmark", .green), title: "Saved!".localized())
             }
     }
     
@@ -370,7 +375,7 @@ struct DetailView<T: SpotPreviewType>: View {
             dismissEditSheet()
         } content: {
             if let spot = spot as? Spot {
-                SpotEditSheet(spot: spot, showingCannotSavePublicAlert: $presentCannotSavePublicAlert)
+                SpotEditSheet(spot: spot, showingCannotSavePublicAlert: $presentCannotSavePublicAlert, didSave: $didSave)
             }
         }
         .disabled(spot.isPublicPreview && !cloudViewModel.isSignedInToiCloud)
@@ -761,11 +766,37 @@ struct DetailView<T: SpotPreviewType>: View {
     
     private func deleteMySpot() {
         if let i = spots.firstIndex(where: { $0.id?.uuidString == spot.parentIDPreview }) {
+            saveForUndo(spot: spots[i])
             CoreDataStack.shared.deleteSpot(spots[i])
             CoreDataStack.shared.save()
             didDelete = true
             popView()
         }
+    }
+    
+    private func saveForUndo(spot: Spot) {
+        let newSpot = UndoDeleteSpot(details: spot.details,
+                                     dateObject: spot.dateObject,
+                                     dateAdded: spot.dateAdded,
+                                     addedBy: spot.addedBy,
+                                     isShared: spot.isShared,
+                                     image: spot.image3,
+                                     image2: spot.image2,
+                                     image3: spot.image3,
+                                     likes: spot.likes,
+                                     name: spot.name,
+                                     userId: spot.userId,
+                                     x: spot.x,
+                                     y: spot.y,
+                                     isPublic: spot.isPublic,
+                                     wasThere: spot.wasThere,
+                                     fromDB: spot.fromDB,
+                                     date: spot.date,
+                                     founder: spot.founder,
+                                     tags: spot.tags,
+                                     dbid: spot.dbid,
+                                     locationName: spot.locationName)
+        cloudViewModel.undoDeleteSpot = newSpot
     }
     
     private func popView() {
@@ -927,7 +958,6 @@ struct DetailView<T: SpotPreviewType>: View {
         if let image1 = spot.imagePreview {
             images.append(image1)
         } else {
-            print("I DONT HAVE IT :((((")
             Task {
                 let id = spot.dataBaseIdPreview
                 let fetchedImages = await cloudViewModel.fetchMainImage(id: id)

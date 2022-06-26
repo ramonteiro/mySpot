@@ -13,6 +13,7 @@
 import SwiftUI
 import MapKit
 import CoreData
+import AlertToast
 
 struct MySpotsView: View {
     
@@ -43,6 +44,11 @@ struct MySpotsView: View {
         }
         .fullScreenCover(isPresented: $presentMapSheet) {
             MapViewSpots(spots: $filteredSpots, sortBy: $sortBy, searchText: nil)
+        }
+        .toast(isPresenting: $didDelete) {
+            AlertToast(displayMode: .hud, type: .systemImage("exclamationmark.triangle", .yellow), title: "Deleted Spot".localized(), subTitle: "Tap to undo")
+        } onTap: {
+            undoDelete()
         }
     }
     
@@ -313,6 +319,35 @@ struct MySpotsView: View {
                 (spot.founder ?? "").lowercased().contains(searchText.lowercased()) ||
                 (spot.date ?? "").lowercased().contains(searchText.lowercased())
             }
+        }
+    }
+    
+    private func undoDelete() {
+        if let spot = cloudViewModel.undoDeleteSpot {
+            let newSpot = Spot(context: CoreDataStack.shared.context)
+            newSpot.image = spot.image
+            newSpot.details = spot.details
+            newSpot.dateObject = spot.dateObject
+            newSpot.dateAdded = spot.dateAdded
+            newSpot.addedBy = spot.addedBy
+            newSpot.isShared = spot.isShared
+            newSpot.image2 = spot.image2
+            newSpot.image3 = spot.image3
+            newSpot.likes = spot.likes
+            newSpot.name = spot.name
+            newSpot.userId = spot.userId
+            newSpot.x = spot.x
+            newSpot.y = spot.y
+            newSpot.isPublic = spot.isPublic
+            newSpot.wasThere = spot.wasThere
+            newSpot.fromDB = spot.fromDB
+            newSpot.date = spot.date
+            newSpot.founder = spot.founder
+            newSpot.tags = spot.tags
+            newSpot.dbid = spot.dbid
+            newSpot.locationName = spot.locationName
+            CoreDataStack.shared.save()
+            cloudViewModel.undoDeleteSpot = nil
         }
     }
 }

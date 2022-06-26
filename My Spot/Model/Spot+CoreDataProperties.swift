@@ -74,7 +74,7 @@ extension Spot: SpotPreviewType {
     }
     
     var dataBaseIdPreview: String {
-        dbid ?? ""
+        dbid ?? "error"
     }
     
     var addedByPreview: String? {
