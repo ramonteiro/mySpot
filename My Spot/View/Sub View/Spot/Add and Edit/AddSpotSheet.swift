@@ -1,20 +1,9 @@
-//
-//  AddSpotSheet.swift
-//  mySpot
-//
-//  Created by Isaac Paschall on 2/21/22.
-//
-
-/*
- AddSpotSheet:
- Dsiplays prompts to create new spot and sends to db if public
- */
-
 import SwiftUI
 import MapKit
 import StoreKit
 import Combine
 import Vision
+import CoreML
 
 struct AddSpotSheet: View {
     
@@ -479,7 +468,7 @@ struct AddSpotSheet: View {
         if let imageData = cloudViewModel.compressImage(image: images[0] ?? defaultImages.errorImage!).pngData() {
             if let image = UIImage(data: imageData) {
                 newSpot.image = image
-                hiddenTags += await getTextFromImage(uiImage: image)
+                hiddenTags += await getTagsFromImage(uiImage: image)
             }
         } else {
             presentCannotSavePrivateAlert = true
@@ -491,7 +480,7 @@ struct AddSpotSheet: View {
             if let imageData = cloudViewModel.compressImage(image: images[1] ?? defaultImages.errorImage!).pngData() {
                 if let image = UIImage(data: imageData) {
                     newSpot.image2 = image
-                    hiddenTags += await getTextFromImage(uiImage: image)
+                    hiddenTags += await getTagsFromImage(uiImage: image)
                 }
             } else {
                 presentCannotSavePrivateAlert = true
@@ -502,7 +491,7 @@ struct AddSpotSheet: View {
             if let imageData = cloudViewModel.compressImage(image: images[2] ?? defaultImages.errorImage!).pngData() {
                 if let image = UIImage(data: imageData) {
                     newSpot.image3 = image
-                    hiddenTags += await getTextFromImage(uiImage: image)
+                    hiddenTags += await getTagsFromImage(uiImage: image)
                 }
             } else {
                 presentCannotSavePrivateAlert = true
@@ -514,7 +503,7 @@ struct AddSpotSheet: View {
             if let imageData = cloudViewModel.compressImage(image: images[1] ?? defaultImages.errorImage!).pngData() {
                 if let image = UIImage(data: imageData) {
                     newSpot.image2 = image
-                    hiddenTags += await getTextFromImage(uiImage: image)
+                    hiddenTags += await getTagsFromImage(uiImage: image)
                 }
             } else {
                 presentCannotSavePrivateAlert = true
@@ -586,7 +575,7 @@ struct AddSpotSheet: View {
         if let imageData = cloudViewModel.compressImage(image: images[0] ?? defaultImages.errorImage!).pngData() {
             if let image = UIImage(data: imageData) {
                 newSpot.image = image
-                hiddenTags += await getTextFromImage(uiImage: image)
+                hiddenTags += await getTagsFromImage(uiImage: image)
             }
             var imageData2: Data? = nil
             var imageData3: Data? = nil
@@ -594,14 +583,14 @@ struct AddSpotSheet: View {
                 if let imageData2Check = cloudViewModel.compressImage(image: images[1] ?? defaultImages.errorImage!).pngData() {
                     if let image = UIImage(data: imageData2Check) {
                         newSpot.image2 = image
-                        hiddenTags += await getTextFromImage(uiImage: image)
+                        hiddenTags += await getTagsFromImage(uiImage: image)
                     }
                     imageData2 = imageData2Check
                 }
                 if let imageData3Check = cloudViewModel.compressImage(image: images[2] ?? defaultImages.errorImage!).pngData() {
                     if let image = UIImage(data: imageData3Check) {
                         newSpot.image3 = image
-                        hiddenTags += await getTextFromImage(uiImage: image)
+                        hiddenTags += await getTagsFromImage(uiImage: image)
                     }
                     imageData3 = imageData3Check
                 }
@@ -609,7 +598,7 @@ struct AddSpotSheet: View {
                 if let imageData2Check = cloudViewModel.compressImage(image: images[1] ?? defaultImages.errorImage!).pngData() {
                     if let image = UIImage(data: imageData2Check) {
                         newSpot.image2 = image
-                        hiddenTags += await getTextFromImage(uiImage: image)
+                        hiddenTags += await getTagsFromImage(uiImage: image)
                     }
                     imageData2 = imageData2Check
                 }
@@ -738,37 +727,64 @@ struct AddSpotSheet: View {
     }
     
     private func saveButtonTapped() {
-        isSaving = true
-        Task {
+        DispatchQueue.main.async {
+            isSaving = true
             presentationMode.wrappedValue.dismiss()
-            tags = descript.findTags()
-            if (isPublic) {
-                await savePublic()
-            } else {
-                await save()
+        }
+        DispatchQueue.global(qos: .background).async {
+            Task {
+                tags = descript.findTags()
+                if (isPublic) {
+                    await savePublic()
+                } else {
+                    await save()
+                }
+                isSaving = false
             }
-            isSaving = false
         }
     }
     
-    private func getTextFromImage(uiImage: UIImage) async -> String {
-        var text = ""
-        guard let cgImage = uiImage.cgImage else { return text }
-        let handler = VNImageRequestHandler(cgImage: cgImage, options: [:])
-        let request = VNRecognizeTextRequest { request, error in
-            guard let result = request.results else { return }
-            guard let observations = result as? [VNRecognizedTextObservation], error == nil else { return }
-            text = observations.compactMap({
-                $0.topCandidates(1).first?.string
-            }).joined(separator: ", ")
-            print(text)
+    private func getTagsFromImage(uiImage: UIImage) async -> String {
+        var returnArray: [String] = []
+        guard let cgImage = uiImage.cgImage else { return "" }
+        let keep = 10
+        do {
+            let config = MLModelConfiguration()
+            config.computeUnits = MLComputeUnits.all
+            config.allowLowPrecisionAccumulationOnGPU = true
+            let model1 = try VNCoreMLModel(for: YOLOv3Int8LUT(configuration: config).model)
+            let model2 = try VNCoreMLModel(for: MobileNetV2Int8LUT(configuration: config).model)
+            let handler = VNImageRequestHandler(cgImage: cgImage)
+            let request1 = VNCoreMLRequest(model: model1) { request, error in
+                guard let result = request.results as? [VNClassificationObservation] else { return }
+                let sortedResult = result.sorted(by: { $0.confidence > $1.confidence })
+                var keeps = keep
+                for item in sortedResult {
+                    if keeps <= 0 { break }
+                    print("\(item.confidence), \(item.identifier)")
+                    returnArray.append(item.identifier)
+                    keeps -= 1
+                }
+            }
+            let request2 = VNCoreMLRequest(model: model2) { request, error in
+                guard let result = request.results as? [VNClassificationObservation] else { return }
+                let sortedResult = result.sorted(by: { $0.confidence > $1.confidence })
+                var keeps = keep
+                for item in sortedResult {
+                    if keeps <= 0 { break }
+                    print("\(item.confidence), \(item.identifier)")
+                    returnArray.append(item.identifier)
+                    keeps -= 1
+                }
+            }
+            await performRequests([request1, request2], handler: handler)
+        } catch {
+            return returnArray.joined(separator: ", ")
         }
-        request.recognitionLevel = VNRequestTextRecognitionLevel.accurate
-        await performRequest(request, handler: handler)
-        return text
+        return returnArray.joined(separator: ", ")
     }
     
-    private func performRequest(_ request: VNRecognizeTextRequest, handler: VNImageRequestHandler) async {
-        try? handler.perform([request])
+    private func performRequests(_ requests: [VNCoreMLRequest], handler: VNImageRequestHandler) async {
+        try? handler.perform(requests)
     }
 }

@@ -81,6 +81,8 @@
 		C5552CD128298E6900AF2683 /* CloudSharingController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5552CD028298E6900AF2683 /* CloudSharingController.swift */; };
 		C57E3ADE2867FFFF00D2470D /* AccountRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = C57E3ADD2867FFFF00D2470D /* AccountRow.swift */; };
 		C57E3AE02868A94B00D2470D /* ScaleButtonStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = C57E3ADF2868A94B00D2470D /* ScaleButtonStyle.swift */; };
+		C57E3AE42868B8DA00D2470D /* MobileNetV2Int8LUT.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = C57E3AE22868B8D900D2470D /* MobileNetV2Int8LUT.mlmodel */; };
+		C57E3AE52868B8DA00D2470D /* YOLOv3Int8LUT.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = C57E3AE32868B8DA00D2470D /* YOLOv3Int8LUT.mlmodel */; };
 		C5850D01285F853C0067EE7F /* SpotPreviewType.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5850D00285F853C0067EE7F /* SpotPreviewType.swift */; };
 		C587027427E27F1900DFB6C4 /* MailViewCallback.swift in Sources */ = {isa = PBXBuildFile; fileRef = C587027327E27F1900DFB6C4 /* MailViewCallback.swift */; };
 		C587B46B2854F472007C3263 /* DatePickerSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = C587B46A2854F472007C3263 /* DatePickerSheet.swift */; };
@@ -307,6 +309,8 @@
 		C5552CD028298E6900AF2683 /* CloudSharingController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudSharingController.swift; sourceTree = "<group>"; };
 		C57E3ADD2867FFFF00D2470D /* AccountRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountRow.swift; sourceTree = "<group>"; };
 		C57E3ADF2868A94B00D2470D /* ScaleButtonStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScaleButtonStyle.swift; sourceTree = "<group>"; };
+		C57E3AE22868B8D900D2470D /* MobileNetV2Int8LUT.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = MobileNetV2Int8LUT.mlmodel; sourceTree = "<group>"; };
+		C57E3AE32868B8DA00D2470D /* YOLOv3Int8LUT.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = YOLOv3Int8LUT.mlmodel; sourceTree = "<group>"; };
 		C5850D00285F853C0067EE7F /* SpotPreviewType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpotPreviewType.swift; sourceTree = "<group>"; };
 		C587027327E27F1900DFB6C4 /* MailViewCallback.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MailViewCallback.swift; sourceTree = "<group>"; };
 		C587B46A2854F472007C3263 /* DatePickerSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DatePickerSheet.swift; sourceTree = "<group>"; };
@@ -539,6 +543,7 @@
 		C51503AC27D7C347009F0DCD /* My Spot */ = {
 			isa = PBXGroup;
 			children = (
+				C57E3AE12868B8C900D2470D /* CoreModel */,
 				C51503B127D7C349009F0DCD /* Assets.xcassets */,
 				C51503BD27D7C52C009F0DCD /* My Spot.entitlements */,
 				C515042B27D95225009F0DCD /* LaunchScreen.storyboard */,
@@ -689,6 +694,15 @@
 				C5266AD6283EBF0100A923A1 /* Info.plist */,
 			);
 			path = mySpotiMsg;
+			sourceTree = "<group>";
+		};
+		C57E3AE12868B8C900D2470D /* CoreModel */ = {
+			isa = PBXGroup;
+			children = (
+				C57E3AE22868B8D900D2470D /* MobileNetV2Int8LUT.mlmodel */,
+				C57E3AE32868B8DA00D2470D /* YOLOv3Int8LUT.mlmodel */,
+			);
+			path = CoreModel;
 			sourceTree = "<group>";
 		};
 		C5850D02285FB69C0067EE7F /* Logic */ = {
@@ -1116,6 +1130,7 @@
 				C51503F427D7CA1D009F0DCD /* MapViewModel.swift in Sources */,
 				C51503FC27D7CA60009F0DCD /* MySpotsView.swift in Sources */,
 				C594285B285EA90D003CF5AA /* MapSearchBar.swift in Sources */,
+				C57E3AE52868B8DA00D2470D /* YOLOv3Int8LUT.mlmodel in Sources */,
 				C5942836285E5E3C003CF5AA /* CheckUserDefaultsValue.swift in Sources */,
 				C587B46B2854F472007C3263 /* DatePickerSheet.swift in Sources */,
 				C5942848285E6008003CF5AA /* EmojiToImage.swift in Sources */,
@@ -1149,6 +1164,7 @@
 				C515042527D7CAC6009F0DCD /* UIEmojiTextField.swift in Sources */,
 				C515040E27D7CA87009F0DCD /* PlaylistRow.swift in Sources */,
 				C515040D27D7CA87009F0DCD /* DetailedPlaylistView.swift in Sources */,
+				C57E3AE42868B8DA00D2470D /* MobileNetV2Int8LUT.mlmodel in Sources */,
 				C51503E727D7C87D009F0DCD /* CloudKitViewModel.swift in Sources */,
 				C50CF4B027F3CD4C001A9698 /* SetUpNewSpotNotification.swift in Sources */,
 				C515040427D7CA72009F0DCD /* DetailView.swift in Sources */,

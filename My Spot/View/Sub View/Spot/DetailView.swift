@@ -749,7 +749,8 @@ struct DetailView<T: SpotPreviewType>: View {
         images.append(spot.imagePreview ?? defaultImages.errorImage!)
         if let image2 = spot.image2Preview {
             images.append(image2)
-        } else if let image3 = spot.image3Preview {
+        }
+        if let image3 = spot.image3Preview {
             images.append(image3)
         }
     }
@@ -872,7 +873,6 @@ struct DetailView<T: SpotPreviewType>: View {
         }
         newSpot.id = UUID()
         newSpot.dbid = spot.dataBaseIdPreview
-        print(newSpot)
         CoreDataStack.shared.save()
         let hashcode = newSpot.name ?? "" + "\(newSpot.x)\(newSpot.y)"
         await updateAppGroup(hashcode: hashcode, image: newSpot.image, x: newSpot.x, y: newSpot.y, name: newSpot.name ?? "", locatioName: newSpot.name ?? "")
