@@ -139,7 +139,7 @@ struct MySpotsView: View {
                     } label: {
                         MapSpotPreview(spot: $searchResults[i])
                     }
-                    .buttonStyle(PlainButtonStyle())
+                    .buttonStyle(ScaleButtonStyle())
                     Spacer()
                 }
                 .id(i)

@@ -54,13 +54,15 @@ struct AddSpotToPlaylistSheet: View {
                     Spacer()
                     ZStack {
                         MapSpotPreview(spot: $spotsFiltered[i])
+                            .scaleEffect(0.9)
                         if addedSpots.contains(spotsFiltered[i]) {
                             HStack {
                                 Spacer()
                                 Image(systemName: "checkmark.square.fill")
                                     .foregroundColor(.green)
+                                    .font(.headline)
                             }
-                            .padding(.trailing, 10)
+                            .padding(.trailing, 20)
                         }
                     }
                     Spacer()
@@ -73,7 +75,7 @@ struct AddSpotToPlaylistSheet: View {
                     }
                 }
                 .listRowInsets(EdgeInsets(top: 10, leading: 0, bottom: 10, trailing: 0))
-                .listRowBackground(Color(uiColor: UIColor.secondarySystemBackground))
+                .listRowBackground(Color(uiColor: UIColor.systemBackground))
             }
         }
         .listStyle(.plain)

@@ -275,6 +275,7 @@ struct DetailPlaylistView: View {
                                     )
                                 }
                         }
+                        .scaleEffect(0.9)
                         Spacer()
                     }
                     .listRowBackground(Color(uiColor: UIColor.systemBackground))

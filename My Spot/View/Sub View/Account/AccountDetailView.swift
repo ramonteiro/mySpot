@@ -287,7 +287,7 @@ struct AccountDetailView: View {
                     } label: {
                         MapSpotPreview(spot: $spots[i])
                     }
-                    .buttonStyle(PlainButtonStyle())
+                    .buttonStyle(ScaleButtonStyle())
                     Spacer()
                 }
                 .id(i)

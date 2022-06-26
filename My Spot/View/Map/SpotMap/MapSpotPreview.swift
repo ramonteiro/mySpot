@@ -37,6 +37,7 @@ struct MapSpotPreview<T: SpotPreviewType>: View {
             Text(spot.locationNamePreview)
                 .font(.subheadline)
                 .foregroundColor(.white)
+                .lineLimit(1)
         }
     }
     
@@ -46,6 +47,7 @@ struct MapSpotPreview<T: SpotPreviewType>: View {
                 .font(.subheadline)
                 .foregroundColor(.white)
             Text("\(spot.downloadsPreview)")
+                .lineLimit(1)
                 .font(.subheadline)
                 .foregroundColor(.white)
         }
@@ -74,6 +76,7 @@ struct MapSpotPreview<T: SpotPreviewType>: View {
             Text(scope)
                 .font(.subheadline)
                 .foregroundColor(.white)
+                .lineLimit(1)
         }
     }
     
@@ -83,6 +86,7 @@ struct MapSpotPreview<T: SpotPreviewType>: View {
                 .foregroundColor(.white)
                 .font(.largeTitle)
                 .fontWeight(.bold)
+                .lineLimit(2)
             Spacer()
         }
     }
@@ -91,6 +95,7 @@ struct MapSpotPreview<T: SpotPreviewType>: View {
         Text(spot.dateObjectPreview?.toString() ?? ("By: \(spot.founderPreview)"))
             .font(.subheadline)
             .foregroundColor(.white)
+            .lineLimit(1)
     }
     
     private var distanceAwayView: some View {
@@ -100,6 +105,7 @@ struct MapSpotPreview<T: SpotPreviewType>: View {
             .onAppear {
                 distance = mapViewModel.calculateDistance(from: spot.locationPreview)
             }
+            .lineLimit(1)
     }
     
     private var bottomRow: some View {
@@ -117,7 +123,7 @@ struct MapSpotPreview<T: SpotPreviewType>: View {
                 ForEach(tags, id: \.self) { tag in
                     Text(tag)
                         .font(.system(size: 12, weight: .regular))
-                        .lineLimit(2)
+                        .lineLimit(1)
                         .foregroundColor(.white)
                         .padding(5)
                         .background(.tint, ignoresSafeAreaEdges: [])
