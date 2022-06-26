@@ -38,7 +38,7 @@ struct ImagePopUp: View {
                     .padding(10)
                     .foregroundColor(.white)
             }
-            .background(.ultraThinMaterial)
+            .background(.ultraThinMaterial, ignoresSafeAreaEdges: [])
             .clipShape(Circle())
             .offset(x: (UIScreen.screenWidth) / 2 - 30, y: -(((UIScreen.screenWidth) * image.size.height * 0.1)/(image.size.width * 0.1) / 2) + 30)
         }

@@ -87,10 +87,10 @@ struct SpotEditSheet: View {
                 .ignoresSafeArea()
             ProgressView("Saving".localized())
                 .padding()
-                .background(
+                .background {
                     RoundedRectangle(cornerRadius: 10)
                         .fill(Color(UIColor.systemBackground))
-                )
+                }
         }
     }
     

@@ -357,7 +357,7 @@ struct SpotsSearchBar: View {
     private var xMarkImage: some View {
         Image(systemName: "xmark")
             .padding(5)
-            .background(.ultraThinMaterial)
+            .background(.ultraThinMaterial, ignoresSafeAreaEdges: [])
             .clipShape(Circle())
             .onTapGesture {
                 UIApplication.shared.dismissKeyboard()

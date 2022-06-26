@@ -274,7 +274,7 @@ struct AccountDetailView: View {
             ProgressView()
             Spacer()
         }
-        .background(Color.clear)
+        .background { Color.clear }
     }
     
     private func mySpotsList(accountModel: AccountModel) -> some View {
@@ -336,10 +336,10 @@ struct AccountDetailView: View {
     private var loadingAccountSpinner: some View {
         ProgressView("Loading Account".localized())
             .padding()
-            .background(
+            .background {
                 RoundedRectangle(cornerRadius: 10)
                     .fill(Color(UIColor.systemBackground))
-            )
+            }
     }
     
     private var badgeView: some View {
@@ -348,7 +348,7 @@ struct AccountDetailView: View {
                 Image(systemName: badge)
                     .padding(6)
                     .foregroundColor(badge == "mappin.and.ellipse" ? spotBadgeColor : (badge == "icloud.and.arrow.down" ? downloadBadgeColor : .white))
-                    .background(Color.gray)
+                    .background { Color.gray }
                     .clipShape(Circle())
                     .onTapGesture {
                         tappedBadge = badge
@@ -408,7 +408,7 @@ struct AccountDetailView: View {
                         .resizable()
                         .frame(width: 25, height: 25)
                         .padding(10)
-                        .background(colorScheme == .dark ? Color.gray : Color.white)
+                        .background { colorScheme == .dark ? Color.gray : Color.white }
                         .cornerRadius(10)
                         .overlay(
                             RoundedRectangle(cornerRadius: 10)

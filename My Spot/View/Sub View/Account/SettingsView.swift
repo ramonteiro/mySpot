@@ -248,7 +248,7 @@ struct SettingsView: View {
         Circle()
             .strokeBorder(cloudViewModel.systemColorIndex == i ? (colorScheme == .dark ? .white : .black) : .clear, lineWidth: 5)
             .frame(width: 40, height: 40)
-            .background(Circle().foregroundColor(cloudViewModel.systemColorArray[i]))
+            .background { Circle().foregroundColor(cloudViewModel.systemColorArray[i]) }
             .onTapGesture {
                 cloudViewModel.systemColorIndex = i
                 UserDefaults(suiteName: "group.com.isaacpaschall.My-Spot")?.set(i, forKey: "colorIndex")

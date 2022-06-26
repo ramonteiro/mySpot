@@ -113,7 +113,7 @@ struct AddSpotMap: View {
                 .foregroundColor(.white)
                 .padding(padding)
                 .frame(width: 50, height: 50)
-                .background(cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex])
+                .background { cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex] }
                 .clipShape(Circle())
                 .offset(x: customLocation ? 0 : -100)
         }
@@ -128,7 +128,7 @@ struct AddSpotMap: View {
                 .foregroundColor(.white)
                 .padding(padding)
                 .frame(width: 50, height: 50)
-                .background(cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex])
+                .background { cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex] }
                 .clipShape(Circle())
                 .offset(x: customLocation ? 0 : -100)
         }
@@ -143,7 +143,7 @@ struct AddSpotMap: View {
                 .foregroundColor(.white)
                 .padding(padding)
                 .frame(width: 50, height: 50)
-                .background(mapViewModel.isAuthorized ? cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex] : .gray)
+                .background { mapViewModel.isAuthorized ? cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex] : .gray }
                 .clipShape(Circle())
         }
         .disabled(!mapViewModel.isAuthorized)
@@ -163,7 +163,7 @@ struct AddSpotMap: View {
                 .foregroundColor(.white)
                 .padding(padding)
                 .frame(width: 50, height: 50)
-                .background(mapViewModel.isAuthorized ? cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex] : .gray)
+                .background { mapViewModel.isAuthorized ? cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex] : .gray }
                 .clipShape(Circle())
         }
         .disabled(!mapViewModel.isAuthorized && customLocation)
@@ -178,7 +178,7 @@ struct AddSpotMap: View {
                 .foregroundColor(.white)
                 .padding(padding)
                 .frame(width: 50, height: 50)
-                .background(cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex])
+                .background { cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex] }
                 .clipShape(Circle())
         }
     }

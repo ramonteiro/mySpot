@@ -30,6 +30,11 @@ struct DiscoverView: View {
     @State private var didDelete = false
     @State private var spots: [SpotFromCloud] = []
     
+    @State private var showUserSearch = false
+    @State private var usersSearchText = "Users"
+    let tabs = ["Users", "Spots"]
+    @Namespace var animation
+    
     var body: some View {
         NavigationView {
             if (cloudViewModel.isSignedInToiCloud) {
@@ -45,6 +50,13 @@ struct DiscoverView: View {
     }
     
     // MARK: - Sub Views
+    
+    private var userView: some View {
+        VStack {
+        Text("users")
+        Spacer()
+        }
+    }
     
     private var displaySpotsFromDB: some View {
         ZStack {
@@ -176,31 +188,94 @@ struct DiscoverView: View {
         VStack(spacing: 0) {
             DiscoverSearchBar(searchText: $searchText,
                               searching: $isSearching,
-                              searchName: $searchLocationName,
+                              searchName: (showUserSearch ? $usersSearchText : $searchLocationName),
                               hasSearched: $hasSearched).padding(.vertical, 10)
-            ScrollViewReader { scroll in
-                ScrollView(showsIndicators: false) {
-                    PullToRefresh(coordinateSpaceName: "pullToRefresh") {
-                        let generator = UIImpactFeedbackGenerator(style: .light)
-                        generator.impactOccurred()
-                        refreshSpots()
-                    }
-                    listOfSpots(scroll: scroll)
+            VStack(spacing: 0) {
+                switchView
+                ZStack {
+                    userView
+                        .offset(x: showUserSearch ? 0 : UIScreen.screenWidth)
+                    spotsSearch
+                        .offset(x: !showUserSearch ? 0 : -UIScreen.screenWidth)
                 }
             }
-            .coordinateSpace(name: "pullToRefresh")
         }
-        .navigationTitle("Spots")
+        .navigationTitle(showUserSearch ? usersSearchText : "Spots")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItemGroup(placement: .navigationBarTrailing) {
-                chooseDistanceMenu
-                mapButton
+                if !showUserSearch {
+                    chooseDistanceMenu
+                    mapButton
+                }
             }
             ToolbarItemGroup(placement: .navigationBarLeading) {
-                displayLocationIcon
+                if !showUserSearch {
+                    displayLocationIcon
+                }
             }
         }
+    }
+    
+    private var switchView: some View {
+        HStack(spacing: 0) {
+            Text("Spots")
+                .font(.callout)
+                .fontWeight(.semibold)
+                .scaleEffect(0.9)
+                .padding(.vertical,6)
+                .foregroundColor(!showUserSearch ? .white : .black)
+                .frame(maxWidth: .infinity)
+                .background {
+                    if !showUserSearch {
+                        Capsule()
+                            .fill(.black)
+                            .matchedGeometryEffect(id: "TAB", in: animation)
+                    }
+                }
+                .contentShape(Capsule())
+                .onTapGesture {
+                    withAnimation {
+                        showUserSearch = false
+                    }
+                }
+            Text("Users")
+                .font(.callout)
+                .fontWeight(.semibold)
+                .scaleEffect(0.9)
+                .padding(.vertical,6)
+                .foregroundColor(showUserSearch ? .white : .black)
+                .frame(maxWidth: .infinity)
+                .background {
+                    if showUserSearch {
+                        Capsule()
+                            .fill(.black)
+                            .matchedGeometryEffect(id: "TAB", in: animation)
+                    }
+                }
+                .contentShape(Capsule())
+                .onTapGesture {
+                    withAnimation {
+                        showUserSearch = true
+                    }
+                }
+        }
+        .padding(.horizontal)
+        .padding(.bottom, 5)
+    }
+    
+    private var spotsSearch: some View {
+        ScrollViewReader { scroll in
+            ScrollView(showsIndicators: false) {
+                PullToRefresh(coordinateSpaceName: "pullToRefresh") {
+                    let generator = UIImpactFeedbackGenerator(style: .light)
+                    generator.impactOccurred()
+                    refreshSpots()
+                }
+                listOfSpots(scroll: scroll)
+            }
+        }
+        .coordinateSpace(name: "pullToRefresh")
     }
     
     private var mapButton: some View {

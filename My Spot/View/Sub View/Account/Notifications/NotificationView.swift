@@ -93,10 +93,10 @@ struct NotificationView: View {
     private var loadingSpotsSpinner: some View {
         ProgressView("Loading Spots".localized())
             .padding()
-            .background(
+            .background {
                 RoundedRectangle(cornerRadius: 10)
                     .fill(Color(UIColor.systemBackground))
-            )
+            }
     }
     
     private var errorLoadingSpots: some View {
@@ -106,10 +106,10 @@ struct NotificationView: View {
         }
         .padding(.vertical)
         .padding(.horizontal, 2)
-        .background(
+        .background {
             RoundedRectangle(cornerRadius: 10)
                 .fill(Color(UIColor.systemBackground))
-        )
+        }
         .onAppear {
             checkIfNotificationSpotsHaveLoaded()
         }

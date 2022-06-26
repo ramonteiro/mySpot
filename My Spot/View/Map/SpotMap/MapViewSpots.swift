@@ -80,7 +80,7 @@ struct MapViewSpots<T: SpotPreviewType>: View {
                 .foregroundColor(.white)
                 .padding(padding)
                 .frame(width: 50, height: 50)
-                .background(cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex])
+                .background { cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex] }
                 .clipShape(Circle())
         }
     }
@@ -94,7 +94,7 @@ struct MapViewSpots<T: SpotPreviewType>: View {
                 .foregroundColor(.white)
                 .padding(padding)
                 .frame(width: 50, height: 50)
-                .background(mapViewModel.isAuthorized ? cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex] : .gray)
+                .background { mapViewModel.isAuthorized ? cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex] : .gray }
                 .clipShape(Circle())
         }
         .disabled(!mapViewModel.isAuthorized)
@@ -109,7 +109,7 @@ struct MapViewSpots<T: SpotPreviewType>: View {
                 .foregroundColor(.white)
                 .padding(padding)
                 .frame(width: 50, height: 50)
-                .background(cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex])
+                .background { cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex] }
                 .clipShape(Circle())
         }
     }
@@ -157,7 +157,7 @@ struct MapViewSpots<T: SpotPreviewType>: View {
                 .foregroundColor(.white)
                 .padding(padding)
                 .frame(width: 50, height: 50)
-                .background(cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex])
+                .background { cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex] }
                 .clipShape(Circle())
         }
     }
@@ -171,7 +171,7 @@ struct MapViewSpots<T: SpotPreviewType>: View {
                 .foregroundColor(.white)
                 .padding(padding)
                 .frame(width: 50, height: 50)
-                .background(cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex])
+                .background { cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex] }
                 .clipShape(Circle())
         }
     }
@@ -246,7 +246,7 @@ struct MapViewSpots<T: SpotPreviewType>: View {
                 .foregroundColor(.white)
                 .padding(padding)
                 .frame(height: 50)
-                .background(!cloudViewModel.isFetching ? cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex] : .gray)
+                .background { !cloudViewModel.isFetching ? cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex] : .gray }
                 .clipShape(Capsule())
         }
         .disabled(cloudViewModel.isFetching)

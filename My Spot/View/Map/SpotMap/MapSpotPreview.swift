@@ -20,7 +20,7 @@ struct MapSpotPreview<T: SpotPreviewType>: View {
     var body: some View {
         content
             .frame(width: UIScreen.screenWidth - 20, height: UIScreen.screenHeight * 0.25)
-            .background(image)
+            .background { image }
             .clipShape(RoundedRectangle(cornerRadius: 20))
             .onAppear {
                 initializeValues()
@@ -120,7 +120,7 @@ struct MapSpotPreview<T: SpotPreviewType>: View {
                         .lineLimit(2)
                         .foregroundColor(.white)
                         .padding(5)
-                        .background(.tint)
+                        .background(.tint, ignoresSafeAreaEdges: [])
                         .cornerRadius(5)
                 }
             }
@@ -146,7 +146,7 @@ struct MapSpotPreview<T: SpotPreviewType>: View {
     
     private var image: some View {
         Color.black.opacity(0.4)
-            .background(imageRender.allowsHitTesting(false))
+            .background { imageRender.allowsHitTesting(false) }
     }
     
     @ViewBuilder

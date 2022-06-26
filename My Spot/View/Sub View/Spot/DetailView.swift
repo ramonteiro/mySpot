@@ -249,11 +249,11 @@ struct DetailView<T: SpotPreviewType>: View {
                 ProgressView().progressViewStyle(.circular)
             }
         }
-        .background(
+        .background {
             Circle()
                 .foregroundColor((spotInCD || isSaved) == true ? .gray : cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex])
                 .shadow(color: Color.black.opacity(0.3), radius: 5)
-        )
+        }
         .disabled(spotInCD || isSaved)
         .padding()
         .rotationEffect(Angle(degrees: (expand ? 360 : 0)), anchor: UnitPoint(x: 0.5, y: 0.5))
@@ -285,7 +285,7 @@ struct DetailView<T: SpotPreviewType>: View {
                 .padding(5)
                 .foregroundColor(colorScheme == .dark ? .white : .black)
         }
-        .background(.ultraThinMaterial)
+        .background(.ultraThinMaterial, ignoresSafeAreaEdges: [])
         .clipShape(Circle())
         .padding()
         .rotationEffect(Angle(degrees: (expand ? 360 : 0)), anchor: UnitPoint(x: 0.5, y: 0.5))
@@ -361,11 +361,11 @@ struct DetailView<T: SpotPreviewType>: View {
                 .padding(15)
                 .foregroundColor(.white)
         }
-        .background(
+        .background {
             Circle()
                 .foregroundColor(cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex])
                 .shadow(color: Color.black.opacity(0.3), radius: 5)
-        )
+        }
         .sheet(isPresented: $presentEditSheet) {
             dismissEditSheet()
         } content: {
@@ -458,13 +458,13 @@ struct DetailView<T: SpotPreviewType>: View {
             Button("Cancel".localized(), role: .cancel) { }
         }
         .frame(maxWidth: .infinity)
-        .background(
+        .background {
             Rectangle()
                 .foregroundColor(Color(UIColor.secondarySystemBackground))
                 .cornerRadius(radius: 20, corners: [.topLeft, .topRight])
                 .shadow(color: Color.black.opacity(0.8), radius: 5)
                 .mask(Rectangle().padding(.top, -20))
-        )
+        }
     }
     
     private var middlePart: some View {
@@ -488,7 +488,7 @@ struct DetailView<T: SpotPreviewType>: View {
                     Spacer()
                     Text("Copied".localized())
                         .padding(10)
-                        .background(Capsule().foregroundColor(.gray))
+                        .background { Capsule().foregroundColor(.gray) }
                     Spacer()
                 }
             }
@@ -599,7 +599,7 @@ struct DetailView<T: SpotPreviewType>: View {
                         .lineLimit(2)
                         .foregroundColor(.white)
                         .padding(5)
-                        .background(.tint)
+                        .background(.tint, ignoresSafeAreaEdges: [])
                         .cornerRadius(5)
                 }
             }

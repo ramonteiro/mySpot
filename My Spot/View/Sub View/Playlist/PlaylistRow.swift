@@ -57,7 +57,7 @@ struct PlaylistRow: View {
                         .lineLimit(2)
                         .foregroundColor(.white)
                         .padding(5)
-                        .background(.tint)
+                        .background(.tint, ignoresSafeAreaEdges: [])
                         .cornerRadius(5)
                 }
             }

@@ -33,7 +33,9 @@ struct NamePopupView: View {
                     Image(systemName: "xmark")
                         .imageScale(.small)
                         .frame(width: 32, height: 32)
-                        .background(.gray.opacity(0.5))
+                        .background {
+                            Color.gray.opacity(0.5)
+                        }
                         .cornerRadius(16)
                         .foregroundColor(.white)
                 }
@@ -41,7 +43,7 @@ struct NamePopupView: View {
             TextField("", text: $text, prompt: Text(spotName))
                 .frame(height: 36)
                 .padding([.leading, .trailing], 10)
-                .background(Color.gray.opacity(0.3))
+                .background { Color.gray.opacity(0.3) }
                 .cornerRadius(10)
                 .submitLabel(.done)
                 .onReceive(Just(text)) { _ in
@@ -66,7 +68,7 @@ struct NamePopupView: View {
                     Text("Save".localized())
                 }
                 .frame(width: 80, height: 36)
-                .background(cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex])
+                .background { cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex] }
                 .foregroundColor(.white)
                 .cornerRadius(10)
             }
@@ -91,7 +93,7 @@ struct BottomPopupView<Content: View>: View {
                 Spacer()
                 content
                     .padding(.bottom, geometry.safeAreaInsets.bottom)
-                    .background(Color(UIColor.secondarySystemBackground))
+                    .background { Color(UIColor.secondarySystemBackground) }
                     .cornerRadius(radius: 16, corners: [.topLeft, .topRight])
             }
             .edgesIgnoringSafeArea([.bottom])

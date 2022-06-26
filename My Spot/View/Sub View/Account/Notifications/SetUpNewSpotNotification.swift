@@ -57,10 +57,10 @@ struct SetUpNewSpotNotification: View {
                 .ignoresSafeArea()
             ProgressView("Saving".localized())
                 .padding()
-                .background(
+                .background {
                     RoundedRectangle(cornerRadius: 10)
                         .fill(Color(UIColor.systemBackground))
-                )
+                }
         }
     }
     
@@ -70,11 +70,11 @@ struct SetUpNewSpotNotification: View {
                 .foregroundColor(.white)
                 .padding([.leading,.trailing])
                 .padding(.vertical, 2)
-                .background(
+                .background {
                     RoundedRectangle(cornerRadius: 10)
                         .foregroundColor(.gray)
                         .opacity(0.5)
-                )
+                }
         }
     }
     

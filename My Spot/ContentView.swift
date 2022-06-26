@@ -206,7 +206,7 @@ struct ContentView: View {
             .resizable()
             .frame(width: 20, height: 20, alignment: .center)
             .padding(10)
-            .background(addedSpotIsSaving ? Color.gray : cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex])
+            .background { addedSpotIsSaving ? Color.gray : cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex] }
             .clipShape(Circle())
             .offset(x: geo.size.width / 2 - 20, y: geo.size.height - 40)
             .foregroundColor(.white)
