@@ -36,9 +36,9 @@ struct DiscoverView: View {
     @State private var isFetchingUsers = false
     @State private var scrollToTopUsers = false
     @State private var showUserSearch = false
-    @State private var presentDetailAccount = false
     @State private var searchTextUsers = ""
     @State private var usersSearchText = "Users".localized()
+    @State private var selectedAccount: AccountModel?
     let tabs = ["Users".localized(), "Spots"]
     @Namespace var animation
     
@@ -141,9 +141,13 @@ struct DiscoverView: View {
                 HStack {
                     Spacer()
                     Button {
-                        presentDetailAccount.toggle()
+                        selectedAccount = users[i]
                     } label: {
-                        AccountRow(account: $users[i])
+                        HStack {
+                            AccountRow(account: $users[i])
+                            Spacer()
+                        }
+                        .background { Color(uiColor: UIColor.systemBackground) }
                     }
                     .buttonStyle(PlainButtonStyle())
                     Spacer()
@@ -154,8 +158,8 @@ struct DiscoverView: View {
                         .padding()
                 }
             }
-            .fullScreenCover(isPresented: $presentDetailAccount) {
-                AccountDetailView(userid: users[i].id, accountModel: users[i])
+            .fullScreenCover(item: $selectedAccount) { account in
+                AccountDetailView(userid: account.id, accountModel: account)
             }
         }
     }
