@@ -1,17 +1,6 @@
-//
-//  DiscoverView.swift
-//  mySpot
-//
-//  Created by Isaac Paschall on 2/21/22.
-//
-
-/*
- DiscoverView:
- root of tabbar for discover, shows all spots from db
- */
-
 import SwiftUI
 import MapKit
+import AlertToast
 
 struct DiscoverView: View {
     
@@ -53,6 +42,9 @@ struct DiscoverView: View {
         .navigationViewStyle(.stack)
         .onAppear {
             firstSearch()
+        }
+        .toast(isPresenting: $didDelete) {
+            AlertToast(displayMode: .alert, type: .systemImage("exclamationmark.triangle", .yellow), title: "Spot Deleted".localized())
         }
     }
     

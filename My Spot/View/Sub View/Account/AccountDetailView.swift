@@ -1,11 +1,5 @@
-//
-//  AccountDetailView.swift
-//  My Spot
-//
-//  Created by Isaac Paschall on 6/4/22.
-//
-
 import SwiftUI
+import AlertToast
 
 struct AccountDetailView: View {
     
@@ -40,6 +34,7 @@ struct AccountDetailView: View {
     @State private var presentNotificationSheet = false
     @State private var presentAccountCreation =  false
     @State private var didDelete = false
+    @State private var toastSuccess = false
     @EnvironmentObject var cloudViewModel: CloudKitViewModel
     @EnvironmentObject var tabController: TabController
     @Environment(\.presentationMode) private var presentationMode
@@ -79,7 +74,7 @@ struct AccountDetailView: View {
                     await refreshAccount()
                 }
             } content: {
-                CreateAccountView(accountModel: nil)
+                CreateAccountView(accountModel: nil, didSave: $toastSuccess)
             }
             .fullScreenCover(isPresented: $presentEditSheet) {
                 Task {
@@ -87,7 +82,7 @@ struct AccountDetailView: View {
                 }
             } content: {
                 if let accountModel = accountModel {
-                    CreateAccountView(accountModel: accountModel)
+                    CreateAccountView(accountModel: accountModel, didSave: $toastSuccess)
                 }
             }
             .fullScreenCover(isPresented: $openSettings) {
@@ -150,6 +145,12 @@ struct AccountDetailView: View {
                 Task {
                     await inititalize()
                 }
+            }
+            .toast(isPresenting: $toastSuccess) {
+                AlertToast(displayMode: .hud, type: .systemImage("checkmark", .green), title: "Saved!".localized())
+            }
+            .toast(isPresenting: $didDelete) {
+                AlertToast(displayMode: .alert, type: .systemImage("exclamationmark.triangle", .yellow), title: "Spot Deleted".localized())
             }
         }
         .navigationViewStyle(.stack)

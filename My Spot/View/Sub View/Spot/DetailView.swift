@@ -766,37 +766,11 @@ struct DetailView<T: SpotPreviewType>: View {
     
     private func deleteMySpot() {
         if let i = spots.firstIndex(where: { $0.id?.uuidString == spot.parentIDPreview }) {
-            saveForUndo(spot: spots[i])
             CoreDataStack.shared.deleteSpot(spots[i])
             CoreDataStack.shared.save()
             didDelete = true
             popView()
         }
-    }
-    
-    private func saveForUndo(spot: Spot) {
-        let newSpot = UndoDeleteSpot(details: spot.details,
-                                     dateObject: spot.dateObject,
-                                     dateAdded: spot.dateAdded,
-                                     addedBy: spot.addedBy,
-                                     isShared: spot.isShared,
-                                     image: spot.image3,
-                                     image2: spot.image2,
-                                     image3: spot.image3,
-                                     likes: spot.likes,
-                                     name: spot.name,
-                                     userId: spot.userId,
-                                     x: spot.x,
-                                     y: spot.y,
-                                     isPublic: spot.isPublic,
-                                     wasThere: spot.wasThere,
-                                     fromDB: spot.fromDB,
-                                     date: spot.date,
-                                     founder: spot.founder,
-                                     tags: spot.tags,
-                                     dbid: spot.dbid,
-                                     locationName: spot.locationName)
-        cloudViewModel.undoDeleteSpot = newSpot
     }
     
     private func popView() {

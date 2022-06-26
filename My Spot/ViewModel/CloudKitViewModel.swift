@@ -24,7 +24,6 @@ final class CloudKitViewModel: ObservableObject {
     @Published var cursorMain: CKQueryOperation.Cursor?
     @Published var cursorAccount: CKQueryOperation.Cursor?
     @Published var cursorUsers: CKQueryOperation.Cursor?
-    var undoDeleteSpot: UndoDeleteSpot? = nil
     var shared: SpotFromCloud? = nil
     var deepAccount: String? = nil
     var userID: String = ""
@@ -911,7 +910,7 @@ final class CloudKitViewModel: ObservableObject {
         let predicate = NSPredicate(format: "userid == %@", userid)
         let query = CKQuery(recordType: "Accounts", predicate: predicate)
         do {
-            let results = try await CKContainer.default().publicCloudDatabase.records(matching: query, resultsLimit: 1)
+            let results = try await CKContainer.default().publicCloudDatabase.records(matching: query, desiredKeys: ["userid", "name"], resultsLimit: 1)
             if results.matchResults.isEmpty {
                 return false
             } else {

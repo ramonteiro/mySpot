@@ -1,10 +1,3 @@
-//
-//  CreateAccountView.swift
-//  My Spot
-//
-//  Created by Isaac Paschall on 6/3/22.
-//
-
 import SwiftUI
 import Combine
 
@@ -19,6 +12,7 @@ struct CreateAccountView: View {
     @State private var imageWasChanged = false
     
     let accountModel: AccountModel?
+    @Binding var didSave: Bool
     @State private var name: String = ""
     @State private var bio: String = ""
     @State private var youtube: String = ""
@@ -510,6 +504,7 @@ struct CreateAccountView: View {
             try await cloudViewModel.addNewAccount(userid: cloudViewModel.userID, name: name, pronoun: pronoun, image: imageData, bio: bio, email: email, youtube: youtube, tiktok: tiktok, insta: insta)
             try? await cloudViewModel.getMemberSince(fromid: cloudViewModel.userID)
             isSaving = false
+            didSave = true
             presentationMode.wrappedValue.dismiss()
         } catch {
             isSaving = false
@@ -528,6 +523,7 @@ struct CreateAccountView: View {
                     try await cloudViewModel.updateAccount(id: accountModel.record.recordID, newName: name, newBio: bio, newPronouns: pronoun, newEmail: email, newTiktok: tiktok, image: imageData, newInsta: insta, newYoutube: youtube)
                     isSaving = false
                     UserDefaults.standard.set(name, forKey: "founder")
+                    didSave = true
                     presentationMode.wrappedValue.dismiss()
                 } catch {
                     isSaving = false
@@ -539,6 +535,7 @@ struct CreateAccountView: View {
                     try await cloudViewModel.updateAccount(id: accountModel.record.recordID, newName: name, newBio: bio, newPronouns: pronoun, newEmail: email, newTiktok: tiktok, image: nil, newInsta: insta, newYoutube: youtube)
                     isSaving = false
                     UserDefaults.standard.set(name, forKey: "founder")
+                    didSave = true
                     presentationMode.wrappedValue.dismiss()
                 } catch {
                     isSaving = false

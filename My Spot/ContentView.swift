@@ -45,6 +45,7 @@ struct ContentView: View {
     @State private var progress: SavingSpot = .noChange
     @State private var errorSavingPrivateToast = false
     @State private var successSavedToast = false
+    @ObservedObject var stack = CoreDataStack.shared
     
     var body: some View {
         ZStack {
@@ -99,9 +100,6 @@ struct ContentView: View {
         .onChange(of: cloudViewModel.isError) { _ in
             presentCloudError()
         }
-        .onChange(of: CoreDataStack.shared.recievedShare) { _ in
-            presentShareInviteAlert()
-        }
         .onChange(of: progress) { newValue in
             if newValue != .noChange {
                 updateSaveState(progress: newValue)
@@ -115,16 +113,6 @@ struct ContentView: View {
             Button("OK".localized(), role: .cancel) { }
         } message: {
             Text("Please check internet connection and try again.".localized())
-        }
-        .alert("Invite Accepted!".localized(), isPresented: $presentShareInviteAcceptedSuccessfullyAlert) {
-            Button("OK".localized(), role: .cancel) { }
-        } message: {
-            Text("It may take a few seconds for the playlist to appear.".localized())
-        }
-        .alert("Invalid Invite".localized(), isPresented: $presentFailedToAcceptShareInviteAlert) {
-            Button("OK".localized(), role: .cancel) { }
-        } message: {
-            Text("Please ask for another invite or check internet connection.".localized())
         }
         .alert(cloudViewModel.isErrorMessage, isPresented: $presentErrorAlert) {
             Button("OK".localized(), role: .cancel) { }
@@ -142,9 +130,7 @@ struct ContentView: View {
             }
         }
         .fullScreenCover(isPresented: $presentAccountCreation) {
-            dismissAccountCreation()
-        } content: {
-            CreateAccountView(accountModel: nil)
+            CreateAccountView(accountModel: nil, didSave: $successSavedToast)
         }
         .sheet(isPresented: $presentAddSpotSheet) {
             AddSpotSheet(isSaving: $addedSpotIsSaving, progress: $progress)
@@ -158,6 +144,12 @@ struct ContentView: View {
         }
         .toast(isPresenting: $errorSavingPrivateToast) {
             AlertToast(displayMode: .hud, type: .systemImage("xmark", .red), title: "Error Saving".localized())
+        }
+        .toast(isPresenting: $stack.recievedShare) {
+            AlertToast(displayMode: .hud, type: .systemImage("checkmark", .green), title: "Invite Accepted!".localized())
+        }
+        .toast(isPresenting: $stack.failedToRecieve) {
+            AlertToast(displayMode: .hud, type: .systemImage("xmark", .red), title: "Failed to Accept".localized(), subTitle: "Invalid Invite".localized())
         }
     }
     
@@ -299,26 +291,6 @@ struct ContentView: View {
             errorSavingPrivateToast.toggle()
         case .noChange:
             print("no change")
-        }
-    }
-    
-    private func presentShareInviteAlert() {
-        if CoreDataStack.shared.wasSuccessful {
-            UIImpactFeedbackGenerator(style: .light).impactOccurred()
-            presentShareInviteAcceptedSuccessfullyAlert = true
-        } else {
-            UINotificationFeedbackGenerator().notificationOccurred(.warning)
-            presentFailedToAcceptShareInviteAlert = true
-        }
-    }
-    
-    private func dismissAccountCreation() {
-        if CoreDataStack.shared.wasSuccessful {
-            UIImpactFeedbackGenerator(style: .light).impactOccurred()
-            presentShareInviteAcceptedSuccessfullyAlert = true
-        } else {
-            UINotificationFeedbackGenerator().notificationOccurred(.warning)
-            presentFailedToAcceptShareInviteAlert = true
         }
     }
 }

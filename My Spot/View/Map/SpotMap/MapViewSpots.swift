@@ -1,12 +1,6 @@
-//
-//  MapViewSpots.swift
-//  mySpot
-//
-//  Created by Isaac Paschall on 2/28/22.
-//
-
 import SwiftUI
 import MapKit
+import AlertToast
 
 struct MapViewSpots<T: SpotPreviewType>: View {
     
@@ -66,6 +60,9 @@ struct MapViewSpots<T: SpotPreviewType>: View {
                 Button("OK".localized(), role: .cancel) { }
             } message: {
                 Text("Connection Error. Please check internet connection and try again.".localized())
+            }
+            .toast(isPresenting: $didDelete) {
+                AlertToast(displayMode: .hud, type: .systemImage("exclamationmark.triangle", .yellow), title: "Spot Deleted".localized())
             }
     }
     
