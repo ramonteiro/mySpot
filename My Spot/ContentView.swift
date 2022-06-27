@@ -131,8 +131,10 @@ struct ContentView: View {
             }
         }
         .fullScreenCover(isPresented: $presentAccountCreation, onDismiss: {
-            if !UserDefaults.standard.bool(forKey: "whatsnew") {
-                presentWhatsNewWelcomeSheet.toggle()
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                if !UserDefaults.standard.bool(forKey: "whatsnew") {
+                    presentWhatsNewWelcomeSheet.toggle()
+                }
             }
         }) {
             CreateAccountView(accountModel: nil, didSave: $welcomeToast)

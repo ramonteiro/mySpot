@@ -1,5 +1,6 @@
 import SwiftUI
 import Combine
+import AlertToast
 
 struct CreateAccountView: View {
     
@@ -56,53 +57,52 @@ struct CreateAccountView: View {
     
     var body: some View {
         NavigationView {
-            ZStack {
-                textForm
-                if isSaving {
-                    savingView
+            textForm
+                .allowsHitTesting(!isSaving)
+                .navigationTitle("Create Account".localized())
+                .navigationViewStyle(.stack)
+                .onAppear {
+                    checkForExistingAccountModel()
                 }
-            }
-            .navigationTitle("Create Account".localized())
-            .navigationViewStyle(.stack)
-            .onAppear {
-                checkForExistingAccountModel()
-            }
-            .toolbar {
-                ToolbarItemGroup(placement: .keyboard) {
-                    keyboardView
+                .toolbar {
+                    ToolbarItemGroup(placement: .keyboard) {
+                        keyboardView
+                    }
+                    ToolbarItem(placement: .navigationBarTrailing) {
+                        saveButton
+                    }
+                    ToolbarItemGroup(placement: .navigationBarLeading) {
+                        cancelButton
+                    }
                 }
-                ToolbarItem(placement: .navigationBarTrailing) {
-                   saveButton
+                .onSubmit {
+                    moveDown()
                 }
-                ToolbarItemGroup(placement: .navigationBarLeading) {
-                    cancelButton
+                .alert("Unable To Create Account".localized(), isPresented: $presentSaveAlert) {
+                    Button("OK".localized(), role: .cancel) { presentationMode.wrappedValue.dismiss() }
+                } message: {
+                    Text("Failed to create account, you will be asked to create your account later.".localized())
                 }
-            }
-            .onSubmit {
-                moveDown()
-            }
-            .alert("Unable To Create Account".localized(), isPresented: $presentSaveAlert) {
-                Button("OK".localized(), role: .cancel) { presentationMode.wrappedValue.dismiss() }
-            } message: {
-                Text("Failed to create account, you will be asked to create your account later.".localized())
-            }
-            .alert("Failed To Update Account".localized(), isPresented: $presentUpdateAlert) {
-                Button("OK".localized(), role: .cancel) { presentationMode.wrappedValue.dismiss() }
-            } message: {
-                Text("Please check internet and try again".localized() + ".")
-            }
-            .confirmationDialog("Choose Image From Photos or Camera".localized(), isPresented: $presentAddImageAlert) {
-                Button("Camera".localized()) {
-                    activeSheet = .cameraSheet
+                .alert("Failed To Update Account".localized(), isPresented: $presentUpdateAlert) {
+                    Button("OK".localized(), role: .cancel) { presentationMode.wrappedValue.dismiss() }
+                } message: {
+                    Text("Please check internet and try again".localized() + ".")
                 }
-                Button("Photos".localized()) {
-                    activeSheet = .cameraRollSheet
+                .confirmationDialog("Choose Image From Photos or Camera".localized(), isPresented: $presentAddImageAlert) {
+                    Button("Camera".localized()) {
+                        activeSheet = .cameraSheet
+                    }
+                    Button("Photos".localized()) {
+                        activeSheet = .cameraRollSheet
+                    }
+                    Button("Cancel".localized(), role: .cancel) { }
                 }
-                Button("Cancel".localized(), role: .cancel) { }
-            }
-            .fullScreenCover(item: $activeSheet) { item in
-                open(item: item)
-            }
+                .fullScreenCover(item: $activeSheet) { item in
+                    open(item: item)
+                }
+                .toast(isPresenting: $isSaving) {
+                    AlertToast(displayMode: .alert, type: .loading, title: "Saving".localized())
+                }
         }
     }
     
@@ -162,16 +162,6 @@ struct CreateAccountView: View {
         case .cropperSheet:
             MantisPhotoCropper(selectedImage: $image)
                 .ignoresSafeArea()
-        }
-    }
-    
-    private var savingView: some View {
-        ZStack {
-            Color.black
-                .ignoresSafeArea()
-                .opacity(0.5)
-            ProgressView("Saving".localized())
-                .progressViewStyle(.circular)
         }
     }
     
@@ -241,6 +231,12 @@ struct CreateAccountView: View {
         Form {
             Section {
                 addImageButton
+            } footer: {
+                HStack {
+                    Spacer()
+                    Text("Only image and name required".localized())
+                    Spacer()
+                }
             }
             Section {
                 displayNamePrompt
@@ -562,7 +558,7 @@ struct CreateAccountView: View {
     
     func playInYoutube(youtubeId: String) {
         if let youtubeURL = URL(string: "youtube://\(youtubeId)"),
-            UIApplication.shared.canOpenURL(youtubeURL) {
+           UIApplication.shared.canOpenURL(youtubeURL) {
             // redirect to app
             UIApplication.shared.open(youtubeURL, options: [:], completionHandler: nil)
         } else if let youtubeURL = URL(string: "https://www.youtube.com/watch?v=\(youtubeId)") {

@@ -147,7 +147,7 @@ struct AccountDetailView: View {
                 }
             }
             .toast(isPresenting: $toastSuccess) {
-                AlertToast(displayMode: .hud, type: .systemImage("checkmark", .green), title: "Saved!".localized())
+                AlertToast(displayMode: .alert, type: .complete(.green), title: "Saved!".localized())
             }
             .toast(isPresenting: $didDelete) {
                 AlertToast(displayMode: .alert, type: .systemImage("exclamationmark.triangle", .yellow), title: "Spot Deleted".localized())
