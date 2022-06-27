@@ -1,15 +1,3 @@
-//
-//  ViewSingleSpotOnMap.swift
-//  mySpot
-//
-//  Created by Isaac Paschall on 2/23/22.
-//
-
-/*
- ViewSingleSpotOnMap:
- displays only one spot pin; and user location if it is enabled
- */
-
 import SwiftUI
 import MapKit
 
@@ -23,22 +11,24 @@ struct ViewSingleSpotOnMap: View {
     
     @EnvironmentObject var cloudViewModel: CloudKitViewModel
     @EnvironmentObject var mapViewModel: MapViewModel
-    @State var singlePin: [SinglePin]
-    @State private var spotRegion = DefaultLocations.region
+    @State private var map = MKMapView()
+    @State private var mapImageToggle = "square.2.stack.3d.top.filled"
+    let singlePin: [SinglePin]
+    let name: String
     
     var body: some View {
         ZStack {
-            Map(coordinateRegion: $spotRegion,
-                showsUserLocation: mapViewModel.isAuthorized,
-                annotationItems: singlePin) { location in
-                MapMarker(coordinate: singlePin[0].coordinate,
-                          tint: cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex])
-            }
+            MapViewSingleSpot(map: $map, region: MKCoordinateRegion(center: singlePin[0].coordinate, span: DefaultLocations.spanClose))
             locationButton
         }
+        .frame(maxHeight: UIScreen.screenHeight * 0.4)
         .onAppear {
-            spotRegion = MKCoordinateRegion(center: singlePin[0].coordinate,
-                                            span: DefaultLocations.spanClose)
+            if map.annotations.isEmpty {
+                let annotation = MKPointAnnotation()
+                annotation.coordinate = singlePin[0].coordinate
+                annotation.title = name
+                map.addAnnotation(annotation)
+            }
         }
     }
     
@@ -48,21 +38,93 @@ struct ViewSingleSpotOnMap: View {
             VStack {
                 displayLocationButton
                 Spacer()
+                sateliteButton
             }
+            .padding()
+        }
+    }
+    
+    private var sateliteButton: some View {
+        Button {
+            toggleMapType()
+        } label: {
+            Image(systemName: mapImageToggle)
+                .font(.title2)
+                .foregroundColor(.white)
+                .padding(10)
+                .frame(width: 50, height: 50)
+                .background { cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex] }
+                .clipShape(Circle())
         }
     }
     
     private var displayLocationButton: some View {
         Button {
-            withAnimation {
-                spotRegion = MKCoordinateRegion(center: singlePin[0].coordinate,
-                                                span: DefaultLocations.spanClose)
-            }
+            map.setRegion(MKCoordinateRegion(center: singlePin[0].coordinate, span: DefaultLocations.spanClose), animated: true)
         } label: {
-            Image(systemName: "mappin").imageScale(.large)
+            Image(systemName: "mappin")
+                .font(.title2)
+                .foregroundColor(.white)
+                .padding(10)
+                .frame(width: 50, height: 50)
+                .background { cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex] }
+                .clipShape(Circle())
         }
-        .padding([.top, .trailing])
-        .shadow(color: Color.black.opacity(0.3), radius: 5)
-        .buttonStyle(.borderedProminent)
+    }
+    
+    private func toggleMapType() {
+        if map.mapType == .standard {
+            map.mapType = .hybrid
+            withAnimation {
+                mapImageToggle = "square.2.stack.3d.bottom.filled"
+            }
+        } else {
+            map.mapType = .standard
+            withAnimation {
+                mapImageToggle = "square.2.stack.3d.top.filled"
+            }
+        }
+    }
+}
+
+struct MapViewSingleSpot: UIViewRepresentable {
+    
+    @EnvironmentObject var mapViewModel: MapViewModel
+    @Binding var map: MKMapView
+    let region: MKCoordinateRegion
+    
+    func makeUIView(context: Context) -> some MKMapView {
+        let mapView = map
+        mapView.showsCompass = false
+        mapView.showsUserLocation = mapViewModel.isAuthorized
+        mapView.setRegion(mapViewModel.region, animated: true)
+        mapView.delegate = context.coordinator
+        return mapView
+    }
+    
+    func updateUIView(_ uiView: UIViewType, context: Context) {
+    }
+    
+    func makeCoordinator() -> Coordinator {
+        Coordinator(self)
+    }
+    
+    class Coordinator: NSObject, MKMapViewDelegate {
+        private var preventDoubleTrigger = false
+        var parent: MapViewSingleSpot
+        
+        init(_ parent: MapViewSingleSpot) {
+            self.parent = parent
+        }
+        
+        private func deselectAllExcept(_ annotation: MKAnnotation) {
+            for annotaionToDeselect in parent.map.selectedAnnotations {
+                if annotation.coordinate.latitude != annotaionToDeselect.coordinate.latitude &&
+                    annotation.coordinate.longitude != annotaionToDeselect.coordinate.longitude &&
+                    annotation.title != annotaionToDeselect.title {
+                    parent.map.deselectAnnotation(annotaionToDeselect, animated: true)
+                }
+            }
+        }
     }
 }

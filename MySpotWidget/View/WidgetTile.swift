@@ -70,7 +70,6 @@ struct WidgetTile: View {
                 .foregroundColor(.white)
                 .font(.system(size: 14))
                 .lineLimit(1)
-                .shadow(radius: 4)
             Spacer()
         }
         .padding([.leading, .bottom], 10)
