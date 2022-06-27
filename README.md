@@ -44,6 +44,7 @@ import MapKit
 import Combine
 import CloudKit
 import UIKit
+import Vision
 ```
 
 
@@ -53,8 +54,7 @@ In order to run this project with cloukit:
 - you must change signing and capabilities to your own apple developer accont with an icloud container
 - that container must be in entitlements as well
 - the discover tab will load indefinitely until a spot is uploaded as public
-- the container must also alow for sorting by creation date and distance in indexes
-- a small package named, mantis is used to crop photos to 1:1. This package should automatically be downloaded by xcode's package manager
+- the container must also allow for sorting by creation date and distance in indexes
 
 
 ## TODOS
@@ -71,6 +71,7 @@ Clean-up:
 - Create generic cruid funtions for cloudkit…clean up entire cloudkit view model
 - Create view models for each view and inject that view model instead of the model itself 
 - Remove spot data from defaults and change iMessage app to use core data
+- refactor names, create a naming convention and give more thought to names
 
 Bugs:
 - None at the moment :) (at least none found yet)
