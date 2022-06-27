@@ -162,8 +162,8 @@ struct MapSpotPreview<T: SpotPreviewType>: View {
             Image(uiImage: image)
         } else {
             Image(uiImage: defaultImages.errorImage!)
-                .task {
-                    if spot.isFromDiscover {
+                .if(spot.isFromDiscover) { view in
+                    view.task {
                         spot.imagePreview = await cloudViewModel.fetchMainImage(id: spot.dataBaseIdPreview)
                     }
                 }

@@ -718,20 +718,16 @@ struct AddSpotSheet: View {
     }
     
     private func saveButtonTapped() {
-        DispatchQueue.main.async {
-            isSaving = true
-            presentationMode.wrappedValue.dismiss()
-        }
-        DispatchQueue.global(qos: .background).async {
-            Task {
-                tags = descript.findTags()
-                if (isPublic) {
-                    await savePublic()
-                } else {
-                    await save()
-                }
-                isSaving = false
+        isSaving = true
+        presentationMode.wrappedValue.dismiss()
+        Task {
+            tags = descript.findTags()
+            if (isPublic) {
+                await savePublic()
+            } else {
+                await save()
             }
+            isSaving = false
         }
     }
     

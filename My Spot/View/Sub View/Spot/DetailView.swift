@@ -739,7 +739,6 @@ struct DetailView<T: SpotPreviewType>: View {
     private func deleteMySpot() {
         if let i = spots.firstIndex(where: { $0.id?.uuidString == spot.parentIDPreview }) {
             CoreDataStack.shared.deleteSpot(spots[i])
-            CoreDataStack.shared.save()
             didDelete = true
             popView()
         }

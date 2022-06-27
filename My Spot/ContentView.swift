@@ -36,10 +36,11 @@ struct ContentView: View {
     @State private var presentAddSpotErrorAlert = false
     @State private var presentFailedToAcceptShareInviteAlert = false
     @State private var presentShareInviteAcceptedSuccessfullyAlert = false
-    @State private var prsentWhatsNewWelcomeSheet = false
+    @State private var presentWhatsNewWelcomeSheet = false
     @State private var addedSpotIsSaving = false
     @State private var doNotTriggerRepeatWhenTabSelectionChanges = false
     @State private var didDelete = false
+    @State private var welcomeToast = false
     @State private var splashAnimation = false
     @State private var removeSplashScreen = false
     @State private var progress: SavingSpot = .noChange
@@ -129,13 +130,17 @@ struct ContentView: View {
                 AccountDetailView(userid: userid)
             }
         }
-        .fullScreenCover(isPresented: $presentAccountCreation) {
-            CreateAccountView(accountModel: nil, didSave: $successSavedToast)
+        .fullScreenCover(isPresented: $presentAccountCreation, onDismiss: {
+            if !UserDefaults.standard.bool(forKey: "whatsnew") {
+                presentWhatsNewWelcomeSheet.toggle()
+            }
+        }) {
+            CreateAccountView(accountModel: nil, didSave: $welcomeToast)
         }
         .sheet(isPresented: $presentAddSpotSheet) {
             AddSpotSheet(isSaving: $addedSpotIsSaving, progress: $progress)
         }
-        .welcomeSheet(isPresented: $prsentWhatsNewWelcomeSheet,
+        .welcomeSheet(isPresented: $presentWhatsNewWelcomeSheet,
                       onDismiss: { UserDefaults.standard.set(true, forKey: "whatsnew") },
                       isSlideToDismissDisabled: false,
                       pages: whatsNewPages)
@@ -150,6 +155,9 @@ struct ContentView: View {
         }
         .toast(isPresenting: $stack.failedToRecieve) {
             AlertToast(displayMode: .hud, type: .systemImage("xmark", .red), title: "Failed to Accept".localized(), subTitle: "Invalid Invite".localized())
+        }
+        .toast(isPresenting: $welcomeToast) {
+            AlertToast(displayMode: .hud, type: .systemImage("hand.wave.fill", .green), title: "Welcome!".localized())
         }
     }
     
