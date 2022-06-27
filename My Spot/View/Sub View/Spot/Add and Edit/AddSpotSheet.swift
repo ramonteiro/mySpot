@@ -468,7 +468,7 @@ struct AddSpotSheet: View {
     private func save() async {
         var hiddenTags = ""
         let newSpot = Spot(context: CoreDataStack.shared.context)
-        if let imageData = images[0]?.jpegData(compressionQuality: ImageCompression.value) {
+        if let imageData = ImageCompression().compress(image: images[0] ?? defaultImages.errorImage!) {
             if let image = UIImage(data: imageData) {
                 newSpot.image = image
                 hiddenTags += await getTagsFromImage(uiImage: image)
@@ -478,7 +478,7 @@ struct AddSpotSheet: View {
             return
         }
         if (images.count == 3) {
-            if let imageData = images[1]?.jpegData(compressionQuality: ImageCompression.value) {
+            if let imageData = ImageCompression().compress(image: images[1] ?? defaultImages.errorImage!) {
                 if let image = UIImage(data: imageData) {
                     newSpot.image2 = image
                     hiddenTags += await getTagsFromImage(uiImage: image)
@@ -487,7 +487,7 @@ struct AddSpotSheet: View {
                 progress = .errorSavingPrivate
                 return
             }
-            if let imageData = images[2]?.jpegData(compressionQuality: ImageCompression.value) {
+            if let imageData = ImageCompression().compress(image: images[2] ?? defaultImages.errorImage!) {
                 if let image = UIImage(data: imageData) {
                     newSpot.image3 = image
                     hiddenTags += await getTagsFromImage(uiImage: image)
@@ -497,7 +497,7 @@ struct AddSpotSheet: View {
                 return
             }
         } else if (images.count == 2) {
-            if let imageData = images[1]?.jpegData(compressionQuality: ImageCompression.value) {
+            if let imageData = ImageCompression().compress(image: images[1] ?? defaultImages.errorImage!) {
                 if let image = UIImage(data: imageData) {
                     newSpot.image2 = image
                     hiddenTags += await getTagsFromImage(uiImage: image)
@@ -566,7 +566,7 @@ struct AddSpotSheet: View {
     private func savePublic() async {
         var hiddenTags = ""
         let newSpot = Spot(context: CoreDataStack.shared.context)
-        if let imageData = images[0]?.jpegData(compressionQuality: ImageCompression.value) {
+        if let imageData = ImageCompression().compress(image: images[0] ?? defaultImages.errorImage!) {
             if let image = UIImage(data: imageData) {
                 newSpot.image = image
                 hiddenTags += await getTagsFromImage(uiImage: image)
@@ -574,14 +574,14 @@ struct AddSpotSheet: View {
             var imageData2: Data? = nil
             var imageData3: Data? = nil
             if (images.count == 3) {
-                if let imageData2Check = images[1]?.jpegData(compressionQuality: ImageCompression.value) {
+                if let imageData2Check = ImageCompression().compress(image: images[1] ?? defaultImages.errorImage!) {
                     if let image = UIImage(data: imageData2Check) {
                         newSpot.image2 = image
                         hiddenTags += await getTagsFromImage(uiImage: image)
                     }
                     imageData2 = imageData2Check
                 }
-                if let imageData3Check = images[2]?.jpegData(compressionQuality: ImageCompression.value) {
+                if let imageData3Check = ImageCompression().compress(image: images[2] ?? defaultImages.errorImage!) {
                     if let image = UIImage(data: imageData3Check) {
                         newSpot.image3 = image
                         hiddenTags += await getTagsFromImage(uiImage: image)
@@ -589,7 +589,7 @@ struct AddSpotSheet: View {
                     imageData3 = imageData3Check
                 }
             } else if (images.count == 2) {
-                if let imageData2Check = images[1]?.jpegData(compressionQuality: ImageCompression.value) {
+                if let imageData2Check = ImageCompression().compress(image: images[1] ?? defaultImages.errorImage!) {
                     if let image = UIImage(data: imageData2Check) {
                         newSpot.image2 = image
                         hiddenTags += await getTagsFromImage(uiImage: image)

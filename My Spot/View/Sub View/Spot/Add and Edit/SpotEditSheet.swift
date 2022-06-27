@@ -447,19 +447,19 @@ struct SpotEditSheet: View {
     
     private func saveChanges() async {
         if (imageChanged) {
-            if let imageData = images[0].jpegData(compressionQuality: ImageCompression.value) {
+            if let imageData = ImageCompression().compress(image: images[0]) {
                 spot.image = UIImage(data: imageData)
             }
             if images.count == 2 {
-                if let imageData = images[1].jpegData(compressionQuality: ImageCompression.value) {
+                if let imageData = ImageCompression().compress(image: images[1]) {
                     spot.image2 = UIImage(data: imageData)
                 }
                 spot.image3 = nil
             } else if images.count == 3 {
-                if let imageData = images[1].jpegData(compressionQuality: ImageCompression.value) {
+                if let imageData = ImageCompression().compress(image: images[1]) {
                     spot.image2 = UIImage(data: imageData)
                 }
-                if let imageData = images[2].jpegData(compressionQuality: ImageCompression.value) {
+                if let imageData = ImageCompression().compress(image: images[2]) {
                     spot.image3 = UIImage(data: imageData)
                 }
             }
@@ -489,21 +489,21 @@ struct SpotEditSheet: View {
     }
     
     private func savePublic() async {
-        if let imageData = images[0].jpegData(compressionQuality: ImageCompression.value) {
+        if let imageData = ImageCompression().compress(image: images[0]) {
             spot.image = UIImage(data: imageData)
             var imageData2: Data? = nil
             var imageData3: Data? = nil
             if (images.count == 3) {
-                if let imageData2Check = images[1].jpegData(compressionQuality: ImageCompression.value) {
+                if let imageData2Check = ImageCompression().compress(image: images[1]) {
                     spot.image2 = UIImage(data: imageData2Check)
                     imageData2 = imageData2Check
                 }
-                if let imageData3Check = images[2].jpegData(compressionQuality: ImageCompression.value) {
+                if let imageData3Check = ImageCompression().compress(image: images[2]) {
                     spot.image3 = UIImage(data: imageData3Check)
                     imageData3 = imageData3Check
                 }
             } else if (images.count == 2) {
-                if let imageData2Check = images[1].jpegData(compressionQuality: ImageCompression.value) {
+                if let imageData2Check = ImageCompression().compress(image: images[1]) {
                     spot.image2 = UIImage(data: imageData2Check)
                     imageData2 = imageData2Check
                 }
@@ -561,19 +561,19 @@ struct SpotEditSheet: View {
             try await cloudViewModel.deleteSpot(id: spot.dbid ?? "")
             spot.isPublic = false
             if (imageChanged) {
-                if let imageData = images[0].jpegData(compressionQuality: ImageCompression.value) {
+                if let imageData = ImageCompression().compress(image: images[0]) {
                     spot.image = UIImage(data: imageData)
                 }
                 if images.count == 2 {
-                    if let imageData = images[1].jpegData(compressionQuality: ImageCompression.value) {
+                    if let imageData = ImageCompression().compress(image: images[1]) {
                         spot.image2 = UIImage(data: imageData)
                     }
                     spot.image3 = nil
                 } else if images.count == 3 {
-                    if let imageData = images[1].jpegData(compressionQuality: ImageCompression.value) {
+                    if let imageData = ImageCompression().compress(image: images[1]) {
                         spot.image2 = UIImage(data: imageData)
                     }
-                    if let imageData = images[2].jpegData(compressionQuality: ImageCompression.value) {
+                    if let imageData = ImageCompression().compress(image: images[2]) {
                         spot.image3 = UIImage(data: imageData)
                     }
                 }
@@ -613,20 +613,20 @@ struct SpotEditSheet: View {
         var imageData: Data? = nil
         var imageData2: Data? = nil
         var imageData3: Data? = nil
-        if let imageDataCheck = images[0].jpegData(compressionQuality: ImageCompression.value) {
+        if let imageDataCheck = ImageCompression().compress(image: images[0]) {
             spot.image = UIImage(data: imageDataCheck)
             imageData = imageDataCheck
             if (images.count == 3) {
-                if let imageData2Check = images[1].jpegData(compressionQuality: ImageCompression.value) {
+                if let imageData2Check = ImageCompression().compress(image: images[1]) {
                     spot.image2 = UIImage(data: imageData2Check)
                     imageData2 = imageData2Check
                 }
-                if let imageData3Check = images[2].jpegData(compressionQuality: ImageCompression.value) {
+                if let imageData3Check = ImageCompression().compress(image: images[2]) {
                     spot.image3 = UIImage(data: imageData3Check)
                     imageData3 = imageData3Check
                 }
             } else if (images.count == 2) {
-                if let imageData2Check = images[1].jpegData(compressionQuality: ImageCompression.value) {
+                if let imageData2Check = ImageCompression().compress(image: images[1]) {
                     spot.image2 = UIImage(data: imageData2Check)
                     imageData2 = imageData2Check
                 }

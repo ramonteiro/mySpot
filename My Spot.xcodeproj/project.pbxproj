@@ -710,6 +710,7 @@
 		C5850D02285FB69C0067EE7F /* Logic */ = {
 			isa = PBXGroup;
 			children = (
+				C58599AA286A3E5D00D07679 /* ImageCompression.swift */,
 				C515042227D7CAC6009F0DCD /* UIEmojiTextField.swift */,
 				C5F10913284C49DD00B71CBC /* ShareViewController.swift */,
 				C5942835285E5E3C003CF5AA /* CheckUserDefaultsValue.swift */,
@@ -733,7 +734,6 @@
 				C5C2C4DC285EDDBF00E585C9 /* UserDefaults.swift */,
 				C5C2C4DE285EDDD400E585C9 /* DefaultImage.swift */,
 				C5C2C4E2285EEA2000E585C9 /* DefaultRegion.swift */,
-				C58599AA286A3E5D00D07679 /* ImageCompression.swift */,
 			);
 			path = Constant;
 			sourceTree = "<group>";
@@ -1298,7 +1298,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = MySpotWatch/MySpotWatch.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_TEAM = 2HAP7LLHCJ;
 				GENERATE_INFOPLIST_FILE = YES;
 				IBSC_MODULE = MySpotWatch_WatchKit_Extension;
@@ -1324,7 +1324,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = MySpotWatch/MySpotWatch.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_TEAM = 2HAP7LLHCJ;
 				GENERATE_INFOPLIST_FILE = YES;
 				IBSC_MODULE = MySpotWatch_WatchKit_Extension;
@@ -1348,7 +1348,7 @@
 				ASSETCATALOG_COMPILER_COMPLICATION_NAME = Complication;
 				CODE_SIGN_ENTITLEMENTS = "MySpotWatch WatchKit Extension/MySpotWatch WatchKit Extension.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_ASSET_PATHS = "\"MySpotWatch WatchKit Extension/Preview Content\"";
 				DEVELOPMENT_TEAM = 2HAP7LLHCJ;
 				ENABLE_PREVIEWS = YES;
@@ -1382,7 +1382,7 @@
 				ASSETCATALOG_COMPILER_COMPLICATION_NAME = Complication;
 				CODE_SIGN_ENTITLEMENTS = "MySpotWatch WatchKit Extension/MySpotWatch WatchKit Extension.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_ASSET_PATHS = "\"MySpotWatch WatchKit Extension/Preview Content\"";
 				DEVELOPMENT_TEAM = 2HAP7LLHCJ;
 				ENABLE_PREVIEWS = YES;
@@ -1538,7 +1538,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = "My Spot/My Spot.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_ASSET_PATHS = "\"My Spot/Preview Content\"";
 				DEVELOPMENT_TEAM = 2HAP7LLHCJ;
 				ENABLE_PREVIEWS = YES;
@@ -1577,7 +1577,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = "My Spot/My Spot.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_ASSET_PATHS = "\"My Spot/Preview Content\"";
 				DEVELOPMENT_TEAM = 2HAP7LLHCJ;
 				ENABLE_PREVIEWS = YES;
@@ -1614,7 +1614,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = "iMessage App Icon";
 				CODE_SIGN_ENTITLEMENTS = mySpotiMsg/mySpotiMsg.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_TEAM = 2HAP7LLHCJ;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = mySpotiMsg/Info.plist;
@@ -1643,7 +1643,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = "iMessage App Icon";
 				CODE_SIGN_ENTITLEMENTS = mySpotiMsg/mySpotiMsg.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_TEAM = 2HAP7LLHCJ;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = mySpotiMsg/Info.plist;
@@ -1673,7 +1673,7 @@
 				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
 				CODE_SIGN_ENTITLEMENTS = MySpotWidgetExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_TEAM = 2HAP7LLHCJ;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = MySpotWidget/Info.plist;
@@ -1704,7 +1704,7 @@
 				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
 				CODE_SIGN_ENTITLEMENTS = MySpotWidgetExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_TEAM = 2HAP7LLHCJ;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = MySpotWidget/Info.plist;

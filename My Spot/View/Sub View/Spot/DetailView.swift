@@ -871,7 +871,7 @@ struct DetailView<T: SpotPreviewType>: View {
         guard var nameArr: [String] = userDefaults?.object(forKey: "spotNames") as? [String] else { return }
         guard var locationNameArr: [String] = userDefaults?.object(forKey: "spotLocationName") as? [String] else { return }
         guard var imgArr: [Data] = userDefaults?.object(forKey: "spotImgs") as? [Data] else { return }
-        guard let data = image?.jpegData(compressionQuality: ImageCompression.value) else { return }
+        guard let data = ImageCompression().compress(image: image ?? defaultImages.errorImage!) else { return }
         let encoded = try! PropertyListEncoder().encode(data)
         locationNameArr.append(locatioName)
         nameArr.append(name)
