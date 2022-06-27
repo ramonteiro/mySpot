@@ -59,6 +59,7 @@ In order to run this project with cloukit:
 
 ## TODOS
 Features:
+- create a placeholder image asset for account images and spot images, at the moment it is a blank view until image is loaded
 - app clip (ios 16 only, this is due to cloudkit only available in app clips in ios 16)
 - support new ios 16 features: better ipad screen size handling, native share controller
 
