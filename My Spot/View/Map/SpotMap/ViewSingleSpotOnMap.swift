@@ -97,7 +97,7 @@ struct MapViewSingleSpot: UIViewRepresentable {
         let mapView = map
         mapView.showsCompass = false
         mapView.showsUserLocation = mapViewModel.isAuthorized
-        mapView.setRegion(mapViewModel.region, animated: true)
+        mapView.setRegion(region, animated: true)
         mapView.delegate = context.coordinator
         return mapView
     }

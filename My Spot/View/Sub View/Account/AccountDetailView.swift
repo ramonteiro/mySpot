@@ -471,6 +471,9 @@ struct AccountDetailView: View {
             if let account = accountModel {
                 name = account.name
                 image = account.image
+                if account.image == nil {
+                    image = await cloudViewModel.fetchAccountImage(userid: account.id)
+                }
                 pronouns = account.pronouns
                 tiktok = account.tiktok
                 youtube = account.youtube

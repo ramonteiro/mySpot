@@ -14,16 +14,22 @@ struct AccountRow: View {
         .padding(.horizontal)
     }
     
+    @ViewBuilder
     private var image: some View {
-        Image(uiImage: account.image ?? defaultImages.errorAccount!)
-            .resizable()
-            .frame(width: 60, height: 60)
-            .clipShape(Circle())
-            .task {
-                if account.image == nil {
+        if let image = account.image {
+            Image(uiImage: image)
+                .resizable()
+                .frame(width: 60, height: 60)
+                .clipShape(Circle())
+        } else {
+            Image(uiImage: defaultImages.errorAccount!)
+                .resizable()
+                .frame(width: 60, height: 60)
+                .clipShape(Circle())
+                .task {
                     account.image = await cloudViewModel.fetchAccountImage(userid: account.id)
                 }
-            }
+        }
     }
     
     private var content: some View {
