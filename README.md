@@ -70,6 +70,7 @@ Clean-up:
 
 Bugs:
 - images take too long to load, maybe implement better and heavier compression to help
+- users tab in discover needs a loading progressview after searching to indicate it is activley finding users
 
 Business:
 - Create github pages website and replace wordpress for privacy policy
