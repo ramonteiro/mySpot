@@ -163,7 +163,7 @@ struct MapSpotPreview<T: SpotPreviewType>: View {
                 .resizable()
                 .scaledToFill()
         } else {
-            Color.clear
+            Color.gray
                 .if(spot.isFromDiscover) { view in
                     view.task {
                         spot.imagePreview = await cloudViewModel.fetchMainImage(id: spot.dataBaseIdPreview)

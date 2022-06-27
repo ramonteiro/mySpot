@@ -520,10 +520,16 @@ struct DetailView<T: SpotPreviewType>: View {
                     tapAccountButton()
                 } label: {
                     HStack {
-                        Image(uiImage: accountModel.image ?? defaultImages.errorImage!)
-                            .resizable()
-                            .frame(width: 60, height: 60)
-                            .clipShape(Circle())
+                        if let image = accountModel.image {
+                            Image(uiImage: image)
+                                .resizable()
+                                .frame(width: 60, height: 60)
+                                .clipShape(Circle())
+                        } else {
+                            Color.gray
+                                .frame(width: 60, height: 60)
+                                .clipShape(Circle())
+                        }
                         Text(accountModel.name)
                             .font(.headline)
                             .foregroundColor(colorScheme == .dark ? .white : .black)
@@ -865,7 +871,7 @@ struct DetailView<T: SpotPreviewType>: View {
         guard var nameArr: [String] = userDefaults?.object(forKey: "spotNames") as? [String] else { return }
         guard var locationNameArr: [String] = userDefaults?.object(forKey: "spotLocationName") as? [String] else { return }
         guard var imgArr: [Data] = userDefaults?.object(forKey: "spotImgs") as? [Data] else { return }
-        guard let data = image?.jpegData(compressionQuality: 0.5) else { return }
+        guard let data = image?.jpegData(compressionQuality: ImageCompression.value) else { return }
         let encoded = try! PropertyListEncoder().encode(data)
         locationNameArr.append(locatioName)
         nameArr.append(name)

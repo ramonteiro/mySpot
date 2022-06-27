@@ -651,13 +651,6 @@ final class CloudKitViewModel: ObservableObject {
     
     // MARK: - Other
     
-    func compressImage(image: UIImage) -> UIImage {
-        let resizedImage = image.aspectFittedToHeight(200)
-        resizedImage.jpegData(compressionQuality: 1.0)
-        
-        return resizedImage
-    }
-    
     func isBanned() async throws -> Bool {
         let predicate = NSPredicate(format: "userid == %@", userID)
         let query = CKQuery(recordType: "Bans", predicate: predicate)
