@@ -8,6 +8,7 @@
 import SwiftUI
 import Combine
 import CloudKit
+import AlertToast
 
 struct SpotEditSheet: View {
     
@@ -67,32 +68,17 @@ struct SpotEditSheet: View {
     }
     
     var body: some View {
-        ZStack {
-            editSpotView
-            if isSaving {
-                savingSpinnerView
+        editSpotView
+            .onAppear {
+                initializeImages()
             }
-        }
-        .onAppear {
-            initializeImages()
-        }
-        .allowsHitTesting(!isSaving)
+            .allowsHitTesting(!isSaving)
+            .toast(isPresenting: $isSaving) {
+                AlertToast(displayMode: .alert, type: .loading, title: "Saving".localized())
+            }
     }
     
     // MARK: - Sub Views
-    
-    private var savingSpinnerView: some View {
-        ZStack {
-            Color.black.opacity(0.5)
-                .ignoresSafeArea()
-            ProgressView("Saving".localized())
-                .padding()
-                .background {
-                    RoundedRectangle(cornerRadius: 10)
-                        .fill(Color(UIColor.systemBackground))
-                }
-        }
-    }
     
     private var editSpotView: some View {
         NavigationView {
