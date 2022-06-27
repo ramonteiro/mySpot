@@ -163,7 +163,9 @@ struct MapSpotPreview<T: SpotPreviewType>: View {
         } else {
             Image(uiImage: defaultImages.errorImage!)
                 .task {
-                    spot.imagePreview = await cloudViewModel.fetchMainImage(id: spot.dataBaseIdPreview)
+                    if spot.isFromDiscover {
+                        spot.imagePreview = await cloudViewModel.fetchMainImage(id: spot.dataBaseIdPreview)
+                    }
                 }
         }
     }
