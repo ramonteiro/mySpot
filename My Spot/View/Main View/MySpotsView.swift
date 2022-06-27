@@ -34,7 +34,7 @@ struct MySpotsView: View {
                     changeSortType(sortType: sortType)
                 }
         }
-        .navigationViewStyle(.automatic)
+        .navigationViewStyle(.stack)
         .onAppear {
             mapViewModel.checkLocationAuthorization()
             setFilteringType()

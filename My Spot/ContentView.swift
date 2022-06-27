@@ -46,6 +46,7 @@ struct ContentView: View {
     @State private var progress: SavingSpot = .noChange
     @State private var errorSavingPrivateToast = false
     @State private var successSavedToast = false
+    @State private var didInit = false
     @ObservedObject var stack = CoreDataStack.shared
     
     var body: some View {
@@ -53,6 +54,21 @@ struct ContentView: View {
             content
             if !removeSplashScreen {
                 splashScreen
+            }
+        }
+        .onAppear {
+            if !didInit {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                    withAnimation(.easeInOut(duration: 0.4)) {
+                        splashAnimation.toggle()
+                    }
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                        withAnimation(.easeInOut(duration: 0.4)) {
+                            removeSplashScreen.toggle()
+                        }
+                    }
+                }
+                didInit = true
             }
         }
     }
@@ -235,16 +251,6 @@ struct ContentView: View {
                     presentAccountCreation.toggle()
                 } else {
                     try? await cloudViewModel.getMemberSince(fromid: cloudViewModel.userID)
-                }
-            }
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                withAnimation(.easeInOut(duration: 0.4)) {
-                    splashAnimation.toggle()
-                }
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                    withAnimation(.easeInOut(duration: 0.4)) {
-                        removeSplashScreen.toggle()
-                    }
                 }
             }
         }

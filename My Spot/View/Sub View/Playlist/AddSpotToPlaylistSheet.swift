@@ -33,7 +33,7 @@ struct AddSpotToPlaylistSheet: View {
                     filterSpots()
                 }
         }
-        .navigationViewStyle(.automatic)
+        .navigationViewStyle(.stack)
         .interactiveDismissDisabled()
     }
     

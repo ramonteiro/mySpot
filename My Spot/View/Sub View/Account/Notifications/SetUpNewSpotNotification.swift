@@ -34,7 +34,7 @@ struct SetUpNewSpotNotification: View {
             }
             .interactiveDismissDisabled()
             .ignoresSafeArea()
-            .navigationViewStyle(.automatic)
+            .navigationViewStyle(.stack)
             .toolbar {
                 ToolbarItemGroup(placement: .navigationBarTrailing) {
                     saveButton

@@ -160,8 +160,10 @@ struct MapSpotPreview<T: SpotPreviewType>: View {
     private var imageRender: some View {
         if let image = spot.imagePreview {
             Image(uiImage: image)
+                .resizable()
+                .scaledToFill()
         } else {
-            Image(uiImage: defaultImages.errorImage!)
+            Color.clear
                 .if(spot.isFromDiscover) { view in
                     view.task {
                         spot.imagePreview = await cloudViewModel.fetchMainImage(id: spot.dataBaseIdPreview)

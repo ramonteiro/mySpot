@@ -51,7 +51,7 @@ struct PlaylistView: View {
                 Text("Only the owner can delete. If you would like to leave the shared playlist, please tap the person icon and choose yourself.".localized())
             }
         }
-        .navigationViewStyle(.automatic)
+        .navigationViewStyle(.stack)
     }
     
     // MARK: - Sub Views
