@@ -59,24 +59,18 @@ In order to run this project with cloukit:
 
 ## TODOS
 Features:
-- Re-design detail view
-- add section to find users in discover
 - app clip (ios 16 only, this is due to cloudkit only available in app clips in ios 16)
-- support new ios 16: better ipad screen size handling, share views
-- Mac support
-- Update detail view map to use uikit mapview and add cluters in of map annotations + satellite view
-- Make filters + search a half sheet (ios 16)
+- support new ios 16 features: better ipad screen size handling, native share controller
 
 Clean-up:
 - Create generic cruid funtions for cloudkit…clean up entire cloudkit view model
 - Create view models for each view and inject that view model instead of the model itself 
-- Remove spot data from defaults and change iMessage app to use core data
+- change iMessage app to use core data instead of user default app groups, this way all updateAppGroup() functions can be removed and save space
 - refactor names, create a naming convention and give more thought to names
 
 Bugs:
-- None at the moment :) (at least none found yet)
+- images take too long to load, maybe implement better and heavier compression to help
 
 Business:
-- Create github pages website and replace wordpress
-- Monetize app
+- Create github pages website and replace wordpress for privacy policy
 
