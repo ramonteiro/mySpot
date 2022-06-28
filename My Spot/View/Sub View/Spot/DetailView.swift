@@ -134,8 +134,10 @@ struct DetailView<T: SpotPreviewType>: View {
             topButtonRow
             middleButtonRow
             if (presentImageCloseUp) {
-                ImagePopUp(showingImage: $presentImageCloseUp, image: images[imageSelection])
-                    .transition(.scale)
+                if let image = images[imageSelection] {
+                    ImagePopUp(showingImage: $presentImageCloseUp, image: image)
+                        .transition(.scale)
+                }
             }
         }
         .ignoresSafeArea()
@@ -220,7 +222,9 @@ struct DetailView<T: SpotPreviewType>: View {
                 .ignoresSafeArea()
                 .frame(height: UIScreen.screenWidth)
             HStack {
-                enLargeButton
+                if spot.imagePreview != nil {
+                    enLargeButton
+                }
                 Spacer()
                 if from == .discover || from == .profile {
                     downloadButton

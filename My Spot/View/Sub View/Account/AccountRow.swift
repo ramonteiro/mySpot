@@ -47,6 +47,10 @@ struct AccountRow: View {
                 .resizable()
                 .frame(width: 60, height: 60)
                 .clipShape(Circle())
+                .onAppear {
+                    cloudViewModel.checkForCompression(images: ["image"],
+                                                       id: account.record.recordID.recordName)
+                }
         } else {
             Color.gray
                 .frame(width: 60, height: 60)

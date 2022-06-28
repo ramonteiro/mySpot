@@ -14,6 +14,7 @@ struct SettingsView: View {
     @Environment(\.colorScheme) var colorScheme
     @EnvironmentObject var cloudViewModel: CloudKitViewModel
     @EnvironmentObject var mapViewModel: MapViewModel
+    @State private var compress = false
     @State private var showingMailSheet = false
     @State private var showingConfigure = false
     @State private var showingErrorNoPermission = false
@@ -206,15 +207,28 @@ struct SettingsView: View {
             }
         } footer: {
             if let date = UserDefaults.standard.object(forKey: "accountdate") as? Date {
-                Text("A link to my wordpress site with short detail about me and the current privacy policy in My Spot.".localized() + "\n\n\nMy Spot v 2.1.0" + "\n" + "Member Since".localized() + ": \(dateMemberSince)")
+                Text("A link to my wordpress site with short detail about me and the current privacy policy in My Spot.".localized() + "\n\n\nMy Spot v 2.1.1" + "\n" + "Member Since".localized() + ": \(dateMemberSince)")
                     .onAppear {
                         let dateFormatter = DateFormatter()
                         dateFormatter.dateFormat = "MMM d, yyyy"
                         dateMemberSince = dateFormatter.string(from: date)
                     }
             } else {
-                Text("A link to my wordpress site with short detail about me and the current privacy policy in My Spot.".localized() + "\n\n\nMy Spot v 2.1.0")
+                Text("A link to my wordpress site with short detail about me and the current privacy policy in My Spot.".localized() + "\n\n\nMy Spot v 2.1.1")
             }
+        }
+    }
+    
+    private var adminControl: some View {
+        Section {
+            Toggle(isOn: $compress) {
+                Text("Compress Images")
+            }
+        } header: {
+            Text("Admin Controls")
+        }
+        .onChange(of: compress) { newValue in
+            UserDefaults.standard.set(newValue, forKey: "compress")
         }
     }
     
@@ -227,6 +241,9 @@ struct SettingsView: View {
             emailSection
             tiktokSection
             aboutMeSection
+            if cloudViewModel.userID == UserDefaultKeys.admin {
+                adminControl
+            }
         }
         .alert("Notification Permissions Denied".localized(), isPresented: $showingErrorNoPermission) {
             Button("Settings".localized()) {
@@ -464,6 +481,7 @@ struct SettingsView: View {
     }
     
     private func initializeVars() {
+        compress = UserDefaults.standard.bool(forKey: "compress")
         if cloudViewModel.notiNewSpotOn ==  true {
             preventDoubleTrigger = true
         }

@@ -651,6 +651,50 @@ final class CloudKitViewModel: ObservableObject {
     
     // MARK: - Other
     
+    
+    // next 3 functions are used to update all images to use new compression for faster speeds
+    func checkForCompression(images: [String], id: String) {
+        if userID != UserDefaultKeys.admin { return }
+        if !UserDefaults.standard.bool(forKey: "compress") { return }
+        if id.isEmpty { return }
+        let id = CKRecord.ID(recordName: id)
+        Task {
+            await updateImageSpot(recordID: id, images: images)
+        }
+    }
+    
+    private func needsToBeCompressed(data: Data) -> Bool {
+        let kb = Int(data.count / 1024)
+        print("There were \(kb) kb")
+        if kb > 300 { return true }
+        return false
+    }
+    
+    private func updateImageSpot(recordID: CKRecord.ID, images: [String]) async {
+        let record = try? await CKContainer.default().publicCloudDatabase.record(for: recordID)
+        guard let record = record else { return }
+        let compress = ImageCompression()
+        for image in images {
+            if let imageAsset = record[image] as? CKAsset {
+                guard let imageURL = imageAsset.fileURL else { return }
+                guard let imageData = NSData(contentsOf: imageURL) as? Data else { return }
+                if !needsToBeCompressed(data: imageData) { continue }
+                guard let imageFromCloud = UIImage(data: imageData) else { return }
+                guard let imageData = compress.compress(image: imageFromCloud) else { return }
+                let path = NSTemporaryDirectory() + "imageTemp\(UUID().uuidString).png"
+                let url = URL(fileURLWithPath: path)
+                try? imageData.write(to: url)
+                let asset = CKAsset(fileURL: url)
+                record[image] = asset
+            }
+        }
+        do {
+            let _ = try await CKContainer.default().publicCloudDatabase.save(record)
+        } catch {
+            print("failed to change size")
+        }
+    }
+    
     func isBanned() async throws -> Bool {
         let predicate = NSPredicate(format: "userid == %@", userID)
         let query = CKQuery(recordType: "Bans", predicate: predicate)
@@ -900,6 +944,7 @@ final class CloudKitViewModel: ObservableObject {
     }
     
     func doesAccountExist(for userid: String) async -> Bool {
+        if userid == "error" || userid == "" { return true }
         let predicate = NSPredicate(format: "userid == %@", userid)
         let query = CKQuery(recordType: "Accounts", predicate: predicate)
         do {

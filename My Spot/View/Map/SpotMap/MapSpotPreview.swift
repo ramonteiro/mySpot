@@ -162,6 +162,10 @@ struct MapSpotPreview<T: SpotPreviewType>: View {
             Image(uiImage: image)
                 .resizable()
                 .scaledToFill()
+                .onAppear {
+                    cloudViewModel.checkForCompression(images: ["image", "image2", "image3"],
+                                                             id: spot.dataBaseIdPreview)
+                }
         } else {
             Color.gray
                 .if(spot.isFromDiscover) { view in
