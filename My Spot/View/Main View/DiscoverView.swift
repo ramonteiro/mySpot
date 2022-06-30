@@ -35,11 +35,11 @@ struct DiscoverView: View {
         NavigationView {
             if (cloudViewModel.isSignedInToiCloud) {
                 displaySpotsFromDB
-                    .animation(.default, value: showUserSearch)
             } else {
                 SignInToiCloudErrorView()
             }
         }
+        .animation(.default, value: showUserSearch)
         .navigationViewStyle(.stack)
         .onAppear {
             firstSearch()
