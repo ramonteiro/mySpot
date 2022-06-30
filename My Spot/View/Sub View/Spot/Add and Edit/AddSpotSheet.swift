@@ -555,7 +555,7 @@ struct AddSpotSheet: View {
             UserDefaults.standard.set(1, forKey: "spotsCount")
         }
         
-        if (UserDefaults.standard.integer(forKey: "spotsCount") > 3) {
+        if (UserDefaults.standard.integer(forKey: "spotsCount") > 1) {
             if let scene = UIApplication.shared.connectedScenes.first(where: { $0.activationState == .foregroundActive }) as? UIWindowScene {
                 SKStoreReviewController.requestReview(in: scene)
                 UserDefaults.standard.set(true, forKey: "askedAlready")
