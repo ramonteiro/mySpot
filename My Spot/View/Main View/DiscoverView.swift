@@ -24,7 +24,7 @@ struct DiscoverView: View {
     @State private var isSearchingUsers = false
     @State private var isFetchingUsers = false
     @State private var scrollToTopUsers = false
-    @State private var showUserSearch = false
+    @State private var showUserSearch = 0
     @State private var searchTextUsers = ""
     @State private var usersSearchText = "Users".localized()
     @State private var selectedAccount: AccountModel?
@@ -35,6 +35,7 @@ struct DiscoverView: View {
         NavigationView {
             if (cloudViewModel.isSignedInToiCloud) {
                 displaySpotsFromDB
+                    .animation(.default, value: showUserSearch)
             } else {
                 SignInToiCloudErrorView()
             }
@@ -238,31 +239,37 @@ struct DiscoverView: View {
     
     private var listSpots: some View {
         VStack(spacing: 0) {
-            DiscoverSearchBar(searchText: (showUserSearch ? $searchTextUsers : $searchText),
-                              searching: (showUserSearch ? $isSearchingUsers : $isSearching),
-                              searchName: (showUserSearch ? $usersSearchText : $searchLocationName),
-                              hasSearched: (showUserSearch ? $hasSearchedUsers : $hasSearched)).padding(.vertical, 10)
+            DiscoverSearchBar(searchText: (showUserSearch == 1 ? $searchTextUsers : $searchText),
+                              searching: (showUserSearch == 1 ? $isSearchingUsers : $isSearching),
+                              searchName: (showUserSearch == 1 ? $usersSearchText : $searchLocationName),
+                              hasSearched: (showUserSearch == 1 ? $hasSearchedUsers : $hasSearched)).padding(.vertical, 10)
             VStack(spacing: 0) {
                 switchView
-                ZStack {
-                    userView
-                        .offset(x: showUserSearch ? 0 : UIScreen.screenWidth)
+                TabView(selection: $showUserSearch) {
                     spotsSearch
-                        .offset(x: !showUserSearch ? 0 : -UIScreen.screenWidth)
+                        .tag(0)
+                    userView
+                        .onAppear {
+                            if (users.isEmpty) {
+                                refreshUsers()
+                            }
+                        }
+                        .tag(1)
                 }
+                .tabViewStyle(.page(indexDisplayMode: .never))
             }
         }
-        .navigationTitle(showUserSearch ? usersSearchText : "Spots")
+        .navigationTitle(showUserSearch == 1 ? usersSearchText : "Spots")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItemGroup(placement: .navigationBarTrailing) {
-                if !showUserSearch {
+                if showUserSearch == 0 {
                     chooseDistanceMenu
                     mapButton
                 }
             }
             ToolbarItemGroup(placement: .navigationBarLeading) {
-                if !showUserSearch {
+                if showUserSearch == 0 {
                     displayLocationIcon
                 }
             }
@@ -276,10 +283,10 @@ struct DiscoverView: View {
                 .fontWeight(.semibold)
                 .scaleEffect(0.9)
                 .padding(.vertical,6)
-                .foregroundColor(!showUserSearch ? .white : (colorScheme == .dark ? .white : .black))
+                .foregroundColor(showUserSearch == 0 ? .white : (colorScheme == .dark ? .white : .black))
                 .frame(maxWidth: .infinity)
                 .background {
-                    if !showUserSearch {
+                    if showUserSearch == 0 {
                         Capsule()
                             .fill(cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex])
                             .matchedGeometryEffect(id: "TAB", in: animation)
@@ -287,19 +294,17 @@ struct DiscoverView: View {
                 }
                 .contentShape(Capsule())
                 .onTapGesture {
-                    withAnimation {
-                        showUserSearch = false
-                    }
+                    showUserSearch = 0
                 }
             Text("Users".localized())
                 .font(.callout)
                 .fontWeight(.semibold)
                 .scaleEffect(0.9)
                 .padding(.vertical,6)
-                .foregroundColor(showUserSearch ? .white : (colorScheme == .dark ? .white : .black))
+                .foregroundColor(showUserSearch == 1 ? .white : (colorScheme == .dark ? .white : .black))
                 .frame(maxWidth: .infinity)
                 .background {
-                    if showUserSearch {
+                    if showUserSearch == 1 {
                         Capsule()
                             .fill(cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex])
                             .matchedGeometryEffect(id: "TAB", in: animation)
@@ -307,12 +312,7 @@ struct DiscoverView: View {
                 }
                 .contentShape(Capsule())
                 .onTapGesture {
-                    withAnimation {
-                        showUserSearch = true
-                    }
-                    if (users.isEmpty) {
-                        refreshUsers()
-                    }
+                    showUserSearch = 1
                 }
         }
         .padding(.horizontal)
