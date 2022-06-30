@@ -70,9 +70,9 @@ Clean-up:
 - refactor names, create a naming convention and give more thought to names
 
 Bugs:
-- images take too long to load, maybe implement better and heavier compression to help
-- users tab in discover needs a loading progressview after searching to indicate it is activley finding users
+- none yet :)
 
 Business:
+- update app store screenshots and video for new ui
 - Create github pages website and replace wordpress for privacy policy
 
