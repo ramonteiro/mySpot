@@ -118,7 +118,8 @@ struct MapViewSpots<T: SpotPreviewType>: View {
                                 spots: $spots,
                                 selectedFromSwipes: $selectedFromSwipes,
                                 selectedFromTap: $selectedFromTap)
-            .ignoresSafeArea()
+        .accentColor(cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex])
+        .ignoresSafeArea()
     }
     
     private var mapOfSpots: some View {

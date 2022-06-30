@@ -776,12 +776,14 @@ final class CloudKitViewModel: ObservableObject {
         if let i = UserDefaults(suiteName: "group.com.isaacpaschall.My-Spot")?.integer(forKey: "colorIndex") {
             systemColorIndex = i
         }
-        if UserDefaults.standard.valueExists(forKey: "customColorA") {
-            let green = UserDefaults.standard.double(forKey: "customColorG")
-            let blue = UserDefaults.standard.double(forKey: "customColorB")
-            let red = UserDefaults.standard.double(forKey: "customColorR")
-            let alpha = UserDefaults.standard.double(forKey: "customColorA")
-            systemColorArray[systemColorIndex] = Color(uiColor: UIColor(red: red, green: green, blue: blue, alpha: alpha))
+        if let group = UserDefaults(suiteName: "group.com.isaacpaschall.My-Spot") {
+            if group.valueExists(forKey: "colora") {
+                let green = group.double(forKey: "colorg")
+                let blue = group.double(forKey: "colorb")
+                let red = group.double(forKey: "colorr")
+                let alpha = group.double(forKey: "colora")
+                systemColorArray[systemColorArray.count - 1] = Color(uiColor: UIColor(red: red, green: green, blue: blue, alpha: alpha))
+            }
         }
     }
     

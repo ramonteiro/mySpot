@@ -11,6 +11,7 @@ import MapKit
 struct MapViewSpotsWithPreview<T: SpotPreviewType>: UIViewRepresentable {
     
     @EnvironmentObject var mapViewModel: MapViewModel
+    @EnvironmentObject var cloudViewModel: CloudKitViewModel
     @Binding var map: MKMapView
     @Binding var centerRegion: MKCoordinateRegion
     @Binding var selectedAnnotation: Int
@@ -40,6 +41,14 @@ struct MapViewSpotsWithPreview<T: SpotPreviewType>: UIViewRepresentable {
         
         init(_ parent: MapViewSpotsWithPreview) {
             self.parent = parent
+        }
+        
+        func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
+            if annotation.isEqual(mapView.userLocation) { return nil }
+            let annotationView = MKMarkerAnnotationView(annotation: annotation, reuseIdentifier: "something")
+            annotationView.markerTintColor = UIColor(parent.cloudViewModel.systemColorArray[parent.cloudViewModel.systemColorIndex])
+            annotationView.animatesWhenAdded = true
+            return annotationView
         }
         
         func mapView(_ mapView: MKMapView, didSelect view: MKAnnotationView) {

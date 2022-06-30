@@ -47,8 +47,8 @@ struct DetailView<T: SpotPreviewType>: View {
         else { return "chevron.left" }
     }
     private var scope: String {
-        if spot.isPublicPreview { return "Private".localized() }
-        else { return "Public".localized() }
+        if spot.isPublicPreview { return "Public".localized() }
+        else { return "Private".localized() }
     }
     private var tags: [String] {
         spot.tagsPreview.components(separatedBy: ", ")
@@ -186,10 +186,8 @@ struct DetailView<T: SpotPreviewType>: View {
                             .ignoresSafeArea()
                     }
                 } else {
-                    Image(uiImage: defaultImages.errorImage!)
-                        .resizable()
+                    Color.gray
                         .frame(width: UIScreen.screenWidth, height: UIScreen.screenWidth)
-                        .scaledToFit()
                         .ignoresSafeArea()
                 }
             }

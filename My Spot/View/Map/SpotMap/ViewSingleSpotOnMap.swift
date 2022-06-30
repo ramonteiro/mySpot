@@ -19,16 +19,12 @@ struct ViewSingleSpotOnMap: View {
     var body: some View {
         ZStack {
             MapViewSingleSpot(map: $map, region: MKCoordinateRegion(center: singlePin[0].coordinate, span: DefaultLocations.spanClose))
+                .accentColor(cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex])
             locationButton
         }
         .frame(maxHeight: UIScreen.screenHeight * 0.4)
         .onAppear {
-            if map.annotations.isEmpty {
-                let annotation = MKPointAnnotation()
-                annotation.coordinate = singlePin[0].coordinate
-                annotation.title = name
-                map.addAnnotation(annotation)
-            }
+            addAnnotation()
         }
     }
     
@@ -61,6 +57,7 @@ struct ViewSingleSpotOnMap: View {
     private var displayLocationButton: some View {
         Button {
             map.setRegion(MKCoordinateRegion(center: singlePin[0].coordinate, span: DefaultLocations.spanClose), animated: true)
+            addAnnotation()
         } label: {
             Image(systemName: "mappin")
                 .font(.title2)
@@ -85,11 +82,22 @@ struct ViewSingleSpotOnMap: View {
             }
         }
     }
+    
+    private func addAnnotation() {
+        if (map.annotations.isEmpty) ||
+            (map.annotations.count == 1 && map.annotations[0].isEqual(map.userLocation)) {
+            let annotation = MKPointAnnotation()
+            annotation.coordinate = singlePin[0].coordinate
+            annotation.title = name
+            map.addAnnotation(annotation)
+        }
+    }
 }
 
 struct MapViewSingleSpot: UIViewRepresentable {
     
     @EnvironmentObject var mapViewModel: MapViewModel
+    @EnvironmentObject var cloudViewModel: CloudKitViewModel
     @Binding var map: MKMapView
     let region: MKCoordinateRegion
     
@@ -117,14 +125,12 @@ struct MapViewSingleSpot: UIViewRepresentable {
             self.parent = parent
         }
         
-        private func deselectAllExcept(_ annotation: MKAnnotation) {
-            for annotaionToDeselect in parent.map.selectedAnnotations {
-                if annotation.coordinate.latitude != annotaionToDeselect.coordinate.latitude &&
-                    annotation.coordinate.longitude != annotaionToDeselect.coordinate.longitude &&
-                    annotation.title != annotaionToDeselect.title {
-                    parent.map.deselectAnnotation(annotaionToDeselect, animated: true)
-                }
-            }
+        func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
+            if annotation.isEqual(mapView.userLocation) { return nil }
+            let annotationView = MKMarkerAnnotationView(annotation: annotation, reuseIdentifier: "something")
+            annotationView.markerTintColor = UIColor(parent.cloudViewModel.systemColorArray[parent.cloudViewModel.systemColorIndex])
+            annotationView.animatesWhenAdded = true
+            return annotationView
         }
     }
 }

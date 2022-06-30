@@ -38,9 +38,6 @@ struct SettingsView: View {
                 .onChange(of: cloudViewModel.systemColorArray[cloudViewModel.systemColorArray.count - 1]) { newColor in
                     setNewColor(newColor)
                 }
-                .onChange(of: cloudViewModel.systemColorIndex) { index in
-                    setNewColorFromIndex(index: index)
-                }
                 .onChange(of: newPlace) { newValue in
                     placeName = UserDefaults.standard.string(forKey: "discovernotiname") ?? ""
                 }
@@ -450,24 +447,6 @@ struct SettingsView: View {
     
     private func setNewColor(_ newColor: Color) {
         let color = UIColor(newColor)
-        var red: CGFloat = 0
-        var green: CGFloat = 0
-        var blue: CGFloat = 0
-        var alpha: CGFloat = 0
-        
-        color.getRed(&red, green: &green, blue: &blue, alpha: &alpha)
-        UserDefaults(suiteName: "group.com.isaacpaschall.My-Spot")?.set(Double(green), forKey: "colorg")
-        UserDefaults(suiteName: "group.com.isaacpaschall.My-Spot")?.set(Double(blue), forKey: "colorb")
-        UserDefaults(suiteName: "group.com.isaacpaschall.My-Spot")?.set(Double(red), forKey: "colorr")
-        UserDefaults(suiteName: "group.com.isaacpaschall.My-Spot")?.set(Double(alpha), forKey: "colora")
-        UserDefaults.standard.set(Double(green), forKey: "customColorG")
-        UserDefaults.standard.set(Double(blue), forKey: "customColorB")
-        UserDefaults.standard.set(Double(red), forKey: "customColorR")
-        UserDefaults.standard.set(Double(alpha), forKey: "customColorA")
-    }
-    
-    private func setNewColorFromIndex(index: Int) {
-        let color = UIColor(cloudViewModel.systemColorArray[index])
         var red: CGFloat = 0
         var green: CGFloat = 0
         var blue: CGFloat = 0
