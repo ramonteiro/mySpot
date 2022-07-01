@@ -251,11 +251,9 @@ struct NotificationView: View {
         Task {
             isFetching = true
             do {
-                for recordid in recordids {
-                    let spot = try await cloudViewModel.fetchNotificationSpots(recordid: recordid)
-                    if let spot = spot {
-                        spots.append(spot)
-                    }
+                let newSpots = try await cloudViewModel.fetchNotificationSpots(recordids: recordids)
+                DispatchQueue.main.async {
+                    spots += newSpots
                 }
                 isFetching = false
                 hasError = false

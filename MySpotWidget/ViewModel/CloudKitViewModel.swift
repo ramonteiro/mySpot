@@ -23,6 +23,7 @@ final class CloudKitViewModel: ObservableObject {
         let creation = NSSortDescriptor(key: "creationDate", ascending: false)
         query.sortDescriptors = [distance, creation]
         let queryOperation = CKQueryOperation(query: query)
+        queryOperation.qualityOfService = .userInteractive
         queryOperation.resultsLimit = resultLimit
         var returnedSpots: [Spot] = []
         queryOperation.recordMatchedBlock = { (recordID, result) in

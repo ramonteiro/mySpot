@@ -16,6 +16,12 @@ final class PhoneViewModel : NSObject,  WCSessionDelegate, ObservableObject {
     var listOfDownloadsInSession: [String] = []
     var session: WCSession
     var message = "Unknown"
+    var highPriorityConfig: CKOperation.Configuration {
+        let config = CKQueryOperation.Configuration()
+        config.qualityOfService = .userInteractive
+        config.allowsCellularAccess = true
+        return config
+    }
     
     init(session: WCSession = .default) {
         self.session = session
@@ -93,7 +99,9 @@ final class PhoneViewModel : NSObject,  WCSessionDelegate, ObservableObject {
     }
     
     func downloadSpot(id: String) async throws {
-        let record = try await CKContainer.default().publicCloudDatabase.record(for: CKRecord.ID(recordName: id))
+        let record = try await CKContainer.default().publicCloudDatabase.configuredWith(configuration: highPriorityConfig) { db in
+            try await db.record(for: CKRecord.ID(recordName: id))
+        }
         DispatchQueue.main.async {
             guard let name = record["name"] as? String else { return }
             guard let founder = record["founder"] as? String else { return }
