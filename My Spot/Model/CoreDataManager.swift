@@ -20,6 +20,8 @@ final class CoreDataStack: ObservableObject {
     var recievedShare = false
     var wasSuccessful = false
     
+    @Published var playlists = [Playlist]()
+    
     var ckContainer: CKContainer {
         let storeDescription = persistentContainer.persistentStoreDescriptions.first
         guard let identifier = storeDescription?.cloudKitContainerOptions?.containerIdentifier else {
@@ -268,4 +270,5 @@ extension CoreDataStack {
         }
         return isShared
     }
+    
 }

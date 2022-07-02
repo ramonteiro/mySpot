@@ -21,6 +21,7 @@ struct AddPlaylistSheet: View {
     @State private var emoji = ""
     @State private var isEmoji: Bool = true
     @FocusState private var focusState: Field?
+    @ObservedObject var viewModel: PlaylistViewModel
     
     private var disableSave: Bool {
         name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ||
@@ -50,7 +51,7 @@ struct AddPlaylistSheet: View {
                     saveButton
                 }
                 ToolbarItemGroup(placement: .navigationBarLeading) {
-                    deleteButton
+                    cancelButton
                 }
             }
         }
@@ -109,9 +110,15 @@ struct AddPlaylistSheet: View {
         }
     }
     
+    private var cancelButton: some View {
+        Button("Cancel".localized()) {
+            presentationMode.wrappedValue.dismiss()
+        }
+    }
+    
     private var saveButton: some View {
         Button("Save".localized()) {
-            save()
+            viewModel.persistence.savePlaylist(name: name, emoji: emoji)
             presentationMode.wrappedValue.dismiss()
         }
         .tint(.blue)
@@ -149,16 +156,6 @@ struct AddPlaylistSheet: View {
             .onReceive(Just(emoji), perform: { _ in
                 self.emoji = String(self.emoji.onlyEmoji().prefix(MaxCharLength.emojis))
             })
-    }
-    
-    // MARK: - Functions
-    
-    private func save() {
-        let newPlaylist = Playlist(context: CoreDataStack.shared.context)
-        newPlaylist.id = UUID()
-        newPlaylist.name = name
-        newPlaylist.emoji = emoji
-        CoreDataStack.shared.save()
     }
     
     private func moveDown() {

@@ -88,7 +88,7 @@ struct ContentView: View {
             mySpotTab
             discoverTab
             addSpotTab
-            playlistTab
+            playlistTab()
             profileTab
         }
         .onChange(of: cloudViewModel.isSignedInToiCloud) { signedIn in
@@ -181,8 +181,9 @@ struct ContentView: View {
             .tag(Tab.addSpot)
     }
     
-    private var playlistTab: some View {
-        PlaylistView()
+    private func playlistTab() -> some View {
+        let viewModel = PlaylistViewModel(mapViewModel: mapViewModel, cloudViewModel: cloudViewModel)
+        return PlaylistView(viewModel: viewModel, factory: PlaylistSubviewsFactory(viewModel: viewModel))
             .tabItem() {
                 Image(systemName: "books.vertical")
                 Text("Playlists".localized())
