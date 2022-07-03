@@ -17,8 +17,8 @@ enum CoreDataErrors: Error {
 final class CoreDataStack: ObservableObject {
     static let shared = CoreDataStack()
     
-    var recievedShare = false
-    var wasSuccessful = false
+    @Published var recievedShare = false
+    @Published var failedToRecieve = false
     
     @Published var playlists = [Playlist]()
     

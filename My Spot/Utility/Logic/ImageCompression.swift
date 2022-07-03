@@ -1,11 +1,11 @@
-//
-//  ImageCompression.swift
-//  My Spot
-//
-//  Created by Isaac Paschall on 6/18/22.
-//
+import SwiftUI
 
-import UIKit
+class ImageCompression {
+    func compress(image: UIImage) -> Data? {
+        let resizedImage = image.aspectFittedToHeight(400)
+        return resizedImage.jpegData(compressionQuality: 0.5)
+    }
+}
 
 extension UIImage {
     func aspectFittedToHeight(_ newHeight: CGFloat) -> UIImage {
@@ -13,7 +13,7 @@ extension UIImage {
         let newWidth = self.size.width * scale
         let newSize = CGSize(width: newWidth, height: newHeight)
         let renderer = UIGraphicsImageRenderer(size: newSize)
-        
+
         return renderer.image { _ in
             self.draw(in: CGRect(origin: .zero, size: newSize))
         }

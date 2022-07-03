@@ -14,6 +14,7 @@ struct SettingsView: View {
     @Environment(\.colorScheme) var colorScheme
     @EnvironmentObject var cloudViewModel: CloudKitViewModel
     @EnvironmentObject var mapViewModel: MapViewModel
+    @State private var compress = false
     @State private var showingMailSheet = false
     @State private var showingConfigure = false
     @State private var showingErrorNoPermission = false
@@ -36,9 +37,6 @@ struct SettingsView: View {
             formView
                 .onChange(of: cloudViewModel.systemColorArray[cloudViewModel.systemColorArray.count - 1]) { newColor in
                     setNewColor(newColor)
-                }
-                .onChange(of: cloudViewModel.systemColorIndex) { index in
-                    setNewColorFromIndex(index: index)
                 }
                 .onChange(of: newPlace) { newValue in
                     placeName = UserDefaults.standard.string(forKey: "discovernotiname") ?? ""
@@ -206,15 +204,28 @@ struct SettingsView: View {
             }
         } footer: {
             if let date = UserDefaults.standard.object(forKey: "accountdate") as? Date {
-                Text("A link to my wordpress site with short detail about me and the current privacy policy in My Spot.".localized() + "\n\n\nMy Spot v 2.0.3" + "\n" + "Member Since".localized() + ": \(dateMemberSince)")
+                Text("A link to my wordpress site with short detail about me and the current privacy policy in My Spot.".localized() + "\n\n\nMy Spot v 2.1.3" + "\n" + "Member Since".localized() + ": \(dateMemberSince)")
                     .onAppear {
                         let dateFormatter = DateFormatter()
                         dateFormatter.dateFormat = "MMM d, yyyy"
                         dateMemberSince = dateFormatter.string(from: date)
                     }
             } else {
-                Text("A link to my wordpress site with short detail about me and the current privacy policy in My Spot.".localized() + "\n\n\nMy Spot v 2.0.3")
+                Text("A link to my wordpress site with short detail about me and the current privacy policy in My Spot.".localized() + "\n\n\nMy Spot v 2.1.3")
             }
+        }
+    }
+    
+    private var adminControl: some View {
+        Section {
+            Toggle(isOn: $compress) {
+                Text("Compress Images")
+            }
+        } header: {
+            Text("Admin Controls")
+        }
+        .onChange(of: compress) { newValue in
+            UserDefaults.standard.set(newValue, forKey: "compress")
         }
     }
     
@@ -227,6 +238,9 @@ struct SettingsView: View {
             emailSection
             tiktokSection
             aboutMeSection
+            if cloudViewModel.userID == UserDefaultKeys.admin {
+                adminControl
+            }
         }
         .alert("Notification Permissions Denied".localized(), isPresented: $showingErrorNoPermission) {
             Button("Settings".localized()) {
@@ -248,7 +262,7 @@ struct SettingsView: View {
         Circle()
             .strokeBorder(cloudViewModel.systemColorIndex == i ? (colorScheme == .dark ? .white : .black) : .clear, lineWidth: 5)
             .frame(width: 40, height: 40)
-            .background(Circle().foregroundColor(cloudViewModel.systemColorArray[i]))
+            .background { Circle().foregroundColor(cloudViewModel.systemColorArray[i]) }
             .onTapGesture {
                 cloudViewModel.systemColorIndex = i
                 UserDefaults(suiteName: "group.com.isaacpaschall.My-Spot")?.set(i, forKey: "colorIndex")
@@ -443,27 +457,10 @@ struct SettingsView: View {
         UserDefaults(suiteName: "group.com.isaacpaschall.My-Spot")?.set(Double(blue), forKey: "colorb")
         UserDefaults(suiteName: "group.com.isaacpaschall.My-Spot")?.set(Double(red), forKey: "colorr")
         UserDefaults(suiteName: "group.com.isaacpaschall.My-Spot")?.set(Double(alpha), forKey: "colora")
-        UserDefaults.standard.set(Double(green), forKey: "customColorG")
-        UserDefaults.standard.set(Double(blue), forKey: "customColorB")
-        UserDefaults.standard.set(Double(red), forKey: "customColorR")
-        UserDefaults.standard.set(Double(alpha), forKey: "customColorA")
-    }
-    
-    private func setNewColorFromIndex(index: Int) {
-        let color = UIColor(cloudViewModel.systemColorArray[index])
-        var red: CGFloat = 0
-        var green: CGFloat = 0
-        var blue: CGFloat = 0
-        var alpha: CGFloat = 0
-        
-        color.getRed(&red, green: &green, blue: &blue, alpha: &alpha)
-        UserDefaults(suiteName: "group.com.isaacpaschall.My-Spot")?.set(Double(green), forKey: "colorg")
-        UserDefaults(suiteName: "group.com.isaacpaschall.My-Spot")?.set(Double(blue), forKey: "colorb")
-        UserDefaults(suiteName: "group.com.isaacpaschall.My-Spot")?.set(Double(red), forKey: "colorr")
-        UserDefaults(suiteName: "group.com.isaacpaschall.My-Spot")?.set(Double(alpha), forKey: "colora")
     }
     
     private func initializeVars() {
+        compress = UserDefaults.standard.bool(forKey: "compress")
         if cloudViewModel.notiNewSpotOn ==  true {
             preventDoubleTrigger = true
         }

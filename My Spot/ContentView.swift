@@ -1,11 +1,5 @@
-//
-//  ContentView.swift
-//  My Spot
-//
-//  Created by Isaac Paschall on 3/8/22.
-//
-
 import WelcomeSheet
+import AlertToast
 import SwiftUI
 
 struct ContentView: View {
@@ -42,19 +36,39 @@ struct ContentView: View {
     @State private var presentAddSpotErrorAlert = false
     @State private var presentFailedToAcceptShareInviteAlert = false
     @State private var presentShareInviteAcceptedSuccessfullyAlert = false
-    @State private var prsentWhatsNewWelcomeSheet = false
-    @State private var errorAddingSpot = false
+    @State private var presentWhatsNewWelcomeSheet = false
     @State private var addedSpotIsSaving = false
     @State private var doNotTriggerRepeatWhenTabSelectionChanges = false
     @State private var didDelete = false
+    @State private var welcomeToast = false
     @State private var splashAnimation = false
     @State private var removeSplashScreen = false
+    @State private var progress: SavingSpot = .noChange
+    @State private var errorSavingPrivateToast = false
+    @State private var successSavedToast = false
+    @State private var didInit = false
+    @ObservedObject var stack = CoreDataStack.shared
     
     var body: some View {
         ZStack {
             content
             if !removeSplashScreen {
                 splashScreen
+            }
+        }
+        .onAppear {
+            if !didInit {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                    withAnimation(.easeInOut(duration: 0.4)) {
+                        splashAnimation.toggle()
+                    }
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                        withAnimation(.easeInOut(duration: 0.4)) {
+                            removeSplashScreen.toggle()
+                        }
+                    }
+                }
+                didInit = true
             }
         }
     }
@@ -103,8 +117,11 @@ struct ContentView: View {
         .onChange(of: cloudViewModel.isError) { _ in
             presentCloudError()
         }
-        .onChange(of: CoreDataStack.shared.recievedShare) { _ in
-            presentShareInviteAlert()
+        .onChange(of: progress) { newValue in
+            if newValue != .noChange {
+                updateSaveState(progress: newValue)
+                progress = .noChange
+            }
         }
         .onReceive(tabController.$activeTab) { selection in
             controlTapsOfTabBarItems(newSelection: selection)
@@ -113,16 +130,6 @@ struct ContentView: View {
             Button("OK".localized(), role: .cancel) { }
         } message: {
             Text("Please check internet connection and try again.".localized())
-        }
-        .alert("Invite Accepted!".localized(), isPresented: $presentShareInviteAcceptedSuccessfullyAlert) {
-            Button("OK".localized(), role: .cancel) { }
-        } message: {
-            Text("It may take a few seconds for the playlist to appear.".localized())
-        }
-        .alert("Invalid Invite".localized(), isPresented: $presentFailedToAcceptShareInviteAlert) {
-            Button("OK".localized(), role: .cancel) { }
-        } message: {
-            Text("Please ask for another invite or check internet connection.".localized())
         }
         .alert(cloudViewModel.isErrorMessage, isPresented: $presentErrorAlert) {
             Button("OK".localized(), role: .cancel) { }
@@ -139,20 +146,37 @@ struct ContentView: View {
                 AccountDetailView(userid: userid)
             }
         }
-        .fullScreenCover(isPresented: $presentAccountCreation) {
-            dismissAccountCreation()
-        } content: {
-            CreateAccountView(accountModel: nil)
+        .fullScreenCover(isPresented: $presentAccountCreation, onDismiss: {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                if !UserDefaults.standard.bool(forKey: "whatsnew") {
+                    presentWhatsNewWelcomeSheet.toggle()
+                }
+            }
+        }) {
+            CreateAccountView(accountModel: nil, didSave: $welcomeToast)
         }
         .sheet(isPresented: $presentAddSpotSheet) {
-            dismissAddSpotSheet()
-        } content: {
-            AddSpotSheet(isSaving: $addedSpotIsSaving, showingCannotSavePublicAlert: $errorAddingSpot)
+            AddSpotSheet(isSaving: $addedSpotIsSaving, progress: $progress)
         }
-        .welcomeSheet(isPresented: $prsentWhatsNewWelcomeSheet,
+        .welcomeSheet(isPresented: $presentWhatsNewWelcomeSheet,
                       onDismiss: { UserDefaults.standard.set(true, forKey: "whatsnew") },
                       isSlideToDismissDisabled: false,
                       pages: whatsNewPages)
+        .toast(isPresenting: $successSavedToast) {
+            AlertToast(displayMode: .hud, type: .systemImage("checkmark", .green), title: "Saved!".localized())
+        }
+        .toast(isPresenting: $errorSavingPrivateToast) {
+            AlertToast(displayMode: .hud, type: .systemImage("xmark", .red), title: "Error Saving".localized())
+        }
+        .toast(isPresenting: $stack.recievedShare) {
+            AlertToast(displayMode: .hud, type: .systemImage("checkmark", .green), title: "Invite Accepted!".localized())
+        }
+        .toast(isPresenting: $stack.failedToRecieve) {
+            AlertToast(displayMode: .hud, type: .systemImage("xmark", .red), title: "Failed to Accept".localized(), subTitle: "Invalid Invite".localized())
+        }
+        .toast(isPresenting: $welcomeToast) {
+            AlertToast(displayMode: .hud, type: .systemImage("hand.wave.fill", .green), title: "Welcome!".localized())
+        }
     }
     
     private var mySpotTab: some View {
@@ -207,7 +231,7 @@ struct ContentView: View {
             .resizable()
             .frame(width: 20, height: 20, alignment: .center)
             .padding(10)
-            .background(addedSpotIsSaving ? Color.gray : cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex])
+            .background { addedSpotIsSaving ? Color.gray : cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex] }
             .clipShape(Circle())
             .offset(x: geo.size.width / 2 - 20, y: geo.size.height - 40)
             .foregroundColor(.white)
@@ -228,16 +252,6 @@ struct ContentView: View {
                     presentAccountCreation.toggle()
                 } else {
                     try? await cloudViewModel.getMemberSince(fromid: cloudViewModel.userID)
-                }
-            }
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                withAnimation(.easeInOut(duration: 0.4)) {
-                    splashAnimation.toggle()
-                }
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                    withAnimation(.easeInOut(duration: 0.4)) {
-                        removeSplashScreen.toggle()
-                    }
                 }
             }
         }
@@ -282,32 +296,18 @@ struct ContentView: View {
         presentErrorAlert.toggle()
     }
     
-    private func dismissAddSpotSheet() {
-        if errorAddingSpot {
+    private func updateSaveState(progress: SavingSpot) {
+        switch progress {
+        case .didSave:
+            successSavedToast.toggle()
+        case .errorSavingPublic:
             let generator = UINotificationFeedbackGenerator()
             generator.notificationOccurred(.warning)
             presentAddSpotErrorAlert.toggle()
-            errorAddingSpot = false
-        }
-    }
-    
-    private func presentShareInviteAlert() {
-        if CoreDataStack.shared.wasSuccessful {
-            UIImpactFeedbackGenerator(style: .light).impactOccurred()
-            presentShareInviteAcceptedSuccessfullyAlert = true
-        } else {
-            UINotificationFeedbackGenerator().notificationOccurred(.warning)
-            presentFailedToAcceptShareInviteAlert = true
-        }
-    }
-    
-    private func dismissAccountCreation() {
-        if CoreDataStack.shared.wasSuccessful {
-            UIImpactFeedbackGenerator(style: .light).impactOccurred()
-            presentShareInviteAcceptedSuccessfullyAlert = true
-        } else {
-            UINotificationFeedbackGenerator().notificationOccurred(.warning)
-            presentFailedToAcceptShareInviteAlert = true
+        case .errorSavingPrivate:
+            errorSavingPrivateToast.toggle()
+        case .noChange:
+            print("no change")
         }
     }
 }

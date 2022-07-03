@@ -1,12 +1,6 @@
-//
-//  MapViewSpots.swift
-//  mySpot
-//
-//  Created by Isaac Paschall on 2/28/22.
-//
-
 import SwiftUI
 import MapKit
+import AlertToast
 
 struct MapViewSpots<T: SpotPreviewType>: View {
     
@@ -67,6 +61,9 @@ struct MapViewSpots<T: SpotPreviewType>: View {
             } message: {
                 Text("Connection Error. Please check internet connection and try again.".localized())
             }
+            .toast(isPresenting: $didDelete) {
+                AlertToast(displayMode: .hud, type: .systemImage("exclamationmark.triangle", .yellow), title: "Spot Deleted".localized())
+            }
     }
     
     // MARK: - Sub Views
@@ -80,7 +77,7 @@ struct MapViewSpots<T: SpotPreviewType>: View {
                 .foregroundColor(.white)
                 .padding(padding)
                 .frame(width: 50, height: 50)
-                .background(cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex])
+                .background { cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex] }
                 .clipShape(Circle())
         }
     }
@@ -94,7 +91,7 @@ struct MapViewSpots<T: SpotPreviewType>: View {
                 .foregroundColor(.white)
                 .padding(padding)
                 .frame(width: 50, height: 50)
-                .background(mapViewModel.isAuthorized ? cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex] : .gray)
+                .background { mapViewModel.isAuthorized ? cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex] : .gray }
                 .clipShape(Circle())
         }
         .disabled(!mapViewModel.isAuthorized)
@@ -109,7 +106,7 @@ struct MapViewSpots<T: SpotPreviewType>: View {
                 .foregroundColor(.white)
                 .padding(padding)
                 .frame(width: 50, height: 50)
-                .background(cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex])
+                .background { cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex] }
                 .clipShape(Circle())
         }
     }
@@ -121,7 +118,8 @@ struct MapViewSpots<T: SpotPreviewType>: View {
                                 spots: $spots,
                                 selectedFromSwipes: $selectedFromSwipes,
                                 selectedFromTap: $selectedFromTap)
-            .ignoresSafeArea()
+        .accentColor(cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex])
+        .ignoresSafeArea()
     }
     
     private var mapOfSpots: some View {
@@ -157,7 +155,7 @@ struct MapViewSpots<T: SpotPreviewType>: View {
                 .foregroundColor(.white)
                 .padding(padding)
                 .frame(width: 50, height: 50)
-                .background(cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex])
+                .background { cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex] }
                 .clipShape(Circle())
         }
     }
@@ -171,7 +169,7 @@ struct MapViewSpots<T: SpotPreviewType>: View {
                 .foregroundColor(.white)
                 .padding(padding)
                 .frame(width: 50, height: 50)
-                .background(cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex])
+                .background { cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex] }
                 .clipShape(Circle())
         }
     }
@@ -246,7 +244,7 @@ struct MapViewSpots<T: SpotPreviewType>: View {
                 .foregroundColor(.white)
                 .padding(padding)
                 .frame(height: 50)
-                .background(!cloudViewModel.isFetching ? cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex] : .gray)
+                .background { !cloudViewModel.isFetching ? cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex] : .gray }
                 .clipShape(Capsule())
         }
         .disabled(cloudViewModel.isFetching)

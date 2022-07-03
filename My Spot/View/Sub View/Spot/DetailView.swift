@@ -1,22 +1,11 @@
-//
-//  DetailView.swift
-//  mySpot
-//
-//  Created by Isaac Paschall on 2/28/22.
-//
-
-/*
- DetailView:
- navigation link for each spot from core data item in list in root view
- */
-
 import SwiftUI
 import MapKit
+import AlertToast
 
 struct DetailView<T: SpotPreviewType>: View {
     
-    var isSheet: Bool
-    var from: Tab
+    let isSheet: Bool
+    let from: Tab
     let spot: T
     @Binding var didDelete: Bool
     @EnvironmentObject var cloudViewModel: CloudKitViewModel
@@ -38,8 +27,6 @@ struct DetailView<T: SpotPreviewType>: View {
     @State private var presentReportSpot = false
     @State private var spotInCD = false
     @State private var attemptToReport = false
-    @State private var didCopy = false
-    @State private var didCopyDescription = false
     @State private var downloads = -1
     @State private var newName = ""
     @State private var expand = false
@@ -48,6 +35,9 @@ struct DetailView<T: SpotPreviewType>: View {
     @State private var initChecked = false
     @State private var hasReported = false
     @State private var loadingAccount = true
+    @State private var reportedToast = false
+    @State private var didSave = false
+    @State private var copiedToast = false
     @State private var accountModel: AccountModel?
     @State private var imageOffset: CGFloat = -50
     @State private var imageSelection = 0
@@ -57,8 +47,8 @@ struct DetailView<T: SpotPreviewType>: View {
         else { return "chevron.left" }
     }
     private var scope: String {
-        if spot.isPublicPreview { return "Private".localized() }
-        else { return "Public".localized() }
+        if spot.isPublicPreview { return "Public".localized() }
+        else { return "Private".localized() }
     }
     private var tags: [String] {
         spot.tagsPreview.components(separatedBy: ", ")
@@ -120,6 +110,15 @@ struct DetailView<T: SpotPreviewType>: View {
                     NamePopupView(isPresented: $presentSaveSheet, text: $newName, saved: $isSaving, spotName: spot.namePreview)
                 }
             }
+            .toast(isPresenting: $didSave) {
+                AlertToast(displayMode: .hud, type: .systemImage("checkmark", .green), title: "Saved!".localized())
+            }
+            .toast(isPresenting: $reportedToast) {
+                AlertToast(displayMode: .hud, type: .systemImage("checkmark", .green), title: "Reported".localized())
+            }
+            .toast(isPresenting: $copiedToast) {
+                AlertToast(displayMode: .hud, type: .systemImage("doc.text", .green), title: "Copied".localized())
+            }
     }
     
     // MARK: Sub Views
@@ -135,8 +134,10 @@ struct DetailView<T: SpotPreviewType>: View {
             topButtonRow
             middleButtonRow
             if (presentImageCloseUp) {
-                ImagePopUp(showingImage: $presentImageCloseUp, image: images[imageSelection])
-                    .transition(.scale)
+                if let image = images[imageSelection] {
+                    ImagePopUp(showingImage: $presentImageCloseUp, image: image)
+                        .transition(.scale)
+                }
             }
         }
         .ignoresSafeArea()
@@ -160,35 +161,33 @@ struct DetailView<T: SpotPreviewType>: View {
             } else {
                 if (!images.isEmpty) {
                     if spot.isFromDiscover && spot.isMultipleImagesPreview {
-                            ZStack {
-                                Image(uiImage: images[0])
-                                    .resizable()
-                                    .frame(width: UIScreen.screenWidth, height: UIScreen.screenWidth)
-                                    .scaledToFit()
-                                    .ignoresSafeArea()
-                                VStack {
-                                    Spacer()
-                                    HStack {
-                                        Spacer()
-                                        ProgressView()
-                                            .frame(width: 30, height: 30)
-                                        Spacer()
-                                    }
-                                }
-                            }
-                            .frame(width: UIScreen.screenWidth, height: UIScreen.screenWidth)
-                        } else {
+                        ZStack {
                             Image(uiImage: images[0])
                                 .resizable()
                                 .frame(width: UIScreen.screenWidth, height: UIScreen.screenWidth)
                                 .scaledToFit()
                                 .ignoresSafeArea()
+                            VStack {
+                                Spacer()
+                                HStack {
+                                    Spacer()
+                                    ProgressView()
+                                        .frame(width: 30, height: 30)
+                                    Spacer()
+                                }
+                            }
                         }
-                } else {
-                    Image(uiImage: defaultImages.errorImage!)
-                        .resizable()
                         .frame(width: UIScreen.screenWidth, height: UIScreen.screenWidth)
-                        .scaledToFit()
+                    } else {
+                        Image(uiImage: images[0])
+                            .resizable()
+                            .frame(width: UIScreen.screenWidth, height: UIScreen.screenWidth)
+                            .scaledToFit()
+                            .ignoresSafeArea()
+                    }
+                } else {
+                    Color.gray
+                        .frame(width: UIScreen.screenWidth, height: UIScreen.screenWidth)
                         .ignoresSafeArea()
                 }
             }
@@ -199,7 +198,7 @@ struct DetailView<T: SpotPreviewType>: View {
     
     private var topButtonRow: some View {
         VStack(spacing: 0) {
-            HStack(spacing: 0) {
+            HStack(spacing: 5) {
                 backButtonView
                 Spacer()
                 if (canModify || isAdmin) {
@@ -209,7 +208,8 @@ struct DetailView<T: SpotPreviewType>: View {
                     shareButton
                 }
             }
-            .padding(.top, 30)
+            .padding(.top, 40)
+            .padding(.horizontal, 10)
             Spacer()
         }
     }
@@ -220,7 +220,9 @@ struct DetailView<T: SpotPreviewType>: View {
                 .ignoresSafeArea()
                 .frame(height: UIScreen.screenWidth)
             HStack {
-                enLargeButton
+                if spot.imagePreview != nil {
+                    enLargeButton
+                }
                 Spacer()
                 if from == .discover || from == .profile {
                     downloadButton
@@ -242,18 +244,17 @@ struct DetailView<T: SpotPreviewType>: View {
         } label: {
             if !presentSavePublicSpotSpinner {
                 Image(systemName: "icloud.and.arrow.down")
-                    .font(.system(size: 30, weight: .regular))
+                    .font(.title)
                     .padding(15)
                     .foregroundColor(.white)
             } else {
                 ProgressView().progressViewStyle(.circular)
             }
         }
-        .background(
+        .background {
             Circle()
                 .foregroundColor((spotInCD || isSaved) == true ? .gray : cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex])
-                .shadow(color: Color.black.opacity(0.3), radius: 5)
-        )
+        }
         .disabled(spotInCD || isSaved)
         .padding()
         .rotationEffect(Angle(degrees: (expand ? 360 : 0)), anchor: UnitPoint(x: 0.5, y: 0.5))
@@ -285,7 +286,7 @@ struct DetailView<T: SpotPreviewType>: View {
                 .padding(5)
                 .foregroundColor(colorScheme == .dark ? .white : .black)
         }
-        .background(.ultraThinMaterial)
+        .background(.ultraThinMaterial, ignoresSafeAreaEdges: [])
         .clipShape(Circle())
         .padding()
         .rotationEffect(Angle(degrees: (expand ? 360 : 0)), anchor: UnitPoint(x: 0.5, y: 0.5))
@@ -302,10 +303,12 @@ struct DetailView<T: SpotPreviewType>: View {
             }
         } label: {
             Image(systemName: "square.and.arrow.up")
+                .font(.title2)
                 .foregroundColor(.white)
-                .font(.system(size: 30, weight: .regular))
-                .padding(15)
-                .shadow(color: Color.black.opacity(0.5), radius: 5)
+                .padding(10)
+                .frame(width: 40, height: 40)
+                .background { Color.black.opacity(0.4) }
+                .clipShape(Circle())
         }
     }
     
@@ -316,10 +319,12 @@ struct DetailView<T: SpotPreviewType>: View {
             presentDeleteAlert.toggle()
         } label: {
             Image(systemName: "trash.fill")
+                .font(.title2)
                 .foregroundColor(.white)
-                .font(.system(size: 30, weight: .regular))
                 .padding(10)
-                .shadow(color: Color.black.opacity(0.5), radius: 5)
+                .frame(width: 40, height: 40)
+                .background { Color.black.opacity(0.4) }
+                .clipShape(Circle())
         }
         .alert("Are you sure you want to delete ".localized() + (spot.namePreview) + "?", isPresented: $presentDeleteAlert) {
             Button("Delete".localized(), role: .destructive) {
@@ -336,7 +341,7 @@ struct DetailView<T: SpotPreviewType>: View {
                 Text("Spot will be removed from 'My Spots' tab. If this spot is still in 'Discover' tab, it will not be deleted there.".localized())
             }
         }
-
+        
     }
     
     private var backButtonView: some View {
@@ -344,10 +349,12 @@ struct DetailView<T: SpotPreviewType>: View {
             popView()
         } label: {
             Image(systemName: backImage)
+                .font(.title2)
                 .foregroundColor(.white)
-                .font(.system(size: 30, weight: .regular))
-                .padding(15)
-                .shadow(color: Color.black.opacity(0.5), radius: 5)
+                .padding(10)
+                .frame(width: 40, height: 40)
+                .background { Color.black.opacity(0.4) }
+                .clipShape(Circle())
         }
     }
     
@@ -357,20 +364,19 @@ struct DetailView<T: SpotPreviewType>: View {
             presentEditSheet = true
         } label: {
             Image(systemName: "slider.horizontal.3")
-                .font(.system(size: 30, weight: .regular))
+                .font(.title)
                 .padding(15)
                 .foregroundColor(.white)
         }
-        .background(
+        .background {
             Circle()
                 .foregroundColor(cloudViewModel.systemColorArray[cloudViewModel.systemColorIndex])
-                .shadow(color: Color.black.opacity(0.3), radius: 5)
-        )
+        }
         .sheet(isPresented: $presentEditSheet) {
             dismissEditSheet()
         } content: {
             if let spot = spot as? Spot {
-                SpotEditSheet(spot: spot, showingCannotSavePublicAlert: $presentCannotSavePublicAlert)
+                SpotEditSheet(spot: spot, showingCannotSavePublicAlert: $presentCannotSavePublicAlert, didSave: $didSave)
             }
         }
         .disabled(spot.isPublicPreview && !cloudViewModel.isSignedInToiCloud)
@@ -389,34 +395,47 @@ struct DetailView<T: SpotPreviewType>: View {
                 .foregroundColor(Color.gray)
                 .padding(.leading, 1)
             Spacer()
+            if (!distance.isEmpty) {
+                Text((distance) + " away".localized())
+                    .foregroundColor(.gray)
+                    .font(.system(size: 15, weight: .light))
+                    .padding(.bottom, 1)
+            }
         }
         .padding([.leading, .trailing], 30)
     }
     
     private var detailSheet: some View {
-        ZStack {
-            ScrollView(showsIndicators: false) {
-                expandDetailsButton
-                if !spot.locationNamePreview.isEmpty {
-                    locationNameView
-                }
-                middlePart
-                if spot.isFromDiscover {
-                    downloadsView
-                }
-                if !spot.tagsPreview.isEmpty {
-                    tagView
-                }
-                descriptionView
-                
-                ViewSingleSpotOnMap(singlePin: [SinglePin(name: spot.namePreview, coordinate: spot.locationPreview.coordinate)])
-                    .aspectRatio(contentMode: .fit)
-                    .cornerRadius(15)
-                    .padding([.leading, .trailing], 30)
-                routeMeToButton
-                bottomHalf
-                    .padding(.bottom, 100)
+        ScrollView(showsIndicators: false) {
+            expandDetailsButton
+            if !spot.locationNamePreview.isEmpty {
+                locationNameView
             }
+            middlePart
+            if spot.isFromDiscover {
+                downloadsView
+            } else if (!distance.isEmpty) {
+                HStack {
+                    Text((distance) + " away".localized())
+                        .foregroundColor(.gray)
+                        .font(.system(size: 15, weight: .light))
+                        .padding(.bottom, 1)
+                        Spacer()
+                }
+                .padding([.leading, .trailing], 30)
+            }
+            if !spot.tagsPreview.isEmpty {
+                tagView
+            }
+            descriptionView
+            
+            ViewSingleSpotOnMap(singlePin: [SinglePin(name: spot.namePreview, coordinate: spot.locationPreview.coordinate)], name: spot.namePreview)
+                .aspectRatio(contentMode: .fit)
+                .cornerRadius(15)
+                .padding([.leading, .trailing], 30)
+            routeMeToButton
+            bottomHalf
+                .padding(.bottom, 100)
         }
         .confirmationDialog("How should this spot be reported?".localized(), isPresented: $presentReportSpot) {
             Button("Offensive".localized()) {
@@ -458,54 +477,30 @@ struct DetailView<T: SpotPreviewType>: View {
             Button("Cancel".localized(), role: .cancel) { }
         }
         .frame(maxWidth: .infinity)
-        .background(
+        .background {
             Rectangle()
                 .foregroundColor(Color(UIColor.secondarySystemBackground))
                 .cornerRadius(radius: 20, corners: [.topLeft, .topRight])
-                .shadow(color: Color.black.opacity(0.8), radius: 5)
                 .mask(Rectangle().padding(.top, -20))
-        )
+        }
     }
     
     private var middlePart: some View {
         VStack(spacing: 4) {
             nameView
             dateView
-            if from == .playlists && spot.addedByPreview != nil && spot.dateAddedToPlaylistPreview != nil {
-                addedByView
-            }
         }
     }
     
     private var descriptionView: some View {
-        ZStack {
-            HStack(spacing: 5) {
-                Text(spot.descriptionPreview)
-                Spacer()
-            }
-            if didCopyDescription {
-                HStack {
-                    Spacer()
-                    Text("Copied".localized())
-                        .padding(10)
-                        .background(Capsule().foregroundColor(.gray))
-                    Spacer()
-                }
-            }
+        HStack(spacing: 5) {
+            Text(spot.descriptionPreview)
+            Spacer()
         }
         .padding(.top, 10)
         .padding([.leading, .trailing], 30)
         .onTapGesture {
             copyDescription()
-        }
-        .onChange(of: didCopyDescription) { newValue in
-            if newValue {
-                let _ = Timer.scheduledTimer(withTimeInterval: 1.5, repeats: false) { timer in
-                    withAnimation {
-                        didCopyDescription = false
-                    }
-                }
-            }
         }
     }
     
@@ -527,10 +522,16 @@ struct DetailView<T: SpotPreviewType>: View {
                     tapAccountButton()
                 } label: {
                     HStack {
-                        Image(uiImage: accountModel.image)
-                            .resizable()
-                            .frame(width: 60, height: 60)
-                            .clipShape(Circle())
+                        if let image = accountModel.image {
+                            Image(uiImage: image)
+                                .resizable()
+                                .frame(width: 60, height: 60)
+                                .clipShape(Circle())
+                        } else {
+                            Color.gray
+                                .frame(width: 60, height: 60)
+                                .clipShape(Circle())
+                        }
                         Text(accountModel.name)
                             .font(.headline)
                             .foregroundColor(colorScheme == .dark ? .white : .black)
@@ -599,7 +600,7 @@ struct DetailView<T: SpotPreviewType>: View {
                         .lineLimit(2)
                         .foregroundColor(.white)
                         .padding(5)
-                        .background(.tint)
+                        .background(.tint, ignoresSafeAreaEdges: [])
                         .cornerRadius(5)
                 }
             }
@@ -640,23 +641,10 @@ struct DetailView<T: SpotPreviewType>: View {
         .padding([.leading, .trailing], 30)
     }
     
-    private var idCopiedView: some View {
-        HStack {
-            Text("Copied".localized())
-            Image(systemName: "checkmark.square.fill")
-        }
-        .padding([.top, .bottom], 10)
-        .padding([.leading, .trailing], 30)
-    }
-    
     private var bottomHalf: some View {
         VStack {
             if spot.isPublicPreview && !spot.dataBaseIdPreview.isEmpty {
-                if !didCopy {
-                    copyIdButton
-                } else {
-                    idCopiedView
-                }
+                copyIdButton
             }
             if isAdmin && spot.isFromDiscover {
                 Button {
@@ -667,12 +655,6 @@ struct DetailView<T: SpotPreviewType>: View {
                 } label: {
                     Text("add random downloads")
                 }
-            }
-            if (!distance.isEmpty) {
-                Text((distance) + " away".localized())
-                    .foregroundColor(.gray)
-                    .font(.system(size: 15, weight: .light))
-                    .padding(.bottom, 1)
             }
             if spot.isFromDiscover {
                 if (!attemptToReport) {
@@ -692,6 +674,9 @@ struct DetailView<T: SpotPreviewType>: View {
                             Image(systemName: "checkmark.square.fill")
                         }
                         .padding([.top, .bottom], 10)
+                        .onAppear {
+                            reportedToast = true
+                        }
                     }
                 } else {
                     ProgressView().progressViewStyle(.circular)
@@ -736,6 +721,7 @@ struct DetailView<T: SpotPreviewType>: View {
                     withAnimation {
                         loadingAccount = false
                     }
+                    accountModel?.image = await cloudViewModel.fetchAccountImage(userid: accountModel?.id ?? "error")
                 } catch {
                     print("failed to load user account")
                 }
@@ -748,7 +734,8 @@ struct DetailView<T: SpotPreviewType>: View {
         images.append(spot.imagePreview ?? defaultImages.errorImage!)
         if let image2 = spot.image2Preview {
             images.append(image2)
-        } else if let image3 = spot.image3Preview {
+        }
+        if let image3 = spot.image3Preview {
             images.append(image3)
         }
     }
@@ -760,7 +747,6 @@ struct DetailView<T: SpotPreviewType>: View {
     private func deleteMySpot() {
         if let i = spots.firstIndex(where: { $0.id?.uuidString == spot.parentIDPreview }) {
             CoreDataStack.shared.deleteSpot(spots[i])
-            CoreDataStack.shared.save()
             didDelete = true
             popView()
         }
@@ -787,9 +773,7 @@ struct DetailView<T: SpotPreviewType>: View {
         generator.impactOccurred()
         let pasteboard = UIPasteboard.general
         pasteboard.string = spot.descriptionPreview
-        withAnimation {
-            didCopyDescription = true
-        }
+        copiedToast = true
     }
     
     private func expandSheet() {
@@ -805,7 +789,7 @@ struct DetailView<T: SpotPreviewType>: View {
         generator.impactOccurred()
         let pasteboard = UIPasteboard.general
         pasteboard.string = "myspot://" + (spot.dataBaseIdPreview)
-        didCopy = true
+        copiedToast = true
     }
     
     private func fetchDownloads() {
@@ -871,7 +855,6 @@ struct DetailView<T: SpotPreviewType>: View {
         }
         newSpot.id = UUID()
         newSpot.dbid = spot.dataBaseIdPreview
-        print(newSpot)
         CoreDataStack.shared.save()
         let hashcode = newSpot.name ?? "" + "\(newSpot.x)\(newSpot.y)"
         await updateAppGroup(hashcode: hashcode, image: newSpot.image, x: newSpot.x, y: newSpot.y, name: newSpot.name ?? "", locatioName: newSpot.name ?? "")
@@ -890,7 +873,7 @@ struct DetailView<T: SpotPreviewType>: View {
         guard var nameArr: [String] = userDefaults?.object(forKey: "spotNames") as? [String] else { return }
         guard var locationNameArr: [String] = userDefaults?.object(forKey: "spotLocationName") as? [String] else { return }
         guard var imgArr: [Data] = userDefaults?.object(forKey: "spotImgs") as? [Data] else { return }
-        guard let data = image?.jpegData(compressionQuality: 0.5) else { return }
+        guard let data = ImageCompression().compress(image: image ?? defaultImages.errorImage!) else { return }
         let encoded = try! PropertyListEncoder().encode(data)
         locationNameArr.append(locatioName)
         nameArr.append(name)
@@ -923,7 +906,17 @@ struct DetailView<T: SpotPreviewType>: View {
     
     private func loadCloudImages() {
         spotInCD = isSpotInCoreData()
-        images.append(spot.imagePreview ?? defaultImages.errorImage!)
+        if let image1 = spot.imagePreview {
+            images.append(image1)
+        } else {
+            Task {
+                let id = spot.dataBaseIdPreview
+                let fetchedImages = await cloudViewModel.fetchMainImage(id: id)
+                if let image = fetchedImages {
+                    images.append(image)
+                }
+            }
+        }
         if let image2 = spot.image2Preview {
             images.append(image2)
         }
@@ -969,14 +962,14 @@ struct DetailView<T: SpotPreviewType>: View {
     
     private func shareSheet() {
         let activityView = getShareAC(id: spot.dataBaseIdPreview, name: spot.namePreview)
-
+        
         let allScenes = UIApplication.shared.connectedScenes
         let scene = allScenes.first { $0.activationState == .foregroundActive }
-
+        
         if let windowScene = scene as? UIWindowScene {
             windowScene.keyWindow?.rootViewController?.present(activityView, animated: true, completion: nil)
         }
-
+        
     }
     
     private func initializeVars() {

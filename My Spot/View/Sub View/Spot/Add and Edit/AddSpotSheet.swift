@@ -1,20 +1,16 @@
-//
-//  AddSpotSheet.swift
-//  mySpot
-//
-//  Created by Isaac Paschall on 2/21/22.
-//
-
-/*
- AddSpotSheet:
- Dsiplays prompts to create new spot and sends to db if public
- */
-
 import SwiftUI
 import MapKit
 import StoreKit
 import Combine
 import Vision
+import CoreML
+
+enum SavingSpot {
+    case didSave
+    case errorSavingPublic
+    case errorSavingPrivate
+    case noChange
+}
 
 struct AddSpotSheet: View {
     
@@ -23,7 +19,6 @@ struct AddSpotSheet: View {
     @EnvironmentObject var cloudViewModel: CloudKitViewModel
     @State private var presentDeleteAlert = false
     @State private var presentAddImageAlert = false
-    @State private var presentCannotSavePrivateAlert = false
     @State private var presentMapView = false
     @State private var usingCustomLocation = false
     @State private var isFromImagesUnedited = false
@@ -45,7 +40,7 @@ struct AddSpotSheet: View {
     @State private var imageCount: ImageCount?
     @FocusState private var focusState: Field?
     @Binding var isSaving: Bool
-    @Binding var showingCannotSavePublicAlert: Bool
+    @Binding var progress: SavingSpot
     
     
     private var disableSave: Bool {
@@ -204,18 +199,20 @@ struct AddSpotSheet: View {
     }
     
     private var customNavigationBarTitle: some View {
-        VStack {
-            HStack {
-                Image(systemName: (usingCustomLocation ? "mappin" : "figure.wave"))
-                Text(locationName.isEmpty ? "My Spot" : locationName)
-                
+        HStack {
+            Spacer()
+            VStack {
+                HStack {
+                    Image(systemName: (usingCustomLocation ? "mappin" : "figure.wave"))
+                    Text(locationName.isEmpty ? "My Spot" : locationName)
+                }
+                .font(.subheadline)
+                Text(dateFound.toString())
+                    .font(.caption)
+                    .foregroundColor(.gray)
             }
-            .font(.subheadline)
-            Text(dateFound.toString())
-                .font(.caption)
-                .foregroundColor(.gray)
+            Spacer()
         }
-        .frame(width: UIScreen.screenWidth * 0.7)
     }
     
     private var bottomButtonOverlay: some View {
@@ -347,11 +344,6 @@ struct AddSpotSheet: View {
                 initChecked = true
             }
         }
-        .alert("Unable To Save Spot".localized(), isPresented: $presentCannotSavePrivateAlert) {
-            Button("OK".localized(), role: .cancel) { }
-        } message: {
-            Text("Failed to save spot. Please try again.".localized())
-        }
         .alert("Are you sure you want to delete spot?".localized(), isPresented: $presentDeleteAlert) {
             Button("Delete".localized(), role: .destructive) {
                 presentationMode.wrappedValue.dismiss()
@@ -476,50 +468,42 @@ struct AddSpotSheet: View {
     private func save() async {
         var hiddenTags = ""
         let newSpot = Spot(context: CoreDataStack.shared.context)
-        if let imageData = cloudViewModel.compressImage(image: images[0] ?? defaultImages.errorImage!).pngData() {
+        if let imageData = ImageCompression().compress(image: images[0] ?? defaultImages.errorImage!) {
             if let image = UIImage(data: imageData) {
                 newSpot.image = image
-                hiddenTags += await getTextFromImage(uiImage: image)
+                hiddenTags += await getTagsFromImage(uiImage: image)
             }
         } else {
-            presentCannotSavePrivateAlert = true
-            let generator = UINotificationFeedbackGenerator()
-            generator.notificationOccurred(.warning)
+            progress = .errorSavingPrivate
             return
         }
         if (images.count == 3) {
-            if let imageData = cloudViewModel.compressImage(image: images[1] ?? defaultImages.errorImage!).pngData() {
+            if let imageData = ImageCompression().compress(image: images[1] ?? defaultImages.errorImage!) {
                 if let image = UIImage(data: imageData) {
                     newSpot.image2 = image
-                    hiddenTags += await getTextFromImage(uiImage: image)
+                    hiddenTags += await getTagsFromImage(uiImage: image)
                 }
             } else {
-                presentCannotSavePrivateAlert = true
-                let generator = UINotificationFeedbackGenerator()
-                generator.notificationOccurred(.warning)
+                progress = .errorSavingPrivate
                 return
             }
-            if let imageData = cloudViewModel.compressImage(image: images[2] ?? defaultImages.errorImage!).pngData() {
+            if let imageData = ImageCompression().compress(image: images[2] ?? defaultImages.errorImage!) {
                 if let image = UIImage(data: imageData) {
                     newSpot.image3 = image
-                    hiddenTags += await getTextFromImage(uiImage: image)
+                    hiddenTags += await getTagsFromImage(uiImage: image)
                 }
             } else {
-                presentCannotSavePrivateAlert = true
-                let generator = UINotificationFeedbackGenerator()
-                generator.notificationOccurred(.warning)
+                progress = .errorSavingPrivate
                 return
             }
         } else if (images.count == 2) {
-            if let imageData = cloudViewModel.compressImage(image: images[1] ?? defaultImages.errorImage!).pngData() {
+            if let imageData = ImageCompression().compress(image: images[1] ?? defaultImages.errorImage!) {
                 if let image = UIImage(data: imageData) {
                     newSpot.image2 = image
-                    hiddenTags += await getTextFromImage(uiImage: image)
+                    hiddenTags += await getTagsFromImage(uiImage: image)
                 }
             } else {
-                presentCannotSavePrivateAlert = true
-                let generator = UINotificationFeedbackGenerator()
-                generator.notificationOccurred(.warning)
+                progress = .errorSavingPrivate
                 return
             }
         }
@@ -550,11 +534,10 @@ struct AddSpotSheet: View {
         newSpot.id = UUID()
         do {
             try CoreDataStack.shared.context.save()
+            progress = .didSave
             askForReview()
         } catch {
-            presentCannotSavePrivateAlert = true
-            let generator = UINotificationFeedbackGenerator()
-            generator.notificationOccurred(.warning)
+            progress = .errorSavingPrivate
             return
         }
     }
@@ -572,7 +555,7 @@ struct AddSpotSheet: View {
             UserDefaults.standard.set(1, forKey: "spotsCount")
         }
         
-        if (UserDefaults.standard.integer(forKey: "spotsCount") > 3) {
+        if (UserDefaults.standard.integer(forKey: "spotsCount") > 1) {
             if let scene = UIApplication.shared.connectedScenes.first(where: { $0.activationState == .foregroundActive }) as? UIWindowScene {
                 SKStoreReviewController.requestReview(in: scene)
                 UserDefaults.standard.set(true, forKey: "askedAlready")
@@ -583,33 +566,33 @@ struct AddSpotSheet: View {
     private func savePublic() async {
         var hiddenTags = ""
         let newSpot = Spot(context: CoreDataStack.shared.context)
-        if let imageData = cloudViewModel.compressImage(image: images[0] ?? defaultImages.errorImage!).pngData() {
+        if let imageData = ImageCompression().compress(image: images[0] ?? defaultImages.errorImage!) {
             if let image = UIImage(data: imageData) {
                 newSpot.image = image
-                hiddenTags += await getTextFromImage(uiImage: image)
+                hiddenTags += await getTagsFromImage(uiImage: image)
             }
             var imageData2: Data? = nil
             var imageData3: Data? = nil
             if (images.count == 3) {
-                if let imageData2Check = cloudViewModel.compressImage(image: images[1] ?? defaultImages.errorImage!).pngData() {
+                if let imageData2Check = ImageCompression().compress(image: images[1] ?? defaultImages.errorImage!) {
                     if let image = UIImage(data: imageData2Check) {
                         newSpot.image2 = image
-                        hiddenTags += await getTextFromImage(uiImage: image)
+                        hiddenTags += await getTagsFromImage(uiImage: image)
                     }
                     imageData2 = imageData2Check
                 }
-                if let imageData3Check = cloudViewModel.compressImage(image: images[2] ?? defaultImages.errorImage!).pngData() {
+                if let imageData3Check = ImageCompression().compress(image: images[2] ?? defaultImages.errorImage!) {
                     if let image = UIImage(data: imageData3Check) {
                         newSpot.image3 = image
-                        hiddenTags += await getTextFromImage(uiImage: image)
+                        hiddenTags += await getTagsFromImage(uiImage: image)
                     }
                     imageData3 = imageData3Check
                 }
             } else if (images.count == 2) {
-                if let imageData2Check = cloudViewModel.compressImage(image: images[1] ?? defaultImages.errorImage!).pngData() {
+                if let imageData2Check = ImageCompression().compress(image: images[1] ?? defaultImages.errorImage!) {
                     if let image = UIImage(data: imageData2Check) {
                         newSpot.image2 = image
-                        hiddenTags += await getTextFromImage(uiImage: image)
+                        hiddenTags += await getTagsFromImage(uiImage: image)
                     }
                     imageData2 = imageData2Check
                 }
@@ -672,20 +655,17 @@ struct AddSpotSheet: View {
             do {
                 try CoreDataStack.shared.context.save()
             } catch {
-                presentCannotSavePrivateAlert = true
-                let generator = UINotificationFeedbackGenerator()
-                generator.notificationOccurred(.warning)
+                progress = .errorSavingPrivate
                 return
             }
             if newSpot.isPublic {
+                progress = .didSave
                 askForReview()
             } else {
-                showingCannotSavePublicAlert = true
+                progress = .errorSavingPublic
             }
         } else {
-            presentCannotSavePrivateAlert = true
-            let generator = UINotificationFeedbackGenerator()
-            generator.notificationOccurred(.warning)
+            progress = .errorSavingPrivate
             return
         }
     }
@@ -739,8 +719,8 @@ struct AddSpotSheet: View {
     
     private func saveButtonTapped() {
         isSaving = true
+        presentationMode.wrappedValue.dismiss()
         Task {
-            presentationMode.wrappedValue.dismiss()
             tags = descript.findTags()
             if (isPublic) {
                 await savePublic()
@@ -751,24 +731,47 @@ struct AddSpotSheet: View {
         }
     }
     
-    private func getTextFromImage(uiImage: UIImage) async -> String {
-        var text = ""
-        guard let cgImage = uiImage.cgImage else { return text }
-        let handler = VNImageRequestHandler(cgImage: cgImage, options: [:])
-        let request = VNRecognizeTextRequest { request, error in
-            guard let result = request.results else { return }
-            guard let observations = result as? [VNRecognizedTextObservation], error == nil else { return }
-            text = observations.compactMap({
-                $0.topCandidates(1).first?.string
-            }).joined(separator: ", ")
-            print(text)
+    private func getTagsFromImage(uiImage: UIImage) async -> String {
+        var returnArray: [String] = []
+        guard let cgImage = uiImage.cgImage else { return "" }
+        let keep = 10
+        do {
+            let config = MLModelConfiguration()
+            config.computeUnits = MLComputeUnits.all
+            config.allowLowPrecisionAccumulationOnGPU = true
+            let model1 = try VNCoreMLModel(for: YOLOv3Int8LUT(configuration: config).model)
+            let model2 = try VNCoreMLModel(for: MobileNetV2Int8LUT(configuration: config).model)
+            let handler = VNImageRequestHandler(cgImage: cgImage)
+            let request1 = VNCoreMLRequest(model: model1) { request, error in
+                guard let result = request.results as? [VNClassificationObservation] else { return }
+                let sortedResult = result.sorted(by: { $0.confidence > $1.confidence })
+                var keeps = keep
+                for item in sortedResult {
+                    if keeps <= 0 { break }
+                    print("\(item.confidence), \(item.identifier)")
+                    returnArray.append(item.identifier)
+                    keeps -= 1
+                }
+            }
+            let request2 = VNCoreMLRequest(model: model2) { request, error in
+                guard let result = request.results as? [VNClassificationObservation] else { return }
+                let sortedResult = result.sorted(by: { $0.confidence > $1.confidence })
+                var keeps = keep
+                for item in sortedResult {
+                    if keeps <= 0 { break }
+                    print("\(item.confidence), \(item.identifier)")
+                    returnArray.append(item.identifier)
+                    keeps -= 1
+                }
+            }
+            await performRequests([request1, request2], handler: handler)
+        } catch {
+            return returnArray.joined(separator: ", ")
         }
-        request.recognitionLevel = VNRequestTextRecognitionLevel.accurate
-        await performRequest(request, handler: handler)
-        return text
+        return returnArray.joined(separator: ", ")
     }
     
-    private func performRequest(_ request: VNRecognizeTextRequest, handler: VNImageRequestHandler) async {
-        try? handler.perform([request])
+    private func performRequests(_ requests: [VNCoreMLRequest], handler: VNImageRequestHandler) async {
+        try? handler.perform(requests)
     }
 }

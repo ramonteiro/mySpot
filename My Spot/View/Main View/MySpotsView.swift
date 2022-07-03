@@ -13,6 +13,7 @@
 import SwiftUI
 import MapKit
 import CoreData
+import AlertToast
 
 struct MySpotsView: View {
     
@@ -33,7 +34,7 @@ struct MySpotsView: View {
                     changeSortType(sortType: sortType)
                 }
         }
-        .navigationViewStyle(.automatic)
+        .navigationViewStyle(.stack)
         .onAppear {
             mapViewModel.checkLocationAuthorization()
             setFilteringType()
@@ -43,6 +44,9 @@ struct MySpotsView: View {
         }
         .fullScreenCover(isPresented: $presentMapSheet) {
             MapViewSpots(spots: $filteredSpots, sortBy: $sortBy, searchText: nil)
+        }
+        .toast(isPresenting: $didDelete) {
+            AlertToast(displayMode: .hud, type: .systemImage("exclamationmark.triangle", .yellow), title: "Spot Deleted".localized())
         }
     }
     
@@ -139,7 +143,7 @@ struct MySpotsView: View {
                     } label: {
                         MapSpotPreview(spot: $searchResults[i])
                     }
-                    .buttonStyle(PlainButtonStyle())
+                    .buttonStyle(ScaleButtonStyle())
                     Spacer()
                 }
                 .id(i)
@@ -357,7 +361,7 @@ struct SpotsSearchBar: View {
     private var xMarkImage: some View {
         Image(systemName: "xmark")
             .padding(5)
-            .background(.ultraThinMaterial)
+            .background(.ultraThinMaterial, ignoresSafeAreaEdges: [])
             .clipShape(Circle())
             .onTapGesture {
                 UIApplication.shared.dismissKeyboard()

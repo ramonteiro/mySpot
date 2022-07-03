@@ -79,11 +79,16 @@
 		C5552CCB2827616600AF2683 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5552CCA2827616600AF2683 /* AppDelegate.swift */; };
 		C5552CCD2827696500AF2683 /* NotificationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5552CCC2827696500AF2683 /* NotificationView.swift */; };
 		C5552CD128298E6900AF2683 /* CloudSharingController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5552CD028298E6900AF2683 /* CloudSharingController.swift */; };
+		C57E3ADE2867FFFF00D2470D /* AccountRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = C57E3ADD2867FFFF00D2470D /* AccountRow.swift */; };
+		C57E3AE02868A94B00D2470D /* ScaleButtonStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = C57E3ADF2868A94B00D2470D /* ScaleButtonStyle.swift */; };
+		C57E3AE42868B8DA00D2470D /* MobileNetV2Int8LUT.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = C57E3AE22868B8D900D2470D /* MobileNetV2Int8LUT.mlmodel */; };
+		C57E3AE52868B8DA00D2470D /* YOLOv3Int8LUT.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = C57E3AE32868B8DA00D2470D /* YOLOv3Int8LUT.mlmodel */; };
+		C57E3AE82868DD7500D2470D /* AlertToast in Frameworks */ = {isa = PBXBuildFile; productRef = C57E3AE72868DD7500D2470D /* AlertToast */; };
 		C5850D01285F853C0067EE7F /* SpotPreviewType.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5850D00285F853C0067EE7F /* SpotPreviewType.swift */; };
+		C58599AB286A3E5D00D07679 /* ImageCompression.swift in Sources */ = {isa = PBXBuildFile; fileRef = C58599AA286A3E5D00D07679 /* ImageCompression.swift */; };
 		C587027427E27F1900DFB6C4 /* MailViewCallback.swift in Sources */ = {isa = PBXBuildFile; fileRef = C587027327E27F1900DFB6C4 /* MailViewCallback.swift */; };
 		C587B46B2854F472007C3263 /* DatePickerSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = C587B46A2854F472007C3263 /* DatePickerSheet.swift */; };
 		C58F2BF62830AA42005FA88F /* WelcomeSheet in Frameworks */ = {isa = PBXBuildFile; productRef = C58F2BF52830AA42005FA88F /* WelcomeSheet */; };
-		C5942834285E5DFA003CF5AA /* ImageCompression.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5942833285E5DFA003CF5AA /* ImageCompression.swift */; };
 		C5942836285E5E3C003CF5AA /* CheckUserDefaultsValue.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5942835285E5E3C003CF5AA /* CheckUserDefaultsValue.swift */; };
 		C5942838285E5E73003CF5AA /* GetTags.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5942837285E5E73003CF5AA /* GetTags.swift */; };
 		C594283A285E5E98003CF5AA /* ScreenSize.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5942839285E5E98003CF5AA /* ScreenSize.swift */; };
@@ -303,10 +308,14 @@
 		C5552CCA2827616600AF2683 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		C5552CCC2827696500AF2683 /* NotificationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationView.swift; sourceTree = "<group>"; };
 		C5552CD028298E6900AF2683 /* CloudSharingController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudSharingController.swift; sourceTree = "<group>"; };
+		C57E3ADD2867FFFF00D2470D /* AccountRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountRow.swift; sourceTree = "<group>"; };
+		C57E3ADF2868A94B00D2470D /* ScaleButtonStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScaleButtonStyle.swift; sourceTree = "<group>"; };
+		C57E3AE22868B8D900D2470D /* MobileNetV2Int8LUT.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = MobileNetV2Int8LUT.mlmodel; sourceTree = "<group>"; };
+		C57E3AE32868B8DA00D2470D /* YOLOv3Int8LUT.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = YOLOv3Int8LUT.mlmodel; sourceTree = "<group>"; };
 		C5850D00285F853C0067EE7F /* SpotPreviewType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpotPreviewType.swift; sourceTree = "<group>"; };
+		C58599AA286A3E5D00D07679 /* ImageCompression.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageCompression.swift; sourceTree = "<group>"; };
 		C587027327E27F1900DFB6C4 /* MailViewCallback.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MailViewCallback.swift; sourceTree = "<group>"; };
 		C587B46A2854F472007C3263 /* DatePickerSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DatePickerSheet.swift; sourceTree = "<group>"; };
-		C5942833285E5DFA003CF5AA /* ImageCompression.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageCompression.swift; sourceTree = "<group>"; };
 		C5942835285E5E3C003CF5AA /* CheckUserDefaultsValue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckUserDefaultsValue.swift; sourceTree = "<group>"; };
 		C5942837285E5E73003CF5AA /* GetTags.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GetTags.swift; sourceTree = "<group>"; };
 		C5942839285E5E98003CF5AA /* ScreenSize.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenSize.swift; sourceTree = "<group>"; };
@@ -390,6 +399,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				C50CF4A627F122DB001A9698 /* Mantis in Frameworks */,
+				C57E3AE82868DD7500D2470D /* AlertToast in Frameworks */,
 				C58F2BF62830AA42005FA88F /* WelcomeSheet in Frameworks */,
 				C51503C027D7C531009F0DCD /* CloudKit.framework in Frameworks */,
 			);
@@ -508,8 +518,8 @@
 		C51503A127D7C347009F0DCD = {
 			isa = PBXGroup;
 			children = (
-				C5AB6F802863688C002E07CF /* Local */,
 				C5D2955F28238C9C00FBA01E /* MySpotWidgetExtension.entitlements */,
+				C5AB6F802863688C002E07CF /* Local */,
 				C51503AC27D7C347009F0DCD /* My Spot */,
 				C5D2954F2823719100FBA01E /* MySpotWidget */,
 				C507156E282584AB000F344C /* MySpotWatch */,
@@ -535,6 +545,7 @@
 		C51503AC27D7C347009F0DCD /* My Spot */ = {
 			isa = PBXGroup;
 			children = (
+				C57E3AE12868B8C900D2470D /* CoreModel */,
 				C51503B127D7C349009F0DCD /* Assets.xcassets */,
 				C51503BD27D7C52C009F0DCD /* My Spot.entitlements */,
 				C515042B27D95225009F0DCD /* LaunchScreen.storyboard */,
@@ -687,12 +698,21 @@
 			path = mySpotiMsg;
 			sourceTree = "<group>";
 		};
+		C57E3AE12868B8C900D2470D /* CoreModel */ = {
+			isa = PBXGroup;
+			children = (
+				C57E3AE22868B8D900D2470D /* MobileNetV2Int8LUT.mlmodel */,
+				C57E3AE32868B8DA00D2470D /* YOLOv3Int8LUT.mlmodel */,
+			);
+			path = CoreModel;
+			sourceTree = "<group>";
+		};
 		C5850D02285FB69C0067EE7F /* Logic */ = {
 			isa = PBXGroup;
 			children = (
+				C58599AA286A3E5D00D07679 /* ImageCompression.swift */,
 				C515042227D7CAC6009F0DCD /* UIEmojiTextField.swift */,
 				C5F10913284C49DD00B71CBC /* ShareViewController.swift */,
-				C5942833285E5DFA003CF5AA /* ImageCompression.swift */,
 				C5942835285E5E3C003CF5AA /* CheckUserDefaultsValue.swift */,
 				C5942837285E5E73003CF5AA /* GetTags.swift */,
 				C594283B285E5EBE003CF5AA /* ConditionalViewModifier.swift */,
@@ -729,6 +749,7 @@
 				C501FC1927E41FF1008FEFA1 /* ImagePopUp.swift */,
 				C587027327E27F1900DFB6C4 /* MailViewCallback.swift */,
 				C5942845285E5FE7003CF5AA /* BadgeViewOverlay.swift */,
+				C57E3ADF2868A94B00D2470D /* ScaleButtonStyle.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -837,6 +858,7 @@
 				C50CF4AD27F395E2001A9698 /* SettingsView.swift */,
 				C5B01353284AD15B00121163 /* CreateAccountView.swift */,
 				C5F1090F284BEE7E00B71CBC /* AccountDetailView.swift */,
+				C57E3ADD2867FFFF00D2470D /* AccountRow.swift */,
 			);
 			path = Account;
 			sourceTree = "<group>";
@@ -899,6 +921,7 @@
 			packageProductDependencies = (
 				C50CF4A527F122DB001A9698 /* Mantis */,
 				C58F2BF52830AA42005FA88F /* WelcomeSheet */,
+				C57E3AE72868DD7500D2470D /* AlertToast */,
 			);
 			productName = "My Spot";
 			productReference = C51503AA27D7C347009F0DCD /* My Spot.app */;
@@ -988,6 +1011,7 @@
 			packageReferences = (
 				C50CF4A427F122DB001A9698 /* XCRemoteSwiftPackageReference "Mantis" */,
 				C58F2BF42830AA42005FA88F /* XCRemoteSwiftPackageReference "Welcome-Sheet" */,
+				C57E3AE62868DD7500D2470D /* XCRemoteSwiftPackageReference "AlertToast" */,
 			);
 			productRefGroup = C51503AB27D7C347009F0DCD /* Products */;
 			projectDirPath = "";
@@ -1091,6 +1115,7 @@
 				C5C2C4DD285EDDBF00E585C9 /* UserDefaults.swift in Sources */,
 				C5F10910284BEE7E00B71CBC /* AccountDetailView.swift in Sources */,
 				C515042927D8540A009F0DCD /* TabController.swift in Sources */,
+				C57E3AE02868A94B00D2470D /* ScaleButtonStyle.swift in Sources */,
 				C5850D01285F853C0067EE7F /* SpotPreviewType.swift in Sources */,
 				C501FC1A27E41FF1008FEFA1 /* ImagePopUp.swift in Sources */,
 				C51503E127D7C856009F0DCD /* Spot+CoreDataClass.swift in Sources */,
@@ -1098,7 +1123,6 @@
 				C5942842285E5FAE003CF5AA /* ColorRGBA.swift in Sources */,
 				C5C2C4E3285EEA2000E585C9 /* DefaultRegion.swift in Sources */,
 				C51503E427D7C856009F0DCD /* Spots.xcdatamodeld in Sources */,
-				C5942834285E5DFA003CF5AA /* ImageCompression.swift in Sources */,
 				C594284C285E8C16003CF5AA /* DiscoverSearchBar.swift in Sources */,
 				C594284E285E8EB4003CF5AA /* SignInToiCloudErrorView.swift in Sources */,
 				C50CF4AA27F13915001A9698 /* ChoosePhoto.swift in Sources */,
@@ -1109,17 +1133,20 @@
 				C51503F427D7CA1D009F0DCD /* MapViewModel.swift in Sources */,
 				C51503FC27D7CA60009F0DCD /* MySpotsView.swift in Sources */,
 				C594285B285EA90D003CF5AA /* MapSearchBar.swift in Sources */,
+				C57E3AE52868B8DA00D2470D /* YOLOv3Int8LUT.mlmodel in Sources */,
 				C5942836285E5E3C003CF5AA /* CheckUserDefaultsValue.swift in Sources */,
 				C587B46B2854F472007C3263 /* DatePickerSheet.swift in Sources */,
 				C5942848285E6008003CF5AA /* EmojiToImage.swift in Sources */,
 				C51503AE27D7C347009F0DCD /* My_SpotApp.swift in Sources */,
 				C5552CCD2827696500AF2683 /* NotificationView.swift in Sources */,
 				C501FC1827E3FAB7008FEFA1 /* ZoomableScrollView.swift in Sources */,
+				C57E3ADE2867FFFF00D2470D /* AccountRow.swift in Sources */,
 				C5F10914284C49DD00B71CBC /* ShareViewController.swift in Sources */,
 				C5942838285E5E73003CF5AA /* GetTags.swift in Sources */,
 				C5942855285EA7AE003CF5AA /* CircleShape.swift in Sources */,
 				C5E129F828678CB2002A39E5 /* SpotRowDemo.swift in Sources */,
 				C51503FD27D7CA60009F0DCD /* DiscoverView.swift in Sources */,
+				C58599AB286A3E5D00D07679 /* ImageCompression.swift in Sources */,
 				C51503DD27D7C856009F0DCD /* UIImageTransformer.swift in Sources */,
 				C5552CD128298E6900AF2683 /* CloudSharingController.swift in Sources */,
 				C5552CC22826472900AF2683 /* PhoneViewModel.swift in Sources */,
@@ -1141,6 +1168,7 @@
 				C515042527D7CAC6009F0DCD /* UIEmojiTextField.swift in Sources */,
 				C515040E27D7CA87009F0DCD /* PlaylistRow.swift in Sources */,
 				C515040D27D7CA87009F0DCD /* DetailedPlaylistView.swift in Sources */,
+				C57E3AE42868B8DA00D2470D /* MobileNetV2Int8LUT.mlmodel in Sources */,
 				C51503E727D7C87D009F0DCD /* CloudKitViewModel.swift in Sources */,
 				C50CF4B027F3CD4C001A9698 /* SetUpNewSpotNotification.swift in Sources */,
 				C515040427D7CA72009F0DCD /* DetailView.swift in Sources */,
@@ -1276,7 +1304,7 @@
 				IBSC_MODULE = MySpotWatch_WatchKit_Extension;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = "com.isaacpaschall.My-Spot";
-				MARKETING_VERSION = 2.0.3;
+				MARKETING_VERSION = 2.1.3;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.isaacpaschall.My-Spot.watchkitapp";
 				PRODUCT_NAME = "My Spot";
 				SDKROOT = watchos;
@@ -1302,7 +1330,7 @@
 				IBSC_MODULE = MySpotWatch_WatchKit_Extension;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = "com.isaacpaschall.My-Spot";
-				MARKETING_VERSION = 2.0.3;
+				MARKETING_VERSION = 2.1.3;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.isaacpaschall.My-Spot.watchkitapp";
 				PRODUCT_NAME = "My Spot";
 				SDKROOT = watchos;
@@ -1336,7 +1364,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 2.0.3;
+				MARKETING_VERSION = 2.1.3;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.isaacpaschall.My-Spot.watchkitapp.watchkitextension";
 				PRODUCT_NAME = "${TARGET_NAME}";
 				SDKROOT = watchos;
@@ -1370,7 +1398,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 2.0.3;
+				MARKETING_VERSION = 2.1.3;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.isaacpaschall.My-Spot.watchkitapp.watchkitextension";
 				PRODUCT_NAME = "${TARGET_NAME}";
 				SDKROOT = watchos;
@@ -1530,7 +1558,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2.0.3;
+				MARKETING_VERSION = 2.1.3;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.isaacpaschall.My-Spot";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTS_MACCATALYST = NO;
@@ -1569,7 +1597,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2.0.3;
+				MARKETING_VERSION = 2.1.3;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.isaacpaschall.My-Spot";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTS_MACCATALYST = NO;
@@ -1598,7 +1626,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 2.0.3;
+				MARKETING_VERSION = 2.1.3;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.isaacpaschall.My-Spot.mySpotiMsg";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -1627,7 +1655,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 2.0.3;
+				MARKETING_VERSION = 2.1.3;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.isaacpaschall.My-Spot.mySpotiMsg";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -1658,7 +1686,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 2.0.3;
+				MARKETING_VERSION = 2.1.3;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.isaacpaschall.My-Spot.w";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -1689,7 +1717,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 2.0.3;
+				MARKETING_VERSION = 2.1.3;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.isaacpaschall.My-Spot.w";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -1768,6 +1796,14 @@
 				kind = branch;
 			};
 		};
+		C57E3AE62868DD7500D2470D /* XCRemoteSwiftPackageReference "AlertToast" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/elai950/AlertToast.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.0.0;
+			};
+		};
 		C58F2BF42830AA42005FA88F /* XCRemoteSwiftPackageReference "Welcome-Sheet" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/MAJKFL/Welcome-Sheet";
@@ -1783,6 +1819,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = C50CF4A427F122DB001A9698 /* XCRemoteSwiftPackageReference "Mantis" */;
 			productName = Mantis;
+		};
+		C57E3AE72868DD7500D2470D /* AlertToast */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C57E3AE62868DD7500D2470D /* XCRemoteSwiftPackageReference "AlertToast" */;
+			productName = AlertToast;
 		};
 		C58F2BF52830AA42005FA88F /* WelcomeSheet */ = {
 			isa = XCSwiftPackageProductDependency;

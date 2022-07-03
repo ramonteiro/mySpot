@@ -1,12 +1,21 @@
 {
   "pins" : [
     {
+      "identity" : "alerttoast",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/elai950/AlertToast.git",
+      "state" : {
+        "revision" : "a4f4267f6454259ba4ed8f9dadb87334a789c26c",
+        "version" : "1.3.7"
+      }
+    },
+    {
       "identity" : "mantis",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/guoyingtao/Mantis.git",
       "state" : {
         "branch" : "master",
-        "revision" : "bb4b250aed6b001e4a6dad29399aaa3cc3c1f060"
+        "revision" : "a73b728581f5f1d24346d7d8307fa5967ac900bb"
       }
     },
     {

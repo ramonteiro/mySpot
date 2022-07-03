@@ -23,6 +23,7 @@ final class CloudKitViewModel: ObservableObject {
     @Published var notiPermission = 0 // 0: not determined, 1: denied, 2: allowed, 3: provisional, 4: ephemeral, 5: unknown
     @Published var cursorMain: CKQueryOperation.Cursor?
     @Published var cursorAccount: CKQueryOperation.Cursor?
+    @Published var cursorUsers: CKQueryOperation.Cursor?
     var shared: SpotFromCloud? = nil
     var deepAccount: String? = nil
     var userID: String = ""
@@ -30,47 +31,21 @@ final class CloudKitViewModel: ObservableObject {
     var isErrorMessageDetails = ""
     var limit = 5
     var radiusInMeters: Double { Double(UserDefaults.standard.integer(forKey: "savedDistance")) }
-    let desiredKeys = ["name", "founder", "date", "location", "likes", "inappropriate", "offensive", "dangerous", "spam", "id", "userID", "image", "type", "isMultipleImages", "locationName", "description", "customLocation", "dateObject"]
+    let userKeys = ["userid", "name", "isExplorer", "pronoun", "bio", "tiktok", "instagram", "email"]
+    let desiredKeys = ["name", "founder", "date", "location", "likes", "inappropriate", "offensive", "dangerous", "spam", "id", "userID", "type", "isMultipleImages", "locationName", "description", "customLocation", "dateObject"]
+    var highPriorityConfig: CKOperation.Configuration {
+        let config = CKQueryOperation.Configuration()
+        config.qualityOfService = .userInteractive
+        config.allowsCellularAccess = true
+        return config
+    }
     
     init() {
         getiCloudStatus()
         setUserDefaults()
     }
     
-    private func setUserDefaults() {
-        if let id = UserDefaults(suiteName: "group.com.isaacpaschall.My-Spot")?.string(forKey: "userid") {
-            userID = id
-        }
-        if (UserDefaults.standard.valueExists(forKey: "limit")) {
-            limit = UserDefaults.standard.integer(forKey: "limit")
-        } else {
-            UserDefaults.standard.set(10, forKey: "limit")
-        }
-        if (UserDefaults.standard.valueExists(forKey: "discovernot")) {
-            notiNewSpotOn = UserDefaults.standard.bool(forKey: "discovernot")
-        } else {
-            UserDefaults.standard.set(false, forKey: "discovernot")
-        }
-        if (UserDefaults.standard.valueExists(forKey: "sharednot")) {
-            notiSharedOn = UserDefaults.standard.bool(forKey: "sharednot")
-        } else {
-            UserDefaults.standard.set(false, forKey: "sharednot")
-        }
-        setColors()
-    }
-    
-    private func setColors() {
-        if let i = UserDefaults(suiteName: "group.com.isaacpaschall.My-Spot")?.integer(forKey: "colorIndex") {
-            systemColorIndex = i
-        }
-        if UserDefaults.standard.valueExists(forKey: "customColorA") {
-            let green = UserDefaults.standard.double(forKey: "customColorG")
-            let blue = UserDefaults.standard.double(forKey: "customColorB")
-            let red = UserDefaults.standard.double(forKey: "customColorR")
-            let alpha = UserDefaults.standard.double(forKey: "customColorA")
-            systemColorArray[systemColorIndex] = Color(uiColor: UIColor(red: red, green: green, blue: blue, alpha: alpha))
-        }
-    }
+    // MARK: - Spots
     
     func deleteSpot(id: String) async throws {
         let ckid = CKRecord.ID(recordName: id)
@@ -79,7 +54,9 @@ final class CloudKitViewModel: ObservableObject {
     
     func checkDeepLink(host: String) async {
         do {
-            let record = try await CKContainer.default().publicCloudDatabase.record(for: CKRecord.ID(recordName: host))
+            let record = try await CKContainer.default().publicCloudDatabase.configuredWith(configuration: highPriorityConfig) { db in
+                try await db.record(for: CKRecord.ID(recordName: host))
+            }
             DispatchQueue.main.async {
                 guard let name = record["name"] as? String else { return }
                 guard let founder = record["founder"] as? String else { return }
@@ -129,6 +106,8 @@ final class CloudKitViewModel: ObservableObject {
                     dangerous = dan
                 }
                 let imageURL = image.fileURL
+                let data = try? Data(contentsOf: imageURL ?? URL(fileURLWithPath: ""))
+                guard let imageURL = UIImage(data: data ?? Data()) else { return }
                 if let image3Check = record["image3"] as? CKAsset {
                     guard let image2Check = record["image2"] as? CKAsset else { return }
                     let image3URL = image3Check.fileURL ?? URL(fileURLWithPath: "none")
@@ -137,18 +116,16 @@ final class CloudKitViewModel: ObservableObject {
                     guard let data3 = try? Data(contentsOf: image3URL) else { return }
                     let image2 = UIImage(data: data2)
                     let image3 = UIImage(data: data3)
-                    self.shared = SpotFromCloud(id: id, name: name, founder: founder, description: description, date: date, location: location, type: types, imageURL: imageURL ?? URL(fileURLWithPath: "none"),  image2URL: image2 , image3URL: image3, isMultipleImages: isMultipleImages , likes: likes, offensive: offensive, spam: spam, inappropriate: inappropriate, dangerous: dangerous, customLocation: customLocation, locationName: locationName, userID: user, dateObject: dateObject, record: record)
+                    self.shared = SpotFromCloud(id: id, name: name, founder: founder, description: description, date: date, location: location, type: types, imageURL: imageURL,  image2URL: image2 , image3URL: image3, isMultipleImages: isMultipleImages , likes: likes, offensive: offensive, spam: spam, inappropriate: inappropriate, dangerous: dangerous, customLocation: customLocation, locationName: locationName, userID: user, dateObject: dateObject, record: record)
                 } else if let image2Check = record["image2"] as? CKAsset {
                     let image2URL = image2Check.fileURL ?? URL(fileURLWithPath: "none")
                     guard let data2 = try? Data(contentsOf: image2URL) else { return }
                     let image2 = UIImage(data: data2)
-                    self.shared = SpotFromCloud(id: id, name: name, founder: founder, description: description, date: date, location: location, type: types, imageURL: imageURL ?? URL(fileURLWithPath: "none"),  image2URL: image2 , image3URL: nil, isMultipleImages: isMultipleImages , likes: likes, offensive: offensive, spam: spam, inappropriate: inappropriate, dangerous: dangerous, customLocation: customLocation, locationName: locationName, userID: user, dateObject: dateObject, record: record)
+                    self.shared = SpotFromCloud(id: id, name: name, founder: founder, description: description, date: date, location: location, type: types, imageURL: imageURL,  image2URL: image2 , image3URL: nil, isMultipleImages: isMultipleImages , likes: likes, offensive: offensive, spam: spam, inappropriate: inappropriate, dangerous: dangerous, customLocation: customLocation, locationName: locationName, userID: user, dateObject: dateObject, record: record)
                 } else {
-                    self.shared = SpotFromCloud(id: id, name: name, founder: founder, description: description, date: date, location: location, type: types, imageURL: imageURL ?? URL(fileURLWithPath: "none"),  image2URL: nil , image3URL: nil, isMultipleImages: isMultipleImages , likes: likes, offensive: offensive, spam: spam, inappropriate: inappropriate, dangerous: dangerous, customLocation: customLocation, locationName: locationName, userID: user, dateObject: dateObject, record: record)
+                    self.shared = SpotFromCloud(id: id, name: name, founder: founder, description: description, date: date, location: location, type: types, imageURL: imageURL,  image2URL: nil , image3URL: nil, isMultipleImages: isMultipleImages , likes: likes, offensive: offensive, spam: spam, inappropriate: inappropriate, dangerous: dangerous, customLocation: customLocation, locationName: locationName, userID: user, dateObject: dateObject, record: record)
                 }
-                DispatchQueue.main.async {
-                    self.sharedSpotToggle.toggle()
-                }
+                self.sharedSpotToggle.toggle()
             }
         } catch {
             DispatchQueue.main.async {
@@ -177,140 +154,6 @@ final class CloudKitViewModel: ObservableObject {
             print("error fetching likes, none case")
             return nil
         }
-    }
-    
-    func getiCloudStatus() {
-        CKContainer.default().accountStatus { [weak self] returnedStatus, returnedError in
-            DispatchQueue.main.async {
-                switch returnedStatus {
-                case .couldNotDetermine:
-                    self?.accountStatus = .couldNotDetermine
-                    self?.isSignedInToiCloud = false
-                case .available:
-                    self?.isSignedInToiCloud = true
-                    self?.fetchUserID()
-                case .restricted:
-                    self?.accountStatus = .restricted
-                    self?.isSignedInToiCloud = false
-                case .noAccount:
-                    self?.accountStatus = .noAccount
-                    self?.isSignedInToiCloud = false
-                case .temporarilyUnavailable:
-                    self?.accountStatus = .temporarilyUnavailable
-                    self?.isSignedInToiCloud = false
-                @unknown default:
-                    self?.accountStatus = nil
-                    self?.isSignedInToiCloud = false
-                }
-            }
-        }
-    }
-    
-    enum CloudKitError: String, LocalizedError {
-        case iCloudAccountNotFound
-        case iCloudAccountNotDetermined
-        case iCloudAccountRestricted
-        case iCloudAccountUnavailable
-        case iCloudAccountUnknown
-    }
-    
-    func compressImage(image: UIImage) -> UIImage {
-        let resizedImage = image.aspectFittedToHeight(200)
-        resizedImage.jpegData(compressionQuality: 1.0)
-        
-        return resizedImage
-    }
-    
-    func isBanned() async throws -> Bool {
-        let predicate = NSPredicate(format: "userid == %@", userID)
-        let query = CKQuery(recordType: "Bans", predicate: predicate)
-        let results = try await CKContainer.default().publicCloudDatabase.records(matching: query, resultsLimit: 1)
-        if results.matchResults.isEmpty {
-            UserDefaults.standard.set(false, forKey: "isBanned")
-            return false
-        } else {
-            UserDefaults.standard.set(true, forKey: "isBanned")
-            return true
-        }
-    }
-    
-    func addNewAccount(userid: String, name: String, pronoun: String, image: Data, bio: String, email: String, youtube: String, tiktok: String, insta: String) async throws {
-        let newAccount = CKRecord(recordType: "Accounts")
-        newAccount["userid"] = userid
-        newAccount["name"] = name
-        newAccount["bio"] = bio
-        newAccount["youtube"] = youtube
-        newAccount["tiktok"] = tiktok
-        newAccount["instagram"] = insta
-        newAccount["email"] = email
-        newAccount["isExplorer"] = false
-        newAccount["pronoun"] = pronoun
-        let path = NSTemporaryDirectory() + "imageTemp\(UUID().uuidString).png"
-        let url = URL(fileURLWithPath: path)
-        try image.write(to: url)
-        let asset = CKAsset(fileURL: url)
-        newAccount["image"] = asset
-        try await CKContainer.default().publicCloudDatabase.save(newAccount)
-    }
-    
-    func doesAccountExist(for userid: String) async -> Bool {
-        let predicate = NSPredicate(format: "userid == %@", userid)
-        let query = CKQuery(recordType: "Accounts", predicate: predicate)
-        do {
-            let results = try await CKContainer.default().publicCloudDatabase.records(matching: query, resultsLimit: 1)
-            if results.matchResults.isEmpty {
-                return false
-            } else {
-                results.matchResults.forEach { (_,result) in
-                    switch result {
-                    case .success(let record):
-                        if let name = record["name"] {
-                            UserDefaults.standard.set(name, forKey: "founder")
-                        }
-                    case .failure(let error):
-                        print(error)
-                    }
-                }
-                return true
-            }
-        } catch {
-            return true
-        }
-    }
-    
-    func getDownloadsAndSpots(from userid: String) async throws -> [Int] {
-        let predicate = NSPredicate(format: "userID == %@", userid)
-        let query = CKQuery(recordType: "Spots", predicate: predicate)
-        let results = try await CKContainer.default().publicCloudDatabase.records(matching: query, desiredKeys: ["userID", "likes"])
-        var downloads = 0
-        results.matchResults.forEach { (_,result) in
-            switch result {
-            case .success(let record):
-                guard let download = record["likes"] as? Int else { return }
-                downloads += download
-            case .failure(let error):
-                print(error)
-            }
-        }
-        return [downloads, results.matchResults.count]
-    }
-    
-    func getMemberSince(fromid userid: String) async throws {
-        let predicate = NSPredicate(format: "userid == %@", userid)
-        let query = CKQuery(recordType: "Accounts", predicate: predicate)
-        let results = try await CKContainer.default().publicCloudDatabase.records(matching: query, desiredKeys: ["userid"])
-        var date: Date?
-        results.matchResults.forEach { (_,result) in
-            switch result {
-            case .success(let record):
-                if let dateFetched = record.creationDate {
-                    date = dateFetched
-                }
-            case .failure(let error):
-                print(error)
-            }
-        }
-        UserDefaults.standard.set(date, forKey: "accountdate")
     }
     
     func addSpotToPublic(name: String, founder: String, date: String, locationName: String, x: Double, y: Double, description: String, type: String, image: Data, image2: Data?, image3: Data?, isMultipleImages: Int, customLocation: Bool, dateObject: Date?) async throws -> String {
@@ -374,32 +217,18 @@ final class CloudKitViewModel: ObservableObject {
             try image.write(to: url)
             let asset = CKAsset(fileURL: url)
             newSpot["image"] = asset
-            try await CKContainer.default().publicCloudDatabase.save(newSpot)
+            let hash: Double = (x + y + Double(date.count))
+            if UserDefaults.standard.double(forKey: "lastUploadHash") != hash {
+                try await CKContainer.default().publicCloudDatabase.configuredWith(configuration: highPriorityConfig) { db in
+                    try await db.save(newSpot)
+                }
+                UserDefaults.standard.set(hash, forKey: "lastUploadHash")
+            }
             return newSpot.recordID.recordName
         } catch {
             print(error)
             return ""
         }
-    }
-    
-    func resetBadgeNewSpots() {
-        let badgeResetOperation = CKModifyBadgeOperation(badgeValue: UserDefaults.standard.integer(forKey: "badgeplaylists"))
-        badgeResetOperation.modifyBadgeCompletionBlock = { (error) -> Void in
-            if error != nil {
-                print(error as Any)
-            }
-        }
-        CKContainer.default().add(badgeResetOperation)
-    }
-    
-    func resetBadgePlaylists() {
-        let badgeResetOperation = CKModifyBadgeOperation(badgeValue: UserDefaults.standard.integer(forKey: "badge"))
-        badgeResetOperation.modifyBadgeCompletionBlock = { (error) -> Void in
-            if error != nil {
-                print(error as Any)
-            }
-        }
-        CKContainer.default().add(badgeResetOperation)
     }
     
     private func fetchUserID() {
@@ -413,38 +242,12 @@ final class CloudKitViewModel: ObservableObject {
         }
     }
     
-    func fetchAccount(userid: String) async throws -> AccountModel? {
-        let predicate = NSPredicate(format: "userid == %@", userid)
-        let query = CKQuery(recordType: "Accounts", predicate: predicate)
-        let results = try await CKContainer.default().publicCloudDatabase.records(matching: query)
-        var user: AccountModel?
-        results.matchResults.forEach { (_,result) in
-            switch result {
-            case .success(let record):
-                guard let id = record["userid"] as? String else { return }
-                guard let name = record["name"] as? String else { return }
-                guard let imageAsset = record["image"] as? CKAsset else { return }
-                guard let imageURL = imageAsset.fileURL else { return }
-                guard let imageData = NSData(contentsOf: imageURL) as? Data else { return }
-                guard let image = UIImage(data: imageData) else { return }
-                guard let isExplorerBinary = record["isExplorer"] as? Int else { return }
-                let pronouns = record["pronoun"] as? String
-                let bio = record["bio"] as? String
-                let tiktok = record["tiktok"] as? String
-                let youtube = record["youtube"] as? String
-                let insta = record["instagram"] as? String
-                let email = record["email"] as? String
-                user = AccountModel(id: id, name: name, image: image, pronouns: pronouns, isExplorer: (isExplorerBinary == 0 ? false : true), bio: bio, record: record, tiktok: tiktok, insta: insta, youtube: youtube, email: email)
-            case .failure(let error):
-                print(error)
-            }
-        }
-        return user
-    }
-    
     func fetchImages(id: String) async -> [UIImage?] {
+        if id.isEmpty { return [] }
         do {
-            let results = try await CKContainer.default().publicCloudDatabase.records(for: [CKRecord.ID(recordName: id)], desiredKeys: ["image2", "image3"])
+            let results = try await CKContainer.default().publicCloudDatabase.configuredWith(configuration: highPriorityConfig) { db in
+                try await db.records(for: [CKRecord.ID(recordName: id)], desiredKeys: ["image2", "image3"])
+            }
             let record = results[CKRecord.ID(recordName: id)]
             switch record {
             case .success(let record):
@@ -476,83 +279,42 @@ final class CloudKitViewModel: ObservableObject {
         }
     }
     
-    func fetchNotificationSpots(recordid: String) async throws -> SpotFromCloud? {
-        let predicate = NSPredicate(format: "id == %@", recordid)
-        let query = CKQuery(recordType: "Spots", predicate: predicate)
-        
-        let results = try await CKContainer.default().publicCloudDatabase.records(matching: query, desiredKeys: desiredKeys, resultsLimit: 1)
-        var spot: SpotFromCloud? = nil
-        results.matchResults.forEach { (_,result) in
-            switch result {
+    func fetchMainImage(id: String) async -> UIImage? {
+        if id == "error" || id.isEmpty { return nil }
+        do {
+            let results = try await CKContainer.default().publicCloudDatabase.configuredWith(configuration: highPriorityConfig) { db in
+                try await db.records(for: [CKRecord.ID(recordName: id)], desiredKeys: ["image"])
+            }
+            let record = results[CKRecord.ID(recordName: id)]
+            switch record {
             case .success(let record):
-                    guard let name = record["name"] as? String else { return }
-                    guard let founder = record["founder"] as? String else { return }
-                    guard let date = record["date"] as? String else { return }
-                    var dateObject: Date?
-                    if let dateObj = record["dateObject"] as? Date {
-                        dateObject = dateObj
-                    } else {
-                        dateObject = nil
-                    }
-                    guard let location = record["location"] as? CLLocation else { return }
-                    guard let likes = record["likes"] as? Int else { return }
-                    guard let id = record["id"] as? String else { return }
-                    guard let user = record["userID"] as? String else { return }
-                    guard let image = record["image"] as? CKAsset else { return }
-                    var customLocation = 0
-                    if let customLocationChecked = record["customLocation"] as? Int {
-                        customLocation = customLocationChecked
-                    }
-                    var isMultipleImages = 0
-                    if let m = record["isMultipleImages"] as? Int {
-                        isMultipleImages = m
-                    }
-                    var inappropriate = 0
-                    var offensive = 0
-                    var spam = 0
-                    var dangerous = 0
-                    if let inna = record["inappropriate"] as? Int {
-                        inappropriate = inna
-                    }
-                    if let offen = record["offensive"] as? Int {
-                        offensive = offen
-                    }
-                    if let sp = record["spam"] as? Int {
-                        spam = sp
-                    }
-                    if let dan = record["dangerous"] as? Int {
-                        dangerous = dan
-                    }
-                    var types = ""
-                    var description = ""
-                    var locationName = ""
-                    if let typeCheck = record["type"] as? String {
-                        types = typeCheck
-                    }
-                    if let descriptionCheck = record["description"] as? String {
-                        description = descriptionCheck
-                    }
-                    if let locationNameCheck = record["locationName"] as? String {
-                        locationName = locationNameCheck
-                    }
-                    let imageURL = image.fileURL
-                    spot = SpotFromCloud(id: id, name: name, founder: founder, description: description, date: date, location: location, type: types, imageURL: imageURL ?? URL(fileURLWithPath: "none"),  image2URL: nil , image3URL: nil, isMultipleImages: isMultipleImages , likes: likes, offensive: offensive, spam: spam, inappropriate: inappropriate, dangerous: dangerous, customLocation: customLocation, locationName: locationName, userID: user, dateObject: dateObject, record: record)
+                guard let imageAsset = record["image"] as? CKAsset else { return nil }
+                let imageURL = imageAsset.fileURL ?? URL(fileURLWithPath: "none")
+                guard let imageData = try? Data(contentsOf: imageURL) else { return nil }
+                let image = UIImage(data: imageData)
+                return image
                 
             case .failure(let error):
-                print("\(error)")
-                return
+                print("FETCH ERROR: \(error)")
+                return nil
+            case .none:
+                return nil
             }
+        } catch {
+            return nil
         }
-        return spot
     }
     
-    func fetchMoreAccountSpots(cursor: CKQueryOperation.Cursor) async throws -> [SpotFromCloud] {
-        DispatchQueue.main.async {
-            self.cursorAccount = nil
+    func fetchNotificationSpots(recordids: [String]) async throws -> [SpotFromCloud] {
+        let ids = recordids.compactMap {
+            CKRecord.ID(recordName: $0)
         }
-        let results = try await CKContainer.default().publicCloudDatabase.records(continuingMatchFrom: cursor, desiredKeys: desiredKeys, resultsLimit: limit)
+        if ids.isEmpty { return [] }
+        let results = try await CKContainer.default().publicCloudDatabase.configuredWith(configuration: highPriorityConfig) { db in
+            try await db.records(for: ids, desiredKeys: desiredKeys)
+        }
         var spots: [SpotFromCloud] = []
-        results.matchResults.forEach { (_,result) in
+        results.forEach { (_, result) in
             switch result {
             case .success(let record):
                 guard let name = record["name"] as? String else { return }
@@ -568,7 +330,6 @@ final class CloudKitViewModel: ObservableObject {
                 guard let likes = record["likes"] as? Int else { return }
                 guard let id = record["id"] as? String else { return }
                 guard let user = record["userID"] as? String else { return }
-                guard let image = record["image"] as? CKAsset else { return }
                 var customLocation = 0
                 if let customLocationChecked = record["customLocation"] as? Int {
                     customLocation = customLocationChecked
@@ -605,89 +366,10 @@ final class CloudKitViewModel: ObservableObject {
                 if let locationNameCheck = record["locationName"] as? String {
                     locationName = locationNameCheck
                 }
-                let imageURL = image.fileURL
-                spots.append(SpotFromCloud(id: id, name: name, founder: founder, description: description, date: date, location: location, type: types, imageURL: imageURL ?? URL(fileURLWithPath: "none"),  image2URL: nil , image3URL: nil, isMultipleImages: isMultipleImages , likes: likes, offensive: offensive, spam: spam, inappropriate: inappropriate, dangerous: dangerous, customLocation: customLocation, locationName: locationName, userID: user, dateObject: dateObject, record: record))
-                
+                spots.append(SpotFromCloud(id: id, name: name, founder: founder, description: description, date: date, location: location, type: types, imageURL: nil,  image2URL: nil , image3URL: nil, isMultipleImages: isMultipleImages , likes: likes, offensive: offensive, spam: spam, inappropriate: inappropriate, dangerous: dangerous, customLocation: customLocation, locationName: locationName, userID: user, dateObject: dateObject, record: record))
             case .failure(let error):
                 print(error)
             }
-        }
-        DispatchQueue.main.async {
-            self.cursorAccount = results.queryCursor
-        }
-        return spots
-    }
-
-    func fetchAccountSpots(userid: String) async throws -> [SpotFromCloud] {
-        let predicate = NSPredicate(format: "userID == %@", userid)
-        let query = CKQuery(recordType: "Spots", predicate: predicate)
-        let creation = NSSortDescriptor(key: "creationDate", ascending: false)
-        var spots: [SpotFromCloud] = []
-        query.sortDescriptors = [creation]
-        let results = try await CKContainer.default().publicCloudDatabase.records(matching: query, desiredKeys: desiredKeys, resultsLimit: limit)
-        results.matchResults.forEach { (_,result) in
-            switch result {
-            case .success(let record):
-                guard let name = record["name"] as? String else { return }
-                guard let founder = record["founder"] as? String else { return }
-                guard let date = record["date"] as? String else { return }
-                var dateObject: Date?
-                if let dateObj = record["dateObject"] as? Date {
-                    dateObject = dateObj
-                } else {
-                    dateObject = nil
-                }
-                guard let location = record["location"] as? CLLocation else { return }
-                guard let likes = record["likes"] as? Int else { return }
-                guard let id = record["id"] as? String else { return }
-                guard let user = record["userID"] as? String else { return }
-                guard let image = record["image"] as? CKAsset else { return }
-                var customLocation = 0
-                if let customLocationChecked = record["customLocation"] as? Int {
-                    customLocation = customLocationChecked
-                }
-                var isMultipleImages = 0
-                if let m = record["isMultipleImages"] as? Int {
-                    isMultipleImages = m
-                }
-                var inappropriate = 0
-                var offensive = 0
-                var spam = 0
-                var dangerous = 0
-                if let inna = record["inappropriate"] as? Int {
-                    inappropriate = inna
-                }
-                if let offen = record["offensive"] as? Int {
-                    offensive = offen
-                }
-                if let sp = record["spam"] as? Int {
-                    spam = sp
-                }
-                if let dan = record["dangerous"] as? Int {
-                    dangerous = dan
-                }
-                var types = ""
-                var description = ""
-                var locationName = ""
-                if let typeCheck = record["type"] as? String {
-                    types = typeCheck
-                }
-                if let descriptionCheck = record["description"] as? String {
-                    description = descriptionCheck
-                }
-                if let locationNameCheck = record["locationName"] as? String {
-                    locationName = locationNameCheck
-                }
-                let imageURL = image.fileURL
-                spots.append(SpotFromCloud(id: id, name: name, founder: founder, description: description, date: date, location: location, type: types, imageURL: imageURL ?? URL(fileURLWithPath: "none"),  image2URL: nil , image3URL: nil, isMultipleImages: isMultipleImages , likes: likes, offensive: offensive, spam: spam, inappropriate: inappropriate, dangerous: dangerous, customLocation: customLocation, locationName: locationName, userID: user, dateObject: dateObject, record: record))
-                
-            case .failure(let error):
-                print("\(error)")
-                return
-            }
-        }
-        DispatchQueue.main.async {
-            self.cursorAccount = results.queryCursor
         }
         return spots
     }
@@ -730,8 +412,9 @@ final class CloudKitViewModel: ObservableObject {
             let creation = NSSortDescriptor(key: "creationDate", ascending: false)
             query.sortDescriptors = [creation, distance]
         }
-        
-        let results = try await CKContainer.default().publicCloudDatabase.records(matching: query, desiredKeys: desiredKeys, resultsLimit: limit)
+        let results = try await CKContainer.default().publicCloudDatabase.configuredWith(configuration: highPriorityConfig) { db in
+            try await db.records(matching: query, desiredKeys: desiredKeys, resultsLimit: limit)
+        }
         DispatchQueue.main.async {
             self.cursorMain = nil
         }
@@ -751,7 +434,6 @@ final class CloudKitViewModel: ObservableObject {
                     guard let likes = record["likes"] as? Int else { return }
                     guard let id = record["id"] as? String else { return }
                     guard let user = record["userID"] as? String else { return }
-                    guard let image = record["image"] as? CKAsset else { return }
                     var customLocation = 0
                     if let customLocationChecked = record["customLocation"] as? Int {
                         customLocation = customLocationChecked
@@ -788,8 +470,7 @@ final class CloudKitViewModel: ObservableObject {
                     if let locationNameCheck = record["locationName"] as? String {
                         locationName = locationNameCheck
                     }
-                    let imageURL = image.fileURL
-                    spots.append(SpotFromCloud(id: id, name: name, founder: founder, description: description, date: date, location: location, type: types, imageURL: imageURL ?? URL(fileURLWithPath: "none"),  image2URL: nil , image3URL: nil, isMultipleImages: isMultipleImages , likes: likes, offensive: offensive, spam: spam, inappropriate: inappropriate, dangerous: dangerous, customLocation: customLocation, locationName: locationName, userID: user, dateObject: dateObject, record: record))
+                    spots.append(SpotFromCloud(id: id, name: name, founder: founder, description: description, date: date, location: location, type: types, imageURL: nil,  image2URL: nil , image3URL: nil, isMultipleImages: isMultipleImages , likes: likes, offensive: offensive, spam: spam, inappropriate: inappropriate, dangerous: dangerous, customLocation: customLocation, locationName: locationName, userID: user, dateObject: dateObject, record: record))
             case .failure(let error):
                 print("\(error)")
                 DispatchQueue.main.async {
@@ -811,7 +492,9 @@ final class CloudKitViewModel: ObservableObject {
             return false
         }
         let recordID = CKRecord.ID(recordName: id)
-        let record = try await CKContainer.default().publicCloudDatabase.record(for: recordID)
+        let record = try await CKContainer.default().publicCloudDatabase.configuredWith(configuration: highPriorityConfig) { db in
+            try await db.record(for: recordID)
+        }
         record["name"] = newName
         record["description"] = newDescription
         record["type"] = newType
@@ -862,46 +545,10 @@ final class CloudKitViewModel: ObservableObject {
                 }
             }
         }
-        
-        try await CKContainer.default().publicCloudDatabase.save(record)
+        try await CKContainer.default().publicCloudDatabase.configuredWith(configuration: highPriorityConfig) { db in
+            try await db.save(record)
+        }
         return true
-    }
-    
-    func updateAccount(id: CKRecord.ID, newName: String, newBio: String?, newPronouns: String?, newEmail: String?, newTiktok: String?, image: Data?, newInsta: String?, newYoutube: String?) async throws {
-        let record = try await CKContainer.default().publicCloudDatabase.record(for: id)
-        record["name"] = newName
-        if let newBio = newBio {
-            record["bio"] = newBio
-        }
-        if let newEmail = newEmail {
-            record["email"] = newEmail
-        }
-        if let newPronouns = newPronouns {
-            record["pronoun"] = newPronouns
-        }
-        if let newTiktok = newTiktok {
-            record["tiktok"] = newTiktok
-        }
-        if let newInsta = newInsta {
-            record["instagram"] = newInsta
-        }
-        if let newYoutube = newYoutube {
-            record["youtube"] = newYoutube
-        }
-        if let image = image {
-            let path = NSTemporaryDirectory() + "imageTemp\(UUID().uuidString).png"
-            let url = URL(fileURLWithPath: path)
-            try image.write(to: url)
-            let asset = CKAsset(fileURL: url)
-            record["image"] = asset
-        }
-        try await CKContainer.default().publicCloudDatabase.save(record)
-    }
-    
-    func makeExplorer(id: CKRecord.ID) async throws {
-        let record = try await CKContainer.default().publicCloudDatabase.record(for: id)
-        record["isExplorer"] = true
-        try await CKContainer.default().publicCloudDatabase.save(record)
     }
     
     func likeSpot(spot: SpotFromCloud) async -> Bool {
@@ -944,7 +591,9 @@ final class CloudKitViewModel: ObservableObject {
             self.isFetching = true
         }
         do {
-            let results = try await CKContainer.default().publicCloudDatabase.records(continuingMatchFrom: cursor, desiredKeys: desiredKeys, resultsLimit: resultLimit)
+            let results = try await CKContainer.default().publicCloudDatabase.configuredWith(configuration: highPriorityConfig) { db in
+                try await db.records(continuingMatchFrom: cursor, desiredKeys: desiredKeys, resultsLimit: resultLimit)
+            }
             results.matchResults.forEach { (_,result) in
                 switch result {
                 case .success(let record):
@@ -961,7 +610,6 @@ final class CloudKitViewModel: ObservableObject {
                         guard let likes = record["likes"] as? Int else { return }
                         guard let id = record["id"] as? String else { return }
                         guard let user = record["userID"] as? String else { return }
-                        guard let image = record["image"] as? CKAsset else { return }
                         var customLocation = 0
                         if let customLocationChecked = record["customLocation"] as? Int {
                             customLocation = customLocationChecked
@@ -998,8 +646,7 @@ final class CloudKitViewModel: ObservableObject {
                         if let locationNameCheck = record["locationName"] as? String {
                             locationName = locationNameCheck
                         }
-                        let imageURL = image.fileURL
-                        spots.append(SpotFromCloud(id: id, name: name, founder: founder, description: description, date: date, location: location, type: types, imageURL: imageURL ?? URL(fileURLWithPath: "none"),  image2URL: nil , image3URL: nil, isMultipleImages: isMultipleImages , likes: likes, offensive: offensive, spam: spam, inappropriate: inappropriate, dangerous: dangerous, customLocation: customLocation, locationName: locationName, userID: user, dateObject: dateObject, record: record))
+                        spots.append(SpotFromCloud(id: id, name: name, founder: founder, description: description, date: date, location: location, type: types, imageURL: nil,  image2URL: nil , image3URL: nil, isMultipleImages: isMultipleImages , likes: likes, offensive: offensive, spam: spam, inappropriate: inappropriate, dangerous: dangerous, customLocation: customLocation, locationName: locationName, userID: user, dateObject: dateObject, record: record))
                     
                 case .failure(let error):
                     print("\(error)")
@@ -1025,11 +672,164 @@ final class CloudKitViewModel: ObservableObject {
         return spots
     }
     
+    // MARK: - Other
+    
+    
+    // next 3 functions are used to update all images to use new compression for faster speeds
+    func checkForCompression(images: [String], id: String) {
+        if userID != UserDefaultKeys.admin { return }
+        if !UserDefaults.standard.bool(forKey: "compress") { return }
+        if id.isEmpty { return }
+        let id = CKRecord.ID(recordName: id)
+        Task {
+            await updateImageSpot(recordID: id, images: images)
+        }
+    }
+    
+    private func needsToBeCompressed(data: Data) -> Bool {
+        let kb = Int(data.count / 1024)
+        print("There were \(kb) kb")
+        if kb > 300 { return true }
+        return false
+    }
+    
+    private func updateImageSpot(recordID: CKRecord.ID, images: [String]) async {
+        let record = try? await CKContainer.default().publicCloudDatabase.record(for: recordID)
+        guard let record = record else { return }
+        let compress = ImageCompression()
+        for image in images {
+            if let imageAsset = record[image] as? CKAsset {
+                guard let imageURL = imageAsset.fileURL else { return }
+                guard let imageData = NSData(contentsOf: imageURL) as? Data else { return }
+                if !needsToBeCompressed(data: imageData) { continue }
+                guard let imageFromCloud = UIImage(data: imageData) else { return }
+                guard let imageData = compress.compress(image: imageFromCloud) else { return }
+                let path = NSTemporaryDirectory() + "imageTemp\(UUID().uuidString).png"
+                let url = URL(fileURLWithPath: path)
+                try? imageData.write(to: url)
+                let asset = CKAsset(fileURL: url)
+                record[image] = asset
+            }
+        }
+        do {
+            let _ = try await CKContainer.default().publicCloudDatabase.save(record)
+        } catch {
+            print("failed to change size")
+        }
+    }
+    
+    func isBanned() async throws -> Bool {
+        let predicate = NSPredicate(format: "userid == %@", userID)
+        let query = CKQuery(recordType: "Bans", predicate: predicate)
+        let results = try await CKContainer.default().publicCloudDatabase.records(matching: query, resultsLimit: 1)
+        if results.matchResults.isEmpty {
+            UserDefaults.standard.set(false, forKey: "isBanned")
+            return false
+        } else {
+            UserDefaults.standard.set(true, forKey: "isBanned")
+            return true
+        }
+    }
+    
+    func getiCloudStatus() {
+        CKContainer.default().accountStatus { [weak self] returnedStatus, returnedError in
+            DispatchQueue.main.async {
+                switch returnedStatus {
+                case .couldNotDetermine:
+                    self?.accountStatus = .couldNotDetermine
+                    self?.isSignedInToiCloud = false
+                case .available:
+                    self?.isSignedInToiCloud = true
+                    self?.fetchUserID()
+                case .restricted:
+                    self?.accountStatus = .restricted
+                    self?.isSignedInToiCloud = false
+                case .noAccount:
+                    self?.accountStatus = .noAccount
+                    self?.isSignedInToiCloud = false
+                case .temporarilyUnavailable:
+                    self?.accountStatus = .temporarilyUnavailable
+                    self?.isSignedInToiCloud = false
+                @unknown default:
+                    self?.accountStatus = nil
+                    self?.isSignedInToiCloud = false
+                }
+            }
+        }
+    }
+    
+    enum CloudKitError: String, LocalizedError {
+        case iCloudAccountNotFound
+        case iCloudAccountNotDetermined
+        case iCloudAccountRestricted
+        case iCloudAccountUnavailable
+        case iCloudAccountUnknown
+    }
+    
     func isMySpot(user: String) -> Bool {
         if userID == user {
             return true
         }
         return false
+    }
+    
+    private func setUserDefaults() {
+        if let id = UserDefaults(suiteName: "group.com.isaacpaschall.My-Spot")?.string(forKey: "userid") {
+            userID = id
+        }
+        if (UserDefaults.standard.valueExists(forKey: "limit")) {
+            limit = UserDefaults.standard.integer(forKey: "limit")
+        } else {
+            UserDefaults.standard.set(10, forKey: "limit")
+        }
+        if (UserDefaults.standard.valueExists(forKey: "discovernot")) {
+            notiNewSpotOn = UserDefaults.standard.bool(forKey: "discovernot")
+        } else {
+            UserDefaults.standard.set(false, forKey: "discovernot")
+        }
+        if (UserDefaults.standard.valueExists(forKey: "sharednot")) {
+            notiSharedOn = UserDefaults.standard.bool(forKey: "sharednot")
+        } else {
+            UserDefaults.standard.set(false, forKey: "sharednot")
+        }
+        setColors()
+    }
+    
+    private func setColors() {
+        if let i = UserDefaults(suiteName: "group.com.isaacpaschall.My-Spot")?.integer(forKey: "colorIndex") {
+            systemColorIndex = i
+        }
+        if let group = UserDefaults(suiteName: "group.com.isaacpaschall.My-Spot") {
+            if group.valueExists(forKey: "colora") {
+                let green = group.double(forKey: "colorg")
+                let blue = group.double(forKey: "colorb")
+                let red = group.double(forKey: "colorr")
+                let alpha = group.double(forKey: "colora")
+                systemColorArray[systemColorArray.count - 1] = Color(uiColor: UIColor(red: red, green: green, blue: blue, alpha: alpha))
+            }
+        }
+    }
+    
+    // MARK: - Notifications
+    
+    func resetBadgeNewSpots() {
+        let badgeResetOperation = CKModifyBadgeOperation(badgeValue: UserDefaults.standard.integer(forKey: "badgeplaylists"))
+        badgeResetOperation.modifyBadgeCompletionBlock = { (error) -> Void in
+            if error != nil {
+                print(error as Any)
+            }
+        }
+        CKContainer.default().add(badgeResetOperation)
+    }
+    
+    func resetBadgePlaylists() {
+        let badgeResetOperation = CKModifyBadgeOperation(badgeValue: UserDefaults.standard.integer(forKey: "badge"))
+        badgeResetOperation.modifyBadgeCompletionBlock = { (error) -> Void in
+            if error != nil {
+                print(error as Any)
+            }
+        }
+        CKContainer.default().add(badgeResetOperation)
     }
     
     func checkNotificationPermission() async {
@@ -1085,23 +885,35 @@ final class CloudKitViewModel: ObservableObject {
     }
     
     func unsubscribeAllPublic() async throws {
-        let subs = try await CKContainer.default().publicCloudDatabase.allSubscriptions()
+        let subs = try await CKContainer.default().publicCloudDatabase.configuredWith(configuration: highPriorityConfig) { db in
+            try await db.allSubscriptions()
+        }
         for sub in subs {
-            _ = try await CKContainer.default().publicCloudDatabase.deleteSubscription(withID: sub.subscriptionID)
+            _ = try await CKContainer.default().publicCloudDatabase.configuredWith(configuration: highPriorityConfig) { db in
+                try await db.deleteSubscription(withID: sub.subscriptionID)
+            }
         }
     }
     
     func unsubscribeAllShared() async throws {
-        let subs = try await CKContainer.default().sharedCloudDatabase.allSubscriptions()
+        let subs = try await CKContainer.default().sharedCloudDatabase.configuredWith(configuration: highPriorityConfig) { db in
+            try await db.allSubscriptions()
+        }
         for sub in subs {
-            _ = try await CKContainer.default().sharedCloudDatabase.deleteSubscription(withID: sub.subscriptionID)
+            _ = try await CKContainer.default().sharedCloudDatabase.configuredWith(configuration: highPriorityConfig) { db in
+                try await db.deleteSubscription(withID: sub.subscriptionID)
+            }
         }
     }
     
     func unsubscribeAllPrivate() async throws {
-        let subs = try await CKContainer.default().privateCloudDatabase.allSubscriptions()
+        let subs = try await CKContainer.default().privateCloudDatabase.configuredWith(configuration: highPriorityConfig) { db in
+            try await db.allSubscriptions()
+        }
         for sub in subs {
-            _ = try await CKContainer.default().privateCloudDatabase.deleteSubscription(withID: sub.subscriptionID)
+            _ = try await CKContainer.default().privateCloudDatabase.configuredWith(configuration: highPriorityConfig) { db in
+                try await db.deleteSubscription(withID: sub.subscriptionID)
+            }
         }
     }
     
@@ -1119,7 +931,9 @@ final class CloudKitViewModel: ObservableObject {
         notification.desiredKeys = ["id"]
         notification.shouldSendContentAvailable = true
         subscription.notificationInfo = notification
-        try await CKContainer.default().publicCloudDatabase.save(subscription)
+        try await CKContainer.default().publicCloudDatabase.configuredWith(configuration: highPriorityConfig) { db in
+            try await db.save(subscription)
+        }
     }
     
     func subscribeToShares() async throws {
@@ -1134,7 +948,9 @@ final class CloudKitViewModel: ObservableObject {
         notification.shouldBadge = false
         notification.shouldSendContentAvailable = true
         subscription.notificationInfo = notification
-        try await CKContainer.default().sharedCloudDatabase.save(subscription)
+        try await CKContainer.default().sharedCloudDatabase.configuredWith(configuration: highPriorityConfig) { db in
+            try await db.save(subscription)
+        }
         let subscriptionPrivate = CKDatabaseSubscription(subscriptionID: UUID().uuidString)
         let notificationPrivate = CKSubscription.NotificationInfo()
         subscriptionPrivate.recordType = "cloudkit.share"
@@ -1144,6 +960,420 @@ final class CloudKitViewModel: ObservableObject {
         notificationPrivate.shouldBadge = false
         notificationPrivate.shouldSendContentAvailable = true
         subscriptionPrivate.notificationInfo = notificationPrivate
-        try await CKContainer.default().privateCloudDatabase.save(subscriptionPrivate)
+        try await CKContainer.default().privateCloudDatabase.configuredWith(configuration: highPriorityConfig) { db in
+            try await db.save(subscriptionPrivate)
+        }
+    }
+    
+    // MARK: - Account
+    
+    func addNewAccount(userid: String, name: String, pronoun: String, image: Data, bio: String, email: String, youtube: String, tiktok: String, insta: String) async throws {
+        let newAccount = CKRecord(recordType: "Accounts")
+        newAccount["userid"] = userid
+        newAccount["name"] = name
+        newAccount["bio"] = bio
+        newAccount["youtube"] = youtube
+        newAccount["tiktok"] = tiktok
+        newAccount["instagram"] = insta
+        newAccount["email"] = email
+        newAccount["isExplorer"] = false
+        newAccount["pronoun"] = pronoun
+        let path = NSTemporaryDirectory() + "imageTemp\(UUID().uuidString).png"
+        let url = URL(fileURLWithPath: path)
+        try image.write(to: url)
+        let asset = CKAsset(fileURL: url)
+        newAccount["image"] = asset
+        if await !doesAccountExist(for: userid) {
+            try await CKContainer.default().publicCloudDatabase.configuredWith(configuration: highPriorityConfig) { db in
+                try await db.save(newAccount)
+            }
+        }
+    }
+    
+    func doesAccountExist(for userid: String) async -> Bool {
+        if userid == "error" || userid == "" { return true }
+        let predicate = NSPredicate(format: "userid == %@", userid)
+        let query = CKQuery(recordType: "Accounts", predicate: predicate)
+        do {
+            let results = try await CKContainer.default().publicCloudDatabase.records(matching: query, desiredKeys: ["userid", "name"], resultsLimit: 1)
+            if results.matchResults.isEmpty {
+                return false
+            } else {
+                results.matchResults.forEach { (_,result) in
+                    switch result {
+                    case .success(let record):
+                        if let name = record["name"] {
+                            UserDefaults.standard.set(name, forKey: "founder")
+                        }
+                    case .failure(let error):
+                        print(error)
+                    }
+                }
+                return true
+            }
+        } catch {
+            return true
+        }
+    }
+    
+    func getDownloadsAndSpots(from userid: String) async throws -> [Int] {
+        let predicate = NSPredicate(format: "userID == %@", userid)
+        let query = CKQuery(recordType: "Spots", predicate: predicate)
+        let results = try await CKContainer.default().publicCloudDatabase.records(matching: query, desiredKeys: ["userID", "likes"])
+        var downloads = 0
+        results.matchResults.forEach { (_,result) in
+            switch result {
+            case .success(let record):
+                guard let download = record["likes"] as? Int else { return }
+                downloads += download
+            case .failure(let error):
+                print(error)
+            }
+        }
+        return [downloads, results.matchResults.count]
+    }
+    
+    func getMemberSince(fromid userid: String) async throws {
+        let predicate = NSPredicate(format: "userid == %@", userid)
+        let query = CKQuery(recordType: "Accounts", predicate: predicate)
+        let results = try await CKContainer.default().publicCloudDatabase.records(matching: query, desiredKeys: ["userid"])
+        var date: Date?
+        results.matchResults.forEach { (_,result) in
+            switch result {
+            case .success(let record):
+                if let dateFetched = record.creationDate {
+                    date = dateFetched
+                }
+            case .failure(let error):
+                print(error)
+            }
+        }
+        UserDefaults.standard.set(date, forKey: "accountdate")
+    }
+    
+    func makeExplorer(id: CKRecord.ID) async throws {
+        let record = try await CKContainer.default().publicCloudDatabase.record(for: id)
+        record["isExplorer"] = true
+        try await CKContainer.default().publicCloudDatabase.save(record)
+    }
+    
+    func updateAccount(id: CKRecord.ID, newName: String, newBio: String?, newPronouns: String?, newEmail: String?, newTiktok: String?, image: Data?, newInsta: String?, newYoutube: String?) async throws {
+        let record = try await CKContainer.default().publicCloudDatabase.configuredWith(configuration: highPriorityConfig) { db in
+            try await db.record(for: id)
+        }
+        record["name"] = newName
+        if let newBio = newBio {
+            record["bio"] = newBio
+        }
+        if let newEmail = newEmail {
+            record["email"] = newEmail
+        }
+        if let newPronouns = newPronouns {
+            record["pronoun"] = newPronouns
+        }
+        if let newTiktok = newTiktok {
+            record["tiktok"] = newTiktok
+        }
+        if let newInsta = newInsta {
+            record["instagram"] = newInsta
+        }
+        if let newYoutube = newYoutube {
+            record["youtube"] = newYoutube
+        }
+        if let image = image {
+            let path = NSTemporaryDirectory() + "imageTemp\(UUID().uuidString).png"
+            let url = URL(fileURLWithPath: path)
+            try image.write(to: url)
+            let asset = CKAsset(fileURL: url)
+            record["image"] = asset
+        }
+        try await CKContainer.default().publicCloudDatabase.configuredWith(configuration: highPriorityConfig) { db in
+            try await db.save(record)
+        }
+    }
+    
+    func fetchAccountSpots(userid: String) async throws -> [SpotFromCloud] {
+        let predicate = NSPredicate(format: "userID == %@", userid)
+        let query = CKQuery(recordType: "Spots", predicate: predicate)
+        let creation = NSSortDescriptor(key: "creationDate", ascending: false)
+        var spots: [SpotFromCloud] = []
+        query.sortDescriptors = [creation]
+        let results = try await CKContainer.default().publicCloudDatabase.configuredWith(configuration: highPriorityConfig) { db in
+            try await db.records(matching: query, desiredKeys: desiredKeys, resultsLimit: limit)
+        }
+        results.matchResults.forEach { (_,result) in
+            switch result {
+            case .success(let record):
+                guard let name = record["name"] as? String else { return }
+                guard let founder = record["founder"] as? String else { return }
+                guard let date = record["date"] as? String else { return }
+                var dateObject: Date?
+                if let dateObj = record["dateObject"] as? Date {
+                    dateObject = dateObj
+                } else {
+                    dateObject = nil
+                }
+                guard let location = record["location"] as? CLLocation else { return }
+                guard let likes = record["likes"] as? Int else { return }
+                guard let id = record["id"] as? String else { return }
+                guard let user = record["userID"] as? String else { return }
+                var customLocation = 0
+                if let customLocationChecked = record["customLocation"] as? Int {
+                    customLocation = customLocationChecked
+                }
+                var isMultipleImages = 0
+                if let m = record["isMultipleImages"] as? Int {
+                    isMultipleImages = m
+                }
+                var inappropriate = 0
+                var offensive = 0
+                var spam = 0
+                var dangerous = 0
+                if let inna = record["inappropriate"] as? Int {
+                    inappropriate = inna
+                }
+                if let offen = record["offensive"] as? Int {
+                    offensive = offen
+                }
+                if let sp = record["spam"] as? Int {
+                    spam = sp
+                }
+                if let dan = record["dangerous"] as? Int {
+                    dangerous = dan
+                }
+                var types = ""
+                var description = ""
+                var locationName = ""
+                if let typeCheck = record["type"] as? String {
+                    types = typeCheck
+                }
+                if let descriptionCheck = record["description"] as? String {
+                    description = descriptionCheck
+                }
+                if let locationNameCheck = record["locationName"] as? String {
+                    locationName = locationNameCheck
+                }
+                spots.append(SpotFromCloud(id: id, name: name, founder: founder, description: description, date: date, location: location, type: types, imageURL: nil,  image2URL: nil , image3URL: nil, isMultipleImages: isMultipleImages , likes: likes, offensive: offensive, spam: spam, inappropriate: inappropriate, dangerous: dangerous, customLocation: customLocation, locationName: locationName, userID: user, dateObject: dateObject, record: record))
+                
+            case .failure(let error):
+                print("\(error)")
+                return
+            }
+        }
+        DispatchQueue.main.async {
+            self.cursorAccount = results.queryCursor
+        }
+        return spots
+    }
+    
+    func fetchMoreAccountSpots(cursor: CKQueryOperation.Cursor) async throws -> [SpotFromCloud] {
+        DispatchQueue.main.async {
+            self.cursorAccount = nil
+        }
+        let results = try await CKContainer.default().publicCloudDatabase.configuredWith(configuration: highPriorityConfig) { db in
+            try await db.records(continuingMatchFrom: cursor, desiredKeys: desiredKeys, resultsLimit: limit)
+        }
+        var spots: [SpotFromCloud] = []
+        results.matchResults.forEach { (_,result) in
+            switch result {
+            case .success(let record):
+                guard let name = record["name"] as? String else { return }
+                guard let founder = record["founder"] as? String else { return }
+                guard let date = record["date"] as? String else { return }
+                var dateObject: Date?
+                if let dateObj = record["dateObject"] as? Date {
+                    dateObject = dateObj
+                } else {
+                    dateObject = nil
+                }
+                guard let location = record["location"] as? CLLocation else { return }
+                guard let likes = record["likes"] as? Int else { return }
+                guard let id = record["id"] as? String else { return }
+                guard let user = record["userID"] as? String else { return }
+                var customLocation = 0
+                if let customLocationChecked = record["customLocation"] as? Int {
+                    customLocation = customLocationChecked
+                }
+                var isMultipleImages = 0
+                if let m = record["isMultipleImages"] as? Int {
+                    isMultipleImages = m
+                }
+                var inappropriate = 0
+                var offensive = 0
+                var spam = 0
+                var dangerous = 0
+                if let inna = record["inappropriate"] as? Int {
+                    inappropriate = inna
+                }
+                if let offen = record["offensive"] as? Int {
+                    offensive = offen
+                }
+                if let sp = record["spam"] as? Int {
+                    spam = sp
+                }
+                if let dan = record["dangerous"] as? Int {
+                    dangerous = dan
+                }
+                var types = ""
+                var description = ""
+                var locationName = ""
+                if let typeCheck = record["type"] as? String {
+                    types = typeCheck
+                }
+                if let descriptionCheck = record["description"] as? String {
+                    description = descriptionCheck
+                }
+                if let locationNameCheck = record["locationName"] as? String {
+                    locationName = locationNameCheck
+                }
+                spots.append(SpotFromCloud(id: id, name: name, founder: founder, description: description, date: date, location: location, type: types, imageURL: nil,  image2URL: nil , image3URL: nil, isMultipleImages: isMultipleImages , likes: likes, offensive: offensive, spam: spam, inappropriate: inappropriate, dangerous: dangerous, customLocation: customLocation, locationName: locationName, userID: user, dateObject: dateObject, record: record))
+                
+            case .failure(let error):
+                print(error)
+            }
+        }
+        DispatchQueue.main.async {
+            self.cursorAccount = results.queryCursor
+        }
+        return spots
+    }
+    
+    func fetchAccount(userid: String, withImage: Bool? = false) async throws -> AccountModel? {
+        let predicate = NSPredicate(format: "userid == %@", userid)
+        let query = CKQuery(recordType: "Accounts", predicate: predicate)
+        var keys = userKeys
+        if withImage ?? false {
+            keys.append("image")
+        }
+        let results = try await CKContainer.default().publicCloudDatabase.configuredWith(configuration: highPriorityConfig) { db in
+            try await db.records(matching: query, desiredKeys: keys, resultsLimit: 1)
+        }
+        var user: AccountModel?
+        results.matchResults.forEach { (_,result) in
+            switch result {
+            case .success(let record):
+                var image: UIImage?
+                if let imageAsset = record["image"] as? CKAsset {
+                    guard let imageURL = imageAsset.fileURL else { return }
+                    guard let imageData = NSData(contentsOf: imageURL) as? Data else { return }
+                    guard let imageFromCloud = UIImage(data: imageData) else { return }
+                    image = imageFromCloud
+                }
+                guard let id = record["userid"] as? String else { return }
+                guard let name = record["name"] as? String else { return }
+                guard let isExplorerBinary = record["isExplorer"] as? Int else { return }
+                let pronouns = record["pronoun"] as? String
+                let bio = record["bio"] as? String
+                let tiktok = record["tiktok"] as? String
+                let youtube = record["youtube"] as? String
+                let insta = record["instagram"] as? String
+                let email = record["email"] as? String
+                user = AccountModel(id: id, name: name, image: image, pronouns: pronouns, isExplorer: (isExplorerBinary == 0 ? false : true), bio: bio, record: record, tiktok: tiktok, insta: insta, youtube: youtube, email: email)
+            case .failure(let error):
+                print(error)
+            }
+        }
+        return user
+    }
+    
+    func fetchAccounts(searchText: String) async -> [AccountModel] {
+        var users: [AccountModel] = []
+        let predicate = NSPredicate(format: "userid != %@", self.userID)
+        var query = CKQuery(recordType: "Accounts", predicate: predicate)
+        if !searchText.isEmpty {
+            let predicate2 = NSPredicate(format: "self contains %@", searchText)
+            let compoundPredicate = NSCompoundPredicate(andPredicateWithSubpredicates: [predicate, predicate2])
+            query = CKQuery(recordType: "Accounts", predicate: compoundPredicate)
+        }
+        query.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: false)]
+        DispatchQueue.main.async {
+            self.cursorUsers = nil
+        }
+        do {
+            let results = try await CKContainer.default().publicCloudDatabase.configuredWith(configuration: highPriorityConfig) { db in
+                try await db.records(matching: query, desiredKeys: userKeys, resultsLimit: limit)
+            }
+            results.matchResults.forEach { (_,result) in
+                switch result {
+                case .success(let record):
+                    guard let id = record["userid"] as? String else { return }
+                    guard let name = record["name"] as? String else { return }
+                    guard let isExplorerBinary = record["isExplorer"] as? Int else { return }
+                    let pronouns = record["pronoun"] as? String
+                    let bio = record["bio"] as? String
+                    let tiktok = record["tiktok"] as? String
+                    let youtube = record["youtube"] as? String
+                    let insta = record["instagram"] as? String
+                    let email = record["email"] as? String
+                    users.append(AccountModel(id: id, name: name, image: nil, pronouns: pronouns, isExplorer: (isExplorerBinary == 0 ? false : true), bio: bio, record: record, tiktok: tiktok, insta: insta, youtube: youtube, email: email))
+                case .failure(let error):
+                    print(error)
+                }
+            }
+            DispatchQueue.main.async {
+                self.cursorUsers = results.queryCursor
+            }
+        } catch {
+            return users
+        }
+        return users
+    }
+    
+    func fetchMoreAccounts(cursor: CKQueryOperation.Cursor) async -> [AccountModel] {
+        var users: [AccountModel] = []
+        do {
+            let results = try await CKContainer.default().publicCloudDatabase.configuredWith(configuration: highPriorityConfig) { db in
+                try await db.records(continuingMatchFrom: cursor, desiredKeys: userKeys, resultsLimit: limit)
+            }
+            results.matchResults.forEach { (_,result) in
+                switch result {
+                case .success(let record):
+                    guard let id = record["userid"] as? String else { return }
+                    guard let name = record["name"] as? String else { return }
+                    guard let isExplorerBinary = record["isExplorer"] as? Int else { return }
+                    let pronouns = record["pronoun"] as? String
+                    let bio = record["bio"] as? String
+                    let tiktok = record["tiktok"] as? String
+                    let youtube = record["youtube"] as? String
+                    let insta = record["instagram"] as? String
+                    let email = record["email"] as? String
+                    users.append(AccountModel(id: id, name: name, image: nil, pronouns: pronouns, isExplorer: (isExplorerBinary == 0 ? false : true), bio: bio, record: record, tiktok: tiktok, insta: insta, youtube: youtube, email: email))
+                case .failure(let error):
+                    print(error)
+                }
+            }
+            DispatchQueue.main.async {
+                self.cursorUsers = results.queryCursor
+            }
+        } catch {
+            return users
+        }
+        return users
+    }
+    
+    func fetchAccountImage(userid: String) async -> UIImage? {
+        var image: UIImage?
+        let predicate = NSPredicate(format: "userid == %@", userid)
+        let query = CKQuery(recordType: "Accounts", predicate: predicate)
+        do {
+            let results = try await CKContainer.default().publicCloudDatabase.configuredWith(configuration: highPriorityConfig) { db in
+                try await db.records(matching: query, desiredKeys: ["image"], resultsLimit: 1)
+            }
+            results.matchResults.forEach { (_,result) in
+                switch result {
+                case .success(let record):
+                    guard let imageAsset = record["image"] as? CKAsset else { return }
+                    guard let imageURL = imageAsset.fileURL else { return }
+                    guard let imageData = NSData(contentsOf: imageURL) as? Data else { return }
+                    guard let imageFromCloud = UIImage(data: imageData) else { return }
+                    image = imageFromCloud
+                case .failure(let error):
+                    print(error)
+                }
+            }
+        } catch {
+            return image
+        }
+        return image
     }
 }

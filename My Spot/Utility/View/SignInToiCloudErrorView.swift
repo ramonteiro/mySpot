@@ -61,9 +61,7 @@ struct SignInToiCloudErrorView: View {
                 Button {
                     guard let settingsUrl = URL(string: UIApplication.openSettingsURLString) else { return }
                     if UIApplication.shared.canOpenURL(settingsUrl) {
-                        UIApplication.shared.open(settingsUrl, completionHandler: { (success) in
-                            print("Settings opened: \(success)")
-                        })
+                        UIApplication.shared.open(settingsUrl, completionHandler: nil)
                     }
                 } label: {
                     Text("Your iCloud account is restricted by parental controls or remote management".localized()).font(.subheadline).foregroundColor(.gray)
@@ -89,9 +87,7 @@ struct SignInToiCloudErrorView: View {
                 Button {
                     guard let settingsUrl = URL(string: UIApplication.openSettingsURLString) else { return }
                     if UIApplication.shared.canOpenURL(settingsUrl) {
-                        UIApplication.shared.open(settingsUrl, completionHandler: { (success) in
-                            print("Settings opened: \(success)")
-                        })
+                        UIApplication.shared.open(settingsUrl, completionHandler: nil)
                     }
                 } label: {
                     Text("Please check internet and try again".localized()).font(.subheadline).foregroundColor(.gray)
@@ -117,9 +113,7 @@ struct SignInToiCloudErrorView: View {
                 Button {
                     guard let settingsUrl = URL(string: UIApplication.openSettingsURLString) else { return }
                     if UIApplication.shared.canOpenURL(settingsUrl) {
-                        UIApplication.shared.open(settingsUrl, completionHandler: { (success) in
-                            print("Settings opened: \(success)")
-                        })
+                        UIApplication.shared.open(settingsUrl, completionHandler: nil)
                     }
                 } label: {
                     Text("Please Sign In Or Create An Account In Settings and enable iCloud for My Spot".localized()).font(.subheadline).foregroundColor(.gray)
@@ -166,9 +160,7 @@ struct SignInToiCloudErrorView: View {
                 Button {
                     guard let settingsUrl = URL(string: UIApplication.openSettingsURLString) else { return }
                     if UIApplication.shared.canOpenURL(settingsUrl) {
-                        UIApplication.shared.open(settingsUrl, completionHandler: { (success) in
-                            print("Settings opened: \(success)")
-                        })
+                        UIApplication.shared.open(settingsUrl, completionHandler: nil)
                     }
                 } label: {
                     Text("Please make sure you are signed in to iCloud".localized()).font(.subheadline).foregroundColor(.gray)

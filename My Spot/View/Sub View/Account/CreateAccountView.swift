@@ -1,12 +1,6 @@
-//
-//  CreateAccountView.swift
-//  My Spot
-//
-//  Created by Isaac Paschall on 6/3/22.
-//
-
 import SwiftUI
 import Combine
+import AlertToast
 
 struct CreateAccountView: View {
     
@@ -19,6 +13,7 @@ struct CreateAccountView: View {
     @State private var imageWasChanged = false
     
     let accountModel: AccountModel?
+    @Binding var didSave: Bool
     @State private var name: String = ""
     @State private var bio: String = ""
     @State private var youtube: String = ""
@@ -62,53 +57,52 @@ struct CreateAccountView: View {
     
     var body: some View {
         NavigationView {
-            ZStack {
-                textForm
-                if isSaving {
-                    savingView
+            textForm
+                .allowsHitTesting(!isSaving)
+                .navigationTitle("Create Account".localized())
+                .navigationViewStyle(.stack)
+                .onAppear {
+                    checkForExistingAccountModel()
                 }
-            }
-            .navigationTitle("Create Account".localized())
-            .navigationViewStyle(.stack)
-            .onAppear {
-                checkForExistingAccountModel()
-            }
-            .toolbar {
-                ToolbarItemGroup(placement: .keyboard) {
-                    keyboardView
+                .toolbar {
+                    ToolbarItemGroup(placement: .keyboard) {
+                        keyboardView
+                    }
+                    ToolbarItem(placement: .navigationBarTrailing) {
+                        saveButton
+                    }
+                    ToolbarItemGroup(placement: .navigationBarLeading) {
+                        cancelButton
+                    }
                 }
-                ToolbarItem(placement: .navigationBarTrailing) {
-                   saveButton
+                .onSubmit {
+                    moveDown()
                 }
-                ToolbarItemGroup(placement: .navigationBarLeading) {
-                    cancelButton
+                .alert("Unable To Create Account".localized(), isPresented: $presentSaveAlert) {
+                    Button("OK".localized(), role: .cancel) { presentationMode.wrappedValue.dismiss() }
+                } message: {
+                    Text("Failed to create account, you will be asked to create your account later.".localized())
                 }
-            }
-            .onSubmit {
-                moveDown()
-            }
-            .alert("Unable To Create Account".localized(), isPresented: $presentSaveAlert) {
-                Button("OK".localized(), role: .cancel) { presentationMode.wrappedValue.dismiss() }
-            } message: {
-                Text("Failed to create account, you will be asked to create your account later.".localized())
-            }
-            .alert("Failed To Update Account".localized(), isPresented: $presentUpdateAlert) {
-                Button("OK".localized(), role: .cancel) { presentationMode.wrappedValue.dismiss() }
-            } message: {
-                Text("Please check internet and try again".localized() + ".")
-            }
-            .confirmationDialog("Choose Image From Photos or Camera".localized(), isPresented: $presentAddImageAlert) {
-                Button("Camera".localized()) {
-                    activeSheet = .cameraSheet
+                .alert("Failed To Update Account".localized(), isPresented: $presentUpdateAlert) {
+                    Button("OK".localized(), role: .cancel) { presentationMode.wrappedValue.dismiss() }
+                } message: {
+                    Text("Please check internet and try again".localized() + ".")
                 }
-                Button("Photos".localized()) {
-                    activeSheet = .cameraRollSheet
+                .confirmationDialog("Choose Image From Photos or Camera".localized(), isPresented: $presentAddImageAlert) {
+                    Button("Camera".localized()) {
+                        activeSheet = .cameraSheet
+                    }
+                    Button("Photos".localized()) {
+                        activeSheet = .cameraRollSheet
+                    }
+                    Button("Cancel".localized(), role: .cancel) { }
                 }
-                Button("Cancel".localized(), role: .cancel) { }
-            }
-            .fullScreenCover(item: $activeSheet) { item in
-                open(item: item)
-            }
+                .fullScreenCover(item: $activeSheet) { item in
+                    open(item: item)
+                }
+                .toast(isPresenting: $isSaving) {
+                    AlertToast(displayMode: .alert, type: .loading, title: "Saving".localized())
+                }
         }
     }
     
@@ -168,16 +162,6 @@ struct CreateAccountView: View {
         case .cropperSheet:
             MantisPhotoCropper(selectedImage: $image)
                 .ignoresSafeArea()
-        }
-    }
-    
-    private var savingView: some View {
-        ZStack {
-            Color.black
-                .ignoresSafeArea()
-                .opacity(0.5)
-            ProgressView("Saving".localized())
-                .progressViewStyle(.circular)
         }
     }
     
@@ -247,6 +231,12 @@ struct CreateAccountView: View {
         Form {
             Section {
                 addImageButton
+            } footer: {
+                HStack {
+                    Spacer()
+                    Text("Only image and name required".localized())
+                    Spacer()
+                }
             }
             Section {
                 displayNamePrompt
@@ -504,12 +494,13 @@ struct CreateAccountView: View {
     private func save() async {
         UserDefaults.standard.set(name, forKey: "founder")
         guard let image = image else { return }
-        guard let imageData = cloudViewModel.compressImage(image: image).pngData() else { return }
+        guard let imageData = ImageCompression().compress(image: image) else { return }
         isSaving = true
         do {
             try await cloudViewModel.addNewAccount(userid: cloudViewModel.userID, name: name, pronoun: pronoun, image: imageData, bio: bio, email: email, youtube: youtube, tiktok: tiktok, insta: insta)
             try? await cloudViewModel.getMemberSince(fromid: cloudViewModel.userID)
             isSaving = false
+            didSave = true
             presentationMode.wrappedValue.dismiss()
         } catch {
             isSaving = false
@@ -522,12 +513,13 @@ struct CreateAccountView: View {
         if let accountModel = accountModel {
             if imageWasChanged {
                 guard let image = image else { return }
-                guard let imageData = cloudViewModel.compressImage(image: image).pngData() else { return }
+                guard let imageData = ImageCompression().compress(image: image) else { return }
                 isSaving = true
                 do {
                     try await cloudViewModel.updateAccount(id: accountModel.record.recordID, newName: name, newBio: bio, newPronouns: pronoun, newEmail: email, newTiktok: tiktok, image: imageData, newInsta: insta, newYoutube: youtube)
                     isSaving = false
                     UserDefaults.standard.set(name, forKey: "founder")
+                    didSave = true
                     presentationMode.wrappedValue.dismiss()
                 } catch {
                     isSaving = false
@@ -539,6 +531,7 @@ struct CreateAccountView: View {
                     try await cloudViewModel.updateAccount(id: accountModel.record.recordID, newName: name, newBio: bio, newPronouns: pronoun, newEmail: email, newTiktok: tiktok, image: nil, newInsta: insta, newYoutube: youtube)
                     isSaving = false
                     UserDefaults.standard.set(name, forKey: "founder")
+                    didSave = true
                     presentationMode.wrappedValue.dismiss()
                 } catch {
                     isSaving = false
@@ -565,7 +558,7 @@ struct CreateAccountView: View {
     
     func playInYoutube(youtubeId: String) {
         if let youtubeURL = URL(string: "youtube://\(youtubeId)"),
-            UIApplication.shared.canOpenURL(youtubeURL) {
+           UIApplication.shared.canOpenURL(youtubeURL) {
             // redirect to app
             UIApplication.shared.open(youtubeURL, options: [:], completionHandler: nil)
         } else if let youtubeURL = URL(string: "https://www.youtube.com/watch?v=\(youtubeId)") {

@@ -17,7 +17,7 @@ struct SpotFromCloud: Hashable, Identifiable {
     let date: String
     let location: CLLocation
     let type: String
-    let imageURL: URL
+    var imageURL: UIImage?
     var image2URL: UIImage?
     var image3URL: UIImage?
     let isMultipleImages: Int
@@ -34,6 +34,15 @@ struct SpotFromCloud: Hashable, Identifiable {
 }
 
 extension SpotFromCloud: SpotPreviewType {
+    
+    var imagePreview: UIImage? {
+        get {
+            imageURL
+        }
+        set {
+            imageURL = newValue
+        }
+    }
     
     var parentIDPreview: String {
         id
@@ -97,11 +106,6 @@ extension SpotFromCloud: SpotPreviewType {
     
     var dateObjectPreview: Date? {
         dateObject
-    }
-    
-    var imagePreview: UIImage? {
-        let data = try? Data(contentsOf: imageURL)
-        return UIImage(data: data ?? Data())
     }
     
     var locationNamePreview: String {

@@ -15,12 +15,13 @@ struct MapSpotPreview<T: SpotPreviewType>: View {
     @State private var padding: CGFloat = 20
     @State private var scope:String = "Private".localized()
     @State private var distance: String = ""
+    @EnvironmentObject var cloudViewModel: CloudKitViewModel
     @EnvironmentObject var mapViewModel: MapViewModel
     
     var body: some View {
         content
             .frame(width: UIScreen.screenWidth - 20, height: UIScreen.screenHeight * 0.25)
-            .background(image)
+            .background { image }
             .clipShape(RoundedRectangle(cornerRadius: 20))
             .onAppear {
                 initializeValues()
@@ -37,6 +38,7 @@ struct MapSpotPreview<T: SpotPreviewType>: View {
             Text(spot.locationNamePreview)
                 .font(.subheadline)
                 .foregroundColor(.white)
+                .lineLimit(1)
         }
     }
     
@@ -46,6 +48,7 @@ struct MapSpotPreview<T: SpotPreviewType>: View {
                 .font(.subheadline)
                 .foregroundColor(.white)
             Text("\(spot.downloadsPreview)")
+                .lineLimit(1)
                 .font(.subheadline)
                 .foregroundColor(.white)
         }
@@ -74,6 +77,7 @@ struct MapSpotPreview<T: SpotPreviewType>: View {
             Text(scope)
                 .font(.subheadline)
                 .foregroundColor(.white)
+                .lineLimit(1)
         }
     }
     
@@ -83,6 +87,7 @@ struct MapSpotPreview<T: SpotPreviewType>: View {
                 .foregroundColor(.white)
                 .font(.largeTitle)
                 .fontWeight(.bold)
+                .lineLimit(2)
             Spacer()
         }
     }
@@ -91,6 +96,7 @@ struct MapSpotPreview<T: SpotPreviewType>: View {
         Text(spot.dateObjectPreview?.toString() ?? ("By: \(spot.founderPreview)"))
             .font(.subheadline)
             .foregroundColor(.white)
+            .lineLimit(1)
     }
     
     private var distanceAwayView: some View {
@@ -100,6 +106,7 @@ struct MapSpotPreview<T: SpotPreviewType>: View {
             .onAppear {
                 distance = mapViewModel.calculateDistance(from: spot.locationPreview)
             }
+            .lineLimit(1)
     }
     
     private var bottomRow: some View {
@@ -117,10 +124,10 @@ struct MapSpotPreview<T: SpotPreviewType>: View {
                 ForEach(tags, id: \.self) { tag in
                     Text(tag)
                         .font(.system(size: 12, weight: .regular))
-                        .lineLimit(2)
+                        .lineLimit(1)
                         .foregroundColor(.white)
                         .padding(5)
-                        .background(.tint)
+                        .background(.tint, ignoresSafeAreaEdges: [])
                         .cornerRadius(5)
                 }
             }
@@ -146,15 +153,26 @@ struct MapSpotPreview<T: SpotPreviewType>: View {
     
     private var image: some View {
         Color.black.opacity(0.4)
-            .background(imageRender.allowsHitTesting(false))
+            .background { imageRender.allowsHitTesting(false) }
     }
     
     @ViewBuilder
     private var imageRender: some View {
         if let image = spot.imagePreview {
             Image(uiImage: image)
+                .resizable()
+                .scaledToFill()
+                .onAppear {
+                    cloudViewModel.checkForCompression(images: ["image", "image2", "image3"],
+                                                             id: spot.dataBaseIdPreview)
+                }
         } else {
-            Image(systemName: "exclamationmark.triangle")
+            Color.gray
+                .if(spot.isFromDiscover) { view in
+                    view.task {
+                        spot.imagePreview = await cloudViewModel.fetchMainImage(id: spot.dataBaseIdPreview)
+                    }
+                }
         }
     }
     

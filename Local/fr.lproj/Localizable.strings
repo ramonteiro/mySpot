@@ -253,3 +253,11 @@
 "Latitude(X)" = "Latitude (x)";
 "Enter Coordinates" = "Entrez les coordonnées";
 "Enter Account ID" = "Entrez l'ID de compte";
+"Added Spots" = "Les taches ajoutées";
+"Users" = "Utilisateurs";
+"Saved!" = "Enregistré!";
+"Spot Deleted" = "Spot supprimé";
+"Failed to Accept" = "Échec de l'acceptation";
+"Reported" = "Signalé";
+"Welcome!" = "Accueillir!";
+"Only image and name required" = "Seule l'image et le nom requis";

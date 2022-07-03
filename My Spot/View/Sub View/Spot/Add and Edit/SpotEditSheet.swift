@@ -8,7 +8,7 @@
 import SwiftUI
 import Combine
 import CloudKit
-import Vision
+import AlertToast
 
 struct SpotEditSheet: View {
     
@@ -39,6 +39,7 @@ struct SpotEditSheet: View {
     @State private var presentCannotDeleteAlert = false
     @State private var presentCannotSavePrivateAlert = false
     @Binding var showingCannotSavePublicAlert: Bool
+    @Binding var didSave: Bool
     
     
     private enum Field {
@@ -67,32 +68,17 @@ struct SpotEditSheet: View {
     }
     
     var body: some View {
-        ZStack {
-            editSpotView
-            if isSaving {
-                savingSpinnerView
+        editSpotView
+            .onAppear {
+                initializeImages()
             }
-        }
-        .onAppear {
-            initializeImages()
-        }
-        .allowsHitTesting(!isSaving)
+            .allowsHitTesting(!isSaving)
+            .toast(isPresenting: $isSaving) {
+                AlertToast(displayMode: .alert, type: .loading, title: "Saving".localized())
+            }
     }
     
     // MARK: - Sub Views
-    
-    private var savingSpinnerView: some View {
-        ZStack {
-            Color.black.opacity(0.5)
-                .ignoresSafeArea()
-            ProgressView("Saving".localized())
-                .padding()
-                .background(
-                    RoundedRectangle(cornerRadius: 10)
-                        .fill(Color(UIColor.systemBackground))
-                )
-        }
-    }
     
     private var editSpotView: some View {
         NavigationView {
@@ -163,17 +149,20 @@ struct SpotEditSheet: View {
     }
     
     private var customNavigationBarTitle: some View {
-        VStack {
-            HStack {
-                Image(systemName: (!spot.wasThere ? "mappin" : "figure.wave"))
-                Text(spot.locationName ?? "My Spot")
+        HStack {
+            Spacer()
+            VStack {
+                HStack {
+                    Image(systemName: (!spot.wasThere ? "mappin" : "figure.wave"))
+                    Text(spot.locationName ?? "My Spot")
+                }
+                .font(.subheadline)
+                Text(spot.dateObject?.toString() ?? spot.date?.components(separatedBy: ";")[0] ?? "")
+                    .font(.caption)
+                    .foregroundColor(.gray)
             }
-            .font(.subheadline)
-            Text(spot.dateObject?.toString() ?? spot.date?.components(separatedBy: ";")[0] ?? "")
-                .font(.caption)
-                .foregroundColor(.gray)
+            Spacer()
         }
-        .frame(width: UIScreen.screenWidth * 0.7)
     }
     
     private var takePhotoView: some View {
@@ -458,19 +447,19 @@ struct SpotEditSheet: View {
     
     private func saveChanges() async {
         if (imageChanged) {
-            if let imageData = cloudViewModel.compressImage(image: images[0]).pngData() {
+            if let imageData = ImageCompression().compress(image: images[0]) {
                 spot.image = UIImage(data: imageData)
             }
             if images.count == 2 {
-                if let imageData = cloudViewModel.compressImage(image: images[1]).pngData() {
+                if let imageData = ImageCompression().compress(image: images[1]) {
                     spot.image2 = UIImage(data: imageData)
                 }
                 spot.image3 = nil
             } else if images.count == 3 {
-                if let imageData = cloudViewModel.compressImage(image: images[1]).pngData() {
+                if let imageData = ImageCompression().compress(image: images[1]) {
                     spot.image2 = UIImage(data: imageData)
                 }
-                if let imageData = cloudViewModel.compressImage(image: images[2]).pngData() {
+                if let imageData = ImageCompression().compress(image: images[2]) {
                     spot.image3 = UIImage(data: imageData)
                 }
             }
@@ -489,6 +478,7 @@ struct SpotEditSheet: View {
         spot.tags = tags
         do {
             try CoreDataStack.shared.context.save()
+            didSave = true
             await updateAppGroup(hashcode: hashcode, image: spot.image, x: spot.x, y: spot.y, name: spot.name ?? "", locatioName: spot.name ?? "")
         } catch {
             presentCannotSavePrivateAlert = true
@@ -499,21 +489,21 @@ struct SpotEditSheet: View {
     }
     
     private func savePublic() async {
-        if let imageData = cloudViewModel.compressImage(image: images[0]).pngData() {
+        if let imageData = ImageCompression().compress(image: images[0]) {
             spot.image = UIImage(data: imageData)
             var imageData2: Data? = nil
             var imageData3: Data? = nil
             if (images.count == 3) {
-                if let imageData2Check = cloudViewModel.compressImage(image: images[1]).pngData() {
+                if let imageData2Check = ImageCompression().compress(image: images[1]) {
                     spot.image2 = UIImage(data: imageData2Check)
                     imageData2 = imageData2Check
                 }
-                if let imageData3Check = cloudViewModel.compressImage(image: images[2]).pngData() {
+                if let imageData3Check = ImageCompression().compress(image: images[2]) {
                     spot.image3 = UIImage(data: imageData3Check)
                     imageData3 = imageData3Check
                 }
             } else if (images.count == 2) {
-                if let imageData2Check = cloudViewModel.compressImage(image: images[1]).pngData() {
+                if let imageData2Check = ImageCompression().compress(image: images[1]) {
                     spot.image2 = UIImage(data: imageData2Check)
                     imageData2 = imageData2Check
                 }
@@ -527,6 +517,7 @@ struct SpotEditSheet: View {
                     spot.dbid = ""
                     spot.isPublic = false
                 }
+                didSave = true
             } catch {
                 spot.dbid = ""
                 spot.isPublic = false
@@ -570,19 +561,19 @@ struct SpotEditSheet: View {
             try await cloudViewModel.deleteSpot(id: spot.dbid ?? "")
             spot.isPublic = false
             if (imageChanged) {
-                if let imageData = cloudViewModel.compressImage(image: images[0]).pngData() {
+                if let imageData = ImageCompression().compress(image: images[0]) {
                     spot.image = UIImage(data: imageData)
                 }
                 if images.count == 2 {
-                    if let imageData = cloudViewModel.compressImage(image: images[1]).pngData() {
+                    if let imageData = ImageCompression().compress(image: images[1]) {
                         spot.image2 = UIImage(data: imageData)
                     }
                     spot.image3 = nil
                 } else if images.count == 3 {
-                    if let imageData = cloudViewModel.compressImage(image: images[1]).pngData() {
+                    if let imageData = ImageCompression().compress(image: images[1]) {
                         spot.image2 = UIImage(data: imageData)
                     }
-                    if let imageData = cloudViewModel.compressImage(image: images[2]).pngData() {
+                    if let imageData = ImageCompression().compress(image: images[2]) {
                         spot.image3 = UIImage(data: imageData)
                     }
                 }
@@ -600,6 +591,7 @@ struct SpotEditSheet: View {
             spot.tags = tags
             do {
                 try CoreDataStack.shared.context.save()
+                didSave = true
                 await updateAppGroup(hashcode: hashcode, image: spot.image, x: spot.x, y: spot.y, name: spot.name ?? "", locatioName: spot.name ?? "")
             } catch {
                 presentCannotSavePrivateAlert = true
@@ -621,20 +613,20 @@ struct SpotEditSheet: View {
         var imageData: Data? = nil
         var imageData2: Data? = nil
         var imageData3: Data? = nil
-        if let imageDataCheck = cloudViewModel.compressImage(image: images[0]).pngData() {
+        if let imageDataCheck = ImageCompression().compress(image: images[0]) {
             spot.image = UIImage(data: imageDataCheck)
             imageData = imageDataCheck
             if (images.count == 3) {
-                if let imageData2Check = cloudViewModel.compressImage(image: images[1]).pngData() {
+                if let imageData2Check = ImageCompression().compress(image: images[1]) {
                     spot.image2 = UIImage(data: imageData2Check)
                     imageData2 = imageData2Check
                 }
-                if let imageData3Check = cloudViewModel.compressImage(image: images[2]).pngData() {
+                if let imageData3Check = ImageCompression().compress(image: images[2]) {
                     spot.image3 = UIImage(data: imageData3Check)
                     imageData3 = imageData3Check
                 }
             } else if (images.count == 2) {
-                if let imageData2Check = cloudViewModel.compressImage(image: images[1]).pngData() {
+                if let imageData2Check = ImageCompression().compress(image: images[1]) {
                     spot.image2 = UIImage(data: imageData2Check)
                     imageData2 = imageData2Check
                 }
@@ -644,6 +636,7 @@ struct SpotEditSheet: View {
                 let isSuccess = try await cloudViewModel.updateSpotPublic(id: id, newName: name, newDescription: descript, newFounder: UserDefaults.standard.string(forKey: "founder") ?? spot.founder ?? "?", newType: tags, imageChanged: imageChanged, image: imageData, image2: imageData2, image3: imageData3, isMultipleImages: images.count - 1)
                 if isSuccess {
                     spot.isPublic = true
+                    didSave = true
                 } else {
                     presentCannotSaveAlert = true
                     let generator = UINotificationFeedbackGenerator()

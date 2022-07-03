@@ -8,5 +8,6 @@
 import UIKit
 
 enum defaultImages {
-    static let errorImage = UIImage(systemName: "exclamationmark.triangle")
+    static let errorImage = UIImage(systemName: "camera")
+    static let errorAccount = UIImage(systemName: "person.fill")
 }

@@ -45,7 +45,7 @@ struct PlaylistEditSheet: View {
                     keyboardButtons
                 }
             }
-            .navigationViewStyle(.automatic)
+            .navigationViewStyle(.stack)
         }
     }
     

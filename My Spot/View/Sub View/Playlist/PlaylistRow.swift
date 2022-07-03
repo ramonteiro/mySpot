@@ -34,7 +34,6 @@ struct PlaylistRow: View {
     private var emoji: some View {
         Text(playlist.emoji ?? "❓")
             .font(.system(size: 50))
-            .shadow(color: Color.black.opacity(0.3), radius: 5)
     }
     
     private var content: some View {
@@ -57,7 +56,7 @@ struct PlaylistRow: View {
                         .lineLimit(2)
                         .foregroundColor(.white)
                         .padding(5)
-                        .background(.tint)
+                        .background(.tint, ignoresSafeAreaEdges: [])
                         .cornerRadius(5)
                 }
             }

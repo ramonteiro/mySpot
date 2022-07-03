@@ -44,6 +44,7 @@ import MapKit
 import Combine
 import CloudKit
 import UIKit
+import Vision
 ```
 
 
@@ -53,29 +54,25 @@ In order to run this project with cloukit:
 - you must change signing and capabilities to your own apple developer accont with an icloud container
 - that container must be in entitlements as well
 - the discover tab will load indefinitely until a spot is uploaded as public
-- the container must also alow for sorting by creation date and distance in indexes
-- a small package named, mantis is used to crop photos to 1:1. This package should automatically be downloaded by xcode's package manager
+- the container must also allow for sorting by creation date and distance in indexes
 
 
 ## TODOS
 Features:
-- Re-design detail view
-- add section to find users in discover
+- create a placeholder image asset for account images and spot images, at the moment it is a blank view until image is loaded
 - app clip (ios 16 only, this is due to cloudkit only available in app clips in ios 16)
-- support new ios 16: better ipad screen size handling, share views
-- Mac support
-- Update detail view map to use uikit mapview and add cluters in of map annotations + satellite view
-- Make filters + search a half sheet (ios 16)
+- support new ios 16 features: better ipad screen size handling, native share controller
 
 Clean-up:
 - Create generic cruid funtions for cloudkit…clean up entire cloudkit view model
 - Create view models for each view and inject that view model instead of the model itself 
-- Remove spot data from defaults and change iMessage app to use core data
+- change iMessage app to use core data instead of user default app groups, this way all updateAppGroup() functions can be removed and save space
+- refactor names, create a naming convention and give more thought to names
 
 Bugs:
-- None at the moment :) (at least none found yet)
+- none yet :)
 
 Business:
-- Create github pages website and replace wordpress
-- Monetize app
+- update app store screenshots and video for new ui
+- Create github pages website and replace wordpress for privacy policy
 

@@ -93,10 +93,10 @@ struct NotificationView: View {
     private var loadingSpotsSpinner: some View {
         ProgressView("Loading Spots".localized())
             .padding()
-            .background(
+            .background {
                 RoundedRectangle(cornerRadius: 10)
                     .fill(Color(UIColor.systemBackground))
-            )
+            }
     }
     
     private var errorLoadingSpots: some View {
@@ -106,10 +106,10 @@ struct NotificationView: View {
         }
         .padding(.vertical)
         .padding(.horizontal, 2)
-        .background(
+        .background {
             RoundedRectangle(cornerRadius: 10)
                 .fill(Color(UIColor.systemBackground))
-        )
+        }
         .onAppear {
             checkIfNotificationSpotsHaveLoaded()
         }
@@ -211,7 +211,7 @@ struct NotificationView: View {
                             } label: {
                                 MapSpotPreview(spot: $spots[i])
                             }
-                            .buttonStyle(PlainButtonStyle())
+                            .buttonStyle(ScaleButtonStyle())
                             Spacer()
                         }
                         .id(i)
@@ -251,11 +251,9 @@ struct NotificationView: View {
         Task {
             isFetching = true
             do {
-                for recordid in recordids {
-                    let spot = try await cloudViewModel.fetchNotificationSpots(recordid: recordid)
-                    if let spot = spot {
-                        spots.append(spot)
-                    }
+                let newSpots = try await cloudViewModel.fetchNotificationSpots(recordids: recordids)
+                DispatchQueue.main.async {
+                    spots += newSpots
                 }
                 isFetching = false
                 hasError = false

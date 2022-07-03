@@ -1,11 +1,5 @@
-//
-//  AccountDetailView.swift
-//  My Spot
-//
-//  Created by Isaac Paschall on 6/4/22.
-//
-
 import SwiftUI
+import AlertToast
 
 struct AccountDetailView: View {
     
@@ -40,6 +34,7 @@ struct AccountDetailView: View {
     @State private var presentNotificationSheet = false
     @State private var presentAccountCreation =  false
     @State private var didDelete = false
+    @State private var toastSuccess = false
     @EnvironmentObject var cloudViewModel: CloudKitViewModel
     @EnvironmentObject var tabController: TabController
     @Environment(\.presentationMode) private var presentationMode
@@ -79,7 +74,7 @@ struct AccountDetailView: View {
                     await refreshAccount()
                 }
             } content: {
-                CreateAccountView(accountModel: nil)
+                CreateAccountView(accountModel: nil, didSave: $toastSuccess)
             }
             .fullScreenCover(isPresented: $presentEditSheet) {
                 Task {
@@ -87,7 +82,7 @@ struct AccountDetailView: View {
                 }
             } content: {
                 if let accountModel = accountModel {
-                    CreateAccountView(accountModel: accountModel)
+                    CreateAccountView(accountModel: accountModel, didSave: $toastSuccess)
                 }
             }
             .fullScreenCover(isPresented: $openSettings) {
@@ -151,6 +146,12 @@ struct AccountDetailView: View {
                     await inititalize()
                 }
             }
+            .toast(isPresenting: $toastSuccess) {
+                AlertToast(displayMode: .alert, type: .complete(.green), title: "Saved!".localized())
+            }
+            .toast(isPresenting: $didDelete) {
+                AlertToast(displayMode: .alert, type: .systemImage("exclamationmark.triangle", .yellow), title: "Spot Deleted".localized())
+            }
         }
         .navigationViewStyle(.stack)
     }
@@ -158,14 +159,18 @@ struct AccountDetailView: View {
     // MARK: - Sub Views
     
     private var customNavigationTitle: some View {
-        VStack {
-            Text(name)
-                .font(.headline)
-            if let pronouns = pronouns {
-                Text(pronouns)
-                    .foregroundColor(.gray)
-                    .font(.caption)
+        HStack {
+            Spacer()
+            VStack {
+                Text(name)
+                    .font(.headline)
+                if let pronouns = pronouns {
+                    Text(pronouns)
+                        .foregroundColor(.gray)
+                        .font(.caption)
+                }
             }
+            Spacer()
         }
     }
     
@@ -274,7 +279,7 @@ struct AccountDetailView: View {
             ProgressView()
             Spacer()
         }
-        .background(Color.clear)
+        .background { Color.clear }
     }
     
     private func mySpotsList(accountModel: AccountModel) -> some View {
@@ -287,7 +292,7 @@ struct AccountDetailView: View {
                     } label: {
                         MapSpotPreview(spot: $spots[i])
                     }
-                    .buttonStyle(PlainButtonStyle())
+                    .buttonStyle(ScaleButtonStyle())
                     Spacer()
                 }
                 .id(i)
@@ -336,10 +341,10 @@ struct AccountDetailView: View {
     private var loadingAccountSpinner: some View {
         ProgressView("Loading Account".localized())
             .padding()
-            .background(
+            .background {
                 RoundedRectangle(cornerRadius: 10)
                     .fill(Color(UIColor.systemBackground))
-            )
+            }
     }
     
     private var badgeView: some View {
@@ -348,7 +353,7 @@ struct AccountDetailView: View {
                 Image(systemName: badge)
                     .padding(6)
                     .foregroundColor(badge == "mappin.and.ellipse" ? spotBadgeColor : (badge == "icloud.and.arrow.down" ? downloadBadgeColor : .white))
-                    .background(Color.gray)
+                    .background { Color.gray }
                     .clipShape(Circle())
                     .onTapGesture {
                         tappedBadge = badge
@@ -408,7 +413,7 @@ struct AccountDetailView: View {
                         .resizable()
                         .frame(width: 25, height: 25)
                         .padding(10)
-                        .background(colorScheme == .dark ? Color.gray : Color.white)
+                        .background { colorScheme == .dark ? Color.gray : Color.white }
                         .cornerRadius(10)
                         .overlay(
                             RoundedRectangle(cornerRadius: 10)
@@ -434,7 +439,7 @@ struct AccountDetailView: View {
         }
         if accountModel == nil {
             do {
-                accountModel = try await cloudViewModel.fetchAccount(userid: userid)
+                accountModel = try await cloudViewModel.fetchAccount(userid: userid, withImage: true)
                 if let account = accountModel {
                     name = account.name
                     image = account.image
@@ -466,6 +471,9 @@ struct AccountDetailView: View {
             if let account = accountModel {
                 name = account.name
                 image = account.image
+                if account.image == nil {
+                    image = await cloudViewModel.fetchAccountImage(userid: account.id)
+                }
                 pronouns = account.pronouns
                 tiktok = account.tiktok
                 youtube = account.youtube
@@ -625,7 +633,7 @@ struct AccountDetailView: View {
             userid = cloudViewModel.userID
         }
         do {
-            accountModel = try await cloudViewModel.fetchAccount(userid: userid)
+            accountModel = try await cloudViewModel.fetchAccount(userid: userid, withImage: true)
             if let account = accountModel {
                 name = account.name
                 image = account.image

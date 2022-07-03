@@ -24,6 +24,7 @@ struct AddSpotToPlaylistSheet: View {
     @State private var addedSpots: [NSManagedObject] = []
     @Binding var isSaving: Bool
     @Binding var errorSaving: Bool
+    @Binding var didSave: Bool
     
     var body: some View {
         NavigationView {
@@ -32,7 +33,7 @@ struct AddSpotToPlaylistSheet: View {
                     filterSpots()
                 }
         }
-        .navigationViewStyle(.automatic)
+        .navigationViewStyle(.stack)
         .interactiveDismissDisabled()
     }
     
@@ -54,13 +55,15 @@ struct AddSpotToPlaylistSheet: View {
                     Spacer()
                     ZStack {
                         MapSpotPreview(spot: $spotsFiltered[i])
+                            .scaleEffect(0.9)
                         if addedSpots.contains(spotsFiltered[i]) {
                             HStack {
                                 Spacer()
                                 Image(systemName: "checkmark.square.fill")
                                     .foregroundColor(.green)
+                                    .font(.headline)
                             }
-                            .padding(.trailing, 10)
+                            .padding(.trailing, 20)
                         }
                     }
                     Spacer()
@@ -73,7 +76,7 @@ struct AddSpotToPlaylistSheet: View {
                     }
                 }
                 .listRowInsets(EdgeInsets(top: 10, leading: 0, bottom: 10, trailing: 0))
-                .listRowBackground(Color(uiColor: UIColor.secondarySystemBackground))
+                .listRowBackground(Color(uiColor: UIColor.systemBackground))
             }
         }
         .listStyle(.plain)
@@ -133,6 +136,7 @@ struct AddSpotToPlaylistSheet: View {
                             DispatchQueue.main.async {
                                 CoreDataStack.shared.save()
                             }
+                            didSave = true
                             isSaving = false
                         case .failure(let error):
                             errorSaving = true
@@ -152,6 +156,7 @@ struct AddSpotToPlaylistSheet: View {
                 DispatchQueue.main.async {
                     CoreDataStack.shared.save()
                 }
+                didSave = true
                 isSaving = false
             }
         } else {
